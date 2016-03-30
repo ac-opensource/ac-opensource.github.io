@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Spectral</title>
-    <description>Another fine responsive  
-site template freebie  
-crafted by [HTML5 UP](http://html5up.net)
+    <title>A-Ar Concepcion</title>
+    <description>Just another Android Developer
 </description>
-    <link>http://yourdomain.com/</link>
-    <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 30 Mar 2016 10:46:29 +0800</pubDate>
-    <lastBuildDate>Wed, 30 Mar 2016 10:46:29 +0800</lastBuildDate>
+    <link>http://ac-opensource.github.io//</link>
+    <atom:link href="http://ac-opensource.github.io//feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Wed, 30 Mar 2016 11:21:18 +0800</pubDate>
+    <lastBuildDate>Wed, 30 Mar 2016 11:21:18 +0800</lastBuildDate>
     <generator>Jekyll v3.0.3</generator>
     
   </channel>
