@@ -1,184 +1,728 @@
-<!DOCTYPE HTML>
-<!--
-	Spectral by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-	<head>
-		<title>Spectral by HTML5 UP</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
-		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
-	</head>
-	<body class="landing">
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>A‑AR Andrew V. Concepcion — Mobile Developer</title>
+        <meta
+            name="description"
+            content="Mobile Developer — Compose Multiplatform, Kotlin Multiplatform, Jetpack Compose, Kotlin, SwiftUI, Swift."
+        />
+        <meta
+            property="og:title"
+            content="Andrew Concepcion — Mobile Developer"
+        />
+        <meta
+            property="og:description"
+            content="Staff/Lead Android engineer. Compose-first. Kotlin Multiplatform. SwiftUI."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="" />
+        <meta name="theme-color" content="#0f172a" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            html {
+                scroll-behavior: smooth;
+            }
+            /* Tailwind CDN doesn't process @apply. Use plain CSS so chips/cards work without a build step. */
+            .chip {
+                display: inline-flex;
+                align-items: center;
+                border: 1px solid #e5e7eb;
+                border-radius: 9999px;
+                padding: 0.25rem 0.75rem;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+            }
+            .card {
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: saturate(180%) blur(6px);
+                border: 1px solid #e5e7eb;
+                border-radius: 1rem;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            }
+            .section-title {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-weight: 600;
+                letter-spacing: -0.01em;
+            }
+            .section-title::before {
+                content: "";
+                height: 1.5rem;
+                width: 0.375rem;
+                border-radius: 9999px;
+                background: linear-gradient(to bottom, #0f172a, #94a3b8);
+            }
+        </style>
+        <script>
+            function toggleMenu() {
+                document.getElementById("menu").classList.toggle("hidden");
+            }
+        </script>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "Person",
+                "name": "A-AR Andrew V. Concepcion",
+                "jobTitle": "Mobile Developer",
+                "email": "mailto:aarconcepcion@gmail.com",
+                "telephone": "+63 917 815 4366",
+                "url": "https://rebrand.ly/portfolio-app",
+                "address": { "@type": "PostalAddress", "addressCountry": "PH" },
+                "sameAs": [
+                    "https://github.com/ac-opensource",
+                    "https://www.linkedin.com/in/andrew-concepcion-android"
+                ]
+            }
+        </script>
+    </head>
+    <body
+        class="min-h-screen bg-gradient-to-b from-white via-slate-50 to-white text-slate-900"
+    >
+        <!-- Header -->
+        <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
+            <div
+                class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between"
+            >
+                <a href="#home" class="font-bold tracking-tight"
+                    >Andrew Concepcion</a
+                >
+                <nav class="hidden md:flex items-center gap-6 text-sm">
+                    <a href="#about" class="hover:opacity-80">About</a>
+                    <a href="#skills" class="hover:opacity-80">Skills</a>
+                    <a href="#experience" class="hover:opacity-80"
+                        >Experience</a
+                    >
+                    <a href="#projects" class="hover:opacity-80">Projects</a>
+                    <a href="#contact" class="hover:opacity-80">Contact</a>
+                </nav>
+                <button
+                    class="md:hidden border rounded-lg px-3 py-1"
+                    onclick="toggleMenu()"
+                >
+                    Menu
+                </button>
+            </div>
+            <div id="menu" class="md:hidden hidden border-t">
+                <div
+                    class="mx-auto max-w-6xl px-4 py-2 flex flex-col gap-2 text-sm"
+                >
+                    <a href="#about" onclick="toggleMenu()">About</a>
+                    <a href="#skills" onclick="toggleMenu()">Skills</a>
+                    <a href="#experience" onclick="toggleMenu()">Experience</a>
+                    <a href="#projects" onclick="toggleMenu()">Projects</a>
+                    <a href="#contact" onclick="toggleMenu()">Contact</a>
+                </div>
+            </div>
+        </header>
 
-		<!-- Page Wrapper -->
-			<div id="page-wrapper">
-
-				<!-- Header -->
-					<header id="header" class="alt">
-						<h1><a href="index.html">A-Ar Andrew Concepcion</a></h1>
-						<nav id="nav">
-							<ul>
-								<li class="special">
-									<a href="#menu" class="menuToggle"><span>Menu</span></a>
-									<div id="menu">
-										<ul>
-											<li><a href="index.html">Home</a></li>
-											<li><a href="generic.html">Generic</a></li>
-											<li><a href="elements.html">Elements</a></li>
-											<li><a href="#">Sign Up</a></li>
-											<li><a href="#">Log In</a></li>
-										</ul>
-									</div>
-								</li>
-							</ul>
-						</nav>
-					</header>
-
-				<!-- Banner -->
-					<section id="banner">
-						<div class="inner">
-							<h2>A-Ar Andrew Concepcion</h2>
-							<p>I'm a programming enthusiast and I don't think of coding as 'work' <br/>
-								but rather as being paid to do what I love.
-							</p>
-						</div>
-						<a href="#one" class="more scrolly">Learn More</a>
-					</section>
-
-				<!-- One -->
-					<section id="one" class="wrapper style1 special">
-						<div class="inner">
-							<header class="major">
-								<h2>My Qualities</h2>
-                                <p>Or at least what I think I am</p>
-                                <p>These are totally based on my point of view. ;)</p>
-							</header>
-							<ul class="icons major">
-								<li><span class="icon fa-rocket major style1"><span class="label">Get Things Done</span></span></li>
-								<li><span class="icon fa-heart-o major style2"><span class="label">Passionate</span></span></li>
-								<li><span class="icon fa-code major style3"><span class="label">Clean Code</span></span></li>
-							</ul>
-                            <ul class="icons major">
-                                <li style="padding-right: 2em; !important;"><span class="label">Get Things<br/>Done</span></li>
-                                <li style="padding-right: 2em; !important;"><span class="label">Passionate &<br/>Motivated</span></li>
-                                <li style="padding-right: 2em; !important;"><span class="label">Code Quality<br/>is a Must</span></li>
-                            </ul>
-						</div>
-					</section>
-
-				<!-- Two -->
-					<section id="two" class="wrapper alt style2">
-						<section class="spotlight">
-                            <div class="image">
-                                <img src="images/spotlight-websafety.png" alt="" />
+        <main id="home" class="mx-auto max-w-6xl px-4 pb-24">
+            <!-- Hero -->
+            <section
+                class="pt-12 md:pt-16 grid grid-cols-1 md:grid-cols-12 gap-8"
+            >
+                <div class="md:col-span-7">
+                    <h1
+                        class="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight"
+                    >
+                        A‑AR ANDREW V. CONCEPCION
+                    </h1>
+                    <p
+                        class="mt-3 text-lg md:text-xl font-medium text-slate-700"
+                    >
+                        Mobile Developer
+                    </p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <span class="chip">Compose Multiplatform</span>
+                        <span class="chip">Kotlin Multiplatform</span>
+                        <span class="chip">Jetpack Compose</span>
+                        <span class="chip">Kotlin</span>
+                        <span class="chip">SwiftUI</span>
+                        <span class="chip">Swift</span>
+                    </div>
+                    <div class="mt-6 flex flex-wrap items-center gap-3">
+                        <a
+                            class="inline-flex items-center rounded-lg bg-slate-900 text-white px-4 py-2"
+                            href="https://rebrand.ly/portfolio-app"
+                            target="_blank"
+                            rel="noreferrer"
+                            >View App Portfolio
+                            <svg
+                                class="ml-2 h-4 w-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M7 17L17 7" />
+                                <path d="M7 7h10v10" />
+                            </svg>
+                        </a>
+                        <a
+                            class="inline-flex items-center rounded-lg border px-4 py-2"
+                            href="/resume_concepcion_andrew.pdf"
+                            >Download Résumé (PDF)
+                            <svg
+                                class="ml-2 h-4 w-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path
+                                    d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                                />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                        </a>
+                    </div>
+                    <p class="mt-8 max-w-2xl text-slate-700 leading-relaxed">
+                        Dynamic and seasoned software engineer with extensive
+                        experience in developing, optimizing, and maintaining
+                        Android and iOS applications using Kotlin and Swift.
+                        Adept at implementing robust, scalable solutions across
+                        e‑commerce, financial services, transportation, and
+                        digital advertising. Proven leader in cross‑functional
+                        coordination with a deep grasp of modern app
+                        architecture.
+                    </p>
+                </div>
+                <div class="md:col-span-5">
+                    <div class="card p-6">
+                        <h3
+                            class="text-xl font-semibold flex items-center gap-2"
+                        >
+                            <svg
+                                class="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M12 20l9-5-9-5-9 5 9 5z" />
+                                <path d="M12 12l9-5-9-5-9 5 9 5z" />
+                            </svg>
+                            Highlights
+                        </h3>
+                        <div class="mt-4 space-y-3 text-sm">
+                            <div class="flex items-center gap-3">
+                                <svg
+                                    class="h-4 w-4 opacity-70"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M22 16.92V21a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 3 5.18 2 2 0 0 1 5 3h4.09a2 2 0 0 1 2 1.72c.12.81.28 1.6.46 2.38a2 2 0 0 1-.45 1.86L9.91 10.09a16 16 0 0 0 4 4l1.13-1.13a2 2 0 0 1 1.86-.45c.78.18 1.57.34 2.38.46A2 2 0 0 1 20.28 15V19a2 2 0 0 1-2 2"
+                                    />
+                                </svg>
+                                +63 917 815 4366
                             </div>
-                            <div class="content">
-                                <h2>Websafety</h2>
-                                <p>The WebSafety project is one of the the biggest project that I have been involved in. <br/>
-                        It’s a window to provide information to which concerned parents can monitor their child’s potentially harmful mobile device activities</p>
+                            <div class="flex items-center gap-3">
+                                <svg
+                                    class="h-4 w-4 opacity-70"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path d="M4 4h16v16H4z" />
+                                    <path d="M22 6l-10 7L2 6" />
+                                </svg>
+                                aarconcepcion@gmail.com
                             </div>
-                        </section>
-                        <section class="spotlight">
-                            <div class="image"><img src="images/spotlight-popslide.png" alt="" /></div><div class="content">
-                            <h2>PopSlide</h2>
-                            <p>PopSlide is an Android advertisement platform which rewards users with airtime for different kinds of activities; such as downloading and using apps, taking surveys, watching videos, signing up for a service, playing mini-games, completing daily challenges, and even just turning on their phone screen.</p>
+                            <div class="flex items-center gap-3">
+                                <svg
+                                    class="h-4 w-4 opacity-70"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"
+                                    />
+                                    <circle cx="12" cy="10" r="3" />
+                                </svg>
+                                Philippines / New Zealand / Remote
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap pt-2">
+                                <a
+                                    class="inline-flex items-center gap-1 border rounded-lg px-3 py-1.5"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href="https://github.com/ac-opensource"
+                                    >GitHub
+                                    <svg
+                                        class="h-3 w-3"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path d="M7 17L17 7" />
+                                        <path d="M7 7h10v10" />
+                                    </svg>
+                                </a>
+                                <a
+                                    class="inline-flex items-center gap-1 border rounded-lg px-3 py-1.5"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href="https://www.linkedin.com/in/aarconcepcion"
+                                    >LinkedIn
+                                    <svg
+                                        class="h-3 w-3"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path d="M7 17L17 7" />
+                                        <path d="M7 7h10v10" />
+                                    </svg>
+                                </a>
+                            </div>
                         </div>
-                        </section>
-                        <section class="spotlight">
-							<div class="image"><img src="images/spotlight-playup.png" alt="" /></div><div class="content">
-								<h2>PlayUp: Sports Matchmaking App</h2>
-								<p>An app that allows to to select a location where you would like to find, join or create sports or e-sports matches. The rewards of using this app is to promote local sports games and also to create a profile and a history of your matches so that talent scouts may be able to find you and if you're into having or joining fan groups this app might help you follow athletes or update your fans of your upcoming games.</p>
-							</div>
-						</section>
-						<section class="spotlight">
-							<div class="image"><img src="images/spotlight-bass.png" alt="" /></div><div class="content">
-								<h2>BASS: Bandwidth and Signal Statistics</h2>
-								<p>Mobile app for crowd sourced volunteers to help measure the bandwidth and signal strength of carrier networks at given locations</p>
-							</div>
-						</section>
-					</section>
+                    </div>
+                </div>
+            </section>
 
-				<!-- Three -->
-					<section id="three" class="wrapper style3 special">
-						<div class="inner">
-							<header class="major">
-								<h2>Accumsan mus tortor nunc aliquet</h2>
-								<p>Aliquam ut ex ut augue consectetur interdum. Donec amet imperdiet eleifend<br />
-								fringilla tincidunt. Nullam dui leo Aenean mi ligula, rhoncus ullamcorper.</p>
-							</header>
-							<ul class="features">
-								<li class="icon fa-paper-plane-o">
-									<h3>Arcu accumsan</h3>
-									<p>Augue consectetur sed interdum imperdiet et ipsum. Mauris lorem tincidunt nullam amet leo Aenean ligula consequat consequat.</p>
-								</li>
-								<li class="icon fa-laptop">
-									<h3>Ac Augue Eget</h3>
-									<p>Augue consectetur sed interdum imperdiet et ipsum. Mauris lorem tincidunt nullam amet leo Aenean ligula consequat consequat.</p>
-								</li>
-								<li class="icon fa-code">
-									<h3>Mus Scelerisque</h3>
-									<p>Augue consectetur sed interdum imperdiet et ipsum. Mauris lorem tincidunt nullam amet leo Aenean ligula consequat consequat.</p>
-								</li>
-								<li class="icon fa-headphones">
-									<h3>Mauris Imperdiet</h3>
-									<p>Augue consectetur sed interdum imperdiet et ipsum. Mauris lorem tincidunt nullam amet leo Aenean ligula consequat consequat.</p>
-								</li>
-								<li class="icon fa-heart-o">
-									<h3>Aenean Primis</h3>
-									<p>Augue consectetur sed interdum imperdiet et ipsum. Mauris lorem tincidunt nullam amet leo Aenean ligula consequat consequat.</p>
-								</li>
-								<li class="icon fa-flag-o">
-									<h3>Tortor Ut</h3>
-									<p>Augue consectetur sed interdum imperdiet et ipsum. Mauris lorem tincidunt nullam amet leo Aenean ligula consequat consequat.</p>
-								</li>
-							</ul>
-						</div>
-					</section>
+            <!-- Skills -->
+            <section id="skills" class="scroll-mt-24 mt-16">
+                <h2 class="section-title mb-5 text-2xl md:text-3xl">
+                    Skills & Tooling
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="card p-6">
+                        <h3 class="font-semibold mb-3">Platforms</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="chip">Android</span>
+                            <span class="chip">iOS</span>
+                            <span class="chip">Backend</span>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="font-semibold mb-3">Languages</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="chip">Kotlin</span>
+                            <span class="chip">Java</span>
+                            <span class="chip">Swift</span>
+                            <span class="chip">Objective‑C</span>
+                            <span class="chip">JavaScript</span>
+                            <span class="chip">TypeScript</span>
+                            <span class="chip">SQL</span>
+                            <span class="chip">Dart</span>
+                            <span class="chip">HTML</span>
+                            <span class="chip">CSS</span>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="font-semibold mb-3">
+                            Architectures & Practices
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="chip">SOLID</span>
+                            <span class="chip">Clean Architecture</span>
+                            <span class="chip">Vertical Slice</span>
+                            <span class="chip">Screaming Architecture</span>
+                            <span class="chip">Functional</span>
+                            <span class="chip">Reactive</span>
+                            <span class="chip">VIPER</span>
+                            <span class="chip">Redux</span>
+                            <span class="chip">MV*</span>
+                            <span class="chip">TDD</span>
+                            <span class="chip">CI/CD</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-				<!-- CTA -->
-					<section id="cta" class="wrapper style4">
-						<div class="inner">
-							<header>
-								<h2>Arcue ut vel commodo</h2>
-								<p>Aliquam ut ex ut augue consectetur interdum endrerit imperdiet amet eleifend fringilla.</p>
-							</header>
-							<ul class="actions vertical">
-								<li><a href="#" class="button fit special">Activate</a></li>
-								<li><a href="#" class="button fit">Learn More</a></li>
-							</ul>
-						</div>
-					</section>
+            <!-- Experience (STAR, single-column) -->
+            <section id="experience" class="scroll-mt-24 mt-16">
+                <h2 class="section-title mb-5 text-2xl md:text-3xl">
+                    Experience (STAR)
+                </h2>
+                <div class="space-y-6">
+                    <!-- RedAirship -->
+                    <article class="card overflow-hidden">
+                        <div
+                            class="bg-slate-50/70 px-6 py-4 flex flex-wrap items-center justify-between gap-2"
+                        >
+                            <h3 class="text-lg">
+                                <a
+                                    class="hover:underline"
+                                    href="https://redairship.com"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    >RedAirship Pte Ltd.</a
+                                >
+                                <span class="text-slate-600 font-normal"
+                                    >· Staff Mobile Engineer</span
+                                >
+                            </h3>
+                            <span class="text-sm text-slate-600 font-medium"
+                                >Jun 2021 — Present</span
+                            >
+                        </div>
+                        <ul class="p-6 space-y-3 text-sm">
+                            <li>
+                                <span class="font-semibold">Situation:</span>
+                                Joined at project inception to build a mobile
+                                finance app for a Singapore bank.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Task:</span>
+                                Coordinate between client in‑house and
+                                iOS/Android teams; align cross‑platform
+                                decisions and resolve blockers.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Action:</span> Built
+                                Onboarding, Accounts, Dashboard (graphs), Funds
+                                Transfer, Account Opening.
+                                Co‑developed/integrated a critical third‑party
+                                SDK.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Result:</span>
+                                Seamless production operation; recognized for
+                                technical depth and pragmatic delivery.
+                            </li>
+                        </ul>
+                    </article>
+                    <!-- InnovationTeam -->
+                    <article class="card overflow-hidden">
+                        <div
+                            class="bg-slate-50/70 px-6 py-4 flex flex-wrap items-center justify-between gap-2"
+                        >
+                            <h3 class="text-lg">
+                                <a
+                                    class="hover:underline"
+                                    href="https://innovationteam.com"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    >InnovationTeam</a
+                                >
+                                <span class="text-slate-600 font-normal"
+                                    >· Lead Developer</span
+                                >
+                            </h3>
+                            <span class="text-sm text-slate-600 font-medium"
+                                >May 2020 — Jun 2021</span
+                            >
+                        </div>
+                        <ul class="p-6 space-y-3 text-sm">
+                            <li>
+                                <span class="font-semibold">Situation:</span>
+                                Led offshore dev for MySTC, serving millions
+                                across KSA/Gulf.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Task:</span> Oversee
+                                features & maintenance for stability and UX.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Action:</span> Clean
+                                Architecture + MVVM (RxJava/Kotlin, Gson,
+                                Retrofit); team mentorship and process
+                                standards.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Result:</span>
+                                Stable, efficient app; improved developer
+                                velocity.
+                            </li>
+                        </ul>
+                    </article>
+                    <!-- IPara / OWTO -->
+                    <article class="card overflow-hidden">
+                        <div
+                            class="bg-slate-50/70 px-6 py-4 flex flex-wrap items-center justify-between gap-2"
+                        >
+                            <h3 class="text-lg">
+                                <a
+                                    class="hover:underline"
+                                    href="https://owtoph.com"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    >IPara Technologies and Solutions</a
+                                >
+                                <span class="text-slate-600 font-normal"
+                                    >· Team Lead</span
+                                >
+                            </h3>
+                            <span class="text-sm text-slate-600 font-medium"
+                                >Jun 2018 — May 2020</span
+                            >
+                        </div>
+                        <ul class="p-6 space-y-3 text-sm">
+                            <li>
+                                <span class="font-semibold">Situation:</span>
+                                Owned Android + iOS for OWTO transportation
+                                platform.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Task:</span> Deliver
+                                native experiences and emergency‑ready security
+                                features.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Action:</span> Used
+                                Uber's RIB architecture; implemented emergency
+                                cabin livestream.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Result:</span>
+                                Secure, commuter‑focused platform at scale in
+                                PH.
+                            </li>
+                        </ul>
+                    </article>
+                    <!-- YOYO -->
+                    <article class="card overflow-hidden">
+                        <div
+                            class="bg-slate-50/70 px-6 py-4 flex flex-wrap items-center justify-between gap-2"
+                        >
+                            <h3 class="text-lg">
+                                <a
+                                    class="hover:underline"
+                                    href="https://yoyo-holdings.com"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    >YOYO Holdings Pte. Ltd.</a
+                                >
+                                <span class="text-slate-600 font-normal"
+                                    >· Senior Android Developer</span
+                                >
+                            </h3>
+                            <span class="text-sm text-slate-600 font-medium"
+                                >Jun 2016 — Jun 2018</span
+                            >
+                        </div>
+                        <ul class="p-6 space-y-3 text-sm">
+                            <li>
+                                <span class="font-semibold">Situation:</span>
+                                Tech lead for PopSlide (rewards category).
+                            </li>
+                            <li>
+                                <span class="font-semibold">Task:</span> Revamp
+                                architecture to boost stability and UX.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Action:</span>
+                                Android‑first while orchestrating cross‑platform
+                                integrations.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Result:</span>
+                                Improved stability and user satisfaction.
+                            </li>
+                        </ul>
+                    </article>
+                    <!-- ISBX -->
+                    <article class="card overflow-hidden">
+                        <div
+                            class="bg-slate-50/70 px-6 py-4 flex flex-wrap items-center justify-between gap-2"
+                        >
+                            <h3 class="text-lg">
+                                <a
+                                    class="hover:underline"
+                                    href="https://www.isbx.com"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    >ISBX</a
+                                >
+                                <span class="text-slate-600 font-normal"
+                                    >· Full Stack Web & Mobile Developer</span
+                                >
+                            </h3>
+                            <span class="text-sm text-slate-600 font-medium"
+                                >May 2014 — Jun 2016</span
+                            >
+                        </div>
+                        <ul class="p-6 space-y-3 text-sm">
+                            <li>
+                                <span class="font-semibold">Situation:</span>
+                                WebSafety platform contributor across web,
+                                Android, iOS, backend.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Task:</span> Ship
+                                full‑stack features and mobile flows.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Action:</span>
+                                Cross‑surface implementations and coherent
+                                navigation.
+                            </li>
+                            <li>
+                                <span class="font-semibold">Result:</span>
+                                Robust platform; showcased versatility.
+                            </li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
 
-				<!-- Footer -->
-					<footer id="footer">
-						<ul class="icons">
-							<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
-							<li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
-							<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
-							<li><a href="#" class="icon fa-dribbble"><span class="label">Dribbble</span></a></li>
-							<li><a href="#" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
-						</ul>
-						<ul class="copyright">
-							<li>&copy; Untitled</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-						</ul>
-					</footer>
+            <!-- Projects -->
+            <section id="projects" class="scroll-mt-24 mt-16">
+                <h2 class="section-title mb-5 text-2xl md:text-3xl">
+                    Libraries, Projects & Volunteering
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card p-6 hover:shadow-lg transition-shadow">
+                        <h3 class="text-lg font-semibold">
+                            Haven Protocol (Off‑chain server)
+                        </h3>
+                        <p class="text-sm text-slate-700 mt-2">
+                            Built infra for a decentralized social space;
+                            hands‑on with cutting‑edge primitives.
+                        </p>
+                    </div>
+                    <div class="card p-6 hover:shadow-lg transition-shadow">
+                        <h3 class="text-lg font-semibold">
+                            Project BASS (Android)
+                        </h3>
+                        <p class="text-sm text-slate-700 mt-2">
+                            Volunteer crowdsourcing app to improve local
+                            internet quality in the Philippines.
+                        </p>
+                    </div>
+                    <div class="card p-6 hover:shadow-lg transition-shadow">
+                        <h3 class="text-lg font-semibold">
+                            Map Radius Marker Builder (Kotlin Library)
+                        </h3>
+                        <p class="text-sm text-slate-700 mt-2">
+                            Google Maps utility; compact, useful contribution to
+                            the Android dev ecosystem.
+                        </p>
+                    </div>
+                    <div class="card p-6 hover:shadow-lg transition-shadow">
+                        <h3 class="text-lg font-semibold">
+                            Portable Aircon (Meme App)
+                        </h3>
+                        <p class="text-sm text-slate-700 mt-2">
+                            Because code can be fun and viral.
+                        </p>
+                    </div>
+                </div>
+            </section>
 
-			</div>
+            <!-- Contact -->
+            <section id="contact" class="scroll-mt-24 mt-16">
+                <h2 class="section-title mb-5 text-2xl md:text-3xl">
+                    Get in touch
+                </h2>
+                <div class="card p-6 border-2">
+                    <div
+                        class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                    >
+                        <div>
+                            <h3 class="text-xl font-semibold">
+                                Open to Staff/Lead Android roles & ambitious
+                                mobile work.
+                            </h3>
+                            <p class="text-slate-700 mt-1">
+                                Compose‑first teams, strongly‑typed navigation,
+                                clean boundaries.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <a
+                                class="inline-flex items-center rounded-lg bg-slate-900 text-white px-4 py-2"
+                                href="mailto:aarconcepcion@gmail.com"
+                                ><svg
+                                    class="mr-2 h-4 w-4"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path d="M4 4h16v16H4z" />
+                                    <path d="M22 6l-10 7L2 6" /></svg
+                                >Email</a
+                            >
+                            <a
+                                class="inline-flex items-center rounded-lg border px-4 py-2"
+                                href="tel:+639178154366"
+                                ><svg
+                                    class="mr-2 h-4 w-4"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M22 16.92V21a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 3 5.18 2 2 0 0 1 5 3h4.09a2 2 0 0 1 2 1.72c.12.81.28 1.6.46 2.38a2 2 0 0 1-.45 1.86L9.91 10.09a16 16 0 0 0 4 4l1.13-1.13a2 2 0 0 1 1.86-.45c.78.18 1.57.34 2.38.46A2 2 0 0 1 20.28 15V19a2 2 0 0 1-2 2"
+                                    /></svg
+                                >Call</a
+                            >
+                            <a
+                                class="inline-flex items-center rounded-lg bg-slate-100 px-4 py-2"
+                                href="https://rebrand.ly/portfolio-app"
+                                target="_blank"
+                                rel="noreferrer"
+                                >App Portfolio
+                                <svg
+                                    class="ml-2 h-4 w-4"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path d="M7 17L17 7" />
+                                    <path d="M7 7h10v10" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrollex.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/skel.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
-			<script src="assets/js/main.js"></script>
+            <footer class="mt-16 pb-20 text-sm text-slate-500">
+                <hr class="my-6" />
+                <div
+                    class="flex flex-col md:flex-row items-start md:items-center justify-between gap-2"
+                >
+                    <p>
+                        © <span id="year"></span> Andrew Concepcion. Built in
+                        plain HTML + Tailwind.
+                    </p>
+                    <a
+                        href="#home"
+                        class="inline-flex items-center gap-1 hover:underline"
+                        >Back to top
+                        <svg
+                            class="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M7 17L17 7" />
+                            <path d="M7 7h10v10" />
+                        </svg>
+                    </a>
+                </div>
+            </footer>
 
-	</body>
+            <!-- Optional résumé anchor -->
+            <a id="resume" class="block h-1"></a>
+        </main>
+
+        <script>
+            document.getElementById("year").textContent =
+                new Date().getFullYear();
+        </script>
+    </body>
 </html>
