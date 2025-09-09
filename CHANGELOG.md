@@ -1,3 +1,6 @@
+## [0.1.5] - 2025-09-09
+- fix: restyle about section with distinct personal and professional blocks
+
 ## [0.1.4] - 2025-09-09
 - fix: streamline about section and remove personal projects
 - fix: unify blog layout with main site
