@@ -341,28 +341,7 @@
                 <h2 class="section-title mb-5 text-2xl md:text-3xl">
                     Blog
                 </h2>
-                <div class="space-y-6">
-                    <article class="card p-6">
-                        <h3 class="text-lg font-semibold">
-                            <a class="hover:underline" href="#">
-                                Welcome to my blog
-                            </a>
-                        </h3>
-                        <p class="text-sm text-slate-700 mt-2">
-                            Thoughts on software development and more.
-                        </p>
-                    </article>
-                    <article class="card p-6">
-                        <h3 class="text-lg font-semibold">
-                            <a class="hover:underline" href="#">
-                                Building with Kotlin and Swift
-                            </a>
-                        </h3>
-                        <p class="text-sm text-slate-700 mt-2">
-                            Exploring multiplatform mobile development.
-                        </p>
-                    </article>
-                </div>
+                <div id="blog-list" class="space-y-6"></div>
             </section>
 
             <!-- Projects -->
@@ -495,8 +474,55 @@
         </main>
 
         <script>
-            document.getElementById("year").textContent =
-                new Date().getFullYear();
+            document.getElementById("year").textContent = new Date().getFullYear();
+
+            async function loadBlogPosts() {
+                const container = document.getElementById("blog-list");
+                try {
+                    const response = await fetch(
+                        "https://api.github.com/repos/ac-opensource/ac-opensource.github.io/contents/blog"
+                    );
+                    if (!response.ok) throw new Error("Unable to fetch posts");
+                    const files = await response.json();
+                    const posts = files.filter(
+                        (item) => item.type === "file" && item.name.endsWith(".html")
+                    );
+                    if (posts.length === 0) {
+                        container.innerHTML =
+                            '<p class="text-sm text-slate-700">No posts yet.</p>';
+                        return;
+                    }
+                    for (const file of posts) {
+                        try {
+                            const res = await fetch(`blog/${file.name}`);
+                            const html = await res.text();
+                            const doc = new DOMParser().parseFromString(
+                                html,
+                                "text/html"
+                            );
+                            const title =
+                                doc.querySelector("h1")?.textContent?.trim() ||
+                                file.name;
+                            const description =
+                                doc.querySelector("p")?.textContent?.trim() || "";
+                            const article = document.createElement("article");
+                            article.className = "card p-6";
+                            article.innerHTML = `<h3 class="text-lg font-semibold"><a class="hover:underline" href="blog/${file.name}">${title}</a></h3>`;
+                            if (description) {
+                                article.innerHTML += `<p class=\"text-sm text-slate-700 mt-2\">${description}</p>`;
+                            }
+                            container.appendChild(article);
+                        } catch {
+                            // skip file if it fails to load
+                        }
+                    }
+                } catch (e) {
+                    container.innerHTML =
+                        '<p class="text-sm text-slate-700">Failed to load blog posts.</p>';
+                }
+            }
+
+            loadBlogPosts();
         </script>
     </body>
 </html>
