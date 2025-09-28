@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Riding The Token Storm: Notes From A Codex Fleet Wrangler</title>
+        <meta name="description" content="“Automation is just delegation without clarity.” I scribbled that line after watching our Codex fleet burn twenty-five minutes rediscovering a screen we had already refactored twice. The frustration turned into a field manual. This long-form write-up audits every lever we pulled: the prompts that reshaped the workflow, the changes those prompts triggered, the logs that exposed blind spots, and the reason a 100% React web project lapped our elegant but finicky Compose Multiplatform app." />
+        <meta name="theme-color" content="#0f172a" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            html { scroll-behavior: smooth; }
+            .chip {
+                display: inline-flex;
+                align-items: center;
+                border: 1px solid #e5e7eb;
+                border-radius: 9999px;
+                padding: 0.25rem 0.75rem;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+            }
+            .card {
+                background: rgba(255, 255, 255, 0.92);
+                backdrop-filter: saturate(180%) blur(6px);
+                border: 1px solid rgba(148, 163, 184, 0.4);
+                border-radius: 1rem;
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+            }
+            article h2 {
+                font-size: 1.6rem;
+                line-height: 1.2;
+                font-weight: 700;
+                margin-top: 2.5rem;
+            }
+            article h3 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-top: 2rem;
+            }
+            article p {
+                margin-top: 1.2rem;
+                font-size: 1.05rem;
+                line-height: 1.75rem;
+            }
+            article blockquote {
+                border-left: 4px solid #0f172a;
+                padding: 0.5rem 1.25rem;
+                margin: 1.5rem 0;
+                font-style: italic;
+                background: rgba(15, 23, 42, 0.04);
+            }
+            article code {
+                font-family: 'Roboto Mono', 'SFMono-Regular', ui-monospace, monospace;
+                font-size: 0.95rem;
+                background: rgba(15, 23, 42, 0.08);
+                padding: 0.1rem 0.35rem;
+                border-radius: 0.35rem;
+            }
+            article pre {
+                background: rgba(15, 23, 42, 0.08);
+                padding: 1rem;
+                border-radius: 0.75rem;
+                overflow-x: auto;
+                margin-top: 1.5rem;
+            }
+            article table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 1.75rem 0;
+                font-size: 0.95rem;
+            }
+            article th,
+            article td {
+                border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+                padding: 0.75rem 0.5rem;
+                text-align: left;
+            }
+            article ul,
+            article ol {
+                margin-left: 1.25rem;
+                margin-top: 1rem;
+                display: grid;
+                gap: 0.6rem;
+            }
+        </style>
+    </head>
+    <body class="min-h-screen bg-gradient-to-b from-white via-slate-50 to-white text-slate-900">
+        <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
+            <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+                <a href="/" class="font-bold tracking-tight">Andrew Concepcion</a>
+                <nav class="hidden md:flex items-center gap-6 text-sm">
+                    <a href="/" class="hover:opacity-80">Home</a>
+                    <a href="/index.html#blog" class="hover:opacity-80">Blog</a>
+                    <a href="/index.html#contact" class="hover:opacity-80">Contact</a>
+                </nav>
+                <a class="md:hidden border rounded-lg px-3 py-1 text-sm" href="/">Back</a>
+            </div>
+        </header>
+        <main class="mx-auto max-w-4xl px-4 pb-24">
+            <section class="pt-12 md:pt-16">
+                <p class="uppercase tracking-[0.3em] text-xs text-slate-500">Field Notes</p>
+                <h1 class="mt-2 text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">Riding The Token Storm: Notes From A Codex Fleet Wrangler</h1>
+                <p class="mt-4 text-lg md:text-xl text-slate-700 max-w-3xl">“Automation is just delegation without clarity.” I scribbled that line after watching our Codex fleet burn twenty-five minutes rediscovering a screen we had already refactored twice. The frustration turned into a field manual. This long-form write-up audits every lever we pulled: the prompts that reshaped the workflow, the changes those prompts triggered, the logs that exposed blind spots, and the reason a 100% React web project lapped our elegant but finicky Compose Multiplatform app.</p>
+                <div class="mt-6 flex flex-wrap gap-2 text-xs text-slate-500">
+                    <span class="chip bg-white/70">Codex Fleet</span>
+                    <span class="chip bg-white/70">Automation</span>
+                    <span class="chip bg-white/70">Compose Multiplatform</span>
+                </div>
+            </section>
+            <section class="mt-12">
+                <article class="card p-6 md:p-10 space-y-6 leading-relaxed">
+
+<blockquote>
+
+</blockquote>
+<p>Expect a detailed tour through plan hygiene, prompt surgery, token economics, and cross-project whiplash. It is technical, occasionally snarky, and aimed at anyone trying to bend a multi-agent workflow to their will.</p>
+<hr/>
+<h2>0. Setup: Why I Even Tried This</h2>
+<p>OpenAI gives Codex an almost ridiculous runway. Our noisiest implementer log chewed through <strong>461,139 tokens</strong> in a single pass and the quota manager never flinched. That headroom encouraged bold experiments: rebuild an entire product surface with agents, let five roles negotiate plan items live, and freeze the roadmap to keep everyone honest.</p>
+<p>Platform choice decided the outcome. On an earlier project, a 100% React web app, I ran the same fleet. The planner, implementer, tester loop flew. Hot reloads, Jest snapshots, and Storybook diffs gave the agents instant feedback. The Compose Multiplatform stack I am working on now behaved very differently. Gradle builds, multiplatform previews, and mysteriously missing imports humbled the automation. Hence the investigation.</p>
+<hr/>
+<h2>1. Archaeology: Every Prompt Left A Fossil</h2>
+<p>I started by walking the history of our automation scripts. Every exasperated message ended up as a change in the orchestrator, and every change taught the fleet a new trick.</p>
+<ol>
+<li><strong>Launch Phase</strong> — The orchestrator started as a strict planner that demanded exactly two roadmap entries per iteration and forced every role to run the heaviest validation command. The upside was predictability; the downside was a 15-minute tax on even the tiniest documentation tweak.</li>
+<li><strong>Import Amnesty</strong> — After a streak of broken builds, we updated the implementer instructions to insist on adding imports immediately, to log the exact lint and test commands they ran, and to stop dumping entire files when a surgical snippet would do.</li>
+<li><strong>Smoke Signals</strong> — The first time the app crashed on launch we added a dedicated integration checklist, then wired the implementer and tester prompts so they could not exit without recording desktop and web smoke notes whenever navigation changed.</li>
+<li><strong>Freeze Era</strong> — Once the roadmap ballooned to fifteen UI overhauls, we introduced a frozen plan document, added an environment flag that told the planner to reuse it, and taught the orchestrator to skip heavy validation when only prose changed.</li>
+</ol>
+<p>Each stage is a direct translation of someone shouting “stop doing that” during a review.</p>
+<hr/>
+<h2>2. Anatomy Of The Orchestrator</h2>
+<p>After a few close readings the script finally made sense. Here is the cheat sheet so you do not have to stare at bash for an afternoon.</p>
+<h3>2.1 Planner Discipline</h3>
+<ul>
+<li>The planner reads the roadmap, respects any items already checked off, and, when the freeze flag is set, simply announces the next unfinished task instead of drafting new ones. That single environment variable eliminated thrash.</li>
+</ul>
+<h3>2.2 Implementer Checklist</h3>
+<ol>
+<li>Run <code>make lint</code> and <code>make test</code>, only escalate to heavier builds if packaging actually matters.</li>
+<li>Keep shared code multiplatform-friendly, stash platform specifics behind interfaces.</li>
+<li>Confirm imports and dependencies exist before exiting, no parking missing symbols for the next person.</li>
+<li>Use targeted reads: find the right file path first, then peek at the exact span you need.</li>
+<li>When a feature touches several modules, build an allowlist file and iterate through it instead of hammering <code>rg</code> repeatedly.</li>
+<li>Record desktop and web smoke results whenever interactive flows change, following the integration checklist.</li>
+</ol>
+<h3>2.3 Tester Playbook</h3>
+<ul>
+<li>Inspect the diff first. If only text changed, say so. Otherwise, run the narrowest Gradle tasks possible before defaulting to the full suite, and echo every command with its exit code.</li>
+<li>After UI changes, run the desktop bundle, attempt a web build, walk through the smoke checklist, and report anything you observe.</li>
+</ul>
+<h3>2.4 Reviewer Routine</h3>
+<ul>
+<li>Reviewers lean on the implementer and tester summaries, confirm the roadmap item can be checked off, stage everything, and leave a checkpoint commit even if validation fails. Nothing disappears silently.</li>
+</ul>
+<hr/>
+<h2>3. Instrumentation: Listening To The Logs</h2>
+<p>The fleet was noisy long before it was helpful. Building a log summarizer changed that. The script parses every role’s transcript, captures duration, maximum tokens consumed, and the top repeated commands. A typical run looks like this:</p>
+<pre><code>Implementer
+  Runs: 24
+  Average duration: 10:51
+  Longest run: 24:28
+  Average tokens: 163,550
+  Max tokens: 461,139
+  Top commands: make lint (32), git status (31)
+Planner
+  Average duration: 02:46
+  Average tokens: 84,184
+</code></pre>
+<p>Three insights landed immediately:</p>
+<ul>
+<li>Eleven-minute implementer passes were caused by redundant file reads and repeated lint cycles.</li>
+<li>Token peaks north of 400k were tolerable only because Codex’s quota is generous; without instrumentation we never would have noticed.</li>
+<li>Command spam proved the implementer was not sharing results. Once we forced them to include command summaries, downstream roles stopped re-running <code>make lint</code> out of paranoia.</li>
+</ul>
+<hr/>
+<h2>4. Roadmap Hygiene And Freeze Discipline</h2>
+<p>The roadmap now mirrors our UI overhaul checklist. Each entry lists the goal, the surfaces it touches, the expected deliverables, and the exact commands we consider mandatory. When a task is complete, the orchestrator marks the matching goal as done and leaves the roadmap in place for the next pass.</p>
+<p>Skipping heavy validation when the diff only touches texts shaved minutes off documentation updates. More importantly, freezing the roadmap stopped the planner from inventing new work mid-iteration. Focus went up, token burn went down.</p>
+<hr/>
+<h2>5. Integration Testing Went From Afterthought To Law</h2>
+<p>The integration checklist covers the flows that kept breaking:</p>
+<ol>
+<li>Create a report with media and location, submit, and confirm it lands in the feed.</li>
+<li>Follow and unfollow an issue while watching counts adjust.</li>
+<li>Trigger an escalation from the activity view and ensure the timeline updates.</li>
+<li>Visit the account hub, switch between saved items, rotate the anonymous ID, and return without crashes.</li>
+<li>Open the notification bell and the digest preview to confirm they render.</li>
+</ol>
+<p>Until we automate those flows, every implementer and tester documents the desktop and web passes manually. Reviewers refuse to merge without evidence. The process is slower than I would like, but the crash rate plummeted after we adopted it.</p>
+<hr/>
+<h2>6. Token Economics And Quota Reality</h2>
+<p>Codex’s generous limits let us experiment without fear. Multi-role iterations ship even for documentation changes, gigantic screen rewrites flow through in one request, and the prompts themselves can stay verbose.</p>
+<p>That freedom masks inefficiency. Without tracking, we were burning hundreds of thousands of tokens per iteration without accountability. The log summarizer gave us the numbers we needed to justify prompt surgery, freeze the roadmap, and tighten expectations for every role.</p>
+<hr/>
+<h2>7. Cross-Project Reality Check: React Web vs Compose Multiplatform</h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>React Web Fleet</th>
+<th>Compose Multiplatform Fleet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build/Run</td>
+<td><code>npm run build</code>, Vite dev server, Playwright</td>
+<td><code>make desktop</code>, <code>make web</code>, Gradle tasks, emulator smoke</td>
+</tr>
+<tr>
+<td>Test Loop</td>
+<td>Jest/Vitest plus Cypress in roughly 3–5 minutes</td>
+<td><code>make lint</code> + <code>make test</code> + manual desktop/web smoke, often 15–25 minutes</td>
+</tr>
+<tr>
+<td>File Scale</td>
+<td>Dozens of small components</td>
+<td>Monolithic screens (300–1400 LOC) plus multiplatform utilities</td>
+</tr>
+<tr>
+<td>Import Issues</td>
+<td>Rare because ESM handles it</td>
+<td>Frequent due to platform-specific targets</td>
+</tr>
+<tr>
+<td>Fleet Velocity</td>
+<td>Two planner passes per day, implementer/tester done in under an hour</td>
+<td>One frozen plan item per day, implementer passes routinely exceed ten minutes</td>
+</tr>
+<tr>
+<td>Token Use</td>
+<td>Around 80k per run</td>
+<td>Around 160k per run</td>
+</tr>
+</tbody>
+</table>
+<p>The React project thrived because hot reload tightened feedback loops, TypeScript and ESLint caught mistakes early, and snapshot tooling gave testers near-instant diffs. Compose punished every misstep with another Gradle build. Same token budget, wildly different velocity.</p>
+<p>Conclusion: Codex fleets shine when build and test cycles are short and the component graph stays modular. They struggle when multiplatform packaging or binary builds enter the mix.</p>
+<hr/>
+<h2>8. War Stories And Favorite Log Lines</h2>
+<ul>
+<li>An implementer once ran the same search command eight times in a single log. After the prompt started recommending allowlists, repetition vanished.</li>
+<li>Planner logs during a freeze became blissfully quiet: “Using existing plan, freeze flag enabled” and nothing else. Sometimes the best automation knows when to stay silent.</li>
+<li>Reviewer checkpoints ensured even failed runs left an audit trail. No more mystery regressions.</li>
+</ul>
+<hr/>
+<h2>9. Lessons I Will Not Forget</h2>
+<ol>
+<li><strong>Translate pain into prompts.</strong> Every rule—from import hygiene to smoke testing—started as a complaint.</li>
+<li><strong>Freeze plans to fight thrash.</strong> Frozen roadmaps plus a friendly environment flag kept the fleet aligned.</li>
+<li><strong>Instrument everything.</strong> Without token and duration metrics we were flying blind.</li>
+<li><strong>Respect platform reality.</strong> Compose needs heavier smoke coverage; React did not.</li>
+<li><strong>Generous quotas are not an excuse to waste them.</strong> The capacity exists for exploration, not sloppiness.</li>
+<li><strong>Documentation is infrastructure.</strong> The speed plan, integration checklist, and this post are part of the system.</li>
+</ol>
+<hr/>
+<h2>10. To-Do List For Future Me</h2>
+<ol>
+<li><strong>Automate the smoke checklist.</strong> Build a shared Compose UI harness, add a desktop headless run, wire Playwright into the web build, and let testers trigger all of it with one command.</li>
+<li><strong>Diff-driven command planner.</strong> Teach the orchestrator to map file changes directly to the tests they require.</li>
+<li><strong>Token anomaly alerts.</strong> Flag any role that blasts past 250k tokens so we can intervene quickly.</li>
+<li><strong>Parallel doc/test mode.</strong> Once builds stabilize, experiment with overlapping roles to cut wall-clock time.</li>
+<li><strong>Back-port the lessons.</strong> The React fleet should inherit the good parts—freeze plans and logs—even if it does not need heavy smoke checks.</li>
+<li><strong>Share the playbook.</strong> New contributors should not have to rediscover these guardrails the hard way.</li>
+</ol>
+<hr/>
+<h2>11. Closing Thoughts</h2>
+<p>The fleet now obeys a frozen roadmap, keeps imports tidy, logs every detour, and refuses to ship UI changes without smoke evidence. We have also learned to admit that some ecosystems, particularly TypeScript and React, are simply better suited for high-frequency agent iteration than a multiplatform Kotlin stack.</p>
+<p>OpenAI’s permissive Codex limits gave us the runway. Constant feedback supplied the urgency. This write-up captures the messy, detailed process of turning “the fleet sux at working at tasks” into a disciplined automation pipeline.</p>
+<p>If the Compose branch keeps fighting tomorrow, at least we have metrics, documentation, and a frozen plan. And if all else fails, there is always that React project waiting for another lightning-fast iteration.</p>
+                </article>
+            </section>
+            <section class="mt-16">
+                <a href="/index.html#blog" class="inline-flex items-center gap-2 text-slate-700 hover:underline">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5" />
+                        <path d="M12 19l-7-7 7-7" />
+                    </svg>
+                    Back to blog overview
+                </a>
+            </section>
+        </main>
+    </body>
+</html>
