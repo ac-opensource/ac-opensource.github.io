@@ -1,3 +1,17 @@
+## [0.8.3] - 2025-11-19
+- chore: remove binary assets from the repo and bundle them separately for download
+
+## [0.8.2] - 2025-11-19
+- fix: remove temporary OG portfolio hero asset per request
+
+## [0.8.1] - 2025-11-19
+- fix: add back navigation links to every individual blog post
+
+## [0.8.0] - 2025-11-19
+- feat: generate branded Open Graph images for every blog post and the site home
+- feat: add canonical, Open Graph, Twitter, and robots metadata across the blog and homepage
+- feat: embed structured data to make individual blog posts and the blog index searchable
+
 ## [0.7.2] - 2025-02-05
 - fix: add Mount Cook drive details to the New Zealand travel story
 
