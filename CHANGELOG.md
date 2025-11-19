@@ -1,3 +1,20 @@
+## [0.6.4] - 2025-11-19
+- fix: replace reminder reflection body copy with the requested narrative
+
+## [0.6.3] - 2025-11-19
+- fix: refresh quiet systems reflection with the updated title, copy, and figure details
+- fix: swap the reminder reflection hero image for the requested cliffside photo
+
+## [0.6.2] - 2025-11-19
+- fix: swap reminder reflection hero image for a more contextually relevant photo
+
+## [0.6.1] - 2025-11-19
+- refactor: prefix blog post slugs and files with publication dates for better sorting
+
+## [0.6.0] - 2025-11-19
+- feat: publish relationship reflection essay on proactive effort
+- feat: add metadata so the new reflection post appears in feeds
+
 ## [0.5.0] - 2025-11-21
 - feat: add category-aware blog feed filters for reflections and hobbies
 - feat: expand the blog landing page with dedicated reflection and hobby sections

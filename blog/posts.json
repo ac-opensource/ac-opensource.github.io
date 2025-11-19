@@ -1,15 +1,24 @@
 [
     {
-        "slug": "quiet-systems-reflection",
-        "title": "Quiet Systems: Reflection Rituals For Builders",
-        "summary": "A personal essay about designing focus blocks, protecting rest, and keeping philosophy close to the shipping calendar.",
+        "slug": "2025-11-19-reminder-from-my-own-advice",
+        "title": "Reminder I Didn’t Expect to Get From My Own Advice",
+        "summary": "On drifting into complacency, offering a friend honest advice, and realizing you need the same reminders.",
+        "date": "2025-11-19",
+        "readingTime": "7 min read",
+        "topics": ["Relationships", "Reflection", "Personal Growth"],
+        "category": "reflection"
+    },
+    {
+        "slug": "2024-11-21-quiet-systems-reflection",
+        "title": "Reflection Notes: Quiet Systems, Reflection Rituals For Builders",
+        "summary": "Quiet systems that protect anchored focus blocks, rehearse rest, and keep philosophy sprints close to the shipping calendar.",
         "date": "2024-11-21",
         "readingTime": "10 min read",
         "topics": ["Reflection", "Philosophy", "Creative Process"],
         "category": "reflection"
     },
     {
-        "slug": "sunrise-trail-runs",
+        "slug": "2024-11-02-sunrise-trail-runs",
         "title": "Sunrise Trail Runs & Flow States",
         "summary": "A weekend log from Sierra Madre ridge lines—training notes, recovery rituals, and the playlist that keeps my cadence honest.",
         "date": "2024-11-02",
@@ -18,7 +27,7 @@
         "category": "hobby"
     },
     {
-        "slug": "film-photography-gallery",
+        "slug": "2024-09-14-film-photography-gallery",
         "title": "35mm Weekends: A Film Photography Gallery",
         "summary": "Selected frames from recent rolls—water, concrete, and candid musician portraits shot on Portra and Cinestill.",
         "date": "2024-09-14",
@@ -27,7 +36,7 @@
         "category": "hobby"
     },
     {
-        "slug": "running-ai-fleet-learnings",
+        "slug": "2024-10-08-running-ai-fleet-learnings",
         "title": "Riding The Token Storm: Notes From A Codex Fleet Wrangler",
         "summary": "An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.",
         "date": "2024-10-08",
@@ -36,7 +45,7 @@
         "category": "technical"
     },
     {
-        "slug": "building-with-kotlin-and-swift",
+        "slug": "2024-05-22-building-with-kotlin-and-swift",
         "title": "Building with Kotlin and Swift",
         "summary": "A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.",
         "date": "2024-05-22",
@@ -45,7 +54,7 @@
         "category": "technical"
     },
     {
-        "slug": "welcome",
+        "slug": "2024-03-14-welcome",
         "title": "Welcome to my blog",
         "summary": "Opening thoughts on why I'm documenting experimentation notes publicly.",
         "date": "2024-03-14",
