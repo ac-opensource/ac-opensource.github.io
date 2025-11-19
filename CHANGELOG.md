@@ -1,3 +1,6 @@
+## [0.7.2] - 2025-02-05
+- fix: add Mount Cook drive details to the New Zealand travel story
+
 ## [0.7.1] - 2025-02-05
 - fix: upload image
 
