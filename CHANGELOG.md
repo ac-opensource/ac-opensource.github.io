@@ -1,3 +1,23 @@
+## [0.5.0] - 2025-11-21
+- feat: add category-aware blog feed filters for reflections and hobbies
+- feat: expand the blog landing page with dedicated reflection and hobby sections
+- feat: clarify homepage CTA linking to the hobby notebook anchor
+
+## [0.4.0] - 2025-11-20
+- feat: publish reflection essay with dated metadata
+- feat: add reflection notes section to the blog landing page
+- feat: link to reflection notes from the homepage blog section
+
+## [0.3.0] - 2025-11-19
+- feat: add hobby-focused blog posts for trail running and film photography
+- feat: extend blog landing page with a hobby gallery showcase
+- feat: highlight the hobby gallery entry point from the homepage blog section
+
+## [0.2.0] - 2025-11-19
+- feat: add dedicated blog landing page with curated intro
+- feat: drive blog listings from dated metadata and sort feed
+- chore: annotate existing posts with publication timestamps
+
 ## [0.1.5] - 2025-09-09
 - fix: restyle about section with distinct personal and professional blocks
 

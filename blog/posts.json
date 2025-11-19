@@ -1,0 +1,56 @@
+[
+    {
+        "slug": "quiet-systems-reflection",
+        "title": "Quiet Systems: Reflection Rituals For Builders",
+        "summary": "A personal essay about designing focus blocks, protecting rest, and keeping philosophy close to the shipping calendar.",
+        "date": "2024-11-21",
+        "readingTime": "10 min read",
+        "topics": ["Reflection", "Philosophy", "Creative Process"],
+        "category": "reflection"
+    },
+    {
+        "slug": "sunrise-trail-runs",
+        "title": "Sunrise Trail Runs & Flow States",
+        "summary": "A weekend log from Sierra Madre ridge lines—training notes, recovery rituals, and the playlist that keeps my cadence honest.",
+        "date": "2024-11-02",
+        "readingTime": "8 min read",
+        "topics": ["Hobby", "Trail Running", "Wellness"],
+        "category": "hobby"
+    },
+    {
+        "slug": "film-photography-gallery",
+        "title": "35mm Weekends: A Film Photography Gallery",
+        "summary": "Selected frames from recent rolls—water, concrete, and candid musician portraits shot on Portra and Cinestill.",
+        "date": "2024-09-14",
+        "readingTime": "6 min read",
+        "topics": ["Hobby", "Photography"],
+        "category": "hobby"
+    },
+    {
+        "slug": "running-ai-fleet-learnings",
+        "title": "Riding The Token Storm: Notes From A Codex Fleet Wrangler",
+        "summary": "An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.",
+        "date": "2024-10-08",
+        "readingTime": "14 min read",
+        "topics": ["AI Ops", "Prompt Engineering", "Team Process"],
+        "category": "technical"
+    },
+    {
+        "slug": "building-with-kotlin-and-swift",
+        "title": "Building with Kotlin and Swift",
+        "summary": "A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.",
+        "date": "2024-05-22",
+        "readingTime": "5 min read",
+        "topics": ["KMP", "SwiftUI"],
+        "category": "technical"
+    },
+    {
+        "slug": "welcome",
+        "title": "Welcome to my blog",
+        "summary": "Opening thoughts on why I'm documenting experimentation notes publicly.",
+        "date": "2024-03-14",
+        "readingTime": "2 min read",
+        "topics": ["Personal"],
+        "category": "personal"
+    }
+]
