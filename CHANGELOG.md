@@ -1,5 +1,5 @@
 ## [0.6.4] - 2025-11-19
-- fix: replace reminder reflection body copy with the requested narrative
+- fix: update reminder reflection body
 
 ## [0.6.3] - 2025-11-19
 - fix: refresh quiet systems reflection with the updated title, copy, and figure details
