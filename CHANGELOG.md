@@ -1,3 +1,10 @@
+## [0.7.1] - 2025-02-05
+- fix: remove aurora photo asset so it can be reuploaded manually
+
+## [0.7.0] - 2025-02-05
+- feat: publish New Zealand travel journal with February 2025 metadata and personal photo
+- feat: refresh blog listings to reflect the updated story details
+
 ## [0.6.4] - 2025-11-19
 - fix: update reminder reflection body
 
