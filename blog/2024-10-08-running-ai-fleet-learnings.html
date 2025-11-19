@@ -4,8 +4,61 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Riding The Token Storm: Notes From A Codex Fleet Wrangler</title>
-        <meta name="description" content="“Automation is just delegation without clarity.” I scribbled that line after watching our Codex fleet burn twenty-five minutes rediscovering a screen we had already refactored twice. The frustration turned into a field manual. This long-form write-up audits every lever we pulled: the prompts that reshaped the workflow, the changes those prompts triggered, the logs that exposed blind spots, and the reason a 100% React web project lapped our elegant but finicky Compose Multiplatform app." />
+        <meta
+            name="description"
+            content="An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable."
+        />
+        <meta name="author" content="Andrew V. Concepcion" />
+        <meta name="robots" content="index, follow" />
+        <meta name="keywords" content="AI Ops, Prompt Engineering, Team Process" />
         <meta name="theme-color" content="#0f172a" />
+        <link
+            rel="canonical"
+            href="https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html"
+        />
+        <meta property="og:site_name" content="Andrew V. Concepcion" />
+        <meta property="og:type" content="article" />
+        <meta
+            property="og:url"
+            content="https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html"
+        />
+        <meta
+            property="og:title"
+            content="Riding The Token Storm: Notes From A Codex Fleet Wrangler"
+        />
+        <meta
+            property="og:description"
+            content="An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable."
+        />
+        <meta
+            property="og:image"
+            content="https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1600&q=80"
+        />
+        <meta
+            property="og:image:alt"
+            content="Laptop screens glowing with dashboards and system diagrams in a dark room."
+        />
+        <meta property="article:published_time" content="2024-10-08" />
+        <meta property="article:tag" content="AI Ops" />
+        <meta property="article:tag" content="Prompt Engineering" />
+        <meta property="article:tag" content="Team Process" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+            name="twitter:title"
+            content="Riding The Token Storm: Notes From A Codex Fleet Wrangler"
+        />
+        <meta
+            name="twitter:description"
+            content="An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable."
+        />
+        <meta
+            name="twitter:image"
+            content="https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1600&q=80"
+        />
+        <meta
+            name="twitter:image:alt"
+            content="Laptop screens glowing with dashboards and system diagrams in a dark room."
+        />
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
             html { scroll-behavior: smooth; }
@@ -82,6 +135,30 @@
                 gap: 0.6rem;
             }
         </style>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                "headline": "Riding The Token Storm: Notes From A Codex Fleet Wrangler",
+                "description": "An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.",
+                "image": "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1600&q=80",
+                "datePublished": "2024-10-08",
+                "dateModified": "2024-10-08",
+                "author": {
+                    "@type": "Person",
+                    "name": "Andrew V. Concepcion"
+                },
+                "publisher": {
+                    "@type": "Person",
+                    "name": "Andrew V. Concepcion",
+                    "url": "https://ac-opensource.github.io/"
+                },
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": "https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html"
+                }
+            }
+        </script>
     </head>
     <body class="min-h-screen bg-gradient-to-b from-white via-slate-50 to-white text-slate-900">
         <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
@@ -95,6 +172,15 @@
                 <a class="md:hidden border rounded-lg px-3 py-1 text-sm" href="/">Back</a>
             </div>
         </header>
+        <nav aria-label="Breadcrumb" class="mx-auto w-full max-w-4xl px-4 pt-4">
+            <a
+                href="/blog/"
+                class="inline-flex items-center text-sm font-semibold text-slate-600 hover:text-slate-900"
+            >
+                <span aria-hidden="true">←</span>
+                <span class="ml-1">Back to blog</span>
+            </a>
+        </nav>
         <main class="mx-auto max-w-4xl px-4 pb-24">
             <section class="pt-12 md:pt-16">
                 <p class="uppercase tracking-[0.3em] text-xs text-slate-500">Field Notes</p>
