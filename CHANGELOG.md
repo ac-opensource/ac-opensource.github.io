@@ -1,5 +1,5 @@
 ## [0.7.1] - 2025-02-05
-- fix: remove aurora photo asset so it can be reuploaded manually
+- fix: upload image
 
 ## [0.7.0] - 2025-02-05
 - feat: publish New Zealand travel journal with February 2025 metadata and personal photo
