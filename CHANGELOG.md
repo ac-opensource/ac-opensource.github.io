@@ -1,3 +1,10 @@
+## [0.8.2] - 2025-11-21
+- fix: align mist, moon, and lake captions with accurate gear and locations
+
+## [0.8.1] - 2025-11-21
+- fix: refresh hobby gallery with locally hosted mist, moon, and alpine photos
+- fix: rewrite film photography gallery with Fujifilm XS-20, Honor Magic 6 Pro, and iPhone 16 shots
+
 ## [0.8.0] - 2025-11-21
 - feat: publish reflection on choosing honesty over staying stuck in pain
 - feat: surface the new reflection as the latest blog entry
