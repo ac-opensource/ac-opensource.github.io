@@ -118,7 +118,7 @@
                 <nav class="hidden md:flex items-center gap-6 text-sm">
                     <a href="#about" class="hover:opacity-80">About</a>
                     <a href="#skills" class="hover:opacity-80">Skills</a>
-                    <a href="#blog" class="hover:opacity-80">Blog</a>
+                    <a href="/blog/" class="hover:opacity-80">Blog</a>
                     <a href="#contact" class="hover:opacity-80">Contact</a>
                 </nav>
                 <button
@@ -134,7 +134,7 @@
                 >
                     <a href="#about" onclick="toggleMenu()">About</a>
                     <a href="#skills" onclick="toggleMenu()">Skills</a>
-                    <a href="#blog" onclick="toggleMenu()">Blog</a>
+                    <a href="/blog/" onclick="toggleMenu()">Blog</a>
                     <a href="#contact" onclick="toggleMenu()">Contact</a>
                 </div>
             </div>
@@ -528,7 +528,9 @@
             if (window.blogFeed?.loadBlogPosts) {
                 window.blogFeed.loadBlogPosts({
                     containerId: "blog-list",
-                    limit: 3,
+                    limit: 4,
+                    readMoreUrl: "/blog/",
+                    readMoreLabel: "Read more posts",
                 });
             } else {
                 const container = document.getElementById("blog-list");

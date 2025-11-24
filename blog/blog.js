@@ -80,7 +80,37 @@
         return posts.filter((post) => post.category === category);
     }
 
-    async function loadBlogPosts({ containerId, limit, category, emptyMessage } = {}) {
+    function createReadMoreCard({ href, label }) {
+        const article = document.createElement("article");
+        article.className = "card p-6 flex flex-col gap-3 h-full justify-center";
+
+        const title = document.createElement("h3");
+        title.className = "text-lg font-semibold";
+        title.textContent = label || "Read more";
+        article.appendChild(title);
+
+        const description = document.createElement("p");
+        description.className = "text-sm text-slate-700";
+        description.textContent = "Browse the latest notes and essays.";
+        article.appendChild(description);
+
+        const cta = document.createElement("a");
+        cta.className = "inline-flex items-center gap-2 text-sm font-semibold text-slate-900";
+        cta.href = href;
+        cta.innerHTML = 'Visit the blog <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>';
+        article.appendChild(cta);
+
+        return article;
+    }
+
+    async function loadBlogPosts({
+        containerId,
+        limit,
+        category,
+        emptyMessage,
+        readMoreUrl,
+        readMoreLabel,
+    } = {}) {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = '<p class="text-sm text-slate-500">Loading posts…</p>';
@@ -103,6 +133,11 @@
             }
             container.innerHTML = "";
             items.forEach((post) => container.appendChild(createArticle(post)));
+            if (readMoreUrl) {
+                container.appendChild(
+                    createReadMoreCard({ href: readMoreUrl, label: readMoreLabel })
+                );
+            }
         } catch (error) {
             container.innerHTML = '<p class="text-sm text-slate-700">Failed to load blog posts.</p>';
         }

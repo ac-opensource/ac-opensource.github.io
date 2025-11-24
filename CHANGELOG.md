@@ -1,3 +1,9 @@
+## [0.8.4] - 2025-11-24
+- fix: show four homepage blog entries with a read more link to the blog
+
+## [0.8.3] - 2025-11-24
+- fix: route blog navigation link to the blog landing page
+
 ## [0.8.2] - 2025-11-21
 - fix: align mist, moon, and lake captions with accurate gear and locations
 
