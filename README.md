@@ -48,8 +48,19 @@ Fitness keeps me honest; curiosity keeps me moving.
 
 ## 📬 Contact
 
-**Open to Staff/Lead Android roles & ambitious mobile work.**  
+**Open to Staff/Lead Android roles & ambitious mobile work.**
 Compose-first teams, strongly-typed navigation, clean boundaries.
 
-- 📧 [Email Me](mailto:aarconcepcion@gmail.com)  
-- 📱 [View App Portfolio](https://github.com/ac-opensource)  
+- 📧 [Email Me](mailto:aarconcepcion@gmail.com)
+- 📱 [View App Portfolio](https://github.com/ac-opensource)
+
+## ✏️ Editing the blog with Keystatic
+
+Keystatic manages the blog metadata stored under `blog/content/posts` so the Tailwind-driven pages can stay static.
+
+1. Install dependencies: `npm install`
+2. Launch the Keystatic UI: `npm run keystatic:dev`
+3. Update entries in `blog/content/posts` via the UI (or edit the JSON files directly)
+4. Regenerate the blog feed: `npm run build:posts` (writes `blog/posts.json`)
+
+Posts still render from handcrafted HTML files under `blog/`; Keystatic keeps the feed metadata in sync.

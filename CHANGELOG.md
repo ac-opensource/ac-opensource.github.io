@@ -1,3 +1,7 @@
+## [0.9.0] - 2025-11-24
+- feat: add Keystatic configuration and content store for blog metadata
+- feat: generate blog feed JSON from Keystatic entries via npm script
+
 ## [0.8.4] - 2025-11-24
 - fix: show four homepage blog entries with a read more link to the blog
 

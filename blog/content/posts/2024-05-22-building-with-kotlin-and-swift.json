@@ -1,0 +1,16 @@
+{
+    "slug": "Building with Kotlin and Swift",
+    "title": "Building with Kotlin and Swift",
+    "summary": "A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.",
+    "date": "2024-05-22",
+    "readingTime": "5 min read",
+    "category": "technical",
+    "topics": [
+        "KMP",
+        "SwiftUI"
+    ],
+    "canonicalUrl": "https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html",
+    "heroImage": null,
+    "heroAlt": null,
+    "body": "This entry is currently published as a handcrafted HTML file at /blog/2024-05-22-building-with-kotlin-and-swift.html.\nUse Keystatic to edit metadata and keep it in sync with the feed while the HTML body stays manual."
+}

@@ -1,0 +1,22 @@
+{
+  "name": "ac-opensource.github.io",
+  "version": "0.9.0",
+  "description": "Andrew Concepcion personal site and blog",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No automated tests configured\"",
+    "keystatic:dev": "npx keystatic@latest dev",
+    "keystatic:build": "npx keystatic@latest build",
+    "build:posts": "node scripts/generate-posts-json.mjs"
+  },
+  "keywords": [
+    "portfolio",
+    "blog",
+    "keystatic"
+  ],
+  "author": "Andrew Concepcion",
+  "license": "MIT",
+  "dependencies": {
+    "@keystatic/core": "^0.5.48"
+  }
+}
