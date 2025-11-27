@@ -1,3 +1,19 @@
+## [0.9.4] - 2025-11-27
+- fix: swap readiness reflection hero image per request
+
+## [0.9.3] - 2025-11-27
+- fix: replace readiness reflection content with the corrected copy
+
+## [0.9.2] - 2025-11-27
+- fix: correct readiness reflection publish date and links
+
+## [0.9.1] - 2025-12-03
+- fix: refresh readiness reflection copy with highlighted reassurances
+
+## [0.9.0] - 2025-12-02
+- feat: publish reflection on embracing struggle as readiness for parenting
+- feat: feature the new readiness essay as the latest reflection entry
+
 ## [0.8.4] - 2025-11-24
 - fix: show four homepage blog entries with a read more link to the blog
 
