@@ -1,3 +1,6 @@
+## [0.9.4] - 2025-11-27
+- fix: swap readiness reflection hero image per request
+
 ## [0.9.3] - 2025-11-27
 - fix: replace readiness reflection content with the corrected copy
 
