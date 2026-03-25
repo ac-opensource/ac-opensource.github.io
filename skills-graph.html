@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+        <title>Skills Graph — Agentic Portfolio</title>
+        <meta name="description" content="Interactive skills network with platform, language, architecture, and tooling relationships." />
+        <meta name="author" content="Andrew V. Concepcion" />
+        <meta name="theme-color" content="#0b1326" />
+        <link rel="canonical" href="https://ac-opensource.github.io/skills-graph.html" />
+        <meta property="og:site_name" content="Andrew V. Concepcion" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://ac-opensource.github.io/skills-graph.html" />
+        <meta property="og:title" content="Skills Graph — Agentic Portfolio" />
+        <meta property="og:description" content="Interactive graph of technical strengths and their cross-domain relationships." />
+        <meta
+            property="og:image"
+            content="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1600&q=80"
+        />
+        <meta property="og:image:alt" content="Code on a monitor with network connections in the background." />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,600;6..72,700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="/assets/css/site.css" />
+        <link rel="stylesheet" href="/assets/css/graph.css" />
+        <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    </head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a>
+        <div class="site-shell graph-page">
+            <header class="site-header">
+                <div class="page-wrap top-nav">
+                    <a class="brand" href="/">
+                        <span class="brand-mark" aria-hidden="true"></span>
+                        Agentic PRD Toolkit
+                    </a>
+                    <nav id="top-nav-links" class="top-nav-links" aria-label="Primary">
+                        <a class="top-nav-link" href="/">Template</a>
+                        <a class="top-nav-link" href="/blog/" data-match="/blog">Blog</a>
+                        <a class="top-nav-link active" href="/skills-graph.html" data-match="/skills-graph.html">Skills graph</a>
+                    </nav>
+                    <div class="nav-actions">
+                        <button id="menu-toggle" class="btn btn-ghost btn-sm menu-toggle" type="button" aria-expanded="false" aria-controls="top-nav-links">
+                            Menu
+                        </button>
+                        <a class="btn btn-subtle btn-sm" href="/">Open template</a>
+                    </div>
+                </div>
+            </header>
+
+            <main id="main" class="page-wrap">
+                <section class="page-intro">
+                    <p class="page-kicker">Capability Map</p>
+                    <h1 class="page-title">Interactive Skills Network</h1>
+                    <p class="page-lead">
+                        Double-click any node to focus. Double-click empty space to reset and fit. Colors represent domain clusters.
+                    </p>
+                </section>
+
+                <section class="graph-layout">
+                    <div class="graph-canvas">
+                        <div id="mynetwork" role="img" aria-label="Interactive skill relationship graph"></div>
+                    </div>
+
+                    <aside class="graph-panel" aria-label="Graph legend">
+                        <p class="side-panel-title">Skill categories</p>
+                        <div id="legend-content" class="legend"></div>
+                        <p class="graph-note">
+                            Node size approximates years of experience or strength concentration.
+                        </p>
+                    </aside>
+                </section>
+
+                <footer class="footer">
+                    <div class="footer-row">
+                        <p>© <span data-year></span> Andrew Concepcion. Graph powered by vis-network.</p>
+                        <a class="btn btn-subtle btn-sm" href="#main">Back to top</a>
+                    </div>
+                </footer>
+            </main>
+        </div>
+
+        <script src="/assets/js/site-ui.js"></script>
+        <script>
+            const skills = [
+                { id: 99, label: "Mobile Development\n11 yrs", group: "Mobile", value: 40 },
+                { id: 1, label: "Android", group: "Android", value: 10 },
+                { id: 15, label: "iOS", group: "iOS", value: 3 },
+                { id: 25, label: "Backend", group: "Backend", value: 4 },
+                { id: 29, label: "React", group: "Web", value: 1 },
+                { id: 5, label: "Kotlin", group: "Language", value: 7 },
+                { id: 26, label: "Java", group: "Language", value: 10 },
+                { id: 17, label: "Swift", group: "Language", value: 3 },
+                { id: 16, label: "Objective-C", group: "Language", value: 1 },
+                { id: 27, label: "JavaScript", group: "Language", value: 3 },
+                { id: 39, label: "TypeScript", group: "Language", value: 2 },
+                { id: 40, label: "SQL", group: "Language", value: 5 },
+                { id: 41, label: "Dart", group: "Language", value: 1 },
+                { id: 30, label: "HTML", group: "Language", value: 2 },
+                { id: 31, label: "CSS", group: "Language", value: 2 },
+                { id: 42, label: "SOLID", group: "Architecture", value: 5 },
+                { id: 3, label: "Clean Architecture", group: "Architecture", value: 7 },
+                { id: 43, label: "Vertical Slice", group: "Architecture", value: 3 },
+                { id: 44, label: "Screaming Architecture", group: "Architecture", value: 3 },
+                { id: 45, label: "Functional", group: "Architecture", value: 3 },
+                { id: 46, label: "Reactive", group: "Architecture", value: 4 },
+                { id: 47, label: "VIPER", group: "Architecture", value: 2 },
+                { id: 48, label: "Redux", group: "Architecture", value: 2 },
+                { id: 49, label: "MV*", group: "Architecture", value: 4 },
+                { id: 50, label: "TDD", group: "Practices", value: 3 },
+                { id: 33, label: "CI/CD", group: "Practices", value: 2 },
+                { id: 2, label: "Android SDK", group: "Android", value: 10 },
+                { id: 4, label: "Jetpack Compose", group: "Android", value: 2 },
+                { id: 6, label: "MVP", group: "Architecture", value: 3 },
+                { id: 7, label: "MVVM", group: "Architecture", value: 4 },
+                { id: 8, label: "Bluetooth", group: "Android", value: 3 },
+                { id: 9, label: "NFC", group: "Android", value: 4 },
+                { id: 10, label: "Permissions", group: "Android", value: 10 },
+                { id: 11, label: "SQLite", group: "Database", value: 10 },
+                { id: 12, label: "Room", group: "Database", value: 2 },
+                { id: 13, label: "LiveData", group: "Android", value: 4 },
+                { id: 14, label: "Coroutines", group: "Android", value: 3 },
+                { id: 37, label: "Material Design", group: "Design", value: 7 },
+                { id: 38, label: "Automated Testing", group: "Testing", value: 2 },
+                { id: 18, label: "SwiftUI", group: "iOS", value: 1 },
+                { id: 19, label: "Core Animation", group: "iOS", value: 1 },
+                { id: 20, label: "Core Location", group: "iOS", value: 1 },
+                { id: 21, label: "Combine", group: "iOS", value: 1 },
+                { id: 22, label: "Realm", group: "Database", value: 2 },
+                { id: 23, label: "Flutter", group: "Cross-Platform", value: 1 },
+                { id: 24, label: "React Native", group: "Cross-Platform", value: 1 },
+                { id: 28, label: "NodeJS", group: "Backend", value: 3 },
+                { id: 32, label: "Git", group: "Tooling", value: 10 },
+                { id: 34, label: "Internationalization", group: "General", value: 4 },
+                { id: 35, label: "Localization", group: "General", value: 5 },
+                { id: 36, label: "Frameworks", group: "General", value: 3 }
+            ];
+
+            const edges = [
+                { from: 99, to: 1 }, { from: 99, to: 15 }, { from: 99, to: 23 }, { from: 99, to: 24 },
+                { from: 1, to: 2 }, { from: 1, to: 5 }, { from: 1, to: 26 }, { from: 1, to: 4 },
+                { from: 1, to: 8 }, { from: 1, to: 9 }, { from: 1, to: 10 }, { from: 1, to: 13 },
+                { from: 1, to: 14 }, { from: 1, to: 37 }, { from: 1, to: 3 }, { from: 1, to: 6 },
+                { from: 1, to: 7 }, { from: 1, to: 11 }, { from: 1, to: 12 }, { from: 1, to: 38 },
+                { from: 15, to: 17 }, { from: 15, to: 16 }, { from: 15, to: 18 }, { from: 15, to: 19 },
+                { from: 15, to: 20 }, { from: 15, to: 21 }, { from: 15, to: 22 }, { from: 15, to: 3 },
+                { from: 15, to: 7 }, { from: 15, to: 47 },
+                { from: 29, to: 27 }, { from: 29, to: 39 }, { from: 29, to: 30 }, { from: 29, to: 31 },
+                { from: 27, to: 30 }, { from: 27, to: 31 }, { from: 39, to: 27 },
+                { from: 25, to: 28 }, { from: 25, to: 26 }, { from: 25, to: 40 },
+                { from: 28, to: 27 }, { from: 28, to: 39 },
+                { from: 23, to: 41 }, { from: 24, to: 29 }, { from: 24, to: 39 },
+                { from: 12, to: 11 }, { from: 11, to: 40 }, { from: 22, to: 1 }, { from: 22, to: 15 },
+                { from: 3, to: 42 }, { from: 3, to: 44 }, { from: 43, to: 3 },
+                { from: 45, to: 5 }, { from: 45, to: 17 }, { from: 45, to: 27 },
+                { from: 46, to: 13 }, { from: 46, to: 21 }, { from: 46, to: 14 },
+                { from: 48, to: 29 }, { from: 48, to: 23 }, { from: 49, to: 6 }, { from: 49, to: 7 },
+                { from: 50, to: 38 }, { from: 33, to: 32 },
+                { from: 32, to: 1 }, { from: 32, to: 15 }, { from: 32, to: 29 }, { from: 32, to: 25 },
+                { from: 34, to: 35 }, { from: 35, to: 1 }, { from: 35, to: 15 },
+                { from: 5, to: 26 }, { from: 17, to: 16 }
+            ];
+
+            const colors = {
+                Mobile: "#4edea3",
+                Android: "#16a34a",
+                iOS: "#7bd0ff",
+                Web: "#f97316",
+                Backend: "#94a3b8",
+                Language: "#f5d27f",
+                Database: "#22c55e",
+                Architecture: "#f59e0b",
+                Practices: "#fb7185",
+                Tooling: "#ef4444",
+                "Cross-Platform": "#0ea5e9",
+                Design: "#ec4899",
+                Testing: "#a855f7",
+                General: "#c6c6cd"
+            };
+
+            const legendContainer = document.getElementById("legend-content");
+            Object.entries(colors).forEach(([group, color]) => {
+                const item = document.createElement("div");
+                item.className = "legend-item";
+                item.innerHTML = `<span class="legend-swatch" style="background:${color}"></span><span>${group}</span>`;
+                legendContainer.appendChild(item);
+            });
+
+            const data = {
+                nodes: new vis.DataSet(
+                    skills.map((skill) => ({
+                        ...skill,
+                        color: colors[skill.group] || "#c6c6cd",
+                        font: {
+                            color: "#dae2fd",
+                            size: 14,
+                            face: "Manrope, sans-serif"
+                        },
+                        scaling: {
+                            min: 12,
+                            max: 40,
+                            label: {
+                                enabled: true,
+                                min: 13,
+                                max: 24
+                            }
+                        },
+                        borderWidth: 0,
+                        shadow: {
+                            enabled: true,
+                            color: "rgba(6, 14, 32, 0.42)",
+                            size: 12,
+                            x: 0,
+                            y: 8
+                        }
+                    }))
+                ),
+                edges: new vis.DataSet(
+                    edges.map((edge) => ({
+                        ...edge,
+                        color: {
+                            color: "rgba(197, 204, 222, 0.35)",
+                            highlight: "rgba(197, 204, 222, 0.75)"
+                        },
+                        width: 1
+                    }))
+                )
+            };
+
+            const options = {
+                nodes: {
+                    shape: "dot"
+                },
+                edges: {
+                    smooth: {
+                        type: "continuous"
+                    }
+                },
+                physics: {
+                    stabilization: false,
+                    barnesHut: {
+                        gravitationalConstant: -11000,
+                        centralGravity: 0.14,
+                        springLength: 240,
+                        springConstant: 0.04,
+                        damping: 0.09,
+                        avoidOverlap: 0.75
+                    },
+                    minVelocity: 0.65
+                },
+                interaction: {
+                    hover: true,
+                    zoomView: true,
+                    tooltipDelay: 180
+                }
+            };
+
+            const network = new vis.Network(document.getElementById("mynetwork"), data, options);
+
+            network.on("doubleClick", (params) => {
+                if (params.nodes.length) {
+                    network.focus(params.nodes[0], {
+                        scale: 1.45,
+                        animation: {
+                            duration: 700,
+                            easingFunction: "easeInOutQuad"
+                        }
+                    });
+                } else {
+                    network.fit({
+                        animation: {
+                            duration: 700,
+                            easingFunction: "easeInOutQuad"
+                        }
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>

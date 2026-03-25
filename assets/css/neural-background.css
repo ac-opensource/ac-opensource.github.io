@@ -1,0 +1,97 @@
+/* Shared animated background based on Stitch node 57b33aa... */
+.neural-global-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+#site-topbar,
+main,
+#site-footer {
+  position: relative;
+  z-index: 5;
+}
+
+.neural-global-bg .neural-mesh-container {
+  position: absolute;
+  inset: -15%;
+  perspective: 1000px;
+  opacity: 0.22;
+}
+
+.neural-global-bg .neural-mesh {
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  top: -25%;
+  left: -25%;
+  background-image:
+    radial-gradient(circle at 50% 50%, transparent 40%, rgba(31, 92, 186, 0.05) 100%),
+    linear-gradient(rgba(31, 92, 186, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31, 92, 186, 0.1) 1px, transparent 1px);
+  background-size: 100% 100%, 60px 60px, 60px 60px;
+  transform-style: preserve-3d;
+  animation: neuralMeshRotate 40s linear infinite;
+}
+
+.neural-global-bg .neural-node {
+  position: absolute;
+  background: #1f5cba;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #6799fb;
+  animation: neuralNodePulse 4s ease-in-out infinite;
+}
+
+.neural-global-bg .mesh-line {
+  position: absolute;
+  background: linear-gradient(90deg, transparent, rgba(31, 92, 186, 0.2), transparent);
+  height: 1px;
+  transform-origin: left center;
+}
+
+.neural-global-bg .bust-gradient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(31, 92, 186, 0.08) 0%,
+    rgba(250, 249, 244, 0) 70%
+  );
+  mix-blend-mode: multiply;
+}
+
+.neural-global-bg .canvas-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  background-image:
+    linear-gradient(to right, rgba(175, 179, 170, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(175, 179, 170, 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+@keyframes neuralMeshRotate {
+  0% {
+    transform: rotateX(20deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(20deg) rotateY(360deg);
+  }
+}
+
+@keyframes neuralNodePulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+    box-shadow: 0 0 15px #6799fb;
+  }
+}

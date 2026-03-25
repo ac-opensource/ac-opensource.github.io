@@ -3,145 +3,143 @@
 
     function formatDate(value) {
         const date = new Date(value);
-        if (Number.isNaN(date.getTime())) {
-            return value;
-        }
+        if (Number.isNaN(date.getTime())) return value;
         return new Intl.DateTimeFormat("en-US", {
             month: "short",
             day: "numeric",
-            year: "numeric",
+            year: "numeric"
         }).format(date);
     }
 
-    function createTagPill(text) {
-        const pill = document.createElement("span");
-        pill.className = "chip text-xs bg-slate-50 text-slate-600";
-        pill.textContent = text;
-        return pill;
+    function createTopicBadge(topic) {
+        const tag = document.createElement("span");
+        tag.className = "badge";
+        tag.textContent = topic;
+        return tag;
     }
 
-    function createArticle(post) {
-        const article = document.createElement("article");
-        article.className = "card p-6 flex flex-col gap-4 h-full";
-
-        const header = document.createElement("div");
+    function createPostCard(post) {
+        const card = document.createElement("article");
+        card.className = "card post-card";
 
         const meta = document.createElement("p");
-        meta.className = "text-xs font-semibold uppercase tracking-wide text-slate-500";
+        meta.className = "post-meta";
         meta.textContent = formatDate(post.date);
         if (post.readingTime) {
-            const separator = document.createElement("span");
-            separator.textContent = " · ";
-            meta.appendChild(separator);
-            const read = document.createElement("span");
-            read.textContent = post.readingTime;
-            meta.appendChild(read);
+            meta.textContent += ` • ${post.readingTime}`;
         }
-        header.appendChild(meta);
 
         const title = document.createElement("h3");
-        title.className = "text-xl font-semibold mt-2";
-        const link = document.createElement("a");
-        link.className = "hover:underline";
-        link.href = `/blog/${post.slug}.html`;
-        link.textContent = post.title;
-        title.appendChild(link);
-        header.appendChild(title);
+        title.className = "post-title";
+        const titleLink = document.createElement("a");
+        titleLink.href = `/blog/${post.slug}.html`;
+        titleLink.textContent = post.title;
+        titleLink.className = "post-title-link";
+        title.appendChild(titleLink);
 
-        if (post.summary) {
-            const summary = document.createElement("p");
-            summary.className = "text-sm text-slate-700 mt-3";
-            summary.textContent = post.summary;
-            header.appendChild(summary);
-        }
+        const summary = document.createElement("p");
+        summary.className = "post-summary";
+        summary.textContent = post.summary || "No summary provided.";
 
-        article.appendChild(header);
-
-        if (Array.isArray(post.topics) && post.topics.length) {
-            const tagList = document.createElement("div");
-            tagList.className = "flex flex-wrap gap-2";
-            post.topics.forEach((topic) => {
-                tagList.appendChild(createTagPill(topic));
-            });
-            article.appendChild(tagList);
-        }
+        const tags = document.createElement("div");
+        tags.className = "badges";
+        (post.topics || []).forEach((topic) => {
+            tags.appendChild(createTopicBadge(topic));
+        });
 
         const cta = document.createElement("a");
-        cta.className = "mt-auto inline-flex items-center gap-2 text-sm font-semibold text-slate-900";
+        cta.className = "btn btn-subtle btn-sm";
         cta.href = `/blog/${post.slug}.html`;
-        cta.innerHTML = 'Read post <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>';
-        article.appendChild(cta);
+        cta.textContent = "Read post";
 
-        return article;
+        card.append(meta, title, summary);
+        if ((post.topics || []).length) card.appendChild(tags);
+        card.appendChild(cta);
+
+        return card;
     }
 
-    function filterByCategory(posts, category) {
-        if (!category) return posts;
+    async function fetchPosts() {
+        const response = await fetch(BLOG_DATA_URL, { cache: "no-store" });
+        if (!response.ok) {
+            throw new Error("Unable to fetch posts");
+        }
+
+        const posts = await response.json();
+        return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
+
+    function applyFilter(posts, category) {
+        if (!category || category === "all") return posts;
         return posts.filter((post) => post.category === category);
     }
 
-    function createReadMoreCard({ href, label }) {
-        const article = document.createElement("article");
-        article.className = "card p-6 flex flex-col gap-3 h-full justify-center";
+    function updateButtonStates(buttons, activeFilter) {
+        buttons.forEach((button) => {
+            const isActive = button.dataset.filter === activeFilter;
+            button.classList.toggle("btn-primary", isActive);
+            button.classList.toggle("btn-ghost", !isActive);
+        });
+    }
 
-        const title = document.createElement("h3");
-        title.className = "text-lg font-semibold";
-        title.textContent = label || "Read more";
-        article.appendChild(title);
+    async function renderFeed({ containerId, category = "all", limit, emptyMessage }) {
+        const container = document.getElementById(containerId);
+        if (!container) return [];
 
-        const description = document.createElement("p");
-        description.className = "text-sm text-slate-700";
-        description.textContent = "Browse the latest notes and essays.";
-        article.appendChild(description);
+        container.innerHTML = "<p class=\"notice\">Loading posts...</p>";
 
-        const cta = document.createElement("a");
-        cta.className = "inline-flex items-center gap-2 text-sm font-semibold text-slate-900";
-        cta.href = href;
-        cta.innerHTML = 'Visit the blog <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>';
-        article.appendChild(cta);
+        try {
+            const posts = await fetchPosts();
+            const filtered = applyFilter(posts, category);
+            const sliced = typeof limit === "number" ? filtered.slice(0, limit) : filtered;
 
-        return article;
+            if (!sliced.length) {
+                container.innerHTML = `<p class=\"notice\">${emptyMessage || "No posts found."}</p>`;
+                return posts;
+            }
+
+            container.innerHTML = "";
+            sliced.forEach((post) => container.appendChild(createPostCard(post)));
+            return posts;
+        } catch (error) {
+            container.innerHTML = `<p class=\"notice\">Failed to load posts. ${error.message}</p>`;
+            return [];
+        }
+    }
+
+    async function hydrateBlogIndex({ containerId, filterButtons = [] } = {}) {
+        const buttons = Array.isArray(filterButtons) ? filterButtons : [];
+        let activeFilter = "all";
+
+        await renderFeed({ containerId, category: activeFilter });
+        updateButtonStates(buttons, activeFilter);
+
+        buttons.forEach((button) => {
+            button.addEventListener("click", async () => {
+                activeFilter = button.dataset.filter || "all";
+                updateButtonStates(buttons, activeFilter);
+                await renderFeed({ containerId, category: activeFilter });
+            });
+        });
     }
 
     async function loadBlogPosts({
         containerId,
         limit,
         category,
-        emptyMessage,
-        readMoreUrl,
-        readMoreLabel,
+        emptyMessage
     } = {}) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        container.innerHTML = '<p class="text-sm text-slate-500">Loading posts…</p>';
-        try {
-            const response = await fetch(BLOG_DATA_URL);
-            if (!response.ok) throw new Error("Unable to fetch posts");
-            const posts = await response.json();
-            const sorted = posts.sort(
-                (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-            );
-            const filtered = filterByCategory(sorted, category);
-            const items = typeof limit === "number" ? filtered.slice(0, limit) : filtered;
-            if (items.length === 0) {
-                container.innerHTML = `
-                    <p class="text-sm text-slate-700">
-                        ${emptyMessage || "No posts yet."}
-                    </p>
-                `;
-                return;
-            }
-            container.innerHTML = "";
-            items.forEach((post) => container.appendChild(createArticle(post)));
-            if (readMoreUrl) {
-                container.appendChild(
-                    createReadMoreCard({ href: readMoreUrl, label: readMoreLabel })
-                );
-            }
-        } catch (error) {
-            container.innerHTML = '<p class="text-sm text-slate-700">Failed to load blog posts.</p>';
-        }
+        const resolvedCategory = category || "all";
+        await renderFeed({
+            containerId,
+            limit,
+            category: resolvedCategory,
+            emptyMessage
+        });
     }
 
-    window.blogFeed = { loadBlogPosts };
+    window.blogFeed = {
+        hydrateBlogIndex,
+        loadBlogPosts
+    };
 })();

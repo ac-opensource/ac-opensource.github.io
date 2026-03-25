@@ -1,0 +1,25 @@
+{
+  "name": "ac-opensource-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agentic PRD toolkit with SQLite-backed blog authoring and static sync",
+  "scripts": {
+    "blog:db:init": "node scripts/init-blog-db.js",
+    "blog:db:import": "node scripts/import-blog-into-db.js",
+    "blog:db:sync": "node scripts/sync-blog-from-db.js",
+    "blog:build": "node scripts/build-static-blog-pages.js",
+    "blog:query": "node scripts/query-blog-db.js",
+    "blog:writer": "node scripts/blog-writer-server.js",
+    "blog:new": "node scripts/new-post.js",
+    "build": "npm run blog:db:sync && npm run blog:build",
+    "test:e2e": "npm run blog:build && node scripts/e2e-check.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "express": "^4.21.2",
+    "sanitize-html": "^2.17.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2"
+  }
+}

@@ -1,83 +1,123 @@
 [
-    {
-        "slug": "2025-11-27-the-myth-of-being-ready",
-        "title": "The Myth of Being Ready",
-        "summary": "Kids don't come with a manual—readiness is a choice made in the struggle, not a feeling you wait for.",
-        "date": "2025-11-27",
-        "readingTime": "7 min read",
-        "topics": ["Parenting", "Resilience", "Personal Growth"],
-        "category": "reflection"
-    },
-    {
-        "slug": "2025-11-21-its-not-okay-to-stay-not-okay",
-        "title": "It’s Not Okay to Stay “Not Okay” — Why Honesty Is the Fix",
-        "summary": "A reflection on why acknowledging pain is only step one and how ownership keeps your struggles from spilling onto others.",
-        "date": "2025-11-21",
-        "readingTime": "9 min read",
-        "topics": ["Reflection", "Mental Health", "Personal Growth"],
-        "category": "reflection"
-    },
-    {
-        "slug": "2025-11-19-reminder-from-my-own-advice",
-        "title": "Reminder I Didn’t Expect to Get From My Own Advice",
-        "summary": "On drifting into complacency, offering a friend honest advice, and realizing you need the same reminders.",
-        "date": "2025-11-19",
-        "readingTime": "7 min read",
-        "topics": ["Relationships", "Reflection", "Personal Growth"],
-        "category": "reflection"
-    },
-    {
-        "slug": "2024-11-21-quiet-systems-reflection",
-        "title": "Quiet Systems: Reflection Rituals For Builders",
-        "summary": "A personal essay about designing focus blocks, protecting rest, and keeping philosophy close to the shipping calendar.",
-        "date": "2024-11-21",
-        "readingTime": "10 min read",
-        "topics": ["Reflection", "Philosophy", "Creative Process"],
-        "category": "reflection"
-    },
-    {
-        "slug": "2024-11-02-sunrise-trail-runs",
-        "title": "A Month in New Zealand",
-        "summary": "Family holidays in Auckland, a compressed South Island road trip, and the surprise of catching the Aurora Australis.",
-        "date": "2025-02-05",
-        "readingTime": "8 min read",
-        "topics": ["Travel", "Family", "Reflection"],
-        "category": "hobby"
-    },
-    {
-        "slug": "2024-09-14-film-photography-gallery",
-        "title": "Weekend Photo Experiments: Paradise Mist, Dobsonian Moon, and Lake Pukaki",
-        "summary": "Three frames with context: Glenorchy mist from a moving van (Honor Magic 6 Pro), a Dobsonian-mounted moon on the Fujifilm XS-20, and Lake Pukaki with Mount Cook on the Honor.",
-        "date": "2024-09-14",
-        "readingTime": "6 min read",
-        "topics": ["Hobby", "Photography"],
-        "category": "hobby"
-    },
-    {
-        "slug": "2024-10-08-running-ai-fleet-learnings",
-        "title": "Riding The Token Storm: Notes From A Codex Fleet Wrangler",
-        "summary": "An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.",
-        "date": "2024-10-08",
-        "readingTime": "14 min read",
-        "topics": ["AI Ops", "Prompt Engineering", "Team Process"],
-        "category": "technical"
-    },
-    {
-        "slug": "2024-05-22-building-with-kotlin-and-swift",
-        "title": "Building with Kotlin and Swift",
-        "summary": "A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.",
-        "date": "2024-05-22",
-        "readingTime": "5 min read",
-        "topics": ["KMP", "SwiftUI"],
-        "category": "technical"
-    },
-    {
-        "slug": "2024-03-14-welcome",
-        "title": "Welcome to my blog",
-        "summary": "Opening thoughts on why I'm documenting experimentation notes publicly.",
-        "date": "2024-03-14",
-        "readingTime": "2 min read",
-        "topics": ["Personal"],
-        "category": "personal"
-    }
+  {
+    "slug": "2025-11-25-test-post",
+    "title": "Test Post",
+    "author": "Andrew Concepcion",
+    "summary": "This is a test summary.",
+    "date": "2025-11-25",
+    "readingTime": "1 min read",
+    "topics": [
+      "Topic1",
+      "Topic2"
+    ],
+    "category": "test-category"
+  },
+  {
+    "slug": "2025-11-21-its-not-okay-to-stay-not-okay",
+    "title": "It’s Not Okay to Stay “Not Okay” — Why Honesty Is the Fix",
+    "author": "Andrew Concepcion",
+    "summary": "A reflection on why acknowledging pain is only step one and how ownership keeps your struggles from spilling onto others.",
+    "date": "2025-11-21",
+    "readingTime": "9 min read",
+    "topics": [
+      "Reflection",
+      "Mental Health",
+      "Personal Growth"
+    ],
+    "category": "reflection"
+  },
+  {
+    "slug": "2025-11-19-reminder-from-my-own-advice",
+    "title": "Reminder I Didn’t Expect to Get From My Own Advice",
+    "author": "Andrew Concepcion",
+    "summary": "On drifting into complacency, offering a friend honest advice, and realizing you need the same reminders.",
+    "date": "2025-11-19",
+    "readingTime": "7 min read",
+    "topics": [
+      "Relationships",
+      "Reflection",
+      "Personal Growth"
+    ],
+    "category": "reflection"
+  },
+  {
+    "slug": "2024-11-02-sunrise-trail-runs",
+    "title": "A Month in New Zealand",
+    "author": "Andrew Concepcion",
+    "summary": "Family holidays in Auckland, a compressed South Island road trip, and the surprise of catching the Aurora Australis.",
+    "date": "2025-02-05",
+    "readingTime": "8 min read",
+    "topics": [
+      "Travel",
+      "Family",
+      "Reflection"
+    ],
+    "category": "hobby"
+  },
+  {
+    "slug": "2024-11-21-quiet-systems-reflection",
+    "title": "Quiet Systems: Reflection Rituals For Builders",
+    "author": "Andrew Concepcion",
+    "summary": "A personal essay about designing focus blocks, protecting rest, and keeping philosophy close to the shipping calendar.",
+    "date": "2024-11-21",
+    "readingTime": "10 min read",
+    "topics": [
+      "Reflection",
+      "Philosophy",
+      "Creative Process"
+    ],
+    "category": "reflection"
+  },
+  {
+    "slug": "2024-10-08-running-ai-fleet-learnings",
+    "title": "Riding The Token Storm: Notes From A Codex Fleet Wrangler",
+    "author": "Andrew Concepcion",
+    "summary": "An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.",
+    "date": "2024-10-08",
+    "readingTime": "14 min read",
+    "topics": [
+      "AI Ops",
+      "Prompt Engineering",
+      "Team Process"
+    ],
+    "category": "technical"
+  },
+  {
+    "slug": "2024-09-14-film-photography-gallery",
+    "title": "Weekend Photo Experiments: Paradise Mist, Dobsonian Moon, and Lake Pukaki",
+    "author": "Andrew Concepcion",
+    "summary": "Three frames with context: Glenorchy mist from a moving van (Honor Magic 6 Pro), a Dobsonian-mounted moon on the Fujifilm XS-20, and Lake Pukaki with Mount Cook on the Honor.",
+    "date": "2024-09-14",
+    "readingTime": "6 min read",
+    "topics": [
+      "Hobby",
+      "Photography"
+    ],
+    "category": "hobby"
+  },
+  {
+    "slug": "2024-05-22-building-with-kotlin-and-swift",
+    "title": "Building with Kotlin and Swift",
+    "author": "Andrew Concepcion",
+    "summary": "A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.",
+    "date": "2024-05-22",
+    "readingTime": "5 min read",
+    "topics": [
+      "KMP",
+      "SwiftUI"
+    ],
+    "category": "technical"
+  },
+  {
+    "slug": "2024-03-14-welcome",
+    "title": "Welcome to my blog",
+    "author": "Andrew Concepcion",
+    "summary": "Opening thoughts on why I'm documenting experimentation notes publicly.",
+    "date": "2024-03-14",
+    "readingTime": "2 min read",
+    "topics": [
+      "Personal"
+    ],
+    "category": "personal"
+  }
 ]

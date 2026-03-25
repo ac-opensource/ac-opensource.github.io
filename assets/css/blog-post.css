@@ -1,0 +1,192 @@
+.post-page {
+    min-height: 100vh;
+}
+
+.post-page main {
+    width: min(100% - 2rem, var(--content-narrow));
+    margin-inline: auto;
+    padding-top: 1rem;
+    padding-bottom: 4rem;
+}
+
+.breadcrumb,
+.post-page nav[aria-label="Breadcrumb"] {
+    width: min(100% - 2rem, var(--content-narrow));
+    margin-inline: auto;
+    padding-top: 1.4rem;
+}
+
+.breadcrumb a,
+.post-page nav[aria-label="Breadcrumb"] a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    text-decoration: none;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.breadcrumb a:hover,
+.breadcrumb a:focus-visible {
+    color: var(--text-primary);
+}
+
+.post-shell,
+.post-page article.card {
+    margin-top: 1.35rem;
+    background: linear-gradient(160deg, rgba(23, 31, 51, 0.9), rgba(19, 27, 46, 0.9));
+    border: 1px solid rgba(197, 204, 222, 0.15);
+    border-radius: var(--radius-lg);
+    padding: clamp(1rem, 2vw, 1.5rem);
+    box-shadow: var(--shadow-soft);
+}
+
+.post-shell header,
+.post-page article.card > header {
+    margin-bottom: 1.1rem;
+}
+
+.post-shell header p,
+.post-page article.card > header p {
+    margin: 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 800;
+}
+
+.post-shell h1,
+.post-page article.card h1:first-of-type {
+    margin: 0.52rem 0 0;
+    font-family: "Newsreader", Georgia, serif;
+    line-height: 1.12;
+    font-size: clamp(1.9rem, 4.4vw, 2.8rem);
+    letter-spacing: -0.015em;
+}
+
+.post-shell figure,
+.post-page article.card figure {
+    margin: 1.05rem 0 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid rgba(197, 204, 222, 0.2);
+    background: rgba(13, 19, 38, 0.48);
+}
+
+.post-shell figure img,
+.post-page article.card figure img {
+    width: 100%;
+    max-height: min(52vh, 26rem);
+    object-fit: cover;
+}
+
+.post-shell figcaption,
+.post-page article.card figcaption {
+    margin: 0;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    padding: 0.6rem 0.72rem 0.72rem;
+}
+
+.post-shell section,
+.post-shell .content,
+.post-page article.card section {
+    margin-top: 1.2rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.post-shell section > * + *,
+.post-shell .content > * + *,
+.post-page article.card section > * + * {
+    margin-top: 0.95rem;
+}
+
+.post-shell h2,
+.post-shell h3,
+.post-page article.card h2,
+.post-page article.card h3 {
+    color: var(--text-primary);
+    font-family: "Newsreader", Georgia, serif;
+    line-height: 1.2;
+    margin-top: 1.2rem;
+}
+
+.post-shell strong,
+.post-page article.card strong {
+    color: var(--text-primary);
+}
+
+.post-shell a,
+.post-page article.card a {
+    color: var(--accent-strong);
+}
+
+.post-shell ul,
+.post-shell ol,
+.post-page article.card ul,
+.post-page article.card ol {
+    display: grid;
+    gap: 0.55rem;
+    padding-left: 1.1rem;
+}
+
+.post-shell li::marker,
+.post-page article.card li::marker {
+    color: var(--accent);
+}
+
+.post-shell hr,
+.post-page article.card hr {
+    border: none;
+    height: 1px;
+    margin: 1.45rem auto;
+    width: min(9rem, 35%);
+    background: linear-gradient(90deg, transparent, rgba(197, 204, 222, 0.45), transparent);
+}
+
+.post-shell blockquote,
+.post-shell .callout,
+.post-page article.card blockquote,
+.post-page article.card .callout {
+    margin: 1rem 0;
+    padding: 0.82rem 0.9rem;
+    border-left: 3px solid rgba(78, 222, 163, 0.45);
+    background: rgba(78, 222, 163, 0.09);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+}
+
+.post-shell code,
+.post-page article.card code {
+    font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    background: rgba(123, 208, 255, 0.13);
+    border: 1px solid rgba(123, 208, 255, 0.3);
+    border-radius: 0.35rem;
+    padding: 0.08rem 0.3rem;
+}
+
+.post-shell pre,
+.post-page article.card pre {
+    margin: 1rem 0;
+    background: rgba(13, 19, 38, 0.76);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(197, 204, 222, 0.2);
+    padding: 0.8rem;
+    overflow-x: auto;
+}
+
+.post-shell pre code,
+.post-page article.card pre code {
+    border: none;
+    background: transparent;
+    padding: 0;
+}
+
+@media (max-width: 760px) {
+    .post-shell {
+        padding: 0.95rem;
+    }
+}

@@ -1,55 +1,76 @@
-# Andrew Concepcion
+# Andrew Concepcion Site
 
-**Mobile Developer**  
-Compose Multiplatform • Kotlin Multiplatform • Jetpack Compose • Kotlin • SwiftUI • Swift
+Static multi-page portfolio/blog with SQLite-backed blog content.
 
-[📱 View App Portfolio](https://rebrand.ly/portfolio-app) · [📄 Download Résumé (PDF)](./AndrewConcepcion-Resume.pdf)
+## What this includes
 
----
+- Digital Workbench-style homepage/about/blog views
+- SQLite-backed blog index (`/blog/index.html`) with static, SEO-ready blog post pages (`/blog/<slug>.html`)
+- Local WYSIWYG writer that saves posts directly into SQLite (`npm run blog:writer`)
+- Static asset references for blog images under `blog/images/`
 
-## 📌 Highlights
-- 📧 [aarconcepcion@gmail.com](mailto:aarconcepcion@gmail.com)  
-- 🌏 Philippines / New Zealand / Remote  
-- 💻 [GitHub](https://github.com/ac-opensource) · [LinkedIn](https://www.linkedin.com/in/aarconcepcion)
+## SQLite Blog Architecture
 
----
+- `assets/data/blog.sqlite`: source of truth for all blog post data
+- `assets/js/blog-sqlite.js`: browser client that loads and queries SQLite via `sql.js`
+- `scripts/lib/blog-db.js`: shared schema + upsert/query helpers for Node scripts
+- `scripts/init-blog-db.js`: creates schema
+- `scripts/import-blog-into-db.js`: imports existing `blog/posts.json` + post HTML into SQLite
+- `scripts/sync-blog-from-db.js`: exports DB metadata back to `blog/posts.json`
+- `scripts/build-static-blog-pages.js`: builds static blog post pages, `sitemap.xml`, and `robots.txt` from SQLite
+- `scripts/blog-writer-server.js`: local writer API + static writer page host
+- `blog/writer.html` + `assets/js/blog-writer-app.js`: WYSIWYG writer UI (Quill)
 
-## 👨‍💻 About
+## Setup
 
-### Professional
-Staff/Lead-level mobile engineer with **10+ years of experience** shipping production-grade Android and iOS apps for fintech, e-commerce, advertising, and transport.  
-Focused on **composable architectures, team mentorship, and clean, testable code** that scales.
+Install dependencies:
 
-### Personal
-Husband. Dad. Explorer.  
-When I’m not shipping mobile features, I’m outside with an **8-inch Dobsonian telescope** watching Saturn’s rings or planning the next family trip with my camera in tow.  
-I read philosophy and anything that stretches my thinking.  
-I run a **small Airbnb** and a **laundry venture** practical experiments on the road to financial independence.  
-Fitness keeps me honest; curiosity keeps me moving.
+```bash
+npm install
+```
 
----
+Initialize and seed SQLite from existing content:
 
-## 🛠 Skills & Tooling
+```bash
+npm run blog:db:init
+npm run blog:db:import
+```
 
-### Platforms
-- Android  
-- iOS  
-- Backend
+Optional: sync DB metadata back to `blog/posts.json`:
 
-### Languages
-- Kotlin · Java · Swift · Objective-C  
-- JavaScript · TypeScript · SQL · Dart  
-- HTML · CSS
+```bash
+npm run blog:db:sync
+```
 
-### Architectures & Practices
-- SOLID · Clean Architecture · Vertical Slice · Screaming Architecture  
-- Functional · Reactive · VIPER · Redux · MV*  
-- TDD · CI/CD
+Build static blog post pages for GitHub Pages deployment:
 
-## 📬 Contact
+```bash
+npm run blog:build
+```
 
-**Open to Staff/Lead Android roles & ambitious mobile work.**  
-Compose-first teams, strongly-typed navigation, clean boundaries.
+Or run the full build pipeline (`posts.json` sync + static page generation):
 
-- 📧 [Email Me](mailto:aarconcepcion@gmail.com)  
-- 📱 [View App Portfolio](https://github.com/ac-opensource)  
+```bash
+npm run build
+```
+
+## Writing workflow
+
+Run the local writer:
+
+```bash
+npm run blog:writer
+```
+
+Open `http://localhost:4310`, write/edit in the WYSIWYG editor, and save. Entries are written into `assets/data/blog.sqlite`.
+For production/GitHub Pages, run `npm run blog:build` to generate static post pages and SEO artifacts.
+
+## Public Site Preview
+
+Serve with any static server from repository root. Example:
+
+```bash
+python3 -m http.server 8080
+```
+
+Then open `http://localhost:8080`.

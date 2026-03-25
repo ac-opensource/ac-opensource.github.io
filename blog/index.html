@@ -1,237 +1,651 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Blog — Andrew V. Concepcion</title>
-        <meta
-            name="description"
-            content="Deep dives on Compose-first mobile engineering, KMP delivery, and multi-agent experiments."
-        />
-        <link rel="canonical" href="https://ac-opensource.github.io/blog/" />
-        <meta name="author" content="Andrew V. Concepcion" />
-        <meta property="og:site_name" content="Andrew V. Concepcion" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://ac-opensource.github.io/blog/" />
-        <meta property="og:title" content="Blog — Andrew V. Concepcion" />
-        <meta
-            property="og:description"
-            content="Field notes on Compose-first mobile engineering, Kotlin Multiplatform delivery, and multi-agent experiments."
-        />
-        <meta
-            property="og:image"
-            content="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80"
-        />
-        <meta property="og:image:alt" content="Analog camera resting on a concrete ledge next to a notebook." />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Blog — Andrew V. Concepcion" />
-        <meta
-            name="twitter:description"
-            content="Compose-first delivery notes, reflection essays, and hobby journals collected under /blog."
-        />
-        <meta
-            name="twitter:image"
-            content="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80"
-        />
-        <meta name="twitter:image:alt" content="Analog camera resting on a concrete ledge next to a notebook." />
-        <script src="https://cdn.tailwindcss.com"></script>
-        <style>
-            html {
-                scroll-behavior: smooth;
-            }
-            .chip {
-                display: inline-flex;
-                align-items: center;
-                border: 1px solid #e5e7eb;
-                border-radius: 9999px;
-                padding: 0.25rem 0.75rem;
-                font-size: 0.75rem;
-                line-height: 1rem;
-            }
-            .card {
-                background: rgba(255, 255, 255, 0.9);
-                backdrop-filter: saturate(180%) blur(6px);
-                border: 1px solid #e5e7eb;
-                border-radius: 1rem;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-            }
-            .section-title {
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                font-weight: 600;
-                letter-spacing: -0.01em;
-            }
-            .section-title::before {
-                content: "";
-                height: 1.5rem;
-                width: 0.375rem;
-                border-radius: 9999px;
-                background: linear-gradient(to bottom, #0f172a, #94a3b8);
-            }
-        </style>
-        <script type="application/ld+json">
-            {
-                "@context": "https://schema.org",
-                "@type": "Blog",
-                "name": "Andrew V. Concepcion — Field Notes",
-                "description": "Compose-first delivery notes, reflection essays, and hobby journals collected under /blog.",
-                "url": "https://ac-opensource.github.io/blog/",
-                "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
-                "publisher": {
-                    "@type": "Person",
-                    "name": "Andrew V. Concepcion",
-                    "url": "https://ac-opensource.github.io/"
-                }
-            }
-        </script>
-    </head>
-    <body class="min-h-screen bg-gradient-to-b from-white via-slate-50 to-white text-slate-900">
-        <header class="border-b bg-white/80 backdrop-blur">
-            <div class="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
-                <a href="/" class="text-sm text-slate-600 hover:underline">
-                    ← Back to portfolio
-                </a>
-                <span class="text-sm font-semibold tracking-tight">Andrew Concepcion</span>
-            </div>
-        </header>
-        <main class="mx-auto max-w-5xl px-4 py-12">
-            <section>
-                <h1 class="section-title text-3xl">Field notes</h1>
-                <p class="mt-3 text-slate-700 max-w-3xl">
-                    Essays, teardown logs, hobby journals, and reflection letters. Everything lives under
-                    <code class="bg-slate-100 text-xs px-2 py-1 rounded">/blog</code> so the technical,
-                    philosophy, and hobby stories stay together.
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+<title>Blog | Andrew Concepcion</title>
+<meta name="description" content="Engineering logs, essays, and field notes by Andrew Concepcion on mobile systems, architecture, and product delivery.">
+<link rel="canonical" href="https://ac-opensource.github.io/blog/"/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:site_name" content="Andrew Concepcion"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://ac-opensource.github.io/blog/"/>
+<meta property="og:title" content="Blog | Andrew Concepcion"/>
+<meta property="og:description" content="Engineering logs, essays, and field notes by Andrew Concepcion on mobile systems, architecture, and product delivery."/>
+<meta property="og:image" content="https://ac-opensource.github.io/blog/images/new-zealand-aurora.png"/>
+<meta property="og:image:alt" content="Blog index preview image"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Blog | Andrew Concepcion"/>
+<meta name="twitter:description" content="Engineering logs, essays, and field notes by Andrew Concepcion on mobile systems, architecture, and product delivery."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/new-zealand-aurora.png"/>
+<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-error": "#fff7f6",
+                        "on-secondary": "#f6f9ff",
+                        "background": "#faf9f4",
+                        "tertiary": "#1f5cba",
+                        "inverse-surface": "#0d0f0c",
+                        "tertiary-fixed": "#6799fb",
+                        "on-secondary-container": "#4a535c",
+                        "tertiary-container": "#6799fb",
+                        "tertiary-dim": "#024fad",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#faf9f4",
+                        "outline": "#787c73",
+                        "inverse-primary": "#f0f4fb",
+                        "error": "#9f403d",
+                        "on-secondary-fixed": "#374049",
+                        "surface-container-low": "#f4f4ee",
+                        "on-primary-fixed": "#3b4045",
+                        "secondary-container": "#dae3ef",
+                        "secondary": "#57606a",
+                        "primary-container": "#dee3e9",
+                        "surface-tint": "#5a5f65",
+                        "primary-fixed": "#dee3e9",
+                        "on-surface-variant": "#5c6058",
+                        "on-tertiary-container": "#001b46",
+                        "on-background": "#2f342d",
+                        "surface-dim": "#d7dcd0",
+                        "on-tertiary": "#f9f8ff",
+                        "on-surface": "#2f342d",
+                        "on-error-container": "#752121",
+                        "surface-container": "#edefe7",
+                        "on-primary-fixed-variant": "#575c62",
+                        "inverse-on-surface": "#9d9d99",
+                        "secondary-dim": "#4b545d",
+                        "outline-variant": "#afb3aa",
+                        "primary": "#5a5f65",
+                        "error-container": "#fe8983",
+                        "surface-bright": "#faf9f4",
+                        "primary-fixed-dim": "#d0d5db",
+                        "tertiary-fixed-dim": "#598ced",
+                        "surface-variant": "#e0e4d9",
+                        "on-tertiary-fixed-variant": "#002559",
+                        "secondary-fixed-dim": "#ccd5e1",
+                        "primary-dim": "#4e5358",
+                        "error-dim": "#4e0309",
+                        "on-tertiary-fixed": "#000000",
+                        "surface-container-highest": "#e0e4d9",
+                        "on-primary": "#f4f8ff",
+                        "on-secondary-fixed-variant": "#535c66",
+                        "secondary-fixed": "#dae3ef",
+                        "on-primary-container": "#4d5258",
+                        "surface-container-high": "#e7e9e0"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"],
+                        "serif": ["Newsreader"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #faf9f4;
+        }
+        .hero-visual {
+            animation: float 6s ease-in-out infinite;
+        }
+        .data-grid {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 4px;
+            padding: 12px;
+        }
+        .data-node {
+            background: #afb3aa20;
+            border: 1px solid #afb3aa40;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+        .data-node::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: #1f5cba;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .data-node.active::after {
+            opacity: 0.4;
+            animation: pulse 2s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.05); opacity: 0.6; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface">
+<div class="neural-global-bg" aria-hidden="true">
+  <div class="neural-mesh-container">
+    <div class="neural-mesh"></div>
+    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
+    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
+    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
+    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
+    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
+    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
+    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
+    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
+  </div>
+  <div class="bust-gradient"></div>
+  <div class="canvas-grid"></div>
+</div>
+<header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
+  <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
+    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+      <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+      <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+      <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+    </nav>
+    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
+  </div>
+</header>
+<main class="pt-24 pb-20 max-w-6xl mx-auto px-6">
+<!-- Header Section -->
+<header class="mb-20 grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+<div class="md:col-span-8">
+<div class="font-label text-xs uppercase tracking-[0.2em] text-tertiary mb-4">
+                    [archive_mode: active]
+                </div>
+<h1 class="font-headline text-6xl md:text-8xl font-bold tracking-tighter text-on-surface leading-none mb-6">
+                    FIELD NOTES
+                </h1>
+<p class="font-serif text-2xl text-secondary max-w-xl italic">
+                    Compose-first delivery notes, reflection essays, and hobby journals from active projects.
                 </p>
-                <div class="mt-5 flex flex-wrap gap-3 text-sm">
-                    <a class="chip hover:bg-slate-900 hover:text-white" href="#latest-posts">Latest</a>
-                    <a class="chip hover:bg-slate-900 hover:text-white" href="#reflection-notes">Reflection notes</a>
-                    <a class="chip hover:bg-slate-900 hover:text-white" href="#hobby-notebook">Hobby notebook</a>
+</div>
+<div class="md:col-span-4 flex justify-end">
+<div class="hero-visual bg-surface-container-highest aspect-square w-48 md:w-64 flex items-center justify-center border border-outline-variant/20 relative overflow-hidden group">
+<div class="data-grid" id="blog-hero-neural">
+<div class="data-node"></div>
+<div class="data-node active"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node active"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node active"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node active"></div>
+<div class="data-node"></div>
+<div class="data-node active"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node active"></div>
+<div class="data-node"></div>
+<div class="data-node active"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node active"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node active"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node active"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node active"></div>
+</div>
+<div class="absolute z-10 flex flex-col items-center justify-center">
+<div class="w-9 h-9 border-2 border-tertiary/60 rotate-45 flex items-center justify-center">
+<div class="w-4 h-4 bg-tertiary/20"></div>
+</div>
+<span class="font-label text-[8px] mt-3 tracking-[0.3em] text-tertiary font-bold">[DATA_FLOW]</span>
+</div>
+</div>
+</div>
+</header><div class="mb-12 border-b border-outline-variant/10 pb-12">
+<div class="flex flex-col md:flex-row items-center gap-8">
+<!-- Search Input Field -->
+<div class="relative flex-1 group w-full">
+<span class="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-secondary text-lg group-focus-within:text-tertiary transition-colors">search</span>
+<input id="search-posts" class="w-full bg-transparent border-none focus:ring-0 font-label text-lg pl-8 py-2 text-on-surface placeholder:text-outline-variant/60 italic" placeholder="|grep /search/..." type="text"/>
+</div>
+<!-- Separator -->
+<div class="hidden md:block text-outline-variant/30 font-label">-</div>
+<!-- Filters / Categories -->
+<div id="category-filters" class="flex flex-wrap items-center gap-2 md:gap-6">
+<button data-category="all" class="font-label text-xs px-3 py-1.5 bg-surface-container-highest text-on-surface border border-outline-variant/20 uppercase tracking-widest">
+                [ALL]
+            </button>
+</div>
+</div>
+</div>
+<div class="flex justify-end mb-8">
+<a class="font-label text-xs px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors" href="/blog/rss.xml">
+            [RSS]
+          </a>
+</div>
+<section id="blog-feed" class="space-y-12"></section>
+<div id="infinite-sentinel" class="mt-20 py-12 border-t border-on-surface flex justify-center items-center">
+<div id="infinite-status" class="font-label text-sm uppercase tracking-widest flex items-center gap-2 text-outline-variant">
+<span class="material-symbols-outlined">south</span> [SCROLL_FOR_MORE]
+</div>
+</div>
+</main>
+<footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
+    <span>© 2026 Andrew Concepcion</span>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[source]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
+  </div>
+</footer>
+<script src="/assets/js/blog-sqlite.js"></script>
+<script>
+  (() => {
+    const feed = document.getElementById("blog-feed");
+    const searchInput = document.getElementById("search-posts");
+    const infiniteSentinel = document.getElementById("infinite-sentinel");
+    const infiniteStatus = document.getElementById("infinite-status");
+    const categoryFilters = document.getElementById("category-filters");
+    const heroNodes = document.querySelectorAll("#blog-hero-neural .data-node");
+    const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
+    const PAGE_SIZE = 4;
+    let allPosts = [];
+    let filteredPosts = [];
+    let bookmarks = new Set();
+    let activeCategory = "all";
+    let visibleCount = PAGE_SIZE;
+    let isLoadingMore = false;
+    let infiniteObserver = null;
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatDate(raw) {
+      const d = new Date(raw);
+      if (Number.isNaN(d.getTime())) return raw || "";
+      return d.toISOString().slice(0, 10);
+    }
+
+    function hashSeed(value) {
+      const text = String(value || "seed");
+      let hash = 0;
+      for (let i = 0; i < text.length; i += 1) {
+        hash = (hash << 5) - hash + text.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash);
+    }
+
+    function makeAbstractFallback(seedValue) {
+      const palettes = [
+        ["#e2e6db", "#1f5cba", "#5a7fb9", "#a5b7cf"],
+        ["#e6e6df", "#364c73", "#6b86ad", "#afbcd0"],
+        ["#e0e4dc", "#2f485f", "#5e7e9a", "#9fb4c6"],
+        ["#e7e9e2", "#355f95", "#6f8fb8", "#b7c4d6"]
+      ];
+      const hash = hashSeed(seedValue);
+      const [bg, primary, secondary, detail] = palettes[hash % palettes.length];
+      const offset = (hash % 140) + 30;
+      const svg = `
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 900'>
+          <rect width='1200' height='900' fill='${bg}' />
+          <rect x='100' y='120' width='1000' height='660' fill='none' stroke='${detail}' stroke-width='6'/>
+          <rect x='${offset}' y='140' width='640' height='360' fill='none' stroke='${secondary}' stroke-width='7' opacity='0.95'/>
+          <circle cx='860' cy='300' r='120' fill='none' stroke='${primary}' stroke-width='8' opacity='0.75'/>
+          <path d='M120 700 L1080 210' stroke='${primary}' stroke-width='6' opacity='0.55'/>
+          <path d='M240 760 L1020 340' stroke='${secondary}' stroke-width='5' opacity='0.65'/>
+          <rect x='780' y='520' width='220' height='160' fill='${detail}' opacity='0.45'/>
+          <circle cx='320' cy='260' r='10' fill='${primary}'/>
+          <circle cx='920' cy='620' r='10' fill='${primary}'/>
+          <text x='140' y='740' font-family='Space Grotesk, Arial, sans-serif' font-size='44' fill='${primary}' opacity='0.35'>ABSTRACT_PREVIEW</text>
+        </svg>
+      `;
+      return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    }
+
+    function hasUsableHeroImage(value) {
+      const url = String(value || "").trim();
+      if (!url) return false;
+      const lower = url.toLowerCase();
+      if (lower.includes("aida-public")) return false;
+      if (lower.includes("unsplash.com/photos/") && lower.includes("/download")) return false;
+      return true;
+    }
+
+    function normalizePreviewImageUrl(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      if (raw.startsWith("https://ac-opensource.github.io/")) {
+        return raw.replace("https://ac-opensource.github.io", "");
+      }
+      return raw;
+    }
+
+    function loadBookmarks() {
+      try {
+        const raw = localStorage.getItem(BOOKMARKS_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(parsed)) return new Set();
+        return new Set(parsed.map((value) => String(value || "").trim()).filter(Boolean));
+      } catch (_error) {
+        return new Set();
+      }
+    }
+
+    function saveBookmarks() {
+      try {
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(bookmarks)));
+      } catch (_error) {
+        // Ignore write failures.
+      }
+    }
+
+    function isBookmarked(slug) {
+      return bookmarks.has(String(slug || "").trim());
+    }
+
+    function toggleBookmark(slug) {
+      const key = String(slug || "").trim();
+      if (!key) return false;
+      if (bookmarks.has(key)) {
+        bookmarks.delete(key);
+      } else {
+        bookmarks.add(key);
+      }
+      saveBookmarks();
+      return bookmarks.has(key);
+    }
+
+    async function sharePost(shareUrl, title) {
+      const absoluteUrl = new URL(shareUrl, window.location.origin).href;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: String(title || "Blog post"),
+            url: absoluteUrl
+          });
+          return;
+        } catch (_error) {
+          // Continue to clipboard fallback.
+        }
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(absoluteUrl);
+          return;
+        } catch (_error) {
+          // Continue to prompt fallback.
+        }
+      }
+
+      window.prompt("Copy post URL:", absoluteUrl);
+    }
+
+    function renderPosts(posts, options = {}) {
+      if (!posts.length) {
+        const emptyMessage = options.emptyMessage || "No entries found in SQLite.";
+        feed.innerHTML = `<p class="text-on-surface-variant">${escapeHtml(emptyMessage)}</p>`;
+        if (infiniteStatus) {
+          infiniteStatus.innerHTML = '<span class="material-symbols-outlined">block</span> [NO_MORE_ENTRIES]';
+        }
+        return;
+      }
+
+      feed.innerHTML = posts
+        .map((post) => {
+          const postUrl = `/blog/${encodeURIComponent(post.slug)}.html`;
+          const fallbackImage = makeAbstractFallback(post.slug || post.title || "post");
+          const previewImage = hasUsableHeroImage(post.heroImage)
+            ? normalizePreviewImageUrl(post.heroImage)
+            : fallbackImage;
+          const previewAlt = post.heroAlt || `${post.title || "Blog post"} preview`;
+          const bookmarked = isBookmarked(post.slug);
+          return `
+            <article class="group relative grid grid-cols-1 md:grid-cols-12 gap-6 items-start py-12 border-t border-outline-variant/10">
+              <div class="md:col-span-2">
+                <div class="font-label text-xs text-outline-variant space-y-1">
+                  <div class="text-on-surface font-bold">[${formatDate(post.date)}]</div>
+                  <div>[${post.readingTime || "n/a"}]</div>
                 </div>
-            </section>
-            <section class="mt-12" id="latest-posts">
-                <div class="flex flex-col gap-2 mb-6">
-                    <h2 class="section-title text-2xl">Latest dispatches</h2>
-                    <p class="text-slate-600 max-w-3xl">
-                        Sorted by publish date so the freshest build logs, reflections, and hobby write-ups surface first.
-                    </p>
+              </div>
+              <div class="md:col-span-7">
+                <a class="block" href="${postUrl}">
+                  <h2 class="font-serif text-4xl md:text-5xl text-on-surface group-hover:text-tertiary transition-colors leading-tight mb-4">${escapeHtml(post.title)}</h2>
+                  <p class="font-body text-secondary text-lg leading-relaxed mb-6 max-w-2xl">${escapeHtml(post.summary || "")}</p>
+                </a>
+                <div class="flex flex-wrap gap-2">
+                  <span class="font-label text-[10px] px-2 py-1 bg-surface-container-low text-secondary border border-outline-variant/20 uppercase tracking-widest">[${escapeHtml(post.category || "log")}]</span>
+                  ${(post.topics || []).slice(0, 2).map((t) => `<span class="font-label text-[10px] px-2 py-1 bg-surface-container-low text-secondary border border-outline-variant/20 uppercase tracking-widest">[${escapeHtml(t)}]</span>`).join("")}
                 </div>
-                <div id="blog-feed" class="grid gap-6 md:grid-cols-2"></div>
-            </section>
-            <section class="mt-16" id="reflection-notes">
-                <div class="card p-6 flex flex-col gap-4">
-                    <div>
-                        <h2 class="section-title text-2xl">Reflection notes</h2>
-                        <p class="text-slate-700 mt-3 max-w-3xl">
-                            Philosophy-adjacent entries that feel like letters to my future self—focus rituals,
-                            rest practices, and mental models for choosing projects.
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap gap-3">
-                        <a
-                            class="inline-flex items-center rounded-lg bg-slate-900 text-white px-4 py-2"
-                            href="/blog/2025-11-27-the-myth-of-being-ready.html"
-                        >
-                            Read the latest essay
-                            <svg
-                                class="ml-2 h-4 w-4"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <path d="M7 17L17 7" />
-                                <path d="M7 7h10v10" />
-                            </svg>
-                        </a>
-                        <a
-                            class="inline-flex items-center rounded-lg border px-4 py-2"
-                            href="#blog-feed"
-                        >
-                            Browse all posts
-                        </a>
-                    </div>
+                <div class="mt-5 flex flex-wrap items-center gap-2">
+                  <a class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors" href="${postUrl}">[READ]</a>
+                  <button
+                    type="button"
+                    class="share-post-btn font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors"
+                    data-share-url="${postUrl}"
+                    data-share-title="${escapeHtml(post.title)}"
+                  >[SHARE]</button>
+                  <button
+                    type="button"
+                    class="bookmark-post-btn font-label text-[10px] px-3 py-1.5 border uppercase tracking-widest transition-colors ${bookmarked ? "border-tertiary/40 text-tertiary bg-surface-container-highest" : "border-outline-variant/20 text-secondary hover:bg-surface-container-low"}"
+                    data-bookmark-slug="${escapeHtml(post.slug)}"
+                  >${bookmarked ? "[BOOKMARKED]" : "[BOOKMARK]"}</button>
                 </div>
-                <div class="mt-8">
-                    <div id="reflection-feed" class="grid gap-6 md:grid-cols-2"></div>
-                </div>
-            </section>
-            <section class="mt-16" id="hobby-notebook">
-                <div class="flex flex-col gap-3">
-                    <h2 class="section-title text-2xl">Hobby notebook</h2>
-                    <p class="text-slate-700 max-w-3xl">
-                        Trail runs, film photography experiments, and other hobbies live right alongside the
-                        technical logs—here are the latest posts plus a rotating photo gallery.
-                    </p>
-                </div>
-                <div class="mt-8">
-                    <div id="hobby-feed" class="grid gap-6 md:grid-cols-2"></div>
-                </div>
-                <div class="grid gap-6 md:grid-cols-3 mt-8" id="hobby-gallery">
-                    <figure class="card overflow-hidden">
-                        <img
-                            src="/blog/images/photography-misty-mountains.jpg"
-                            alt="Paradise, Glenorchy framed by misty mountains shot from a moving vehicle"
-                            class="w-full h-44 object-cover"
-                        />
-                        <figcaption class="p-4">
-                            <p class="text-sm font-semibold">Paradise mist in motion</p>
-                            <p class="text-xs text-slate-600 mt-1">
-                                Honor Magic 6 Pro pressed to the window while driving through Paradise, Glenorchy—still
-                                catching the fog curling over the ridges.
-                            </p>
-                        </figcaption>
-                    </figure>
-                    <figure class="card overflow-hidden">
-                        <img
-                            src="/blog/images/photography-moon.jpg"
-                            alt="Full moon captured through an 8-inch Dobsonian telescope"
-                            class="w-full h-44 object-cover"
-                        />
-                        <figcaption class="p-4">
-                            <p class="text-sm font-semibold">Dobsonian moon study</p>
-                            <p class="text-xs text-slate-600 mt-1">
-                                Fujifilm XS-20 mounted to an 8-inch Dobsonian telescope to steady the moonlight and pull
-                                more detail from the craters.
-                            </p>
-                        </figcaption>
-                    </figure>
-                    <figure class="card overflow-hidden">
-                        <img
-                            src="/blog/images/photography-summer-alps.jpg"
-                            alt="Mount Cook and Lake Pukaki at Peter's Lookout under blue skies"
-                            class="w-full h-44 object-cover"
-                        />
-                        <figcaption class="p-4">
-                            <p class="text-sm font-semibold">Lake Pukaki blues</p>
-                            <p class="text-xs text-slate-600 mt-1">
-                                Honor Magic 6 Pro framing Mount Cook and Lake Pukaki from Peter's Lookout—the road, the
-                                lake, and the ridgeline stacked together.
-                            </p>
-                        </figcaption>
-                    </figure>
-                </div>
-            </section>
-        </main>
-        <script src="/blog/blog.js"></script>
-        <script>
-            if (window.blogFeed?.loadBlogPosts) {
-                window.blogFeed.loadBlogPosts({ containerId: "blog-feed" });
-                window.blogFeed.loadBlogPosts({
-                    containerId: "reflection-feed",
-                    category: "reflection",
-                    limit: 2,
-                    emptyMessage: "Reflection notes will land here soon.",
-                });
-                window.blogFeed.loadBlogPosts({
-                    containerId: "hobby-feed",
-                    category: "hobby",
-                    limit: 2,
-                    emptyMessage: "Hobby write-ups are in progress.",
-                });
-            }
-        </script>
-    </body>
-</html>
+              </div>
+              <div class="md:col-span-3 flex justify-end">
+                <a class="w-full max-w-[240px] aspect-[4/3] bg-surface-container border border-outline-variant/20 overflow-hidden" href="${postUrl}">
+                  <img
+                    src="${previewImage}"
+                    alt="${escapeHtml(previewAlt)}"
+                    loading="eager"
+                    decoding="async"
+                    class="w-full h-full object-cover grayscale-[0.1] contrast-[1.02] group-hover:scale-[1.03] transition-transform duration-500"
+                    data-fallback="${fallbackImage}"
+                    onerror="this.onerror=null;this.src=this.dataset.fallback;"
+                  />
+                </a>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    function updateInfiniteState() {
+      if (!infiniteStatus || !infiniteSentinel) return;
+      const hasMore = filteredPosts.length > visibleCount;
+      if (hasMore) {
+        infiniteStatus.innerHTML = '<span class="material-symbols-outlined">south</span> [SCROLL_FOR_MORE]';
+        infiniteSentinel.classList.remove("opacity-40");
+      } else {
+        infiniteStatus.innerHTML = '<span class="material-symbols-outlined">check</span> [END_OF_LOG]';
+        infiniteSentinel.classList.add("opacity-40");
+      }
+    }
+
+    function renderVisiblePosts() {
+      const emptyMessage = "No entries found in SQLite.";
+      renderPosts(filteredPosts.slice(0, visibleCount), { emptyMessage });
+      updateInfiniteState();
+    }
+
+    function loadNextPage() {
+      if (isLoadingMore) return;
+      if (visibleCount >= filteredPosts.length) return;
+
+      isLoadingMore = true;
+      visibleCount = Math.min(visibleCount + PAGE_SIZE, filteredPosts.length);
+      renderVisiblePosts();
+      isLoadingMore = false;
+    }
+
+    function setActiveCategory(category) {
+      activeCategory = category;
+      categoryFilters.querySelectorAll("button[data-category]").forEach((button) => {
+        const isActive = button.dataset.category === activeCategory;
+        button.classList.toggle("bg-surface-container-highest", isActive);
+        button.classList.toggle("text-on-surface", isActive);
+        button.classList.toggle("border", isActive);
+        button.classList.toggle("border-outline-variant/20", isActive);
+        button.classList.toggle("text-secondary", !isActive);
+        button.classList.toggle("hover:bg-surface-container-low", !isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+    }
+
+    function buildCategoryButtons(posts) {
+      const counts = posts.reduce((acc, post) => {
+        const category = String(post.category || "log").trim().toLowerCase();
+        acc.set(category, (acc.get(category) || 0) + 1);
+        return acc;
+      }, new Map());
+
+      const topCategories = Array.from(counts.entries())
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, 6)
+        .map(([category]) => category);
+
+      const allCategories = ["all", ...topCategories];
+      categoryFilters.innerHTML = allCategories
+        .map((category) => {
+          const label = category === "all" ? "ALL" : category.toUpperCase().replace(/_/g, " ");
+          return `<button data-category="${category}" class="font-label text-xs px-3 py-1.5 uppercase tracking-widest">${`[${label}]`}</button>`;
+        })
+        .join("");
+
+      categoryFilters.querySelectorAll("button[data-category]").forEach((button) => {
+        button.addEventListener("click", () => {
+          visibleCount = PAGE_SIZE;
+          setActiveCategory(button.dataset.category || "all");
+          applyFilters();
+        });
+      });
+    }
+
+    function applyFilters() {
+      const q = searchInput.value.trim().toLowerCase();
+      filteredPosts = allPosts.filter((p) => {
+        const matchesCategory =
+          activeCategory === "all" || String(p.category || "").toLowerCase() === activeCategory;
+        if (!matchesCategory) return false;
+        if (!q) return true;
+        const bag = [p.title, p.summary, p.category, ...(p.topics || [])].join(" ").toLowerCase();
+        return bag.includes(q);
+      });
+
+      renderVisiblePosts();
+    }
+
+    async function boot() {
+      if (!window.blogSqlite) return;
+
+      allPosts = await window.blogSqlite.getPosts();
+      bookmarks = loadBookmarks();
+      buildCategoryButtons(allPosts);
+      setActiveCategory("all");
+      applyFilters();
+
+      searchInput.addEventListener("input", () => {
+        visibleCount = PAGE_SIZE;
+        applyFilters();
+      });
+
+      if (infiniteSentinel) {
+        infiniteObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                loadNextPage();
+              }
+            });
+          },
+          {
+            root: null,
+            rootMargin: "320px 0px",
+            threshold: 0.01
+          }
+        );
+        infiniteObserver.observe(infiniteSentinel);
+      }
+
+      if (heroNodes.length) {
+        window.setInterval(() => {
+          const randomIndex = Math.floor(Math.random() * heroNodes.length);
+          heroNodes[randomIndex].classList.toggle("active");
+        }, 300);
+      }
+
+      feed.addEventListener("click", async (event) => {
+        const shareButton = event.target.closest(".share-post-btn");
+        if (shareButton) {
+          event.preventDefault();
+          await sharePost(shareButton.dataset.shareUrl, shareButton.dataset.shareTitle);
+          return;
+        }
+
+        const bookmarkButton = event.target.closest(".bookmark-post-btn");
+        if (bookmarkButton) {
+          event.preventDefault();
+          const slug = bookmarkButton.dataset.bookmarkSlug;
+          toggleBookmark(slug);
+          renderVisiblePosts();
+        }
+      });
+    }
+
+    boot().catch((err) => {
+      feed.innerHTML = `<p class="text-red-700">Failed to load blog posts: ${err.message}</p>`;
+    });
+
+    const path = window.location.pathname.replace(/\/index\.html$/, "/");
+    document.querySelectorAll("#site-nav .site-nav-link").forEach((link) => {
+      const route = link.dataset.route;
+      const active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      if (active) {
+        link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+      }
+    });
+  })();
+</script>
+</body></html>

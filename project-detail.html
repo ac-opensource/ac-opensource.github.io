@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+<title>Riding The Token Storm | Andrew V. Concepcion</title>
+<meta name="description" content="Case study by Andrew Concepcion: Riding The Token Storm, architecture decisions and delivery notes from production systems.">
+<link rel="canonical" href="https://ac-opensource.github.io/project-detail.html"/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:site_name" content="Andrew Concepcion"/>
+<meta property="og:type" content="article"/>
+<meta property="og:url" content="https://ac-opensource.github.io/project-detail.html"/>
+<meta property="og:title" content="Riding The Token Storm | Andrew Concepcion"/>
+<meta property="og:description" content="Case study by Andrew Concepcion: Riding The Token Storm, architecture decisions and delivery notes from production systems."/>
+<meta property="og:image" content="https://ac-opensource.github.io/blog/images/new-zealand-aurora.png"/>
+<meta property="og:image:alt" content="Project detail preview image"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Riding The Token Storm | Andrew Concepcion"/>
+<meta name="twitter:description" content="Case study by Andrew Concepcion: Riding The Token Storm, architecture decisions and delivery notes from production systems."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/new-zealand-aurora.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#d4e4fa",
+              "primary-fixed": "#dae2fd",
+              "on-surface-variant": "#45464d",
+              "outline": "#76777d",
+              "secondary-fixed-dim": "#b9c8de",
+              "surface": "#faf9f6",
+              "secondary-container": "#d2e1f7",
+              "secondary": "#516072",
+              "surface-container-highest": "#e3e2e0",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-fixed": "#0d1c2d",
+              "on-error": "#ffffff",
+              "surface-tint": "#565e74",
+              "primary-container": "#131b2e",
+              "error": "#ba1a1a",
+              "surface-container-low": "#f4f3f1",
+              "surface-container": "#efeeeb",
+              "on-tertiary-fixed": "#201c02",
+              "on-secondary-fixed-variant": "#39485a",
+              "on-primary-fixed-variant": "#3f465c",
+              "tertiary": "#665f3d",
+              "surface-container-high": "#e9e8e5",
+              "on-primary-container": "#7c839b",
+              "background": "#faf9f6",
+              "on-secondary-container": "#556477",
+              "on-tertiary": "#ffffff",
+              "tertiary-fixed": "#ede3b8",
+              "outline-variant": "#c6c6cd",
+              "on-tertiary-fixed-variant": "#4d4727",
+              "on-secondary": "#ffffff",
+              "tertiary-container": "#b5ac84",
+              "on-error-container": "#93000a",
+              "primary": "#000000",
+              "on-surface": "#1a1c1a",
+              "on-tertiary-container": "#464021",
+              "tertiary-fixed-dim": "#d1c79d",
+              "surface-bright": "#faf9f6",
+              "inverse-primary": "#bec6e0",
+              "error-container": "#ffdad6",
+              "primary-fixed-dim": "#bec6e0",
+              "inverse-surface": "#2f312f",
+              "on-primary-fixed": "#131b2e",
+              "surface-variant": "#e3e2e0",
+              "inverse-on-surface": "#f2f1ee",
+              "on-background": "#1a1c1a",
+              "on-primary": "#ffffff",
+              "surface-dim": "#dbdad7"
+            },
+            fontFamily: {
+              "headline": ["Newsreader", "serif"],
+              "body": ["Manrope", "sans-serif"],
+              "label": ["Manrope", "sans-serif"],
+              "mono": ["JetBrains Mono", "monospace"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .ghost-border {
+            outline: 1px solid rgba(198, 198, 205, 0.15);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(102, 95, 61, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-tertiary-fixed selection:text-on-tertiary-fixed">
+<!-- Top Navigation Shell -->
+<nav class="fixed top-0 w-full z-50 bg-stone-50/70 dark:bg-slate-900/70 backdrop-blur-xl">
+<div class="flex justify-between items-center px-8 py-6 max-w-7xl mx-auto">
+<div class="font-serif italic text-xl text-slate-900 dark:text-slate-50">Andrew Concepcion</div>
+<div class="hidden md:flex gap-12">
+<a class="font-sans Manrope text-xs uppercase tracking-widest text-slate-900 dark:text-slate-50 border-b border-slate-900 dark:border-slate-50 pb-1" href="/work.html">Work</a>
+<a class="font-sans Manrope text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-700 transition-colors" href="/blog/">Blog</a>
+<a class="font-sans Manrope text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-700 transition-colors" href="/about.html">About</a>
+<a class="font-sans Manrope text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-700 transition-colors" href="/contact.html">Contact</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-stone-100/50 transition-all rounded-lg">
+<span class="material-symbols-outlined text-slate-900">terminal</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-40">
+<!-- Hero Section -->
+<header class="max-w-7xl mx-auto px-8 mb-32">
+<div class="grid grid-cols-12 gap-8">
+<div class="col-span-12 md:col-span-8">
+<div class="font-mono text-secondary text-xs tracking-tighter mb-4 uppercase">Field Notes / Technical</div>
+<h1 class="font-headline text-7xl md:text-9xl font-light tracking-tight leading-none text-primary mb-12">
+                        Riding The Token <br/><span class="italic">Storm</span>
+</h1>
+<div class="flex flex-wrap gap-4 mb-8">
+<span class="px-4 py-1.5 bg-surface-variant text-on-surface-variant rounded-full text-xs font-mono flex items-center gap-2">
+<span class="w-1 h-1 rounded-full bg-tertiary"></span> AI Ops
+                        </span>
+<span class="px-4 py-1.5 bg-surface-variant text-on-surface-variant rounded-full text-xs font-mono flex items-center gap-2">
+<span class="w-1 h-1 rounded-full bg-tertiary"></span> Prompt Engineering
+                        </span>
+<span class="px-4 py-1.5 bg-surface-variant text-on-surface-variant rounded-full text-xs font-mono flex items-center gap-2">
+<span class="w-1 h-1 rounded-full bg-tertiary"></span> Team Process
+                        </span>
+</div>
+</div>
+<div class="col-span-12 md:col-span-4 self-end pb-12">
+<p class="text-secondary font-body leading-relaxed max-w-sm">
+                        Operations diary from running a Codex fleet: how we tuned prompts, instrumentation, and workflows to keep multi-agent delivery shippable.
+                    </p>
+</div>
+</div>
+<!-- Hero Visual Canvas -->
+<div class="mt-20 w-full aspect-[21/9] relative overflow-hidden rounded-lg ghost-border bg-surface-container-low">
+<div class="absolute inset-0 bg-gradient-to-br from-tertiary-fixed/10 via-transparent to-secondary-fixed/5"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-full h-full opacity-30 grayscale mix-blend-multiply transition-all duration-700 hover:scale-105 hover:grayscale-0" data-alt="abstract architectural blueprint with glowing lines and geometric prisms reflecting soft morning light on a vellum texture background" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCCoSrzc-B3_XNPO_A3jPnfRCSGIQvUnaBHJesfH8AfYsfLua5TcdXp4_mcw-7wDo6uosxdqH0OiAPknETNpxgPtMAsRdG6Qx-kXbKT-6aKH5iRq3zyNdGcD7PFWM7YqTJ0vVK_U21lswtcJBbYOsgtqLYwAJest4GXbPDdtcgPzm2xuXooNuWIIJzZPA-BoRw0Ra0XUWnKL4sQwl2atvthNs6Dli9GrZhZlSECzGbAYXUvSQasZ9-_qBmgz50RsUrWvRb8bqSfQ'); background-size: cover; background-position: center;">
+</div>
+</div>
+<div class="absolute bottom-8 left-8 p-6 backdrop-blur-md bg-surface-container-lowest/70 rounded-lg ghost-border">
+<div class="font-mono text-[10px] text-secondary mb-1">RUN METRICS</div>
+<div class="text-2xl font-headline italic">461k Max Tokens</div>
+</div>
+</div>
+</header>
+<!-- The Challenge Section -->
+<section class="max-w-7xl mx-auto px-8 mb-40">
+<div class="grid grid-cols-12 gap-8 items-start">
+<div class="col-span-12 md:col-span-3">
+<div class="sticky top-32">
+<div class="font-mono text-tertiary text-xs mb-2">01. CONTEXT</div>
+<h2 class="font-headline text-3xl font-medium">Where the fleet broke</h2>
+</div>
+</div>
+<div class="col-span-12 md:col-span-7 md:col-start-5">
+<p class="text-xl font-body leading-relaxed text-on-surface mb-8">
+                        We needed a stable agent loop for planning, implementation, testing, and review without wasting cycles. The hard part was keeping roles aligned while token usage and command repetition exploded.
+                    </p>
+<div class="bg-surface-container-low p-12 rounded-lg relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-8 font-mono text-4xl opacity-5 text-secondary">CHALLENGE</div>
+<ul class="space-y-6 relative z-10">
+<li class="flex gap-6 items-start">
+<span class="font-mono text-secondary text-xs pt-1">01</span>
+<p class="font-body text-secondary-fixed-variant">Planner churn kept re-writing goals mid-iteration.</p>
+</li>
+<li class="flex gap-6 items-start">
+<span class="font-mono text-secondary text-xs pt-1">02</span>
+<p class="font-body text-secondary-fixed-variant">Implementer passes were re-running the same lint/test commands without sharing results.</p>
+</li>
+<li class="flex gap-6 items-start">
+<span class="font-mono text-secondary text-xs pt-1">03</span>
+<p class="font-body text-secondary-fixed-variant">Compose Multiplatform feedback loops were far slower than the same workflow on React web.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- Technical Solution Section -->
+<section class="bg-surface-container-low py-40 mb-40">
+<div class="max-w-7xl mx-auto px-8">
+<div class="grid grid-cols-12 gap-8">
+<div class="col-span-12 md:col-span-4">
+<div class="font-mono text-tertiary text-xs mb-2">02. ARCHITECTURE</div>
+<h2 class="font-headline text-5xl font-light mb-8 italic">Prompt Surgery &amp; Instrumentation</h2>
+<p class="text-secondary mb-12 leading-relaxed">
+                            We froze the roadmap, tightened role expectations, and added run summaries. Once each role had explicit checklists and token visibility, iteration quality improved immediately.
+                        </p>
+<div class="space-y-4">
+<div class="p-4 bg-surface-container-lowest rounded-lg ghost-border flex items-center justify-between">
+<span class="font-mono text-xs uppercase tracking-widest">Plan Freeze Mode</span>
+<span class="material-symbols-outlined text-tertiary">check_circle</span>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-lg ghost-border flex items-center justify-between">
+<span class="font-mono text-xs uppercase tracking-widest">Command Summaries</span>
+<span class="material-symbols-outlined text-tertiary">check_circle</span>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-lg ghost-border flex items-center justify-between">
+<span class="font-mono text-xs uppercase tracking-widest">Log Analytics</span>
+<span class="material-symbols-outlined text-tertiary">check_circle</span>
+</div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-7 md:col-start-6">
+<div class="bg-primary-container p-8 rounded-xl shadow-2xl relative">
+<div class="flex items-center gap-2 mb-6">
+<div class="w-3 h-3 rounded-full bg-error/40"></div>
+<div class="w-3 h-3 rounded-full bg-tertiary-fixed/40"></div>
+<div class="w-3 h-3 rounded-full bg-secondary-fixed/40"></div>
+<span class="ml-4 font-mono text-[10px] text-on-primary-container uppercase tracking-widest">orchestrator.config.ts</span>
+</div>
+<pre class="font-mono text-sm leading-relaxed overflow-x-auto text-on-primary-container/80"><span class="text-secondary-fixed-dim italic">// Freeze goals to stop planner thrash</span>
+const roadmapMode = <span class="text-tertiary-fixed">"frozen"</span>;
+
+<span class="text-secondary-fixed-dim italic">// Force implementer to report exact commands + exits</span>
+requireSummaries({
+  commands: [<span class="text-tertiary-fixed">"make lint"</span>, <span class="text-tertiary-fixed">"make test"</span>],
+  includeExitCodes: <span class="text-tertiary-fixed-dim">true</span>,
+});
+
+<span class="text-secondary-fixed-dim italic">// Parse role logs and surface token outliers</span>
+const stats = summarizeLogs(roleRuns);
+alertIf(stats.implementer.maxTokens &gt; 400000);</pre>
+<div class="absolute -bottom-6 -right-6 w-32 h-32 bg-tertiary blur-[60px] opacity-20 pointer-events-none"></div>
+</div>
+<!-- Technical Bento Cards -->
+<div class="grid grid-cols-2 gap-4 mt-8">
+<div class="aspect-square bg-surface-container-lowest p-8 rounded-lg ghost-border flex flex-col justify-between">
+<span class="font-mono text-secondary text-xs">MODULE 01</span>
+<div class="font-headline text-3xl italic">Prompt Discipline</div>
+<p class="text-xs text-secondary leading-relaxed">Role-specific instructions removed redundant loops and cut noisy reruns.</p>
+</div>
+<div class="aspect-square bg-surface-container-lowest p-8 rounded-lg ghost-border flex flex-col justify-between">
+<div class="w-12 h-1 bg-tertiary mb-4"></div>
+<div class="font-headline text-3xl italic">Telemetry</div>
+<p class="text-xs text-secondary leading-relaxed">Run summaries exposed the true cost drivers across planner, implementer, and tester.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Results / Impact Section -->
+<section class="max-w-7xl mx-auto px-8 mb-40">
+<div class="border-t border-outline-variant/20 pt-20">
+<div class="grid grid-cols-12 gap-8">
+<div class="col-span-12 md:col-span-4 mb-12 md:mb-0">
+<div class="font-mono text-tertiary text-xs mb-2">03. OUTCOME</div>
+<h2 class="font-headline text-5xl font-light mb-6">Measured <br/>Improvements</h2>
+<p class="text-secondary max-w-xs leading-relaxed">
+                            With frozen goals and logging in place, the team spent more time shipping and less time rediscovering the same issues.
+                        </p>
+</div>
+<div class="col-span-12 md:col-span-8">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-0.5 bg-outline-variant/10 rounded-lg overflow-hidden ghost-border">
+<div class="bg-surface p-12 text-center">
+<div class="font-headline text-6xl font-light text-primary mb-2">24<span class="text-2xl text-tertiary">x</span></div>
+<div class="font-mono text-[10px] uppercase tracking-widest text-secondary">Implementer Runs Audited</div>
+</div>
+<div class="bg-surface p-12 text-center">
+<div class="font-headline text-6xl font-light text-primary mb-2">461<span class="text-2xl text-tertiary">k</span></div>
+<div class="font-mono text-[10px] uppercase tracking-widest text-secondary">Peak Tokens Captured</div>
+</div>
+<div class="bg-surface p-12 text-center">
+<div class="font-headline text-6xl font-light text-primary mb-2">10:51<span class="text-2xl text-tertiary"></span></div>
+<div class="font-mono text-[10px] uppercase tracking-widest text-secondary">Avg Implementer Duration</div>
+</div>
+</div>
+<div class="mt-12 bg-surface-container-high p-12 rounded-lg relative overflow-hidden">
+<div class="absolute -right-20 -top-20 w-80 h-80 bg-secondary-fixed-dim/20 rounded-full blur-[100px]"></div>
+<span class="material-symbols-outlined text-4xl text-tertiary mb-6" style="font-variation-settings: 'FILL' 1;">format_quote</span>
+<blockquote class="font-headline text-3xl font-light italic leading-snug text-primary mb-8 max-w-2xl relative z-10">
+                                "Automation is just delegation without clarity."
+                            </blockquote>
+<div class="font-mono text-xs uppercase tracking-widest text-secondary">Field note from my Codex fleet journal</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final Visual Callout -->
+<section class="max-w-7xl mx-auto px-8">
+<div class="grid grid-cols-12 gap-8">
+<div class="col-span-12 md:col-span-10 md:col-start-2">
+<div class="aspect-[16/6] bg-surface-container-low rounded-lg overflow-hidden ghost-border group relative">
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent z-10 opacity-60"></div>
+<div class="w-full h-full grayscale opacity-20 transition-all duration-1000 group-hover:opacity-40 group-hover:scale-105" data-alt="monochromatic abstract pattern of crystalline structures and light refracton on architectural drafting paper" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCNGSb6lQIfnwWtgUndzPWtcrWRtgqDdPjdrZsQRRbRi0YR3r1fkb7W3JDzleNEej61HjK7qZVaKD54ya6mYEK2ETD_ldsfPEgLI_4vHxcij8Z4jq_V8pyTaCnC9bsO8gPYo1ZEnBPuFq_0s3ROORLeDcv47xVRmYt3u2D4GuMgPt9Z5TFTB12JmbCmha3-pVtvXevVyK4pzlFWSaTJckI3PPXHmCighYkDBog4lKf7EzW4EfcIivftiVyGOERv_WGMSan_IkN7eQ'); background-size: cover; background-position: center;"></div>
+<div class="absolute inset-0 flex flex-col items-center justify-center z-20 text-center px-8">
+<h3 class="font-headline text-4xl md:text-6xl font-light italic mb-8">Read the full write-up?</h3>
+<a class="bg-primary text-on-primary px-10 py-4 rounded-lg font-mono text-xs uppercase tracking-widest hover:bg-tertiary transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]" href="/blog/2024-10-08-running-ai-fleet-learnings.html">
+                                Open Article
+                            </a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-20 px-8 bg-stone-50 dark:bg-slate-950 border-t border-outline-variant/10">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8 max-w-7xl mx-auto">
+<div class="font-serif text-lg opacity-50 text-slate-400 dark:text-slate-600">Andrew Concepcion</div>
+<div class="font-mono text-xs uppercase text-slate-400 dark:text-slate-600">
+                © 2026 Andrew Concepcion. Built in plain HTML + Tailwind.
+            </div>
+<div class="flex gap-8">
+<a class="font-mono text-xs uppercase text-slate-400 dark:text-slate-600 hover:text-amber-700 transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">Github</a>
+<a class="font-mono text-xs uppercase text-slate-400 dark:text-slate-600 hover:text-amber-700 transition-colors" href="https://www.linkedin.com/in/aarconcepcion" target="_blank" rel="noreferrer">LinkedIn</a>
+<a class="font-mono text-xs uppercase text-slate-400 dark:text-slate-600 hover:text-amber-700 transition-colors" href="https://github.com/ac-opensource/ac-opensource.github.io" target="_blank" rel="noreferrer">Source</a>
+</div>
+</div>
+</footer>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex justify-around items-center p-2 bg-stone-50/80 dark:bg-slate-900/80 backdrop-blur-2xl w-[90%] max-w-md rounded-full border border-slate-200/20 shadow-[0_20px_40px_-10px_rgba(81,96,114,0.1)]">
+<a class="flex flex-col items-center justify-center bg-slate-900 dark:bg-slate-50 text-stone-50 dark:text-slate-900 rounded-full w-12 h-12" href="/work.html">
+<span class="material-symbols-outlined" style="font-size: 18px;">architecture</span>
+<span class="font-mono text-[10px] tracking-tighter">Work</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 w-12 h-12" href="/blog/">
+<span class="material-symbols-outlined" style="font-size: 18px;">tactic</span>
+<span class="font-mono text-[10px] tracking-tighter">Blog</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 w-12 h-12" href="/about.html">
+<span class="material-symbols-outlined" style="font-size: 18px;">person_4</span>
+<span class="font-mono text-[10px] tracking-tighter">About</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 w-12 h-12" href="/contact.html">
+<span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
+<span class="font-mono text-[10px] tracking-tighter">Contact</span>
+</a>
+</nav>
+</body></html>

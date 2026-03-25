@@ -1,0 +1,7 @@
+node_modules/
+data/blog.sqlite
+data/blog.sqlite-shm
+data/blog.sqlite-wal
+assets/data/blog.sqlite-shm
+assets/data/blog.sqlite-wal
+.DS_Store

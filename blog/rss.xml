@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Andrew Concepcion Blog</title>
+  <link>https://ac-opensource.github.io/blog/</link>
+  <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
+  <language>en-us</language>
+  <lastBuildDate>Wed, 25 Mar 2026 12:35:03 GMT</lastBuildDate>
+  <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Test Post</title>
+    <link>https://ac-opensource.github.io/blog/2025-11-25-test-post.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2025-11-25-test-post.html</guid>
+    <pubDate>Tue, 25 Nov 2025 00:00:00 GMT</pubDate>
+    <description>This is a test summary.</description>
+<category>Topic1</category><category>Topic2</category><category>test-category</category>
+  </item>
+  <item>
+    <title>It’s Not Okay to Stay “Not Okay” — Why Honesty Is the Fix</title>
+    <link>https://ac-opensource.github.io/blog/2025-11-21-its-not-okay-to-stay-not-okay.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2025-11-21-its-not-okay-to-stay-not-okay.html</guid>
+    <pubDate>Fri, 21 Nov 2025 00:00:00 GMT</pubDate>
+    <description>A reflection on why acknowledging pain is only step one and how ownership keeps your struggles from spilling onto others.</description>
+<category>Reflection</category><category>Mental Health</category><category>Personal Growth</category><category>reflection</category>
+  </item>
+  <item>
+    <title>Reminder I Didn’t Expect to Get From My Own Advice</title>
+    <link>https://ac-opensource.github.io/blog/2025-11-19-reminder-from-my-own-advice.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2025-11-19-reminder-from-my-own-advice.html</guid>
+    <pubDate>Wed, 19 Nov 2025 00:00:00 GMT</pubDate>
+    <description>On drifting into complacency, offering a friend honest advice, and realizing you need the same reminders.</description>
+<category>Relationships</category><category>Reflection</category><category>Personal Growth</category><category>reflection</category>
+  </item>
+  <item>
+    <title>A Month in New Zealand</title>
+    <link>https://ac-opensource.github.io/blog/2024-11-02-sunrise-trail-runs.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-11-02-sunrise-trail-runs.html</guid>
+    <pubDate>Wed, 05 Feb 2025 00:00:00 GMT</pubDate>
+    <description>Family holidays in Auckland, a compressed South Island road trip, and the surprise of catching the Aurora Australis.</description>
+<category>Travel</category><category>Family</category><category>Reflection</category><category>hobby</category>
+  </item>
+  <item>
+    <title>Quiet Systems: Reflection Rituals For Builders</title>
+    <link>https://ac-opensource.github.io/blog/2024-11-21-quiet-systems-reflection.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-11-21-quiet-systems-reflection.html</guid>
+    <pubDate>Thu, 21 Nov 2024 00:00:00 GMT</pubDate>
+    <description>A personal essay about designing focus blocks, protecting rest, and keeping philosophy close to the shipping calendar.</description>
+<category>Reflection</category><category>Philosophy</category><category>Creative Process</category><category>reflection</category>
+  </item>
+  <item>
+    <title>Riding The Token Storm: Notes From A Codex Fleet Wrangler</title>
+    <link>https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html</guid>
+    <pubDate>Tue, 08 Oct 2024 00:00:00 GMT</pubDate>
+    <description>An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.</description>
+<category>AI Ops</category><category>Prompt Engineering</category><category>Team Process</category><category>technical</category>
+  </item>
+  <item>
+    <title>Weekend Photo Experiments: Paradise Mist, Dobsonian Moon, and Lake Pukaki</title>
+    <link>https://ac-opensource.github.io/blog/2024-09-14-film-photography-gallery.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-09-14-film-photography-gallery.html</guid>
+    <pubDate>Sat, 14 Sep 2024 00:00:00 GMT</pubDate>
+    <description>Three frames with context: Glenorchy mist from a moving van (Honor Magic 6 Pro), a Dobsonian-mounted moon on the Fujifilm XS-20, and Lake Pukaki with Mount Cook on the Honor.</description>
+<category>Hobby</category><category>Photography</category><category>hobby</category>
+  </item>
+  <item>
+    <title>Building with Kotlin and Swift</title>
+    <link>https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html</guid>
+    <pubDate>Wed, 22 May 2024 00:00:00 GMT</pubDate>
+    <description>A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.</description>
+<category>KMP</category><category>SwiftUI</category><category>technical</category>
+  </item>
+  <item>
+    <title>Welcome to my blog</title>
+    <link>https://ac-opensource.github.io/blog/2024-03-14-welcome.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-03-14-welcome.html</guid>
+    <pubDate>Thu, 14 Mar 2024 00:00:00 GMT</pubDate>
+    <description>Opening thoughts on why I&apos;m documenting experimentation notes publicly.</description>
+<category>Personal</category><category>personal</category>
+  </item>
+</channel>
+</rss>

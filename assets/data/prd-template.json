@@ -1,0 +1,407 @@
+{
+    "title": "Project PRD / Brief Template",
+    "subtitle": "Agentic-first documentation foundation for product, design, and engineering alignment.",
+    "hero": {
+        "kicker": "Modern Agentic Workflow",
+        "lead": "Use this template as a living product source of truth. It is structured for both human collaboration and AI-assisted planning, critique, and execution.",
+        "facts": [
+            {
+                "label": "Coverage",
+                "value": "15 core sections",
+                "support": "From strategy to release + iteration"
+            },
+            {
+                "label": "Collaboration",
+                "value": "Cross-functional",
+                "support": "PM, design, engineering, QA, GTM"
+            },
+            {
+                "label": "Output mode",
+                "value": "Brief or full PRD",
+                "support": "Start lightweight, expand with evidence"
+            }
+        ]
+    },
+    "sections": [
+        {
+            "id": "overview",
+            "number": "01",
+            "title": "Project Overview & Document Information",
+            "summary": "Record the document identity, ownership, and linked artifacts so every contributor is aligned on source references.",
+            "fields": [
+                {
+                    "label": "Project Title",
+                    "description": "Concise, descriptive name of the project.",
+                    "examples": [
+                        "Customer Account Dashboard Redesign",
+                        "New User Onboarding Flow v2"
+                    ]
+                },
+                {
+                    "label": "Document Owner",
+                    "description": "Your name, team, or accountable owner group."
+                },
+                {
+                    "label": "Version",
+                    "description": "Use semantic increments like v1.0, v1.1."
+                },
+                {
+                    "label": "Date",
+                    "description": "Date of last update.",
+                    "examples": ["YYYY-MM-DD"]
+                },
+                {
+                    "label": "Status",
+                    "description": "Lifecycle state.",
+                    "examples": ["Draft", "In Review", "Approved", "Active", "On Hold"]
+                },
+                {
+                    "label": "Related Documents",
+                    "description": "Attach links to design mockups, research findings, technical design docs, and business models."
+                }
+            ]
+        },
+        {
+            "id": "executive-summary",
+            "number": "02",
+            "title": "Executive Summary (The Brief in a Nutshell)",
+            "summary": "Capture the one-screen context any stakeholder should understand before reading details.",
+            "fields": [
+                {
+                    "label": "What is this project?",
+                    "description": "Very brief, high-level description of the core deliverable."
+                },
+                {
+                    "label": "Why are we doing it?",
+                    "description": "Summarize the problem or opportunity and expected strategic impact."
+                },
+                {
+                    "label": "Who is it for?",
+                    "description": "Primary target users and stakeholders."
+                },
+                {
+                    "label": "What is the expected outcome?",
+                    "description": "Define visible success indicators such as conversion lift, churn reduction, or market entry."
+                }
+            ]
+        },
+        {
+            "id": "context",
+            "number": "03",
+            "title": "Background & Context",
+            "summary": "Explain the current state and strategic alignment so the project is anchored in evidence, not intuition.",
+            "cards": [
+                {
+                    "title": "Current State",
+                    "body": "Describe the existing system or process this project addresses or replaces.",
+                    "meta": "Include user and business pain points"
+                },
+                {
+                    "title": "Supporting Data",
+                    "body": "List metrics, tickets, feedback, and qualitative signals that validate urgency.",
+                    "meta": "Examples: low conversion, high support volume"
+                },
+                {
+                    "title": "Strategic Alignment",
+                    "body": "Map to company goals, product strategy, or active OKRs.",
+                    "meta": "Show why this matters now"
+                }
+            ]
+        },
+        {
+            "id": "problem-opportunity",
+            "number": "04",
+            "title": "Problem Statement / Opportunity",
+            "summary": "Write a specific and testable problem statement, then articulate the upside unlocked by solving it.",
+            "list": [
+                "Who is experiencing the problem?",
+                "What exactly is broken or missing?",
+                "When and where does it happen in the user journey?",
+                "What is the measurable impact (revenue loss, churn, inefficiency, risk)?"
+            ],
+            "callout": "Example problem: Our checkout flow causes 30% of mobile users to abandon carts due to complex form fields, resulting in an estimated $50k/month in lost revenue.",
+            "secondaryCallout": "Example opportunity: A social sharing feature could increase viral growth by 15%, leading to 10,000 new sign-ups per month."
+        },
+        {
+            "id": "goals",
+            "number": "05",
+            "title": "Goals & Objectives (SMART Metrics)",
+            "summary": "Define measurable targets and tie every goal to instrumentation plans.",
+            "cards": [
+                {
+                    "title": "Project Goal",
+                    "body": "Increase mobile checkout conversion rate by 10% within 3 months post-launch.",
+                    "meta": "SMART example"
+                },
+                {
+                    "title": "Project Goal",
+                    "body": "Reduce support tickets related to account settings by 25% within 6 weeks post-launch.",
+                    "meta": "SMART example"
+                }
+            ],
+            "metrics": [
+                {
+                    "label": "Primary KPI",
+                    "value": "1–3 metrics",
+                    "support": "Critical business outcomes"
+                },
+                {
+                    "label": "Secondary KPI",
+                    "value": "Support metrics",
+                    "support": "Adoption, quality, satisfaction"
+                },
+                {
+                    "label": "Review Window",
+                    "value": "Weekly + launch checkpoints",
+                    "support": "Pre and post release comparisons"
+                }
+            ]
+        },
+        {
+            "id": "audience",
+            "number": "06",
+            "title": "Target Audience / Users",
+            "summary": "Specify who gets value, who is impacted, and who supports delivery decisions.",
+            "fields": [
+                {
+                    "label": "Primary Users",
+                    "description": "Demographics, behaviors, needs, and pain points relevant to this initiative.",
+                    "examples": ["Link personas if available"]
+                },
+                {
+                    "label": "Secondary Users / Stakeholders",
+                    "description": "Internal or adjacent groups affected by rollout, such as support, sales, admins, or operations."
+                }
+            ]
+        },
+        {
+            "id": "solution-overview",
+            "number": "07",
+            "title": "Solution Overview",
+            "summary": "Describe the solution in plain language and connect it to problem resolution and business value.",
+            "cards": [
+                {
+                    "title": "High-Level Solution",
+                    "body": "Redesign mobile checkout to a single-page progressive form with auto-fill and clear progress states.",
+                    "meta": "Example"
+                },
+                {
+                    "title": "Value Proposition",
+                    "body": "Deliver faster completion for users and increased conversion for the business.",
+                    "meta": "User + business value"
+                }
+            ]
+        },
+        {
+            "id": "scope",
+            "number": "08",
+            "title": "Scope & Deliverables",
+            "summary": "Define boundaries so teams can execute quickly without scope ambiguity.",
+            "table": {
+                "headers": ["Scope Type", "What to Include"],
+                "rows": [
+                    [
+                        "In-Scope",
+                        "Features and components explicitly included in delivery (e.g., redesigned mobile checkout + payment gateway integration)."
+                    ],
+                    [
+                        "Out-of-Scope",
+                        "Non-goals to avoid expectation drift (e.g., desktop redesign, new payment methods)."
+                    ],
+                    [
+                        "Key Deliverables",
+                        "Concrete outputs such as app versions, APIs, analytics dashboards, documentation."
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "requirements",
+            "number": "09",
+            "title": "Detailed Requirements (Features & Functionality)",
+            "summary": "Translate intent into testable stories and functional behaviors.",
+            "fields": [
+                {
+                    "label": "User Stories",
+                    "description": "Use the format: As a [user], I want to [action], so that [benefit]."
+                },
+                {
+                    "label": "Prioritization",
+                    "description": "Assign each item by priority scale (High/Medium/Low or MoSCoW)."
+                },
+                {
+                    "label": "Functional Requirements",
+                    "description": "Document explicit system behaviors such as validation, encryption, and workflow logic."
+                }
+            ],
+            "list": [
+                "As a mobile user, I want a clear progress indicator so I know how many steps remain. (High)",
+                "As a returning customer, I want shipping details pre-filled so checkout is faster. (High)",
+                "As an administrator, I want abandoned-cart details so I can follow up. (Medium)"
+            ]
+        },
+        {
+            "id": "ux-ui",
+            "number": "10",
+            "title": "User Experience (UX) & User Interface (UI)",
+            "summary": "Document primary journeys, design principles, and accessibility standards.",
+            "fields": [
+                {
+                    "label": "Key User Flows",
+                    "description": "List highest-impact flows end-to-end."
+                },
+                {
+                    "label": "Design Principles",
+                    "description": "State principles such as simplicity, accessibility, and consistency."
+                },
+                {
+                    "label": "Wireframes/Mockups/Prototypes",
+                    "description": "Attach links to Figma, prototypes, and usability test outcomes."
+                },
+                {
+                    "label": "Accessibility Considerations",
+                    "description": "Specify WCAG level, keyboard support, semantic structure, and screen reader behavior."
+                }
+            ]
+        },
+        {
+            "id": "technical",
+            "number": "11",
+            "title": "Technical Requirements & Considerations",
+            "summary": "Capture architecture, integrations, quality constraints, and telemetry from the start.",
+            "cards": [
+                {
+                    "title": "Architecture & Infrastructure",
+                    "body": "Outline new services, major system changes, and deployment model impacts."
+                },
+                {
+                    "title": "Integrations",
+                    "body": "List internal and external systems, contracts, and dependencies."
+                },
+                {
+                    "title": "Performance",
+                    "body": "Define latency targets, throughput, and scalability requirements."
+                },
+                {
+                    "title": "Security",
+                    "body": "Set encryption, authentication, authorization, and vulnerability requirements."
+                },
+                {
+                    "title": "Data Model & APIs",
+                    "body": "Track schema changes and new/updated API surfaces."
+                },
+                {
+                    "title": "Analytics",
+                    "body": "Define KPI event tracking for tools like Amplitude or Google Analytics."
+                }
+            ]
+        },
+        {
+            "id": "dependencies-risks",
+            "number": "12",
+            "title": "Dependencies & Risks",
+            "summary": "Map dependency constraints and quantify major risks with mitigation plans.",
+            "table": {
+                "headers": ["Category", "Examples", "Mitigation"],
+                "rows": [
+                    [
+                        "Internal Dependencies",
+                        "API updates from Payment Services",
+                        "Cross-team checkpoints + dependency owner"
+                    ],
+                    [
+                        "External Dependencies",
+                        "Third-party providers and market conditions",
+                        "Fallback contracts + SLA monitoring"
+                    ],
+                    [
+                        "Key Risk: Legacy Integration",
+                        "Unexpected complexity may delay delivery",
+                        "Run technical spike early to de-risk"
+                    ],
+                    [
+                        "Key Risk: QA Capacity",
+                        "Insufficient test bandwidth before launch",
+                        "Reserve dedicated QA window"
+                    ],
+                    [
+                        "Key Risk: Scope Creep",
+                        "Unbounded additions impact timeline",
+                        "Use formal change request workflow"
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "release",
+            "number": "13",
+            "title": "Release Plan & Post-Launch",
+            "summary": "Define rollout strategy, operational readiness, rollback safety, and KPI review cadence.",
+            "list": [
+                "Phased rollout strategy: beta, gradual percentage, geo-specific",
+                "Go-to-market plan: marketing, sales enablement, support training",
+                "Monitoring and alerting plan for feature health",
+                "Rollback plan for critical launch issues",
+                "Success measurement window and review dates",
+                "Future iterations and roadmap candidates"
+            ]
+        },
+        {
+            "id": "team",
+            "number": "14",
+            "title": "Team & Stakeholders",
+            "summary": "Name responsible owners, contributors, and approval roles.",
+            "table": {
+                "headers": ["Role", "Owner", "Notes"],
+                "rows": [
+                    ["Product Manager", "[Name]", "Core team"],
+                    ["Engineering Lead", "[Name]", "Core team"],
+                    ["Design Lead", "[Name]", "Core team"],
+                    ["QA Lead", "[Name]", "Core team"],
+                    ["Other Contributors", "[Names/Roles]", "Specialist support"],
+                    ["Approver Stakeholder", "[Name/Role]", "Decision owner"],
+                    ["Consulted Stakeholder", "[Name/Role]", "Input + review"],
+                    ["Informed Stakeholder", "[Name/Role]", "Awareness channel"]
+                ]
+            }
+        },
+        {
+            "id": "open-questions",
+            "number": "15",
+            "title": "Open Questions & Assumptions",
+            "summary": "Track unresolved decisions and explicit assumptions that could invalidate the plan.",
+            "cards": [
+                {
+                    "title": "Open Questions",
+                    "body": "List unresolved details requiring investigation, decisions, or alignment."
+                },
+                {
+                    "title": "Assumptions",
+                    "body": "Document assumptions that, if false, could impact scope, timeline, or outcomes."
+                }
+            ]
+        },
+        {
+            "id": "appendix",
+            "number": "16",
+            "title": "Appendix (Optional)",
+            "summary": "Keep deep context in one place without overloading the main decision narrative.",
+            "list": [
+                "Glossary of Terms",
+                "User Research Findings",
+                "Competitive Analysis",
+                "Detailed Technical Specifications",
+                "Legal and Compliance Requirements"
+            ]
+        }
+    ],
+    "usage": {
+        "title": "How to Use This Template",
+        "steps": [
+            "Fill it out with your project context. Start with Overview, Problem, Goals, and Solution before deep detail.",
+            "Be concise but thorough. Include enough evidence for confident decisions.",
+            "Treat it as a living document. Update whenever assumptions, requirements, or constraints change.",
+            "Collaborate early with stakeholders and cross-functional partners to maintain alignment."
+        ]
+    }
+}
