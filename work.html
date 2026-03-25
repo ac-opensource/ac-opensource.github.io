@@ -99,7 +99,7 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-background font-body selection:bg-tertiary selection:text-on-tertiary">
+<body class="bg-background text-on-background font-body selection:bg-tertiary selection:text-on-tertiary overflow-x-hidden">
 <div class="neural-global-bg" aria-hidden="true">
   <div class="neural-mesh-container">
     <div class="neural-mesh"></div>
@@ -128,8 +128,15 @@
     </nav>
     <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
   </div>
+  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+    <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+    <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+  </nav>
 </header>
-<main class="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-12">
+<main class="relative z-10 max-w-7xl mx-auto px-6 pt-32 md:pt-24 pb-12">
 <header class="mb-16 border-l-4 border-tertiary pl-8">
 <div class="font-label text-tertiary text-sm tracking-widest mb-2">[repository: active_branch/production]</div>
 <h1 class="font-headline text-6xl font-bold tracking-tighter text-on-background">Mobile Source Code</h1>
@@ -246,7 +253,7 @@
                         Open Connection
                     </a>
 </div>
-<div class="absolute -right-8 -bottom-8 opacity-5">
+<div class="absolute -right-8 -bottom-8 opacity-5 hidden md:block">
 <span class="material-symbols-outlined text-[160px]">lan</span>
 </div>
 </div>

@@ -1,4 +1,10 @@
 /* Shared animated background based on Stitch node 57b33aa... */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 .neural-global-bg {
   position: fixed;
   inset: 0;

@@ -112,7 +112,7 @@
         .code-func { color: #E0E4D9; }
     </style>
 </head>
-<body class="bg-background text-on-surface font-body antialiased">
+<body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
 <div class="neural-global-bg" aria-hidden="true">
   <div class="neural-mesh-container">
     <div class="neural-mesh"></div>
@@ -141,8 +141,15 @@
     </nav>
     <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
   </div>
+  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+    <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+    <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+  </nav>
 </header>
-<main class="pt-24 pb-32">
+<main class="pt-32 md:pt-24 pb-32">
 <article class="max-w-screen-xl mx-auto px-6">
 <!-- Breadcrumbs & Meta Top -->
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
