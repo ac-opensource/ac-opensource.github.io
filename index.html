@@ -530,7 +530,6 @@
         if (!response.ok) return;
 
         const payload = await response.json();
-        const truncateForHome = (value, maxLength) => truncateText(value, maxLength);
         const setText = (id, value) => {
           const node = document.getElementById(id);
           if (node && typeof value === "string" && value.trim()) {
@@ -540,9 +539,9 @@
 
         setText("home-about-heading", payload.heading);
         setText("home-about-professional-title", payload.professional?.title);
-        setText("home-about-professional-body", truncateForHome(payload.professional?.body, 240));
+        setText("home-about-professional-body", payload.professional?.body);
         setText("home-about-personal-title", payload.personal?.title);
-        setText("home-about-personal-body", truncateForHome(payload.personal?.body, 260));
+        setText("home-about-personal-body", payload.personal?.body);
         if (window.aiRebrand) {
           window.aiRebrand.refresh("#home-about-professional-body");
         }
