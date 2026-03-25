@@ -1,0 +1,119 @@
+.ai-rebrand {
+  position: relative;
+  display: inline-block;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.ai-rebrand-from {
+  display: inline-block;
+  transform-origin: center;
+}
+
+.ai-rebrand-to {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(0.2em) scale(0.98);
+}
+
+.ai-rebrand-flare {
+  position: absolute;
+  left: 0;
+  top: 58%;
+  width: 0;
+  height: 1px;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(239, 68, 68, 0.05),
+    rgba(249, 115, 22, 0.65),
+    rgba(250, 204, 21, 0.75),
+    rgba(239, 68, 68, 0.05)
+  );
+  box-shadow: 0 0 6px rgba(249, 115, 22, 0.35);
+}
+
+.ai-rebrand.is-burning .ai-rebrand-from {
+  animation: ai-burn-out 780ms cubic-bezier(0.25, 0.8, 0.3, 1) forwards;
+}
+
+.ai-rebrand.is-burning .ai-rebrand-flare {
+  animation: ai-scratch 720ms cubic-bezier(0.2, 0.9, 0.25, 1) forwards;
+}
+
+.ai-rebrand.is-revealed .ai-rebrand-to {
+  animation: ai-reveal 680ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+
+.ai-rebrand.is-complete .ai-rebrand-from {
+  display: none;
+}
+
+.ai-rebrand.is-complete .ai-rebrand-flare {
+  display: none;
+}
+
+.ai-rebrand.is-complete .ai-rebrand-to {
+  position: static;
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+@keyframes ai-scratch {
+  0% {
+    width: 0;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes ai-burn-out {
+  0% {
+    opacity: 1;
+    filter: none;
+    transform: scale(1) translateY(0);
+  }
+  40% {
+    opacity: 0.85;
+    filter: blur(0.6px);
+    transform: scale(1.01) translateY(-0.02em);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(2px);
+    transform: scale(0.97) translateY(-0.08em);
+  }
+}
+
+@keyframes ai-reveal {
+  0% {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(0.22em) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-rebrand,
+  .ai-rebrand-from,
+  .ai-rebrand-to,
+  .ai-rebrand-flare {
+    animation: none !important;
+    transition: none !important;
+  }
+}
