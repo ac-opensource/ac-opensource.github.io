@@ -1,42 +1,18 @@
 [
   {
-    "slug": "2025-11-25-test-post",
-    "title": "Test Post",
+    "slug": "2026-03-26-cognitive-profile-deep-dive",
+    "title": "Cognitive Profile Deep Dive: Emergenetics + Harrison",
     "author": "Andrew Concepcion",
-    "summary": "This is a test summary.",
-    "date": "2025-11-25",
-    "readingTime": "1 min read",
+    "summary": "A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.",
+    "date": "2026-03-26",
+    "readingTime": "13 min read",
     "topics": [
-      "Topic1",
-      "Topic2"
-    ],
-    "category": "test-category"
-  },
-  {
-    "slug": "2025-11-21-its-not-okay-to-stay-not-okay",
-    "title": "It’s Not Okay to Stay “Not Okay” — Why Honesty Is the Fix",
-    "author": "Andrew Concepcion",
-    "summary": "A reflection on why acknowledging pain is only step one and how ownership keeps your struggles from spilling onto others.",
-    "date": "2025-11-21",
-    "readingTime": "9 min read",
-    "topics": [
-      "Reflection",
-      "Mental Health",
-      "Personal Growth"
-    ],
-    "category": "reflection"
-  },
-  {
-    "slug": "2025-11-19-reminder-from-my-own-advice",
-    "title": "Reminder I Didn’t Expect to Get From My Own Advice",
-    "author": "Andrew Concepcion",
-    "summary": "On drifting into complacency, offering a friend honest advice, and realizing you need the same reminders.",
-    "date": "2025-11-19",
-    "readingTime": "7 min read",
-    "topics": [
-      "Relationships",
-      "Reflection",
-      "Personal Growth"
+      "emergenetics",
+      "harrison",
+      "paradox",
+      "self-awareness",
+      "leadership",
+      "reflection"
     ],
     "category": "reflection"
   },
@@ -168,18 +144,6 @@
       "SwiftUI"
     ],
     "category": "technical"
-  },
-  {
-    "slug": "2024-03-14-welcome",
-    "title": "Welcome to my blog",
-    "author": "Andrew Concepcion",
-    "summary": "Opening thoughts on why I'm documenting experimentation notes publicly.",
-    "date": "2024-03-14",
-    "readingTime": "2 min read",
-    "topics": [
-      "Personal"
-    ],
-    "category": "personal"
   },
   {
     "slug": "case-study-popslide-engagement-and-monetization",

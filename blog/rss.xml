@@ -5,7 +5,7 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Thu, 26 Mar 2026 05:06:06 GMT</lastBuildDate>
+  <lastBuildDate>Thu, 26 Mar 2026 10:18:15 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
   <item>
     <title>Cognitive Profile Deep Dive: Emergenetics + Harrison</title>
@@ -14,30 +14,6 @@
     <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
     <description>A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.</description>
 <category>emergenetics</category><category>harrison</category><category>paradox</category><category>self-awareness</category><category>leadership</category><category>reflection</category>
-  </item>
-  <item>
-    <title>Test Post</title>
-    <link>https://ac-opensource.github.io/blog/2025-11-25-test-post.html</link>
-    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2025-11-25-test-post.html</guid>
-    <pubDate>Tue, 25 Nov 2025 00:00:00 GMT</pubDate>
-    <description>This is a test summary.</description>
-<category>Topic1</category><category>Topic2</category><category>test-category</category>
-  </item>
-  <item>
-    <title>It’s Not Okay to Stay “Not Okay” — Why Honesty Is the Fix</title>
-    <link>https://ac-opensource.github.io/blog/2025-11-21-its-not-okay-to-stay-not-okay.html</link>
-    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2025-11-21-its-not-okay-to-stay-not-okay.html</guid>
-    <pubDate>Fri, 21 Nov 2025 00:00:00 GMT</pubDate>
-    <description>A reflection on why acknowledging pain is only step one and how ownership keeps your struggles from spilling onto others.</description>
-<category>Reflection</category><category>Mental Health</category><category>Personal Growth</category><category>reflection</category>
-  </item>
-  <item>
-    <title>Reminder I Didn’t Expect to Get From My Own Advice</title>
-    <link>https://ac-opensource.github.io/blog/2025-11-19-reminder-from-my-own-advice.html</link>
-    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2025-11-19-reminder-from-my-own-advice.html</guid>
-    <pubDate>Wed, 19 Nov 2025 00:00:00 GMT</pubDate>
-    <description>On drifting into complacency, offering a friend honest advice, and realizing you need the same reminders.</description>
-<category>Relationships</category><category>Reflection</category><category>Personal Growth</category><category>reflection</category>
   </item>
   <item>
     <title>Case Study: MySTC at Telecom Scale</title>
@@ -110,14 +86,6 @@
     <pubDate>Wed, 22 May 2024 00:00:00 GMT</pubDate>
     <description>A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.</description>
 <category>KMP</category><category>SwiftUI</category><category>technical</category>
-  </item>
-  <item>
-    <title>Welcome to my blog</title>
-    <link>https://ac-opensource.github.io/blog/2024-03-14-welcome.html</link>
-    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-03-14-welcome.html</guid>
-    <pubDate>Thu, 14 Mar 2024 00:00:00 GMT</pubDate>
-    <description>Opening thoughts on why I&apos;m documenting experimentation notes publicly.</description>
-<category>Personal</category><category>personal</category>
   </item>
   <item>
     <title>Case Study: Popslide Engagement and Monetization</title>
