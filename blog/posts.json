@@ -182,6 +182,22 @@
     "category": "hobby"
   },
   {
+    "slug": "case-study-openpay-bnpl-experience",
+    "title": "Case Study: openpay BNPL Experience",
+    "author": "Andrew Concepcion",
+    "summary": "How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work.",
+    "date": "2024-09-01",
+    "readingTime": "8 min read",
+    "topics": [
+      "openpay",
+      "fintech",
+      "bnpl",
+      "android",
+      "checkout"
+    ],
+    "category": "work"
+  },
+  {
     "slug": "case-study-solo-whitelabel-delivery-platform",
     "title": "Case Study: Solo Whitelabel Delivery Platform",
     "author": "Andrew Concepcion",

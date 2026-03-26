@@ -3,29 +3,30 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
-<title>Case Study: Solo Whitelabel Delivery Platform | Andrew Concepcion</title>
-<meta name="description" content="Scaling one codebase across multiple food brands while preserving brand-specific behavior and keeping deployment overhead manageable."/>
-<link rel="canonical" href="https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html"/>
+<title>Case Study: openpay BNPL Experience | Andrew Concepcion</title>
+<meta name="description" content="How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work."/>
+<link rel="canonical" href="https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
-<meta property="og:url" content="https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html"/>
-<meta property="og:title" content="Case Study: Solo Whitelabel Delivery Platform | Andrew Concepcion"/>
-<meta property="og:description" content="Scaling one codebase across multiple food brands while preserving brand-specific behavior and keeping deployment overhead manageable."/>
-<meta property="og:image" content="https://ac-opensource.github.io/assets/images/work/img_solo_app.png"/>
-<meta property="og:image:alt" content="Solo food delivery app screenshot"/>
-<meta property="article:published_time" content="2024-08-10"/>
+<meta property="og:url" content="https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html"/>
+<meta property="og:title" content="Case Study: openpay BNPL Experience | Andrew Concepcion"/>
+<meta property="og:description" content="How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work."/>
+<meta property="og:image" content="https://ac-opensource.github.io/assets/images/work/img_openpay_app.webp"/>
+<meta property="og:image:alt" content="openpay app interface showing spend limits and merchant discovery cards."/>
+<meta property="article:published_time" content="2024-09-01"/>
 <meta property="article:author" content="Andrew Concepcion"/>
-<meta property="article:tag" content="Solo">
-<meta property="article:tag" content="Food Delivery">
-<meta property="article:tag" content="Android">
-<meta property="article:tag" content="Whitelabel">
+<meta property="article:tag" content="openpay">
+<meta property="article:tag" content="fintech">
+<meta property="article:tag" content="bnpl">
+<meta property="article:tag" content="android">
+<meta property="article:tag" content="checkout">
 <meta property="article:tag" content="work">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Case Study: Solo Whitelabel Delivery Platform | Andrew Concepcion"/>
-<meta name="twitter:description" content="Scaling one codebase across multiple food brands while preserving brand-specific behavior and keeping deployment overhead manageable."/>
-<meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/work/img_solo_app.png"/>
-<meta name="twitter:image:alt" content="Solo food delivery app screenshot"/>
+<meta name="twitter:title" content="Case Study: openpay BNPL Experience | Andrew Concepcion"/>
+<meta name="twitter:description" content="How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/work/img_openpay_app.webp"/>
+<meta name="twitter:image:alt" content="openpay app interface showing spend limits and merchant discovery cards."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -93,8 +94,8 @@
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Case Study: Solo Whitelabel Delivery Platform",
-  "description": "Scaling one codebase across multiple food brands while preserving brand-specific behavior and keeping deployment overhead manageable.",
+  "headline": "Case Study: openpay BNPL Experience",
+  "description": "How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -104,10 +105,10 @@
     "name": "Andrew Concepcion",
     "url": "https://ac-opensource.github.io"
   },
-  "datePublished": "2024-08-10",
-  "dateModified": "2024-08-10",
-  "image": "https://ac-opensource.github.io/assets/images/work/img_solo_app.png",
-  "mainEntityOfPage": "https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html"
+  "datePublished": "2024-09-01",
+  "dateModified": "2024-09-01",
+  "image": "https://ac-opensource.github.io/assets/images/work/img_openpay_app.webp",
+  "mainEntityOfPage": "https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html"
 }</script>
 </head>
 <body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
@@ -151,13 +152,13 @@
 <article class="max-w-screen-xl mx-auto px-6">
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[work]</span>
-<span id="post-date" class="bg-surface-container-low px-2 py-1">2024-08-10</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[7 min read]</span>
+<span id="post-date" class="bg-surface-container-low px-2 py-1">2024-09-01</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[8 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Case Study: Solo Whitelabel Delivery Platform</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">Scaling one codebase across multiple food brands while preserving brand-specific behavior and keeping deployment overhead manageable.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Case Study: openpay BNPL Experience</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -166,7 +167,7 @@
 </div>
 
 <div class="lg:col-span-5 relative aspect-[4/5] bg-surface-container-low border border-outline-variant/20 overflow-hidden">
-<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="/assets/images/work/img_solo_app.png" alt="Solo food delivery app screenshot" loading="eager" decoding="async"/>
+<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="/assets/images/work/img_openpay_app.webp" alt="openpay app interface showing spend limits and merchant discovery cards." loading="eager" decoding="async"/>
 </div>
 
 </div>
@@ -186,45 +187,64 @@
 </div>
 <div class="pt-4 border-t border-outline-variant/20">
 <h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
-<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#solo</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#food_delivery</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#android</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#whitelabel</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#work</span></div>
+<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#openpay</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#fintech</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#bnpl</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#android</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#checkout</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#work</span></div>
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">Scaling one codebase across multiple food brands while preserving brand-specific behavior and keeping deployment overhead manageable.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work.</p>
 </section>
 </aside>
-<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><h2>Context</h2>
-      <p>Solo supports multiple delivery brands through a whitelabel platform model. Product and engineering needed predictable customization without fragmenting the codebase.</p>
-      <h2>Stack</h2>
-      <ul>
-        <li>Kotlin + XML layouts</li>
-        <li>Retrofit-based API integration patterns</li>
-      </ul>
-      <h2>Key Challenges</h2>
-      <ul>
-        <li>Legacy integration constraints from older modules</li>
-        <li>API consistency across varied partner requirements</li>
-      </ul>
-      <h2>Contributions</h2>
-      <ul>
-        <li>Implemented production fixes and shipping features across brands</li>
-        <li>Reduced risk on rollout by improving implementation consistency</li>
-      </ul>
-      <h2>Outcome</h2>
-      <p>The platform maintained delivery momentum while supporting brand-level variation with fewer brittle custom forks.</p></div>
+<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
+  <p>
+    <strong>openpay</strong> was one of the projects where small UX decisions had outsized product impact. 
+    The core challenge was balancing conversion with responsible spend behavior: make checkout feel fast 
+    without removing trust cues around limits and repayment context.
+  </p>
+  <p>
+    My work focused on tightening the purchase journey and reducing edge-case failures in critical surfaces 
+    like spend-limit cards, merchant tiles, and payment confirmation flows.
+  </p>
+</section>
+
+<section class="grid gap-6 md:grid-cols-2">
+  <figure class="md:col-span-2 bg-surface-container-low border border-outline-variant/20 p-4">
+    <img src="/assets/images/work/img_openpay_app.webp" alt="openpay app journey preview" class="w-full h-auto object-contain" />
+    <figcaption class="mt-3 text-sm text-secondary">
+      Working model of the openpay purchase surface: spend limits, merchant discovery, and checkout direction.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="space-y-4">
+  <h2 class="font-headline text-2xl font-bold tracking-tight">What I Drove</h2>
+  <ul class="list-disc pl-6 space-y-2">
+    <li>Checkout flow refinements to reduce abandonments on critical decision steps.</li>
+    <li>UI responsiveness and render optimizations on content-dense home and merchant modules.</li>
+    <li>Stability hardening before releases, especially around partner-dependent payment paths.</li>
+  </ul>
+</section>
+
+<section class="space-y-4">
+  <h2 class="font-headline text-2xl font-bold tracking-tight">Engineering Notes</h2>
+  <p>
+    In BNPL products, reliability is product experience. You can have a beautiful interface, but if one edge case
+    breaks confirmation timing, trust drops immediately. We prioritized deterministic state transitions and clear
+    loading/failure states so users always knew what the app was doing.
+  </p>
+</section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
-<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/case-study-owto-ride-hailing-platform.html">
+<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/case-study-solo-whitelabel-delivery-platform.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: OWTO Ride-Hailing Platform</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: Solo Whitelabel Delivery Platform</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
 </div>
 </a>
-<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/case-study-openpay-bnpl-experience.html">
+<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/case-study-ocbc-banking-experience.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: openpay BNPL Experience</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: OCBC Mobile Banking Delivery</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -264,9 +284,9 @@
     });
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
-    const CURRENT_POST_SLUG = "case-study-solo-whitelabel-delivery-platform";
-    const CURRENT_POST_TITLE = "Case Study: Solo Whitelabel Delivery Platform";
-    const CURRENT_POST_URL = "/blog/case-study-solo-whitelabel-delivery-platform.html";
+    const CURRENT_POST_SLUG = "case-study-openpay-bnpl-experience";
+    const CURRENT_POST_TITLE = "Case Study: openpay BNPL Experience";
+    const CURRENT_POST_URL = "/blog/case-study-openpay-bnpl-experience.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");
 
