@@ -5,7 +5,7 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Wed, 25 Mar 2026 13:17:59 GMT</lastBuildDate>
+  <lastBuildDate>Thu, 26 Mar 2026 02:18:28 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
   <item>
     <title>Test Post</title>
@@ -32,6 +32,14 @@
 <category>Relationships</category><category>Reflection</category><category>Personal Growth</category><category>reflection</category>
   </item>
   <item>
+    <title>Case Study: MySTC at Telecom Scale</title>
+    <link>https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</guid>
+    <pubDate>Wed, 05 Feb 2025 00:00:00 GMT</pubDate>
+    <description>How we delivered high-traffic telecom account flows with tighter performance budgets, multi-language support, and predictable release execution.</description>
+<category>MySTC</category><category>Android</category><category>Kotlin</category><category>Telecom</category><category>work</category>
+  </item>
+  <item>
     <title>A Month in New Zealand</title>
     <link>https://ac-opensource.github.io/blog/2024-11-02-sunrise-trail-runs.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-11-02-sunrise-trail-runs.html</guid>
@@ -46,6 +54,14 @@
     <pubDate>Thu, 21 Nov 2024 00:00:00 GMT</pubDate>
     <description>A personal essay about designing focus blocks, protecting rest, and keeping philosophy close to the shipping calendar.</description>
 <category>Reflection</category><category>Philosophy</category><category>Creative Process</category><category>reflection</category>
+  </item>
+  <item>
+    <title>Case Study: OCBC Mobile Banking Delivery</title>
+    <link>https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html</guid>
+    <pubDate>Wed, 20 Nov 2024 00:00:00 GMT</pubDate>
+    <description>Delivery notes from a banking app environment where trust, performance, and safe iteration all matter simultaneously.</description>
+<category>OCBC</category><category>Fintech</category><category>Android</category><category>Kotlin</category><category>work</category>
   </item>
   <item>
     <title>Riding The Token Storm: Notes From A Codex Fleet Wrangler</title>
@@ -64,6 +80,22 @@
 <category>Hobby</category><category>Photography</category><category>hobby</category>
   </item>
   <item>
+    <title>Case Study: Solo Whitelabel Delivery Platform</title>
+    <link>https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html</guid>
+    <pubDate>Sat, 10 Aug 2024 00:00:00 GMT</pubDate>
+    <description>Scaling one codebase across multiple food brands while preserving brand-specific behavior and keeping deployment overhead manageable.</description>
+<category>Solo</category><category>Food Delivery</category><category>Android</category><category>Whitelabel</category><category>work</category>
+  </item>
+  <item>
+    <title>Case Study: OWTO Ride-Hailing Platform</title>
+    <link>https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html</guid>
+    <pubDate>Sat, 15 Jun 2024 00:00:00 GMT</pubDate>
+    <description>Leading full-stack mobile and backend delivery for a ride-hailing product focused on booking reliability and operational execution.</description>
+<category>OWTO</category><category>Mobility</category><category>Android</category><category>iOS</category><category>Backend</category><category>work</category>
+  </item>
+  <item>
     <title>Building with Kotlin and Swift</title>
     <link>https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html</guid>
@@ -78,6 +110,30 @@
     <pubDate>Thu, 14 Mar 2024 00:00:00 GMT</pubDate>
     <description>Opening thoughts on why I&apos;m documenting experimentation notes publicly.</description>
 <category>Personal</category><category>personal</category>
+  </item>
+  <item>
+    <title>Case Study: Popslide Engagement and Monetization</title>
+    <link>https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html</guid>
+    <pubDate>Thu, 30 Nov 2023 00:00:00 GMT</pubDate>
+    <description>Operational lessons from balancing retention, monetization, and product stability in an ad-and-task rewards app.</description>
+<category>Popslide</category><category>Adtech</category><category>Android</category><category>Experimentation</category><category>work</category>
+  </item>
+  <item>
+    <title>Case Study: WebSafety Parental Controls</title>
+    <link>https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html</guid>
+    <pubDate>Thu, 22 Jun 2023 00:00:00 GMT</pubDate>
+    <description>Building parental control features with strict privacy and platform constraints, including hard technical limits on mobile operating systems.</description>
+<category>WebSafety</category><category>Security</category><category>Parental Controls</category><category>Android</category><category>work</category>
+  </item>
+  <item>
+    <title>Case Study: ProjectBASS Community Network Mapping</title>
+    <link>https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html</guid>
+    <pubDate>Wed, 05 Oct 2022 00:00:00 GMT</pubDate>
+    <description>Community-built signal and bandwidth mapping designed to collect useful field data through volunteer contributions.</description>
+<category>ProjectBASS</category><category>Open Source</category><category>Network Mapping</category><category>Kotlin</category><category>work</category>
   </item>
 </channel>
 </rss>

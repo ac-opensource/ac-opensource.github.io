@@ -11,6 +11,7 @@
     "blog:query": "node scripts/query-blog-db.js",
     "blog:writer": "node scripts/blog-writer-server.js",
     "blog:new": "node scripts/new-post.js",
+    "work:seed": "node scripts/seed-work-deep-dives.js",
     "build": "npm run blog:db:sync && npm run blog:build",
     "test:e2e": "npm run blog:build && node scripts/e2e-check.js"
   },

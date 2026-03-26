@@ -168,7 +168,7 @@
         </div>
       </dl>
       <a class="mt-8 inline-flex items-center gap-2 bg-primary text-on-primary px-4 py-2 font-label text-xs uppercase tracking-widest hover:bg-primary-dim transition-colors" href="https://github.com/ac-opensource/portfolio-app" target="_blank" rel="noreferrer">
-        View Docs
+        Open Portfolio App
         <span class="material-symbols-outlined text-sm">arrow_outward</span>
       </a>
     </aside>
@@ -213,6 +213,7 @@
         desc: "App for Saudi Telecommunication Company (STC) consumer services: manage accounts and connections, order devices, and get support.",
         logo: "/assets/images/work/ic_stc_logo.png",
         image: "/assets/images/work/img_mystc_app.png",
+        deepDivePath: "/blog/case-study-mystc-scale-and-reliability.html",
         techUsed: ["Kotlin", "Java", "MVVM", "Firebase", "SQLite"],
         challenges: ["Data synchronization", "Multi-language support"],
         downloads: "10m+",
@@ -227,6 +228,7 @@
         desc: "Mobile banking and corporate finance management app for one of Singapore's largest banks.",
         logo: "/assets/images/work/ic_ocbc_logo.png",
         image: "/assets/images/work/img_ocbc_app.png",
+        deepDivePath: "/blog/case-study-ocbc-banking-experience.html",
         techUsed: ["Kotlin", "XML", "Firebase"],
         challenges: ["Charts customization", "Identity verification", "Concurrency handling", "Network optimization"],
         downloads: "1m+",
@@ -237,6 +239,7 @@
         desc: "Whitelabel food delivery platform for brands including Burger King, Shawarma Classic, and Wayback Burgers.",
         logo: "/assets/images/work/ic_solo_logo.png",
         image: "/assets/images/work/img_solo_app.png",
+        deepDivePath: "/blog/case-study-solo-whitelabel-delivery-platform.html",
         techUsed: ["Kotlin", "XML Layouts", "Retrofit"],
         challenges: ["Legacy code integration", "API design"],
         downloads: "1m+",
@@ -247,6 +250,7 @@
         desc: "Ride-hailing app for the Philippine market.",
         logo: "/assets/images/work/ic_owto_logo.webp",
         image: "/assets/images/work/img_owto_app.png",
+        deepDivePath: "/blog/case-study-owto-ride-hailing-platform.html",
         techUsed: ["Kotlin", "Swift", "Firebase", "Uber RIB Architecture", "Node.js", "Postgres"],
         challenges: ["Real-time GPS tracking", "Payment integration"],
         downloads: "500k+",
@@ -262,6 +266,7 @@
         desc: "Cashback and rewards app with ad and task mechanics, including lockscreen ad/article experiences.",
         logo: "/assets/images/work/ic_popslide_logo.png",
         image: "/assets/images/work/img_popslide_app.png",
+        deepDivePath: "/blog/case-study-popslide-engagement-and-monetization.html",
         techUsed: ["Kotlin", "Lockscreen", "Notifications", "Flux", "Firebase"],
         challenges: ["User engagement optimization", "Ad delivery optimization"],
         downloads: "1m+",
@@ -272,6 +277,7 @@
         desc: "Parental monitoring and control software for child smartphone/mobile-device safety.",
         logo: "/assets/images/work/ic_websafety_logo.webp",
         image: "/assets/images/work/img_websafety_app.jpg",
+        deepDivePath: "/blog/case-study-websafety-parental-controls.html",
         techUsed: ["Java", "Objective-C", "AWS S3", "ElasticSearch"],
         challenges: ["Undocumented Android APIs", "GPS tracking", "Data syncing", "Security and privacy compliance"],
         downloads: "50k+",
@@ -282,6 +288,7 @@
         desc: "Crowdsourced bandwidth and signal-strength mapping app built by volunteers for volunteers.",
         logo: "/assets/images/work/ic_projectbass_logo.webp",
         image: "/assets/images/work/img_projectbass_app.png",
+        deepDivePath: "/blog/case-study-projectbass-crowdsourced-network-mapping.html",
         techUsed: ["Kotlin", "Retrofit"],
         challenges: ["Data aggregation", "Carrier compatibility"],
         downloads: "10k+",
@@ -344,6 +351,12 @@
               <p class="font-label text-[10px] uppercase tracking-widest text-outline mb-2">[key_contributions]</p>
               <ul class="space-y-1">${contributionItems}</ul>
             </div>
+            <div class="mt-5">
+              <a data-work-deep-dive href="${escapeHtml(project.deepDivePath || "/blog/")}" class="inline-flex items-center gap-2 text-[11px] font-label uppercase tracking-widest text-tertiary hover:text-tertiary-dim transition-colors">
+                [Deep Dive]
+                <span class="material-symbols-outlined text-sm">north_east</span>
+              </a>
+            </div>
           </div>
         </div>
       `;
@@ -379,6 +392,12 @@
                 <p class="font-label text-[10px] uppercase tracking-widest text-outline mb-1">[contributions]</p>
                 <p class="text-xs text-secondary leading-relaxed">${escapeHtml((project.contributions || []).slice(0, 2).join(" • "))}</p>
               </div>
+            </div>
+            <div class="pt-2 border-t border-outline-variant/20">
+              <a data-work-deep-dive href="${escapeHtml(project.deepDivePath || "/blog/")}" class="inline-flex items-center gap-2 text-[11px] font-label uppercase tracking-widest text-tertiary hover:text-tertiary-dim transition-colors">
+                [Read Case Study]
+                <span class="material-symbols-outlined text-sm">north_east</span>
+              </a>
             </div>
           </article>
         `)

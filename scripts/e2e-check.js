@@ -252,8 +252,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   // Work page specific CTA check
   await page.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  const docsLink = await page.locator('a:has-text("View Docs")').first().getAttribute('href');
-  await assert(Boolean(docsLink), 'Work page View Docs CTA has no link');
+  const portfolioAppLink = await page.locator('a:has-text("Open Portfolio App")').first().getAttribute('href');
+  await assert(
+    Boolean(portfolioAppLink && portfolioAppLink.includes('github.com/ac-opensource/portfolio-app')),
+    'Work page portfolio app CTA is missing or incorrect'
+  );
+  const deepDiveLinks = await page.locator('a[data-work-deep-dive]').count();
+  await assert(deepDiveLinks >= 3, 'Work page deep-dive links are missing');
 
   if (consoleIssues.length) {
     warnings.push(...consoleIssues);

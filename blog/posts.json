@@ -41,6 +41,21 @@
     "category": "reflection"
   },
   {
+    "slug": "case-study-mystc-scale-and-reliability",
+    "title": "Case Study: MySTC at Telecom Scale",
+    "author": "Andrew Concepcion",
+    "summary": "How we delivered high-traffic telecom account flows with tighter performance budgets, multi-language support, and predictable release execution.",
+    "date": "2025-02-05",
+    "readingTime": "9 min read",
+    "topics": [
+      "MySTC",
+      "Android",
+      "Kotlin",
+      "Telecom"
+    ],
+    "category": "work"
+  },
+  {
     "slug": "2024-11-02-sunrise-trail-runs",
     "title": "A Month in New Zealand",
     "author": "Andrew Concepcion",
@@ -67,6 +82,21 @@
       "Creative Process"
     ],
     "category": "reflection"
+  },
+  {
+    "slug": "case-study-ocbc-banking-experience",
+    "title": "Case Study: OCBC Mobile Banking Delivery",
+    "author": "Andrew Concepcion",
+    "summary": "Delivery notes from a banking app environment where trust, performance, and safe iteration all matter simultaneously.",
+    "date": "2024-11-20",
+    "readingTime": "8 min read",
+    "topics": [
+      "OCBC",
+      "Fintech",
+      "Android",
+      "Kotlin"
+    ],
+    "category": "work"
   },
   {
     "slug": "2024-10-08-running-ai-fleet-learnings",
@@ -96,6 +126,37 @@
     "category": "hobby"
   },
   {
+    "slug": "case-study-solo-whitelabel-delivery-platform",
+    "title": "Case Study: Solo Whitelabel Delivery Platform",
+    "author": "Andrew Concepcion",
+    "summary": "Scaling one codebase across multiple food brands while preserving brand-specific behavior and keeping deployment overhead manageable.",
+    "date": "2024-08-10",
+    "readingTime": "7 min read",
+    "topics": [
+      "Solo",
+      "Food Delivery",
+      "Android",
+      "Whitelabel"
+    ],
+    "category": "work"
+  },
+  {
+    "slug": "case-study-owto-ride-hailing-platform",
+    "title": "Case Study: OWTO Ride-Hailing Platform",
+    "author": "Andrew Concepcion",
+    "summary": "Leading full-stack mobile and backend delivery for a ride-hailing product focused on booking reliability and operational execution.",
+    "date": "2024-06-15",
+    "readingTime": "10 min read",
+    "topics": [
+      "OWTO",
+      "Mobility",
+      "Android",
+      "iOS",
+      "Backend"
+    ],
+    "category": "work"
+  },
+  {
     "slug": "2024-05-22-building-with-kotlin-and-swift",
     "title": "Building with Kotlin and Swift",
     "author": "Andrew Concepcion",
@@ -119,5 +180,50 @@
       "Personal"
     ],
     "category": "personal"
+  },
+  {
+    "slug": "case-study-popslide-engagement-and-monetization",
+    "title": "Case Study: Popslide Engagement and Monetization",
+    "author": "Andrew Concepcion",
+    "summary": "Operational lessons from balancing retention, monetization, and product stability in an ad-and-task rewards app.",
+    "date": "2023-11-30",
+    "readingTime": "8 min read",
+    "topics": [
+      "Popslide",
+      "Adtech",
+      "Android",
+      "Experimentation"
+    ],
+    "category": "work"
+  },
+  {
+    "slug": "case-study-websafety-parental-controls",
+    "title": "Case Study: WebSafety Parental Controls",
+    "author": "Andrew Concepcion",
+    "summary": "Building parental control features with strict privacy and platform constraints, including hard technical limits on mobile operating systems.",
+    "date": "2023-06-22",
+    "readingTime": "9 min read",
+    "topics": [
+      "WebSafety",
+      "Security",
+      "Parental Controls",
+      "Android"
+    ],
+    "category": "work"
+  },
+  {
+    "slug": "case-study-projectbass-crowdsourced-network-mapping",
+    "title": "Case Study: ProjectBASS Community Network Mapping",
+    "author": "Andrew Concepcion",
+    "summary": "Community-built signal and bandwidth mapping designed to collect useful field data through volunteer contributions.",
+    "date": "2022-10-05",
+    "readingTime": "6 min read",
+    "topics": [
+      "ProjectBASS",
+      "Open Source",
+      "Network Mapping",
+      "Kotlin"
+    ],
+    "category": "work"
   }
 ]
