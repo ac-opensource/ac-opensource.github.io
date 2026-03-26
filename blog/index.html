@@ -21,7 +21,7 @@
 <meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/new-zealand-aurora.png"/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="/assets/css/neural-background.css" rel="stylesheet"/>
@@ -86,8 +86,7 @@
                     fontFamily: {
                         "headline": ["Space Grotesk"],
                         "body": ["Manrope"],
-                        "label": ["Space Grotesk"],
-                        "serif": ["Newsreader"]
+                        "label": ["Space Grotesk"]
                     },
                     borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
                 },
@@ -187,7 +186,7 @@
 <h1 class="font-headline text-6xl md:text-8xl font-bold tracking-tighter text-on-surface leading-none mb-6">
                     FIELD NOTES
                 </h1>
-<p class="font-serif text-2xl text-secondary max-w-xl italic">
+<p class="font-body text-2xl text-secondary max-w-xl leading-relaxed">
                     Compose-first delivery notes, reflection essays, and hobby journals from active projects.
                 </p>
 </div>
@@ -458,7 +457,7 @@
               </div>
               <div class="md:col-span-7">
                 <a class="block" href="${postUrl}">
-                  <h2 class="font-serif text-4xl md:text-5xl text-on-surface group-hover:text-tertiary transition-colors leading-tight mb-4">${escapeHtml(post.title)}</h2>
+                  <h2 class="font-headline text-4xl md:text-5xl font-bold text-on-surface group-hover:text-tertiary transition-colors leading-tight mb-4">${escapeHtml(post.title)}</h2>
                   <p class="font-body text-secondary text-lg leading-relaxed mb-6 max-w-2xl">${escapeHtml(post.summary || "")}</p>
                 </a>
                 <div class="flex flex-wrap gap-2">
