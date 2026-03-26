@@ -118,13 +118,13 @@ function buildStaticPostHtml({ post, previous, next }) {
   const heroPanelHtml = isWorkDeepDive
     ? `
 <div class="lg:col-span-5 relative aspect-[4/5] bg-surface-container-low border border-outline-variant/20 overflow-hidden">
-<img id="post-hero-image" class="w-full h-full object-cover" src="${escapeHtml(heroImage)}" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="${escapeHtml(heroImage)}" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
 </div>
 `
     : `
 <div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
-<div class="absolute inset-0 opacity-10 pointer-events-none">
-<img id="post-hero-image" class="w-full h-full object-cover grayscale" src="${escapeHtml(heroImage)}" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+<div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
+<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="${escapeHtml(heroImage)}" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
 </div>
 <div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
 <div class="flex justify-between items-start">
@@ -246,6 +246,18 @@ ${articleTagsMeta}
   .code-keyword { color: #6799FB; }
   .code-type { color: #FE8983; }
   .code-func { color: #E0E4D9; }
+  .hero-overlay-alpha {
+    opacity: 0;
+    animation: overlayAlphaPulse 4.8s ease-in-out infinite;
+    will-change: opacity;
+  }
+  @keyframes overlayAlphaPulse {
+    0% { opacity: 0; }
+    35% { opacity: 0; }
+    55% { opacity: 1; }
+    75% { opacity: 0; }
+    100% { opacity: 0; }
+  }
 </style>
 <script type="application/ld+json">${structuredData}</script>
 </head>

@@ -78,6 +78,18 @@
   .code-keyword { color: #6799FB; }
   .code-type { color: #FE8983; }
   .code-func { color: #E0E4D9; }
+  .hero-overlay-alpha {
+    opacity: 0;
+    animation: overlayAlphaPulse 4.8s ease-in-out infinite;
+    will-change: opacity;
+  }
+  @keyframes overlayAlphaPulse {
+    0% { opacity: 0; }
+    35% { opacity: 0; }
+    55% { opacity: 1; }
+    75% { opacity: 0; }
+    100% { opacity: 0; }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
@@ -155,7 +167,7 @@
 </div>
 
 <div class="lg:col-span-5 relative aspect-[4/5] bg-surface-container-low border border-outline-variant/20 overflow-hidden">
-<img id="post-hero-image" class="w-full h-full object-cover" src="/assets/images/work/img_owto_app.png" alt="OWTO ride-hailing app screenshot" loading="eager" decoding="async"/>
+<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="/assets/images/work/img_owto_app.png" alt="OWTO ride-hailing app screenshot" loading="eager" decoding="async"/>
 </div>
 
 </div>
