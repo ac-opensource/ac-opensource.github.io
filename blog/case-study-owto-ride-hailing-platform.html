@@ -153,29 +153,11 @@
 <a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[RSS]</a>
 </div>
 </div>
-<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
-<div class="absolute inset-0 opacity-10 pointer-events-none">
-<img id="post-hero-image" class="w-full h-full object-cover grayscale" src="/assets/images/work/img_owto_app.png" alt="OWTO ride-hailing app screenshot" loading="eager" decoding="async"/>
+
+<div class="lg:col-span-5 relative aspect-[4/5] bg-surface-container-low border border-outline-variant/20 overflow-hidden">
+<img id="post-hero-image" class="w-full h-full object-cover" src="/assets/images/work/img_owto_app.png" alt="OWTO ride-hailing app screenshot" loading="eager" decoding="async"/>
 </div>
-<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
-<div class="flex justify-between items-start">
-<span class="font-label text-xs">[state_machine_v4.svg]</span>
-<span class="material-symbols-outlined text-tertiary">schema</span>
-</div>
-<div class="space-y-4">
-<div class="h-1 w-2/3 bg-tertiary/20"></div>
-<div class="flex gap-2">
-<div class="w-4 h-4 border border-tertiary"></div>
-<div class="w-4 h-4 bg-tertiary"></div>
-<div class="w-4 h-4 border border-tertiary"></div>
-</div>
-<div class="h-px w-full bg-outline-variant/50"></div>
-<div class="flex justify-end">
-<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
-</div>
-</div>
-</div>
-</div>
+
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
 <aside class="lg:col-span-3 hidden lg:block space-y-12">
@@ -224,9 +206,9 @@
       <p>Core booking and dispatch experiences became more predictable, and release management improved through tighter ownership boundaries.</p></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
-<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2024-05-22-building-with-kotlin-and-swift.html">
+<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/case-study-popslide-engagement-and-monetization.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Building with Kotlin and Swift</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: Popslide Engagement and Monetization</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
@@ -256,10 +238,18 @@
 </footer>
 <script>
   (() => {
+    const FORCE_ACTIVE_ROUTE = "/work.html";
     const path = window.location.pathname.replace(/\/index\.html$/, "/");
-    document.querySelectorAll("#site-nav .site-nav-link").forEach((link) => {
+    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
       const route = link.dataset.route;
-      const active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      let active = false;
+      if (route === FORCE_ACTIVE_ROUTE) {
+        active = true;
+      } else if (FORCE_ACTIVE_ROUTE === "/work.html" && route === "/blog/") {
+        active = false;
+      } else {
+        active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      }
       if (active) {
         link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
       }

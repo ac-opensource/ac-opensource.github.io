@@ -71,11 +71,20 @@ function dateForSitemap(raw) {
   return date.toISOString().slice(0, 10);
 }
 
+function isWorkPost(post) {
+  const category = String(post?.category || "")
+    .trim()
+    .toLowerCase();
+  const slug = String(post?.slug || "").trim().toLowerCase();
+  return category === "work" || slug.startsWith("case-study-");
+}
+
 function buildStaticPostHtml({ post, previous, next }) {
   const title = String(post.title || "").trim() || "Untitled";
   const author = String(post.author || "Andrew Concepcion").trim() || "Andrew Concepcion";
   const summary = String(post.summary || "").trim() || stripHtml(post.body_html).slice(0, 180);
   const category = String(post.category || "log").trim() || "log";
+  const isWorkDeepDive = isWorkPost(post);
   const publishedDate = String(post.published_date || "").trim();
   const readingTime = String(post.reading_time || "").trim() || "n/a";
   const heroImage = toAssetUrl(post.hero_image);
@@ -99,10 +108,44 @@ function buildStaticPostHtml({ post, previous, next }) {
         .join("")
     : '<span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#log</span>';
 
-  const prevHref = previous ? postPath(previous.slug) : "/blog/";
-  const prevTitle = previous ? previous.title : "No previous post";
-  const nextHref = next ? postPath(next.slug) : "/blog/";
-  const nextTitle = next ? next.title : "No next post";
+  const fallbackNavPath = isWorkDeepDive ? "/work.html" : "/blog/";
+  const prevHref = previous ? postPath(previous.slug) : fallbackNavPath;
+  const prevTitle = previous ? previous.title : isWorkDeepDive ? "Return to Source" : "No previous post";
+  const nextHref = next ? postPath(next.slug) : fallbackNavPath;
+  const nextTitle = next ? next.title : isWorkDeepDive ? "Return to Source" : "No next post";
+  const navForceRoute = isWorkDeepDive ? "/work.html" : "/blog/";
+
+  const heroPanelHtml = isWorkDeepDive
+    ? `
+<div class="lg:col-span-5 relative aspect-[4/5] bg-surface-container-low border border-outline-variant/20 overflow-hidden">
+<img id="post-hero-image" class="w-full h-full object-cover" src="${escapeHtml(heroImage)}" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+</div>
+`
+    : `
+<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<img id="post-hero-image" class="w-full h-full object-cover grayscale" src="${escapeHtml(heroImage)}" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+</div>
+<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
+<div class="flex justify-between items-start">
+<span class="font-label text-xs">[state_machine_v4.svg]</span>
+<span class="material-symbols-outlined text-tertiary">schema</span>
+</div>
+<div class="space-y-4">
+<div class="h-1 w-2/3 bg-tertiary/20"></div>
+<div class="flex gap-2">
+<div class="w-4 h-4 border border-tertiary"></div>
+<div class="w-4 h-4 bg-tertiary"></div>
+<div class="w-4 h-4 border border-tertiary"></div>
+</div>
+<div class="h-px w-full bg-outline-variant/50"></div>
+<div class="flex justify-end">
+<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
+</div>
+</div>
+</div>
+</div>
+`;
 
   const structuredData = JSON.stringify(
     {
@@ -260,29 +303,7 @@ ${articleTagsMeta}
 <a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[RSS]</a>
 </div>
 </div>
-<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
-<div class="absolute inset-0 opacity-10 pointer-events-none">
-<img id="post-hero-image" class="w-full h-full object-cover grayscale" src="${escapeHtml(heroImage)}" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
-</div>
-<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
-<div class="flex justify-between items-start">
-<span class="font-label text-xs">[state_machine_v4.svg]</span>
-<span class="material-symbols-outlined text-tertiary">schema</span>
-</div>
-<div class="space-y-4">
-<div class="h-1 w-2/3 bg-tertiary/20"></div>
-<div class="flex gap-2">
-<div class="w-4 h-4 border border-tertiary"></div>
-<div class="w-4 h-4 bg-tertiary"></div>
-<div class="w-4 h-4 border border-tertiary"></div>
-</div>
-<div class="h-px w-full bg-outline-variant/50"></div>
-<div class="flex justify-end">
-<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
-</div>
-</div>
-</div>
-</div>
+${heroPanelHtml}
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
 <aside class="lg:col-span-3 hidden lg:block space-y-12">
@@ -342,10 +363,18 @@ ${articleTagsMeta}
 </footer>
 <script>
   (() => {
+    const FORCE_ACTIVE_ROUTE = ${JSON.stringify(navForceRoute)};
     const path = window.location.pathname.replace(/\\/index\\.html$/, "/");
-    document.querySelectorAll("#site-nav .site-nav-link").forEach((link) => {
+    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
       const route = link.dataset.route;
-      const active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      let active = false;
+      if (route === FORCE_ACTIVE_ROUTE) {
+        active = true;
+      } else if (FORCE_ACTIVE_ROUTE === "/work.html" && route === "/blog/") {
+        active = false;
+      } else {
+        active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      }
       if (active) {
         link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
       }
@@ -536,11 +565,20 @@ function main() {
       .sort((a, b) => String(b.published_date).localeCompare(String(a.published_date)));
 
     const fullPosts = list.map((post) => getPostWithTopics(db, post.slug)).filter(Boolean);
+    const workPosts = fullPosts.filter(isWorkPost);
+    const workPostIndices = new Map(workPosts.map((post, index) => [post.slug, index]));
 
     for (let i = 0; i < fullPosts.length; i += 1) {
       const post = fullPosts[i];
-      const previous = fullPosts[i + 1] || null;
-      const next = fullPosts[i - 1] || null;
+      let previous = fullPosts[i + 1] || null;
+      let next = fullPosts[i - 1] || null;
+
+      if (isWorkPost(post)) {
+        const workIndex = workPostIndices.get(post.slug);
+        previous = typeof workIndex === "number" ? workPosts[workIndex + 1] || null : null;
+        next = typeof workIndex === "number" ? workPosts[workIndex - 1] || null : null;
+      }
+
       const html = buildStaticPostHtml({ post, previous, next });
       const outputPath = path.join(BLOG_DIR, `${post.slug}.html`);
       fs.writeFileSync(outputPath, html, "utf8");

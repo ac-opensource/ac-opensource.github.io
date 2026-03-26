@@ -151,6 +151,7 @@
 <a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[RSS]</a>
 </div>
 </div>
+
 <div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
 <div class="absolute inset-0 opacity-10 pointer-events-none">
 <img id="post-hero-image" class="w-full h-full object-cover grayscale" src="https://unsplash.com/photos/ZrHqFR8qky8/download?force=true&amp;w=1600" alt="Friends sitting on a cliff edge overlooking misty mountains." loading="eager" decoding="async"/>
@@ -174,6 +175,7 @@
 </div>
 </div>
 </div>
+
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
 <aside class="lg:col-span-3 hidden lg:block space-y-12">
@@ -317,10 +319,18 @@
 </footer>
 <script>
   (() => {
+    const FORCE_ACTIVE_ROUTE = "/blog/";
     const path = window.location.pathname.replace(/\/index\.html$/, "/");
-    document.querySelectorAll("#site-nav .site-nav-link").forEach((link) => {
+    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
       const route = link.dataset.route;
-      const active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      let active = false;
+      if (route === FORCE_ACTIVE_ROUTE) {
+        active = true;
+      } else if (FORCE_ACTIVE_ROUTE === "/work.html" && route === "/blog/") {
+        active = false;
+      } else {
+        active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      }
       if (active) {
         link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
       }
