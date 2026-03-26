@@ -254,7 +254,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await page.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   const portfolioAppLink = await page.locator('a:has-text("Open Portfolio App")').first().getAttribute('href');
   await assert(
-    Boolean(portfolioAppLink && portfolioAppLink.includes('github.com/ac-opensource/portfolio-app')),
+    Boolean(portfolioAppLink && portfolioAppLink.includes('play.google.com/store/apps/details?id=com.aconcepcion.portfolio')),
     'Work page portfolio app CTA is missing or incorrect'
   );
   const deepDiveLinks = await page.locator('a[data-work-deep-dive]').count();
