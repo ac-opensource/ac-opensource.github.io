@@ -1,5 +1,85 @@
 [
   {
+    "slug": "2026-03-26-prompt-patterns-for-production-ready-code",
+    "title": "Prompt Patterns That Consistently Produce Production-Ready Code",
+    "author": "Andrew Concepcion",
+    "summary": "The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.",
+    "date": "2026-03-26",
+    "readingTime": "10 min read",
+    "topics": [
+      "ai-workflow",
+      "prompting",
+      "engineering",
+      "delivery",
+      "quality"
+    ],
+    "category": "technical"
+  },
+  {
+    "slug": "2026-03-26-e2e-and-visual-qa-for-personal-websites",
+    "title": "E2E + Visual QA for Personal Websites: What to Test and Why",
+    "author": "Andrew Concepcion",
+    "summary": "A practical QA stack for personal sites using route-level E2E checks and Playwright screenshot loops to catch regressions early.",
+    "date": "2026-03-26",
+    "readingTime": "11 min read",
+    "topics": [
+      "quality",
+      "e2e",
+      "playwright",
+      "qa",
+      "frontend"
+    ],
+    "category": "technical"
+  },
+  {
+    "slug": "2026-03-26-editable-blog-system-on-github-pages",
+    "title": "Building an Editable Blog System That Still Works on GitHub Pages",
+    "author": "Andrew Concepcion",
+    "summary": "How to keep a blog editable with SQLite and tooling while deploying static pages for GitHub Pages compatibility and SEO.",
+    "date": "2026-03-26",
+    "readingTime": "12 min read",
+    "topics": [
+      "site-architecture",
+      "sqlite",
+      "github-pages",
+      "seo",
+      "content-system"
+    ],
+    "category": "technical"
+  },
+  {
+    "slug": "2026-03-26-career-trajectory-platform-ownership",
+    "title": "Career Trajectory as Platform Ownership, Not Job Titles",
+    "author": "Andrew Concepcion",
+    "summary": "A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression.",
+    "date": "2026-03-26",
+    "readingTime": "8 min read",
+    "topics": [
+      "career",
+      "leadership",
+      "platform-ownership",
+      "delivery",
+      "engineering-growth"
+    ],
+    "category": "technical"
+  },
+  {
+    "slug": "2026-03-26-from-mobile-developer-to-ai-accelerated-engineer",
+    "title": "From Mobile Developer to AI Accelerated Engineer",
+    "author": "Andrew Concepcion",
+    "summary": "What actually changed in my day-to-day engineering: workflow became parallel, delivery got faster, and scope expanded from feature ownership to full system ownership.",
+    "date": "2026-03-26",
+    "readingTime": "9 min read",
+    "topics": [
+      "ai-workflow",
+      "engineering",
+      "delivery",
+      "scope",
+      "systems-thinking"
+    ],
+    "category": "technical"
+  },
+  {
     "slug": "2026-03-26-cognitive-profile-deep-dive",
     "title": "Cognitive Profile Deep Dive: Emergenetics + Harrison",
     "author": "Andrew Concepcion",

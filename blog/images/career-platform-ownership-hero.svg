@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="t d">
+  <title id="t">Career Trajectory as Platform Ownership</title>
+  <desc id="d">Abstract timeline showing progression from feature delivery to platform architecture ownership.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f5f6f1"/>
+      <stop offset="100%" stop-color="#e7ebe3"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#205dbd"/>
+      <stop offset="100%" stop-color="#79a3f4"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <g stroke="#d3d9cb" stroke-width="1" opacity="0.64">
+    <path d="M0 120h1600M0 240h1600M0 360h1600M0 480h1600M0 600h1600M0 720h1600"/>
+    <path d="M120 0v900M320 0v900M520 0v900M720 0v900M920 0v900M1120 0v900M1320 0v900M1520 0v900"/>
+  </g>
+
+  <g transform="translate(120 150)">
+    <rect x="0" y="0" width="1360" height="580" fill="#fafbf7" stroke="#d7ddce" stroke-width="4"/>
+    <text x="42" y="64" font-family="Space Grotesk, Arial, sans-serif" font-size="24" fill="#205dbd" letter-spacing="2">[CAREER_TRAJECTORY]</text>
+
+    <path d="M88 354h1178" stroke="url(#accent)" stroke-width="12" stroke-linecap="round"/>
+
+    <g>
+      <circle cx="200" cy="354" r="22" fill="#205dbd"/>
+      <circle cx="520" cy="354" r="22" fill="#205dbd"/>
+      <circle cx="840" cy="354" r="22" fill="#205dbd"/>
+      <circle cx="1160" cy="354" r="22" fill="#205dbd"/>
+    </g>
+
+    <g font-family="Manrope, Arial, sans-serif" fill="#2f342d">
+      <text x="130" y="250" font-size="30" font-weight="700">Feature Delivery</text>
+      <text x="130" y="290" font-size="24" fill="#5a5f65">Ship reliable product increments</text>
+
+      <text x="430" y="250" font-size="30" font-weight="700">System Thinking</text>
+      <text x="430" y="290" font-size="24" fill="#5a5f65">Design reusable boundaries</text>
+
+      <text x="740" y="250" font-size="30" font-weight="700">Platform Ownership</text>
+      <text x="740" y="290" font-size="24" fill="#5a5f65">Scale tooling and standards</text>
+
+      <text x="1040" y="250" font-size="30" font-weight="700">Org-Level Impact</text>
+      <text x="1040" y="290" font-size="24" fill="#5a5f65">Multiply teams and outcomes</text>
+    </g>
+
+    <g font-family="JetBrains Mono, monospace" font-size="18" fill="#4f5f74">
+      <text x="132" y="434">2015-2018</text>
+      <text x="450" y="434">2018-2021</text>
+      <text x="770" y="434">2021-2024</text>
+      <text x="1090" y="434">2024+</text>
+    </g>
+
+    <rect x="980" y="470" width="332" height="76" fill="#f2f5ee" stroke="#dce3d4"/>
+    <text x="1010" y="518" font-family="JetBrains Mono, monospace" font-size="21" fill="#205dbd">Ownership &gt; Job Titles</text>
+  </g>
+
+  <text x="120" y="836" font-family="Space Grotesk, Arial, sans-serif" font-size="30" fill="#205dbd" letter-spacing="3">[PLATFORM_SCOPE_AND_PRODUCT_IMPACT]</text>
+</svg>

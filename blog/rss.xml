@@ -5,8 +5,48 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Thu, 26 Mar 2026 10:18:15 GMT</lastBuildDate>
+  <lastBuildDate>Thu, 26 Mar 2026 11:42:42 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Prompt Patterns That Consistently Produce Production-Ready Code</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.</description>
+<category>ai-workflow</category><category>prompting</category><category>engineering</category><category>delivery</category><category>quality</category><category>technical</category>
+  </item>
+  <item>
+    <title>E2E + Visual QA for Personal Websites: What to Test and Why</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>A practical QA stack for personal sites using route-level E2E checks and Playwright screenshot loops to catch regressions early.</description>
+<category>quality</category><category>e2e</category><category>playwright</category><category>qa</category><category>frontend</category><category>technical</category>
+  </item>
+  <item>
+    <title>Building an Editable Blog System That Still Works on GitHub Pages</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-editable-blog-system-on-github-pages.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-editable-blog-system-on-github-pages.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>How to keep a blog editable with SQLite and tooling while deploying static pages for GitHub Pages compatibility and SEO.</description>
+<category>site-architecture</category><category>sqlite</category><category>github-pages</category><category>seo</category><category>content-system</category><category>technical</category>
+  </item>
+  <item>
+    <title>Career Trajectory as Platform Ownership, Not Job Titles</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression.</description>
+<category>career</category><category>leadership</category><category>platform-ownership</category><category>delivery</category><category>engineering-growth</category><category>technical</category>
+  </item>
+  <item>
+    <title>From Mobile Developer to AI Accelerated Engineer</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>What actually changed in my day-to-day engineering: workflow became parallel, delivery got faster, and scope expanded from feature ownership to full system ownership.</description>
+<category>ai-workflow</category><category>engineering</category><category>delivery</category><category>scope</category><category>systems-thinking</category><category>technical</category>
+  </item>
   <item>
     <title>Cognitive Profile Deep Dive: Emergenetics + Harrison</title>
     <link>https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html</link>

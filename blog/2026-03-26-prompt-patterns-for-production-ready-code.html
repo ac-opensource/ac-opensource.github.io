@@ -3,30 +3,30 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
-<title>Cognitive Profile Deep Dive: Emergenetics + Harrison | Andrew Concepcion</title>
-<meta name="description" content="A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior."/>
-<link rel="canonical" href="https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html"/>
+<title>Prompt Patterns That Consistently Produce Production-Ready Code | Andrew Concepcion</title>
+<meta name="description" content="The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions."/>
+<link rel="canonical" href="https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
-<meta property="og:url" content="https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html"/>
-<meta property="og:title" content="Cognitive Profile Deep Dive: Emergenetics + Harrison | Andrew Concepcion"/>
-<meta property="og:description" content="A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior."/>
-<meta property="og:image" content="https://ac-opensource.github.io/blog/images/cognitive-profile-cover.svg"/>
-<meta property="og:image:alt" content="Abstract visualization of cognitive profile signals"/>
+<meta property="og:url" content="https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html"/>
+<meta property="og:title" content="Prompt Patterns That Consistently Produce Production-Ready Code | Andrew Concepcion"/>
+<meta property="og:description" content="The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions."/>
+<meta property="og:image" content="https://ac-opensource.github.io/blog/images/prompt-patterns-hero.svg"/>
+<meta property="og:image:alt" content="Structured prompt components flowing into automated checks and production release."/>
 <meta property="article:published_time" content="2026-03-26"/>
 <meta property="article:author" content="Andrew Concepcion"/>
-<meta property="article:tag" content="emergenetics">
-<meta property="article:tag" content="harrison">
-<meta property="article:tag" content="paradox">
-<meta property="article:tag" content="self-awareness">
-<meta property="article:tag" content="leadership">
-<meta property="article:tag" content="reflection">
+<meta property="article:tag" content="ai-workflow">
+<meta property="article:tag" content="prompting">
+<meta property="article:tag" content="engineering">
+<meta property="article:tag" content="delivery">
+<meta property="article:tag" content="quality">
+<meta property="article:tag" content="technical">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Cognitive Profile Deep Dive: Emergenetics + Harrison | Andrew Concepcion"/>
-<meta name="twitter:description" content="A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior."/>
-<meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/cognitive-profile-cover.svg"/>
-<meta name="twitter:image:alt" content="Abstract visualization of cognitive profile signals"/>
+<meta name="twitter:title" content="Prompt Patterns That Consistently Produce Production-Ready Code | Andrew Concepcion"/>
+<meta name="twitter:description" content="The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/prompt-patterns-hero.svg"/>
+<meta name="twitter:image:alt" content="Structured prompt components flowing into automated checks and production release."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -82,8 +82,8 @@
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Cognitive Profile Deep Dive: Emergenetics + Harrison",
-  "description": "A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.",
+  "headline": "Prompt Patterns That Consistently Produce Production-Ready Code",
+  "description": "The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -95,8 +95,8 @@
   },
   "datePublished": "2026-03-26",
   "dateModified": "2026-03-26",
-  "image": "https://ac-opensource.github.io/blog/images/cognitive-profile-cover.svg",
-  "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html"
+  "image": "https://ac-opensource.github.io/blog/images/prompt-patterns-hero.svg",
+  "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html"
 }</script>
 </head>
 <body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
@@ -139,14 +139,14 @@
 <main class="pt-32 md:pt-24 pb-32">
 <article class="max-w-screen-xl mx-auto px-6">
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
-<span id="post-category" class="bg-surface-container-low px-2 py-1">[reflection]</span>
+<span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2026-03-26</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[13 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[10 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Cognitive Profile Deep Dive: Emergenetics + Harrison</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Prompt Patterns That Consistently Produce Production-Ready Code</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -156,7 +156,7 @@
 
 <div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
 <div class="absolute inset-0 opacity-10 pointer-events-none">
-<img id="post-hero-image" class="w-full h-full object-cover grayscale" src="/blog/images/cognitive-profile-cover.svg" alt="Abstract visualization of cognitive profile signals" loading="eager" decoding="async"/>
+<img id="post-hero-image" class="w-full h-full object-cover grayscale" src="/blog/images/prompt-patterns-hero.svg" alt="Structured prompt components flowing into automated checks and production release." loading="eager" decoding="async"/>
 </div>
 <div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
 <div class="flex justify-between items-start">
@@ -189,133 +189,101 @@
 </div>
 <div>
 <p id="post-author-name" class="text-sm font-bold">Andrew Concepcion</p>
-<p id="post-author-role" class="text-xs text-secondary">[reflection]</p>
+<p id="post-author-role" class="text-xs text-secondary">[technical]</p>
 </div>
 </div>
 </div>
 <div class="pt-4 border-t border-outline-variant/20">
 <h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
-<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#emergenetics</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#harrison</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#paradox</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#self-awareness</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#leadership</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#reflection</span></div>
+<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ai-workflow</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#prompting</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#engineering</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#delivery</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#quality</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#technical</span></div>
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.</p>
 </section>
 </aside>
 <div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
   <p>
-    I use assessment results the same way I use profiling data in production systems: as signals to tune behavior,
-    not labels to hide behind. This deep dive merges two artifacts I actually use in planning and leadership loops:
-    <strong>Emergenetics</strong> (from my personal app profile) and my <strong>Harrison Assessment</strong> report.
+    Prompt quality is now part of engineering quality. If prompts are vague, code quality becomes stochastic.
+    If prompts are structured, outputs become predictable enough for production workflows.
   </p>
   <p>
-    The point is operational clarity. If a trait does not improve decision quality, collaboration, or delivery speed,
-    it stays trivia. If it improves outcomes, it becomes part of my engineering operating model.
+    This post documents the patterns I use when I want AI output that is fast, testable, and integration-safe.
   </p>
 </section>
-
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">01. Emergenetics: Thinking Mix</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. Start With Constraints, Not Solutions</h2>
   <p>
-    My thinking mix is <strong>Analytical 33%</strong>, <strong>Conceptual 32%</strong>,
-    <strong>Structural 20%</strong>, and <strong>Social 15%</strong>.
-    In practice, this creates a two-phase rhythm: broad option synthesis first, then deterministic system framing.
+    I define environment and acceptance constraints first: repository path, coding conventions, non-goals,
+    and what “done” means. This narrows output variance before implementation starts.
   </p>
-  <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/emergenetics-thinking-mix.svg" alt="Emergenetics thinking mix chart" class="w-full h-auto" loading="lazy" decoding="async"/>
-    <figcaption class="mt-3 text-sm text-secondary">Thinking percentages sourced from the Emergenetics module in my personal app.</figcaption>
-  </figure>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Analytical + Conceptual</strong><br/>Useful for converting ambiguous product intent into executable architecture.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Structural support</strong><br/>Enough structure-bias to keep execution stable through shifting constraints.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Lower social weighting</strong><br/>I counterbalance with explicit context notes, tradeoff docs, and decision records.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Delivery effect</strong><br/>Fast framing, fewer ambiguous handoffs, cleaner feedback loops.</div>
+  <div class="code-block text-sm leading-relaxed">
+    <span class="code-keyword">Goal</span>: Add feature X without changing existing UX language.<br/>
+    <span class="code-keyword">Constraints</span>: keep SQLite source of truth, static output required for GitHub Pages.<br/>
+    <span class="code-keyword">Validation</span>: route checks + E2E + visual smoke.
   </div>
 </section>
-
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">02. Emergenetics: Behavior Percentiles</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. Ask for an Execution Loop</h2>
   <p>
-    Behavior percentiles are <strong>Expressiveness 49%</strong>, <strong>Assertiveness 51%</strong>, and
-    <strong>Flexibility 60%</strong>. This profile usually reads as measured communication, balanced advocacy,
-    and high adaptation when context changes quickly.
+    Instead of one-shot code generation, I ask for this cycle: inspect, patch, run checks, summarize deltas.
+    That loop enforces incremental quality and catches integration drift early.
   </p>
-  <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/emergenetics-behavior-percentiles.svg" alt="Emergenetics behavior percentile chart" class="w-full h-auto" loading="lazy" decoding="async"/>
-    <figcaption class="mt-3 text-sm text-secondary">Behavior calibration used for cross-team communication and leadership posture.</figcaption>
-  </figure>
-  <p>
-    Practical outcome: I can move between contributor mode and architecture-lead mode without defaulting to forceful command style.
-    That tends to preserve trust while still shipping under pressure.
-  </p>
-</section>
-
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">03. Harrison: High-Signal Traits</h2>
-  <p>
-    Harrison highlights in my report include <strong>Open / Reflective 9.8</strong>, <strong>Flexible 9.7</strong>,
-    <strong>Analytical 9.3</strong>, <strong>Helpful 8.3</strong>, and <strong>Optimistic 8.0</strong>.
-    A useful watchpoint is <strong>Assertive 4.1</strong>.
-  </p>
-  <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/harrison-trait-snapshot.svg" alt="Harrison trait score snapshot" class="w-full h-auto" loading="lazy" decoding="async"/>
-    <figcaption class="mt-3 text-sm text-secondary">Selected scores from Harrison Assessment completed on 2025-09-10.</figcaption>
-  </figure>
-  <div class="bg-surface-container-high p-5 border border-outline-variant/20">
-    <h3 class="font-headline text-2xl font-bold mb-2">What this means in delivery</h3>
-    <p>
-      The profile favors broad perspective intake, rapid adaptation, and careful synthesis.
-      The assertiveness watchpoint reminds me to state boundaries and priorities explicitly,
-      especially when helping-mode can overtake prioritization.
-    </p>
-  </div>
-</section>
-
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">04. Harrison Paradoxes (The Useful Part)</h2>
-  <p>
-    Harrison paradoxes are where the report becomes actionable. They expose tension-pairs that can produce either
-    leverage or friction depending on context.
-  </p>
-  <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/harrison-paradox-map.svg" alt="Harrison paradox map" class="w-full h-auto" loading="lazy" decoding="async"/>
-    <figcaption class="mt-3 text-sm text-secondary">Paradox map interpretation based on report language and observed delivery behavior.</figcaption>
-  </figure>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Certain vs Open / Reflective</strong><br/>High openness enables strong exploration; I prevent over-analysis by decision timeboxing.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Assertive vs Helpful</strong><br/>Supportive bias strengthens team trust; I force explicit priority statements to avoid self-sacrificing loops.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Organised vs Flexible</strong><br/>High adaptability is a strength; I anchor execution with milestone gates and written contracts.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Optimistic vs Analyses Pitfalls</strong><br/>Realistic optimism helps momentum; risk scans keep me out of blind-optimism traps.</div>
-  </div>
-</section>
-
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">05. Cool Stuff I Actually Use</h2>
   <ul class="list-disc pl-6 space-y-2">
-    <li><strong>Decision logs:</strong> every major tradeoff gets a short reason + fallback path.</li>
-    <li><strong>Boundary prompts:</strong> I explicitly ask, “What are we not doing this sprint?”</li>
-    <li><strong>Risk pairing:</strong> each optimistic plan item gets one concrete failure mode.</li>
-    <li><strong>Conflict hygiene:</strong> disagree early in architecture, align hard before implementation.</li>
-    <li><strong>Post-ship review:</strong> compare expected impact versus real telemetry, then recalibrate.</li>
+    <li>Inspect current files and call out assumptions.</li>
+    <li>Apply smallest viable patch.</li>
+    <li>Run tests/checks immediately.</li>
+    <li>Report unresolved risks explicitly.</li>
   </ul>
+</section>
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. Require Environment-Aware Behavior</h2>
   <p>
-    Net result: this profile works best as a calibration loop. The value is not identity language;
-    the value is shipping better systems with clearer decisions and healthier team dynamics.
+    Production-ready prompts include deployment context. In this site, that means static blog pages,
+    SQLite for query/search behavior, and SEO metadata consistency.
+  </p>
+  <p>
+    I also request non-destructive git behavior and explicit handling of existing edits to avoid accidental rollback.
+  </p>
+</section>
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. Demand Verification Artifacts</h2>
+  <p>
+    “Looks good” is not enough. I ask for objective checks: command outputs, route status, and screenshot evidence when needed.
+  </p>
+  <div class="bg-surface-container-low border border-outline-variant/20 p-5">
+    <h3 class="font-headline text-2xl font-bold mb-3">Minimum verification bar</h3>
+    <ul class="list-disc pl-6 space-y-2">
+      <li>Build succeeds.</li>
+      <li>E2E passes on critical routes.</li>
+      <li>No broken internal links.</li>
+      <li>Changed behavior is described with file-level references.</li>
+    </ul>
+  </div>
+</section>
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">05. Prompt Template I Reuse</h2>
+  <p>
+    The reusable shape is simple: objective, constraints, acceptance criteria, test command, and output format.
+    That structure turns AI from autocomplete into a dependable implementation partner.
+  </p>
+  <p>
+    The pattern is less about “magic words” and more about clarity, bounded scope, and verification discipline.
   </p>
 </section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
-<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/case-study-mystc-scale-and-reliability.html">
+<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: MySTC at Telecom Scale</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">E2E + Visual QA for Personal Websites: What to Test and Why</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
 </div>
 </a>
-<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html">
+<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">From Mobile Developer to AI Accelerated Engineer</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">No next post</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -355,9 +323,9 @@
     });
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
-    const CURRENT_POST_SLUG = "2026-03-26-cognitive-profile-deep-dive";
-    const CURRENT_POST_TITLE = "Cognitive Profile Deep Dive: Emergenetics + Harrison";
-    const CURRENT_POST_URL = "/blog/2026-03-26-cognitive-profile-deep-dive.html";
+    const CURRENT_POST_SLUG = "2026-03-26-prompt-patterns-for-production-ready-code";
+    const CURRENT_POST_TITLE = "Prompt Patterns That Consistently Produce Production-Ready Code";
+    const CURRENT_POST_URL = "/blog/2026-03-26-prompt-patterns-for-production-ready-code.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");
 
