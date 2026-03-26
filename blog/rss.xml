@@ -5,8 +5,16 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Thu, 26 Mar 2026 02:23:38 GMT</lastBuildDate>
+  <lastBuildDate>Thu, 26 Mar 2026 05:06:06 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Cognitive Profile Deep Dive: Emergenetics + Harrison</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.</description>
+<category>emergenetics</category><category>harrison</category><category>paradox</category><category>self-awareness</category><category>leadership</category><category>reflection</category>
+  </item>
   <item>
     <title>Test Post</title>
     <link>https://ac-opensource.github.io/blog/2025-11-25-test-post.html</link>

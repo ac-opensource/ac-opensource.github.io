@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Harrison Paradox Map</title>
+  <desc id="desc">Quadrant-style map of key Harrison paradox dimensions and interpreted tendencies.</desc>
+  <rect width="1200" height="760" fill="#f6f7f2"/>
+  <rect x="90" y="70" width="1020" height="620" fill="#fcfcf8" stroke="#d8ddd0" stroke-width="3"/>
+  <text x="130" y="120" font-family="Space Grotesk, Arial, sans-serif" font-size="26" letter-spacing="2" fill="#1f5cba">[HARRISON_PARADOX_SIGNALS]</text>
+
+  <g transform="translate(130 170)">
+    <rect x="0" y="0" width="450" height="220" fill="#f7f9f4" stroke="#dde2d6"/>
+    <text x="24" y="40" font-family="Space Grotesk, Arial, sans-serif" font-size="24" fill="#2f342d" font-weight="700">Certain vs Open / Reflective</text>
+    <text x="24" y="78" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Signal: very high openness, moderate certainty.</text>
+    <text x="24" y="112" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Likely strength: brainstorming, perspective range.</text>
+    <text x="24" y="146" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Watch: avoid endless option loops.</text>
+    <rect x="24" y="172" width="402" height="18" fill="#e4e8de"/>
+    <rect x="24" y="172" width="340" height="18" fill="#1f5cba"/>
+  </g>
+
+  <g transform="translate(620 170)">
+    <rect x="0" y="0" width="450" height="220" fill="#f7f9f4" stroke="#dde2d6"/>
+    <text x="24" y="40" font-family="Space Grotesk, Arial, sans-serif" font-size="24" fill="#2f342d" font-weight="700">Assertive vs Helpful</text>
+    <text x="24" y="78" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Signal: helpfulness trends above assertiveness.</text>
+    <text x="24" y="112" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Likely strength: trust, team cohesion, support.</text>
+    <text x="24" y="146" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Watch: explicitly state boundaries and tradeoffs.</text>
+    <rect x="24" y="172" width="402" height="18" fill="#e4e8de"/>
+    <rect x="24" y="172" width="250" height="18" fill="#6799fb"/>
+  </g>
+
+  <g transform="translate(130 430)">
+    <rect x="0" y="0" width="450" height="220" fill="#f7f9f4" stroke="#dde2d6"/>
+    <text x="24" y="40" font-family="Space Grotesk, Arial, sans-serif" font-size="24" fill="#2f342d" font-weight="700">Organised vs Flexible</text>
+    <text x="24" y="78" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Signal: extremely high flexibility.</text>
+    <text x="24" y="112" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Likely strength: rapid adaptation to change.</text>
+    <text x="24" y="146" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Watch: preserve execution structure.</text>
+    <rect x="24" y="172" width="402" height="18" fill="#e4e8de"/>
+    <rect x="24" y="172" width="360" height="18" fill="#356ec6"/>
+  </g>
+
+  <g transform="translate(620 430)">
+    <rect x="0" y="0" width="450" height="220" fill="#f7f9f4" stroke="#dde2d6"/>
+    <text x="24" y="40" font-family="Space Grotesk, Arial, sans-serif" font-size="24" fill="#2f342d" font-weight="700">Optimistic vs Analyses Pitfalls</text>
+    <text x="24" y="78" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Signal: realistic optimism (not blind optimism).</text>
+    <text x="24" y="112" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Likely strength: positive, risk-aware planning.</text>
+    <text x="24" y="146" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Watch: avoid over-buffering decisions.</text>
+    <rect x="24" y="172" width="402" height="18" fill="#e4e8de"/>
+    <rect x="24" y="172" width="320" height="18" fill="#4b7fd1"/>
+  </g>
+</svg>
