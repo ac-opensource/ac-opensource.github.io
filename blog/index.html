@@ -97,45 +97,60 @@
         body {
             background-color: #faf9f4;
         }
-        .hero-visual {
-            animation: float 6s ease-in-out infinite;
-        }
-        .data-grid {
+        .archive-cube-container {
+            perspective: 1000px;
             width: 100%;
             height: 100%;
-            position: relative;
-            overflow: hidden;
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: repeat(6, 1fr);
-            gap: 4px;
-            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .data-node {
-            background: #afb3aa20;
-            border: 1px solid #afb3aa40;
+        .archive-stage {
+            width: 120px;
+            height: 120px;
             position: relative;
-            transition: all 0.5s ease;
+            transform-style: preserve-3d;
+            animation: rotateArchive 25s infinite linear;
         }
-        .data-node::after {
-            content: "";
+        .plane {
             position: absolute;
-            inset: 0;
-            background: #1f5cba;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            width: 100%;
+            height: 100%;
+            border: 0.5px solid rgba(90, 95, 101, 0.3);
+            background: rgba(224, 228, 217, 0.1);
+            backdrop-filter: blur(1px);
         }
-        .data-node.active::after {
-            opacity: 0.4;
-            animation: pulse 2s infinite alternate;
+        .plane:nth-child(1) { transform: translateZ(40px); }
+        .plane:nth-child(2) { transform: translateZ(20px); }
+        .plane:nth-child(3) { transform: translateZ(0px); }
+        .plane:nth-child(4) { transform: translateZ(-20px); }
+        .plane:nth-child(5) { transform: translateZ(-40px); }
+        .lattice {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(to right, rgba(90, 95, 101, 0.2) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(90, 95, 101, 0.2) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.2; }
-            100% { transform: scale(1.05); opacity: 0.6; }
+        .shifting-line {
+            position: absolute;
+            height: 1px;
+            width: 100%;
+            background: rgba(31, 92, 186, 0.4);
+            animation: moveLine 4s infinite ease-in-out;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0); }
-            50% { transform: translateY(-10px) rotate(1deg); }
+        @keyframes rotateArchive {
+            0% { transform: rotateX(-20deg) rotateY(0deg) rotateZ(0deg); }
+            50% { transform: rotateX(20deg) rotateY(180deg) rotateZ(10deg); }
+            100% { transform: rotateX(-20deg) rotateY(360deg) rotateZ(0deg); }
+        }
+        @keyframes moveLine {
+            0% { top: 0; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
         }
     </style>
 </head>
@@ -178,64 +193,30 @@
 </header>
 <main class="pt-32 md:pt-24 pb-20 max-w-6xl mx-auto px-6">
 <!-- Header Section -->
-<header class="mb-20 grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+<header class="mb-20 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
 <div class="md:col-span-8">
 <div class="font-label text-xs uppercase tracking-[0.2em] text-tertiary mb-4">
                     [archive_mode: active]
                 </div>
-<h1 class="font-headline text-6xl md:text-8xl font-bold tracking-tighter text-on-surface leading-none mb-6">
-                    Field Notes
+<h1 class="font-headline text-7xl font-bold tracking-tighter text-on-surface leading-none mb-2">
+                    logs.
                 </h1>
-<p class="font-body text-2xl text-secondary max-w-xl leading-relaxed">
-                    Compose-first delivery notes, reflection essays, and hobby journals from active projects.
+<p class="font-serif text-2xl text-on-surface-variant max-w-xl leading-relaxed italic">
+                    Compose-first delivery notes, architecture retrospectives, and personal journals from active projects.
                 </p>
 </div>
 <div class="md:col-span-4 flex justify-end">
-<div class="hero-visual bg-surface-container-highest aspect-square w-48 md:w-64 flex items-center justify-center border border-outline-variant/20 relative overflow-hidden group">
-<div class="data-grid" id="blog-hero-neural">
-<div class="data-node"></div>
-<div class="data-node active"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node active"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node active"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node active"></div>
-<div class="data-node"></div>
-<div class="data-node active"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node active"></div>
-<div class="data-node"></div>
-<div class="data-node active"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node active"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node active"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node active"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node active"></div>
+<div class="bg-surface-container-highest p-8 aspect-square w-64 flex items-center justify-center border border-outline-variant/20 relative overflow-hidden">
+<div class="archive-cube-container">
+<div class="archive-stage">
+<div class="plane"><div class="lattice"></div><div class="shifting-line" style="animation-delay: -1s"></div></div>
+<div class="plane"><div class="lattice"></div><div class="shifting-line" style="animation-delay: -2s"></div></div>
+<div class="plane"><div class="lattice"></div><div class="shifting-line" style="animation-delay: -3s"></div></div>
+<div class="plane"><div class="lattice"></div><div class="shifting-line" style="animation-delay: -4s"></div></div>
+<div class="plane"><div class="lattice"></div><div class="shifting-line" style="animation-delay: -5s"></div></div>
 </div>
-<div class="absolute z-10 flex flex-col items-center justify-center">
-<div class="w-9 h-9 border-2 border-tertiary/60 rotate-45 flex items-center justify-center">
-<div class="w-4 h-4 bg-tertiary/20"></div>
 </div>
-<span class="font-label text-[8px] mt-3 tracking-[0.3em] text-tertiary font-bold">[DATA_FLOW]</span>
-</div>
+<div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-tertiary/5 to-transparent h-1 w-full animate-pulse top-1/2"></div>
 </div>
 </div>
 </header><div class="mb-12 border-b border-outline-variant/10 pb-12">
@@ -286,7 +267,6 @@
     const infiniteSentinel = document.getElementById("infinite-sentinel");
     const infiniteStatus = document.getElementById("infinite-status");
     const categoryFilters = document.getElementById("category-filters");
-    const heroNodes = document.querySelectorAll("#blog-hero-neural .data-node");
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const PAGE_SIZE = 4;
     let allPosts = [];
@@ -613,13 +593,6 @@
           }
         );
         infiniteObserver.observe(infiniteSentinel);
-      }
-
-      if (heroNodes.length) {
-        window.setInterval(() => {
-          const randomIndex = Math.floor(Math.random() * heroNodes.length);
-          heroNodes[randomIndex].classList.toggle("active");
-        }, 300);
       }
 
       feed.addEventListener("click", async (event) => {
