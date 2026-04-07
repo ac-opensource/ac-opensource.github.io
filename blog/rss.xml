@@ -5,8 +5,16 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Thu, 26 Mar 2026 15:01:31 GMT</lastBuildDate>
+  <lastBuildDate>Tue, 07 Apr 2026 12:03:30 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Deep Dive: One Rust Core Across Android and iOS</title>
+    <link>https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html</guid>
+    <pubDate>Tue, 07 Apr 2026 00:00:00 GMT</pubDate>
+    <description>A deep technical breakdown of how one Rust workspace can expose a unified core to Android and iOS through a facade crate, UniFFI, and platform-specific packaging without duplicating behavior.</description>
+<category>rust</category><category>mobile</category><category>architecture</category><category>android</category><category>ios</category><category>uniffi</category><category>ffi</category><category>technical</category>
+  </item>
   <item>
     <title>Prompt Patterns That Consistently Produce Production-Ready Code</title>
     <link>https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html</link>

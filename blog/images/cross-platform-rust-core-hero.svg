@@ -1,0 +1,42 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="900" fill="#F7F6EF"/>
+  <rect x="48" y="48" width="1504" height="804" stroke="#D9DDD3" stroke-width="2"/>
+  <path d="M120 160H520" stroke="#245FBE" stroke-width="6"/>
+  <text x="120" y="145" fill="#245FBE" font-family="Space Grotesk, Arial, sans-serif" font-size="28" font-weight="700">[cross_platform_core]</text>
+
+  <rect x="144" y="234" width="300" height="380" fill="#FCFBF7" stroke="#D2D6CB" stroke-width="3"/>
+  <text x="184" y="302" fill="#2D322B" font-family="Space Grotesk, Arial, sans-serif" font-size="38" font-weight="700">Android</text>
+  <text x="184" y="346" fill="#6B7268" font-family="Space Grotesk, Arial, sans-serif" font-size="20">Gradle produces one</text>
+  <text x="184" y="376" fill="#6B7268" font-family="Space Grotesk, Arial, sans-serif" font-size="20">shared Rust runtime for</text>
+  <text x="184" y="406" fill="#6B7268" font-family="Space Grotesk, Arial, sans-serif" font-size="20">every ABI and one Kotlin API.</text>
+  <rect x="184" y="468" width="220" height="76" fill="#E9ECE1" stroke="#C9CEC2" stroke-width="2"/>
+  <text x="220" y="515" fill="#245FBE" font-family="Space Grotesk, Arial, sans-serif" font-size="30" font-weight="700">shared.so</text>
+
+  <rect x="650" y="174" width="300" height="500" fill="#242C41"/>
+  <rect x="650" y="174" width="300" height="10" fill="#245FBE"/>
+  <text x="692" y="258" fill="#F7F9FF" font-family="Space Grotesk, Arial, sans-serif" font-size="48" font-weight="700">Rust Core</text>
+  <text x="692" y="304" fill="#B5BED4" font-family="Manrope, Arial, sans-serif" font-size="24">facade + exported feature crates</text>
+  <line x1="692" y1="350" x2="908" y2="350" stroke="#55637F" stroke-width="2"/>
+  <text x="692" y="400" fill="#F7F9FF" font-family="Space Grotesk, Arial, sans-serif" font-size="24">lifecycle</text>
+  <text x="692" y="438" fill="#F7F9FF" font-family="Space Grotesk, Arial, sans-serif" font-size="24">state_queries</text>
+  <text x="692" y="476" fill="#F7F9FF" font-family="Space Grotesk, Arial, sans-serif" font-size="24">request_builder</text>
+  <text x="692" y="514" fill="#F7F9FF" font-family="Space Grotesk, Arial, sans-serif" font-size="24">submission_flow</text>
+  <text x="692" y="552" fill="#F7F9FF" font-family="Space Grotesk, Arial, sans-serif" font-size="24">release_checks</text>
+  <text x="692" y="618" fill="#245FBE" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="700">crate-type = [lib, staticlib, cdylib]</text>
+
+  <rect x="1156" y="234" width="300" height="380" fill="#FCFBF7" stroke="#D2D6CB" stroke-width="3"/>
+  <text x="1196" y="302" fill="#2D322B" font-family="Space Grotesk, Arial, sans-serif" font-size="38" font-weight="700">iOS</text>
+  <text x="1196" y="346" fill="#6B7268" font-family="Space Grotesk, Arial, sans-serif" font-size="20">One XCFramework, one</text>
+  <text x="1196" y="376" fill="#6B7268" font-family="Space Grotesk, Arial, sans-serif" font-size="20">umbrella FFI module, and</text>
+  <text x="1196" y="406" fill="#6B7268" font-family="Space Grotesk, Arial, sans-serif" font-size="20">per-feature Swift targets.</text>
+  <rect x="1196" y="468" width="220" height="76" fill="#E9ECE1" stroke="#C9CEC2" stroke-width="2"/>
+  <text x="1242" y="515" fill="#245FBE" font-family="Space Grotesk, Arial, sans-serif" font-size="28" font-weight="700">core.xcframework</text>
+
+  <path d="M444 424H610" stroke="#245FBE" stroke-width="3"/>
+  <path d="M590 404L620 424L590 444" stroke="#245FBE" stroke-width="3"/>
+  <path d="M950 424H1116" stroke="#245FBE" stroke-width="3"/>
+  <path d="M1096 404L1126 424L1096 444" stroke="#245FBE" stroke-width="3"/>
+
+  <text x="144" y="746" fill="#6B7268" font-family="Space Grotesk, Arial, sans-serif" font-size="24">one domain core, two native shells, no duplicated platform logic</text>
+  <text x="1095" y="804" fill="#245FBE" font-family="Space Grotesk, Arial, sans-serif" font-size="24" font-weight="700">Rust / UniFFI / Android / iOS</text>
+</svg>

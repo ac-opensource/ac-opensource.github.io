@@ -1,5 +1,23 @@
 [
   {
+    "slug": "2026-04-07-one-rust-core-across-android-and-ios",
+    "title": "Deep Dive: One Rust Core Across Android and iOS",
+    "author": "Andrew Concepcion",
+    "summary": "A deep technical breakdown of how one Rust workspace can expose a unified core to Android and iOS through a facade crate, UniFFI, and platform-specific packaging without duplicating behavior.",
+    "date": "2026-04-07",
+    "readingTime": "14 min read",
+    "topics": [
+      "rust",
+      "mobile",
+      "architecture",
+      "android",
+      "ios",
+      "uniffi",
+      "ffi"
+    ],
+    "category": "technical"
+  },
+  {
     "slug": "2026-03-26-prompt-patterns-for-production-ready-code",
     "title": "Prompt Patterns That Consistently Produce Production-Ready Code",
     "author": "Andrew Concepcion",

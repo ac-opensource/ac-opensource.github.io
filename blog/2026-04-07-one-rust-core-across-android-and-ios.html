@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+<title>Deep Dive: One Rust Core Across Android and iOS | Andrew Concepcion</title>
+<meta name="description" content="A deep technical breakdown of how one Rust workspace can expose a unified core to Android and iOS through a facade crate, UniFFI, and platform-specific packaging without duplicating behavior."/>
+<link rel="canonical" href="https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html"/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:site_name" content="Andrew Concepcion"/>
+<meta property="og:type" content="article"/>
+<meta property="og:url" content="https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html"/>
+<meta property="og:title" content="Deep Dive: One Rust Core Across Android and iOS | Andrew Concepcion"/>
+<meta property="og:description" content="A deep technical breakdown of how one Rust workspace can expose a unified core to Android and iOS through a facade crate, UniFFI, and platform-specific packaging without duplicating behavior."/>
+<meta property="og:image" content="https://ac-opensource.github.io/blog/images/cross-platform-rust-core-hero.svg"/>
+<meta property="og:image:alt" content="Diagram showing one Rust core feeding both Android and iOS through a unified runtime boundary."/>
+<meta property="article:published_time" content="2026-04-07"/>
+<meta property="article:author" content="Andrew Concepcion"/>
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="mobile">
+<meta property="article:tag" content="architecture">
+<meta property="article:tag" content="android">
+<meta property="article:tag" content="ios">
+<meta property="article:tag" content="uniffi">
+<meta property="article:tag" content="ffi">
+<meta property="article:tag" content="technical">
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Deep Dive: One Rust Core Across Android and iOS | Andrew Concepcion"/>
+<meta name="twitter:description" content="A deep technical breakdown of how one Rust workspace can expose a unified core to Android and iOS through a facade crate, UniFFI, and platform-specific packaging without duplicating behavior."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/cross-platform-rust-core-hero.svg"/>
+<meta name="twitter:image:alt" content="Diagram showing one Rust core feeding both Android and iOS through a unified runtime boundary."/>
+<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#faf9f4",
+          "tertiary": "#1f5cba",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f4f4ee",
+          "surface-container": "#edefe7",
+          "surface-container-highest": "#e0e4d9",
+          "secondary": "#57606a",
+          "on-surface": "#2f342d",
+          "outline": "#787c73",
+          "outline-variant": "#afb3aa",
+          "primary": "#5a5f65",
+          "on-primary": "#f4f8ff"
+        },
+        fontFamily: {
+          "headline": ["Space Grotesk"],
+          "body": ["Manrope"],
+          "label": ["Space Grotesk"]
+        },
+        borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"}
+      }
+    }
+  }
+</script>
+<style>
+  body {
+    background-color: #faf9f4;
+  }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .code-block {
+    background: #1A1C1E;
+    color: #DEE3E9;
+    font-family: 'Space Grotesk', monospace;
+    padding: 1.5rem;
+    border-left: 4px solid #1F5CBA;
+  }
+  .code-keyword { color: #6799FB; }
+  .code-type { color: #FE8983; }
+  .code-func { color: #E0E4D9; }
+  .hero-overlay-alpha {
+    opacity: 0;
+    animation: overlayAlphaPulse 4.8s ease-in-out infinite;
+    will-change: opacity;
+  }
+  @keyframes overlayAlphaPulse {
+    0% { opacity: 0; }
+    35% { opacity: 0; }
+    55% { opacity: 1; }
+    75% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+</style>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Deep Dive: One Rust Core Across Android and iOS",
+  "description": "A deep technical breakdown of how one Rust workspace can expose a unified core to Android and iOS through a facade crate, UniFFI, and platform-specific packaging without duplicating behavior.",
+  "author": {
+    "@type": "Person",
+    "name": "Andrew Concepcion"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Andrew Concepcion",
+    "url": "https://ac-opensource.github.io"
+  },
+  "datePublished": "2026-04-07",
+  "dateModified": "2026-04-07",
+  "image": "https://ac-opensource.github.io/blog/images/cross-platform-rust-core-hero.svg",
+  "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html"
+}</script>
+</head>
+<body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
+<div class="neural-global-bg" aria-hidden="true">
+  <div class="neural-mesh-container">
+    <div class="neural-mesh"></div>
+    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
+    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
+    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
+    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
+    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
+    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
+    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
+    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
+  </div>
+  <div class="bust-gradient"></div>
+  <div class="canvas-grid"></div>
+</div>
+<header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
+  <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
+    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+      <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+      <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+      <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+    </nav>
+    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
+  </div>
+  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+    <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+    <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+  </nav>
+</header>
+<main class="pt-32 md:pt-24 pb-32">
+<article class="max-w-screen-xl mx-auto px-6">
+<div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
+<span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
+<span id="post-date" class="bg-surface-container-low px-2 py-1">2026-04-07</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[14 min read]</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
+<div class="lg:col-span-7">
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Deep Dive: One Rust Core Across Android and iOS</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A deep technical breakdown of how one Rust workspace can expose a unified core to Android and iOS through a facade crate, UniFFI, and platform-specific packaging without duplicating behavior.</p>
+<div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
+<button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
+<button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
+<a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[RSS]</a>
+</div>
+</div>
+
+<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
+<div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
+<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="/blog/images/cross-platform-rust-core-hero.svg" alt="Diagram showing one Rust core feeding both Android and iOS through a unified runtime boundary." loading="eager" decoding="async"/>
+</div>
+<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
+<div class="flex justify-between items-start">
+<span class="font-label text-xs">[state_machine_v4.svg]</span>
+<span class="material-symbols-outlined text-tertiary">schema</span>
+</div>
+<div class="space-y-4">
+<div class="h-1 w-2/3 bg-tertiary/20"></div>
+<div class="flex gap-2">
+<div class="w-4 h-4 border border-tertiary"></div>
+<div class="w-4 h-4 bg-tertiary"></div>
+<div class="w-4 h-4 border border-tertiary"></div>
+</div>
+<div class="h-px w-full bg-outline-variant/50"></div>
+<div class="flex justify-end">
+<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<aside class="lg:col-span-3 hidden lg:block space-y-12">
+<div class="pt-4 border-t border-outline-variant/20">
+<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[author_identity]</h4>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">account_tree</span>
+</div>
+<div>
+<p id="post-author-name" class="text-sm font-bold">Andrew Concepcion</p>
+<p id="post-author-role" class="text-xs text-secondary">[technical]</p>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/20">
+<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
+<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#rust</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#mobile</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#architecture</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#android</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ios</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#uniffi</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ffi</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#technical</span></div>
+</div>
+<section class="p-6 bg-surface-container-low space-y-4">
+<h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A deep technical breakdown of how one Rust workspace can expose a unified core to Android and iOS through a facade crate, UniFFI, and platform-specific packaging without duplicating behavior.</p>
+</section>
+</aside>
+<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
+  <p>
+    Cross-platform stories are usually told too cleanly. “Write it once in Rust and call it from Android and iOS” sounds elegant,
+    but the real work lives in the seams: symbol collisions, generated bindings, packaging, initialization order, ABI outputs,
+    and keeping the domain model coherent while two native shells expect to feel idiomatic.
+  </p>
+  <p>
+    What I find interesting about this implementation is that it does not stop at sharing a cryptography primitive or a tiny parser.
+    It pushes a more ambitious idea: a Rust workspace can own meaningful application behavior, then surface that same behavior to
+    Android and iOS without splitting the logic into two separate maintenance stories.
+  </p>
+  <p>
+    In practice, that means one Rust core is responsible for things like state checks, request assembly, network-derived calculations,
+    release validation, and other domain rules, while the native apps stay focused on lifecycle, UI, and platform integration.
+    That boundary is where the design gets good.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. The Real Problem Is Not “Can Rust Run on Mobile?”</h2>
+  <p>
+    The easy answer is yes. Rust can compile to Android shared objects and iOS static libraries. That part is almost boring now.
+    The harder question is: <strong>can one Rust project be consumed as a coherent product surface on both platforms</strong>?
+  </p>
+  <p>
+    This implementation solves a very specific version of that problem. The workspace exposes multiple capability areas through UniFFI,
+    but it avoids turning each one into its own independently-linked native package. That matters because separate UniFFI outputs tend to drag
+    shared runtime scaffolding with them, and once multiple packages land in the same native target, collisions become a build-system problem,
+    not a business-logic problem.
+  </p>
+  <div class="bg-surface-container-low border border-outline-variant/20 p-5">
+    <h3 class="font-headline text-2xl font-bold mb-3">What the architecture is really optimizing for</h3>
+    <ul class="list-disc pl-6 space-y-2">
+      <li>One source of truth for core behavior.</li>
+      <li>One native artifact per platform boundary, not one per feature crate.</li>
+      <li>Generated bindings that feel modular without linking modular native runtimes.</li>
+      <li>App code that calls focused functions instead of knowing Rust internals.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. Workspace Design: Public FFI Surface, Private Domain Core</h2>
+  <p>
+    The workspace is organized around a clean split between what needs to cross the language boundary and what should stay purely Rust.
+    Public crates own UniFFI-facing exports. Internal crates own the real domain mechanics, pipelines, and infrastructure abstractions.
+  </p>
+  <pre class="code-block overflow-x-auto"><code>crates/
+  public/
+    lifecycle
+    feature_a
+    feature_b
+    feature_c
+
+  internal/
+    domains/
+    orchestrators/
+    core/
+    infra/</code></pre>
+  <p>
+    That split is more than cosmetic. The internal side gets to behave like a real Rust system: traits in a shared core crate,
+    concrete implementations in infra, and domain crates that depend on abstractions rather than platform code.
+    The public side becomes the export membrane. Only the APIs that truly need to be visible to Swift or Kotlin are promoted.
+  </p>
+  <p>
+    This is one of the reasons the project feels sustainable. Rust remains the place where the architecture is allowed to be serious,
+    while the FFI boundary stays intentionally small.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. The Facade Crate Is the Core Trick</h2>
+  <p>
+    The design would be much less interesting if every exported crate produced its own native library. That would fragment distribution,
+    duplicate runtime pieces, and make both Android and iOS packaging noisier than they need to be.
+  </p>
+  <p>
+    Instead, the workspace introduces a facade crate that builds as a regular Rust library, a static library, and a cdylib,
+    then re-exports the public UniFFI crates through one place.
+  </p>
+  <pre class="code-block overflow-x-auto"><code>[lib]
+crate-type = ["lib", "staticlib", "cdylib"]
+
+[dependencies]
+feature_a = { path = "../crates/public/feature_a" }
+feature_b = { path = "../crates/public/feature_b" }
+feature_c = { path = "../crates/public/feature_c" }</code></pre>
+  <pre class="code-block overflow-x-auto"><code>pub use feature_a;
+pub use feature_b;
+pub use feature_c;</code></pre>
+  <p>
+    That looks almost too simple, but it changes the whole packaging story. One facade means one linked native core. The generated bindings
+    can still be per-domain, but the compiled runtime is unified. The practical win is avoiding duplicate UniFFI runtime symbols and avoiding
+    redefinition of shared FFI types in incompatible native contexts.
+  </p>
+  <p>
+    In other words, the facade crate is not an abstraction for elegance. It is an abstraction for link sanity.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. Android: Build Once, Bind Many, Load One .so</h2>
+  <p>
+    The Android integration is where the implementation becomes concrete. The app does not treat Rust as a sidecar experiment. It wires the shared core
+    directly into the Android build through a dedicated Gradle script.
+  </p>
+  <pre class="code-block overflow-x-auto"><code>apply(from = "$projectDir/gradle/shared-core.gradle.kts")
+
+java.srcDir(layout.buildDirectory.dir("generated/source/shared"))
+jniLibs.srcDir(layout.buildDirectory.dir("generated/jniLibs/shared"))</code></pre>
+  <p>
+    That script does three important things:
+  </p>
+  <ol class="list-decimal pl-6 space-y-2">
+    <li>Syncs facade dependencies so the exported crate list stays aligned with the workspace.</li>
+    <li>Builds one shared <code>.so</code> for every Android ABI using <code>cargo ndk</code>.</li>
+    <li>Generates Kotlin UniFFI bindings from a host build, then post-processes them so every generated crate points at the same library name.</li>
+  </ol>
+  <pre class="code-block overflow-x-auto"><code>// Post-process generated Kotlin so every crate resolves to one runtime.
+content = content.replace(
+  "return \"feature_a\"",
+  "return \"shared_core\""
+)</code></pre>
+  <p>
+    That little replacement step is one of my favorite details in the whole system. It captures the actual architecture in one line:
+    <strong>many Kotlin namespaces, one native runtime</strong>. The generated APIs stay nicely separated, but all of them resolve to the same Rust artifact.
+  </p>
+  <p>
+    In the application layer, the library is initialized once during app startup, and failures are treated as app-critical rather than recoverable.
+    That is the right stance when the native shell now depends on Rust for core behavior.
+  </p>
+  <p>
+    After that, the app can call real production functions directly from Kotlin: request building, validity checks, cost estimation,
+    remote update checks, and other domain-level operations that would otherwise be duplicated in platform code.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">05. iOS: One XCFramework, Multiple Swift Modules</h2>
+  <p>
+    On iOS, the output shape is different, but the philosophy stays the same. The build script compiles the facade crate for device, simulator,
+    and Apple Silicon macOS, generates Swift bindings for each exported crate, then packages the whole thing as a single XCFramework.
+  </p>
+  <pre class="code-block overflow-x-auto"><code>cargo build \
+  --target aarch64-apple-ios \
+  --target aarch64-apple-ios-sim \
+  --target aarch64-apple-darwin \
+  -p shared_core</code></pre>
+  <p>
+    The build then generates a Swift package with a binary target for the unified native core and separate Swift targets layered on top.
+    The result is the same as Android in spirit: modular surface area, unified runtime.
+  </p>
+  <pre class="code-block overflow-x-auto"><code>.binaryTarget(
+  name: "SharedCoreLib",
+  path: "dist/ios/SharedCore.xcframework"
+)
+.target(
+  name: "SharedCoreFFI",
+  dependencies: ["SharedCoreLib"],
+  path: "dist/ios/Sources/SharedCoreFFI",
+  publicHeadersPath: "include"
+)
+.target(name: "FeatureA", dependencies: ["SharedCoreFFI"])
+.target(name: "FeatureB", dependencies: ["SharedCoreFFI"])</code></pre>
+  <p>
+    There is also a subtle but important header strategy. The iOS build creates an umbrella FFI module so Swift sees a single coherent C-facing
+    boundary instead of a pile of overlapping per-crate headers. That reduces the chance of scaffolding collisions and makes the Swift layer feel like
+    one package instead of an accidental pile of generated fragments.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">06. The Most Interesting Part: Rust Owns Behavior, Not Just Math</h2>
+  <p>
+    A lot of cross-platform Rust examples stop at deterministic leaf logic: parsing, crypto, serialization, maybe some request encoding.
+    This implementation goes further. It models sources, transforms, sinks, effects, and pipelines in Rust, then lets the native app call those results.
+  </p>
+  <p>
+    The internal architecture is expressed in data-flow terms: <strong>read data → transform data → write data</strong>. Underneath that are traits like HTTP clients,
+    app context, and infrastructure boundaries, so the domain layer can perform meaningful work without coupling itself directly to a platform SDK.
+  </p>
+  <div class="bg-surface-container-low border border-outline-variant/20 p-5">
+    <h3 class="font-headline text-2xl font-bold mb-3">Why that matters</h3>
+    <p>
+      It means the portable unit is not just an algorithm. It is a behavior slice. A state query, request-cost computation,
+      or release-check flow can be designed once, tested once in Rust, and then called from both mobile stacks with much thinner native glue.
+    </p>
+  </div>
+  <p>
+    That is the real leverage. Once Rust becomes the place where these behaviors live, the native apps can become smaller and more honest.
+    They still own UX and lifecycle, but they stop pretending to own business logic they are really just re-expressing.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">07. What Makes This Harder Than It Looks</h2>
+  <p>
+    None of this is free. The repo contains the evidence of the complexity tax:
+  </p>
+  <ul class="list-disc pl-6 space-y-2">
+    <li>Facade sync scripts to keep exports aligned with crate visibility.</li>
+    <li>Version-pinned binding generation to avoid generator drift.</li>
+    <li>Platform-specific packaging rules for Android ABIs and iOS XCFramework outputs.</li>
+    <li>Symbol handling on Apple targets to avoid duplicate Rust runtime symbols during linking.</li>
+    <li>Lifecycle initialization that must happen before any feature crate tries to use shared context.</li>
+  </ul>
+  <p>
+    This is why I do not think of a system like this as “just a Rust library.” It is closer to a product runtime with carefully managed native delivery paths.
+  </p>
+  <p>
+    If you skip that discipline, the dream of shared logic collapses into fragile build scripts, mysterious linker failures, and two platforms that
+    technically share code but operationally still behave like separate systems.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">08. Why This Pattern Is Worth It</h2>
+  <p>
+    What I like about this implementation is not the language novelty. It is the architectural consequence. A well-designed Rust workspace can become
+    the stable center of gravity for mobile behavior, while Android and iOS stay genuinely native at the edges.
+  </p>
+  <p>
+    The payoff is not “write once, forget forever.” The payoff is tighter semantic consistency, clearer ownership boundaries, and less duplicated reasoning.
+    When one platform needs a bug fix in request assembly, validation, or state handling, you do not negotiate two rewrites. You move the core once.
+  </p>
+  <p>
+    That is why this pattern is interesting to me. It proves that sharing Rust across Android and iOS can be more than a performance trick.
+    It can be an architecture decision about where the application is actually allowed to think.
+  </p>
+</section></div>
+</div>
+<div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
+<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-prompt-patterns-for-production-ready-code.html">
+<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Prompt Patterns That Consistently Produce Production-Ready Code</h5>
+<div class="mt-6 flex items-center gap-2 text-tertiary">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="font-label text-xs">read_entry</span>
+</div>
+</a>
+<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/">
+<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">No next post</h5>
+<div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
+<span class="font-label text-xs">read_entry</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</a>
+</div>
+</article>
+</main>
+<footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
+    <span>© 2026 Andrew Concepcion</span>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[source]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
+  </div>
+</footer>
+<script>
+  (() => {
+    const FORCE_ACTIVE_ROUTE = "/blog/";
+    const path = window.location.pathname.replace(/\/index\.html$/, "/");
+    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
+      const route = link.dataset.route;
+      let active = false;
+      if (route === FORCE_ACTIVE_ROUTE) {
+        active = true;
+      } else if (FORCE_ACTIVE_ROUTE === "/work.html" && route === "/blog/") {
+        active = false;
+      } else {
+        active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      }
+      if (active) {
+        link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+      }
+    });
+
+    const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
+    const CURRENT_POST_SLUG = "2026-04-07-one-rust-core-across-android-and-ios";
+    const CURRENT_POST_TITLE = "Deep Dive: One Rust Core Across Android and iOS";
+    const CURRENT_POST_URL = "/blog/2026-04-07-one-rust-core-across-android-and-ios.html";
+    const sharePostButton = document.getElementById("share-post-button");
+    const bookmarkPostButton = document.getElementById("bookmark-post-button");
+
+    function loadBookmarks() {
+      try {
+        const raw = localStorage.getItem(BOOKMARKS_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(parsed)) return new Set();
+        return new Set(parsed.map((value) => String(value || "").trim()).filter(Boolean));
+      } catch (_error) {
+        return new Set();
+      }
+    }
+
+    function saveBookmarks(set) {
+      try {
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(set)));
+      } catch (_error) {
+        // Ignore write failures.
+      }
+    }
+
+    function setBookmarkButtonState(active) {
+      if (!bookmarkPostButton) return;
+      bookmarkPostButton.textContent = active ? "[BOOKMARKED]" : "[BOOKMARK]";
+      bookmarkPostButton.classList.toggle("border-tertiary/40", active);
+      bookmarkPostButton.classList.toggle("text-tertiary", active);
+      bookmarkPostButton.classList.toggle("bg-surface-container-highest", active);
+      bookmarkPostButton.classList.toggle("border-outline-variant/20", !active);
+      bookmarkPostButton.classList.toggle("text-secondary", !active);
+    }
+
+    async function shareCurrentPost() {
+      const absoluteUrl = new URL(CURRENT_POST_URL, window.location.origin).href;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: CURRENT_POST_TITLE || "Blog post",
+            url: absoluteUrl
+          });
+          return;
+        } catch (_error) {
+          // Continue to fallback.
+        }
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(absoluteUrl);
+          return;
+        } catch (_error) {
+          // Continue to prompt fallback.
+        }
+      }
+      window.prompt("Copy post URL:", absoluteUrl);
+    }
+
+    if (sharePostButton) {
+      sharePostButton.addEventListener("click", () => {
+        shareCurrentPost();
+      });
+    }
+
+    if (bookmarkPostButton && CURRENT_POST_SLUG) {
+      const bookmarks = loadBookmarks();
+      setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      bookmarkPostButton.addEventListener("click", () => {
+        if (bookmarks.has(CURRENT_POST_SLUG)) {
+          bookmarks.delete(CURRENT_POST_SLUG);
+        } else {
+          bookmarks.add(CURRENT_POST_SLUG);
+        }
+        saveBookmarks(bookmarks);
+        setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      });
+    }
+  })();
+</script>
+</body></html>
