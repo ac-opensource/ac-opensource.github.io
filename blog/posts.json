@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-04-09-how-i-use-mempalace-with-local-agents",
+    "title": "How I Use MemPalace to Make Local Agents Better",
+    "author": "Andrew Concepcion",
+    "summary": "How I set up MemPalace as a practical tool for local agents: small taxonomy, verify-first retrieval, agent diaries, AAAK wake-up context, and why protocol matters more than storage.",
+    "date": "2026-04-09",
+    "readingTime": "11 min read",
+    "topics": [
+      "ai-workflow",
+      "mempalace",
+      "local-agents",
+      "memory-systems",
+      "mcp",
+      "technical"
+    ],
+    "category": "technical"
+  },
+  {
     "slug": "2026-04-07-one-rust-core-across-android-and-ios",
     "title": "Deep Dive: One Rust Core Across Android and iOS",
     "author": "Andrew Concepcion",

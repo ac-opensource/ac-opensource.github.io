@@ -5,8 +5,16 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Wed, 08 Apr 2026 01:37:24 GMT</lastBuildDate>
+  <lastBuildDate>Thu, 09 Apr 2026 13:21:48 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>How I Use MemPalace to Make Local Agents Better</title>
+    <link>https://ac-opensource.github.io/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html</guid>
+    <pubDate>Thu, 09 Apr 2026 00:00:00 GMT</pubDate>
+    <description>How I set up MemPalace as a practical tool for local agents: small taxonomy, verify-first retrieval, agent diaries, AAAK wake-up context, and why protocol matters more than storage.</description>
+<category>ai-workflow</category><category>mempalace</category><category>local-agents</category><category>memory-systems</category><category>mcp</category><category>technical</category>
+  </item>
   <item>
     <title>Deep Dive: One Rust Core Across Android and iOS</title>
     <link>https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html</link>

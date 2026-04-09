@@ -2,23 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://ac-opensource.github.io/</loc>
-    <lastmod>2026-04-08</lastmod>
+    <lastmod>2026-04-09</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/work.html</loc>
-    <lastmod>2026-04-08</lastmod>
+    <lastmod>2026-04-09</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/about.html</loc>
-    <lastmod>2026-04-08</lastmod>
+    <lastmod>2026-04-09</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/contact.html</loc>
-    <lastmod>2026-04-08</lastmod>
+    <lastmod>2026-04-09</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/</loc>
-    <lastmod>2026-04-08</lastmod>
+    <lastmod>2026-04-09</lastmod>
+  </url>
+  <url>
+    <loc>https://ac-opensource.github.io/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html</loc>
+    <lastmod>2026-04-09</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html</loc>
