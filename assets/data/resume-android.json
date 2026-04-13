@@ -1,0 +1,130 @@
+{
+  "name": "A-AR ANDREW V. CONCEPCION",
+  "headline": "AI-Accelerated Developer (with deep platform knowledge) | Kotlin | Jetpack Compose | Compose Multiplatform",
+  "contact": {
+    "phone": "+63 917 815 4366",
+    "email": "aarconcepcion@gmail.com",
+    "website": "https://ac-opensource.github.io",
+    "github": "https://github.com/ac-opensource",
+    "linkedin": "https://www.linkedin.com/in/aarconcepcion"
+  },
+  "summary": "AI-accelerated developer with deep platform knowledge and 10+ years of experience shipping production systems across fintech, telecom, transport, rewards, safety, and e-commerce. Strong in Kotlin, Jetpack Compose, mobile architecture, performance tuning, release hardening, and third-party integrations. Known for high-output execution, strong engineering judgment, and moving effectively across Android, iOS, backend, product, and design to ship reliable user-facing systems.",
+  "skills": [
+    {
+      "label": "Android",
+      "items": [
+        "Kotlin",
+        "Java",
+        "Jetpack Compose",
+        "XML layouts",
+        "Android SDK",
+        "Coroutines",
+        "Flow",
+        "RxJava",
+        "RxKotlin"
+      ]
+    },
+    {
+      "label": "Architecture",
+      "items": [
+        "Clean Architecture",
+        "MVVM",
+        "modularization",
+        "SDK integration",
+        "unit testing",
+        "CI/CD",
+        "release hardening",
+        "performance tuning"
+      ]
+    },
+    {
+      "label": "Cross-Platform / Adjacent",
+      "items": [
+        "Compose Multiplatform",
+        "Kotlin Multiplatform",
+        "SwiftUI",
+        "Swift",
+        "Firebase",
+        "Retrofit",
+        "SQLite",
+        "REST APIs"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "dates": "Dec 2025 - May 2026",
+      "title": "Lead Android Developer",
+      "company": "Littlepay",
+      "bullets": [
+        "Led Android delivery and technical direction for Littlepay mobile initiatives.",
+        "Worked across product, design, and backend stakeholders to keep implementation quality, release confidence, and user-facing reliability high.",
+        "Guided architecture and code quality decisions with an emphasis on maintainable, testable Android code."
+      ]
+    },
+    {
+      "dates": "Jun 2021 - Dec 2025",
+      "title": "Senior Mobile Engineer",
+      "company": "RedAirship Pte Ltd",
+      "bullets": [
+        "Built and launched a new mobile banking app for a major Singaporean bank, shipping onboarding, account dashboard graphs, transfers, and digital account opening with Android and iOS feature parity.",
+        "Integrated third-party SDKs, refactored selected modules to reduce coupling, and improved unit-test coverage for critical fintech flows.",
+        "Improved checkout reliability, UI responsiveness, and release hardening on openpay, and shipped production fixes and features for Solo's whitelabel delivery brands."
+      ]
+    },
+    {
+      "dates": "May 2020 - Jun 2021",
+      "title": "Lead Developer",
+      "company": "InnovationTeam (MySTC, Saudi Telecom)",
+      "bullets": [
+        "Led an offshore team of five senior Android engineers on MySTC, serving 10M+ installs across multilingual customer journeys.",
+        "Drove Clean Architecture and MVVM adoption with RxJava and RxKotlin, improving modular boundaries and release confidence.",
+        "Delivered performance, stability, and data synchronization improvements across account, ordering, and support flows."
+      ]
+    },
+    {
+      "dates": "Jun 2018 - May 2020",
+      "title": "Team Lead",
+      "company": "iPARA Technologies and Solutions (OWTO)",
+      "bullets": [
+        "Led cross-functional delivery across Android, iOS, and backend for a ride-hailing platform that grew to 500K+ downloads.",
+        "Architected the mobile app with Uber RIB-inspired patterns to support modular growth and clearer ownership boundaries.",
+        "Improved booking reliability, payment-path handling, and backend API coordination for real-time transport flows."
+      ]
+    },
+    {
+      "dates": "Jun 2016 - Jun 2018",
+      "title": "Senior Android Developer",
+      "company": "YOYO Holdings Pte. Ltd. (PopSlide)",
+      "bullets": [
+        "Led Android development for a rewards app with 1M+ downloads across Southeast Asia.",
+        "Migrated large Java surfaces to Kotlin, reduced regressions in fragile areas, and shipped safer feature rollouts through A/B testing and guardrails.",
+        "Improved API and caching behavior while keeping monetization-critical lockscreen and notification surfaces stable."
+      ]
+    },
+    {
+      "dates": "May 2014 - Jun 2016",
+      "title": "Full-Stack Web and Mobile Developer",
+      "company": "Internet Strategy Branding and Execution (ISBX)",
+      "bullets": [
+        "Delivered end-to-end features for WebSafety across Android, iOS, web, and backend systems.",
+        "Worked through undocumented Android APIs, GPS and sync reliability, and security-sensitive feature requirements.",
+        "Helped ship a robust parental-controls platform with stronger operational and compliance posture."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "OCBC",
+      "description": "Mobile banking delivery for a major Singaporean bank, including onboarding, account dashboards, transfers, digital account opening, and guarded third-party SDK integration."
+    },
+    {
+      "name": "MySTC",
+      "description": "Telecom-scale Android product serving 10M+ installs, where I led a team of five senior engineers and drove modular, multilingual stability improvements."
+    },
+    {
+      "name": "OWTO",
+      "description": "Ride-hailing platform work across Android, iOS, and backend delivery, improving booking reliability, payment-path handling, API contracts, and release ownership as the product scaled to 500K+ downloads."
+    }
+  ]
+}
