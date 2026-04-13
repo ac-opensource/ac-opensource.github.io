@@ -304,6 +304,36 @@
         challenges: ["Data aggregation", "Carrier compatibility"],
         downloads: "10k+",
         contributions: ["Open-source contributions", "Community support"]
+      },
+      {
+        name: "NTU Pass + NUS Counterpart",
+        desc: "Digital campus identity work spanning the NTU Pass Android app, its watch companion, and the equivalent NUS counterpart experience.",
+        logo: "/assets/images/work/ic_ntu_pass_logo.png",
+        image: "/assets/images/work/img_ntu_pass_app.svg",
+        deepDivePath: "https://play.google.com/store/apps/details?id=sg.edu.ntu.apps.ntusmartpass&hl=en",
+        linkLabel: "Open Listing",
+        external: true,
+        techUsed: ["Kotlin", "Android", "Wear OS", "Digital Identity"],
+        challenges: ["Campus credential UX", "Phone-watch continuity"],
+        downloads: "10k+",
+        contributions: [
+          "Android app delivery",
+          "Watch app support",
+          "NUS counterpart contributions"
+        ]
+      },
+      {
+        name: "Aqua Expeditions",
+        desc: "Contributed Android engineering to Aqua Expeditions, a luxury small-ship expeditions brand operating premium travel experiences across remote destinations.",
+        logo: "/assets/images/work/ic_aqua_expeditions_logo.svg",
+        image: "/assets/images/work/img_aqua_expeditions_app.svg",
+        deepDivePath: "https://www.aquaexpeditions.com/home",
+        linkLabel: "Visit Brand",
+        external: true,
+        techUsed: ["Kotlin", "Android", "Travel"],
+        challenges: ["Premium travel UX", "Brand-consistent mobile polish"],
+        downloads: "n/a",
+        contributions: ["Selected Android contributions", "Feature support", "Production fixes"]
       }
     ];
 
@@ -340,6 +370,10 @@
         .map((item) => `<li class="text-sm text-secondary leading-relaxed">- ${escapeHtml(item)}</li>`)
         .join("");
 
+      const linkLabel = escapeHtml(project.linkLabel || "Deep Dive");
+      const linkTarget = project.external ? "_blank" : "_self";
+      const linkRel = project.external ? "noreferrer" : "";
+
       container.innerHTML = `
         <div class="flex items-center justify-between gap-3 mb-5">
           <span class="font-label text-[10px] tracking-widest uppercase text-outline">[featured_case]</span>
@@ -363,8 +397,8 @@
               <ul class="space-y-1">${contributionItems}</ul>
             </div>
             <div class="mt-5">
-              <a data-work-deep-dive href="${escapeHtml(project.deepDivePath || "/blog/")}" class="inline-flex items-center gap-2 text-[11px] font-label uppercase tracking-widest text-tertiary hover:text-tertiary-dim transition-colors">
-                [Deep Dive]
+              <a data-work-deep-dive href="${escapeHtml(project.deepDivePath || "/blog/")}" target="${linkTarget}" rel="${linkRel}" class="inline-flex items-center gap-2 text-[11px] font-label uppercase tracking-widest text-tertiary hover:text-tertiary-dim transition-colors">
+                [${linkLabel}]
                 <span class="material-symbols-outlined text-sm">north_east</span>
               </a>
             </div>
@@ -378,7 +412,12 @@
       if (!grid) return;
 
       grid.innerHTML = projects
-        .map((project) => `
+        .map((project) => {
+          const linkLabel = escapeHtml(project.linkLabel || "Read Case Study");
+          const linkTarget = project.external ? "_blank" : "_self";
+          const linkRel = project.external ? "noreferrer" : "";
+
+          return `
           <article class="bg-surface-container-low border border-outline-variant/20 p-5 flex flex-col gap-4 hover:border-tertiary/30 transition-colors">
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
@@ -405,13 +444,14 @@
               </div>
             </div>
             <div class="pt-2 border-t border-outline-variant/20">
-              <a data-work-deep-dive href="${escapeHtml(project.deepDivePath || "/blog/")}" class="inline-flex items-center gap-2 text-[11px] font-label uppercase tracking-widest text-tertiary hover:text-tertiary-dim transition-colors">
-                [Read Case Study]
+              <a data-work-deep-dive href="${escapeHtml(project.deepDivePath || "/blog/")}" target="${linkTarget}" rel="${linkRel}" class="inline-flex items-center gap-2 text-[11px] font-label uppercase tracking-widest text-tertiary hover:text-tertiary-dim transition-colors">
+                [${linkLabel}]
                 <span class="material-symbols-outlined text-sm">north_east</span>
               </a>
             </div>
           </article>
-        `)
+        `;
+        })
         .join("");
     }
 

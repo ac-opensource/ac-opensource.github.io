@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">NTU Pass app placeholder artwork</title>
+  <desc id="desc">Concept artwork showing a campus identity app on phone and watch surfaces.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#F8F4EE"/>
+      <stop offset="100%" stop-color="#DCE7F7"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <rect x="120" y="120" width="960" height="660" rx="28" fill="#FAF9F4" stroke="#C2CEDF" stroke-width="4"/>
+  <rect x="220" y="180" width="340" height="540" rx="36" fill="#153A73"/>
+  <rect x="250" y="230" width="280" height="420" rx="20" fill="#F4F8FF"/>
+  <rect x="280" y="270" width="220" height="30" fill="#1F5CBA"/>
+  <rect x="280" y="330" width="220" height="130" rx="16" fill="#D9E5F7"/>
+  <rect x="280" y="490" width="150" height="20" fill="#6C7C92"/>
+  <rect x="280" y="530" width="190" height="20" fill="#6C7C92"/>
+  <rect x="710" y="280" width="210" height="210" rx="54" fill="#0F294D"/>
+  <rect x="745" y="315" width="140" height="140" rx="28" fill="#EAF1FB"/>
+  <circle cx="815" cy="385" r="38" fill="#1F5CBA"/>
+  <text x="220" y="95" fill="#153A73" font-family="Space Grotesk, Arial, sans-serif" font-size="56" font-weight="700">NTU Pass</text>
+  <text x="220" y="770" fill="#475467" font-family="Manrope, Arial, sans-serif" font-size="32">Android app + watch companion + NUS counterpart</text>
+</svg>
