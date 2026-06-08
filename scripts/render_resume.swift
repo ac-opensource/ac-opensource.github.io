@@ -15,21 +15,25 @@ final class ResumeRenderer: NSObject, WKNavigationDelegate {
     private let pdfURL: URL
     private let pngURL: URL
     private let exportMode: Bool
+    private let minWidth: Int
+    private let minHeight: Int
     private let webView: WKWebView
     private let window: NSWindow
     private var continuation: CheckedContinuation<Void, Error>?
 
-    init(url: URL, pdfURL: URL, pngURL: URL, exportMode: Bool) {
+    init(url: URL, pdfURL: URL, pngURL: URL, exportMode: Bool, minWidth: Int, minHeight: Int) {
         self.url = url
         self.pdfURL = pdfURL
         self.pngURL = pngURL
         self.exportMode = exportMode
+        self.minWidth = minWidth
+        self.minHeight = minHeight
 
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .nonPersistent()
-        self.webView = WKWebView(frame: NSRect(x: 0, y: 0, width: 1440, height: 2200), configuration: configuration)
+        self.webView = WKWebView(frame: NSRect(x: 0, y: 0, width: minWidth, height: minHeight), configuration: configuration)
         self.window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 1440, height: 2200),
+            contentRect: NSRect(x: 0, y: 0, width: minWidth, height: minHeight),
             styleMask: [.titled],
             backing: .buffered,
             defer: false
@@ -59,8 +63,8 @@ final class ResumeRenderer: NSObject, WKNavigationDelegate {
                     try await Task.sleep(nanoseconds: 750_000_000)
                 }
 
-                let width = max(1440, Int(try await evaluateDouble("Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, 1440)")))
-                let height = max(2200, Int(try await evaluateDouble("Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, 2200)")))
+                let width = max(minWidth, Int(try await evaluateDouble("Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, \(minWidth))")))
+                let height = max(minHeight, Int(try await evaluateDouble("Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, \(minHeight))")))
                 let size = CGSize(width: width, height: height)
 
                 webView.setFrameSize(size)
@@ -164,13 +168,15 @@ final class ResumeRenderer: NSObject, WKNavigationDelegate {
 struct Main {
     static func main() async {
         guard CommandLine.arguments.count >= 4 else {
-            fputs("usage: render_resume.swift <url> <pdf-output> <png-output>\n", stderr)
+            fputs("usage: render_resume.swift <url> <pdf-output> <png-output> [min-width] [min-height]\n", stderr)
             exit(1)
         }
 
         let urlString = CommandLine.arguments[1]
         let pdfOutput = URL(fileURLWithPath: CommandLine.arguments[2])
         let pngOutput = URL(fileURLWithPath: CommandLine.arguments[3])
+        let minWidth = CommandLine.arguments.count >= 5 ? Int(CommandLine.arguments[4]) ?? 1440 : 1440
+        let minHeight = CommandLine.arguments.count >= 6 ? Int(CommandLine.arguments[5]) ?? 2200 : 2200
 
         guard let url = URL(string: urlString) else {
             fputs("invalid url: \(urlString)\n", stderr)
@@ -180,7 +186,14 @@ struct Main {
         NSApplication.shared.setActivationPolicy(.prohibited)
 
         do {
-            let renderer = ResumeRenderer(url: url, pdfURL: pdfOutput, pngURL: pngOutput, exportMode: true)
+            let renderer = ResumeRenderer(
+                url: url,
+                pdfURL: pdfOutput,
+                pngURL: pngOutput,
+                exportMode: true,
+                minWidth: minWidth,
+                minHeight: minHeight
+            )
             try await renderer.render()
         } catch {
             fputs("render failed: \(error)\n", stderr)

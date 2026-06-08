@@ -225,7 +225,10 @@
         <div class="space-y-5 text-sm">
           <div class="border-b border-outline-variant/20 pb-4">
             <div class="font-label text-[10px] uppercase tracking-widest text-outline mb-2">[phone]</div>
-            <div class="text-on-surface font-medium">+63 917 815 4366</div>
+            <div class="text-on-surface font-medium space-y-1" data-phone-region>
+              <a class="block hover:text-tertiary transition-colors" href="tel:+642904312382">NZ +64 290 431 2382</a>
+              <a class="block hover:text-tertiary transition-colors" href="tel:+639178154366">PH +63 917 815 4366</a>
+            </div>
           </div>
           <div class="border-b border-outline-variant/20 pb-4">
             <div class="font-label text-[10px] uppercase tracking-widest text-outline mb-2">[email]</div>
@@ -449,5 +452,55 @@
       <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
     </div>
   </footer>
+  <script>
+    (function () {
+      const phoneRegion = document.querySelector("[data-phone-region]");
+      if (!phoneRegion || !window.fetch) return;
+
+      const phones = {
+        nz: { label: "+64 290 431 2382", href: "tel:+642904312382" },
+        ph: { label: "PH +63 917 815 4366", href: "tel:+639178154366" }
+      };
+
+      function renderPhones(showPhilippinesNumber) {
+        const visiblePhones = showPhilippinesNumber ? [
+          { label: "NZ " + phones.nz.label, href: phones.nz.href },
+          phones.ph
+        ] : [phones.nz];
+
+        phoneRegion.replaceChildren(...visiblePhones.map((phone) => {
+          const link = document.createElement("a");
+          link.className = "block hover:text-tertiary transition-colors";
+          link.href = phone.href;
+          link.textContent = phone.label;
+          return link;
+        }));
+      }
+
+      const phoneMode = new URLSearchParams(window.location.search).get("phone");
+      if (phoneMode === "all") {
+        renderPhones(true);
+        return;
+      }
+      if (phoneMode === "nz") {
+        renderPhones(false);
+        return;
+      }
+
+      fetch("https://get.geojs.io/v1/ip/country.json", {
+        cache: "no-store"
+      })
+        .then((response) => response.ok ? response.json() : null)
+        .then((location) => {
+          const country = String(location && location.country || "").toUpperCase();
+          if (country === "NZ" || country === "AU") {
+            renderPhones(false);
+          }
+        })
+        .catch(() => {
+          // Keep the static NZ + PH fallback when location lookup is unavailable.
+        });
+    })();
+  </script>
 </body>
 </html>

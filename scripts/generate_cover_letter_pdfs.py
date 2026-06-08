@@ -11,9 +11,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RENDERER = ROOT / "scripts" / "render_resume.swift"
-OUTPUT_PDF = ROOT / "resume_concepcion_andrew.pdf"
-OUTPUT_PNG = Path("/tmp/resume-preview.png")
+RENDER_BIN = Path("/tmp/render_resume")
 PORT = 8765
+DOCUMENTS = [
+    (
+        "applications/cover-letter-general.html",
+        "cover_letter_concepcion_andrew.pdf",
+        "/tmp/cover-letter-general-preview.png",
+        1280,
+        1400,
+    ),
+    (
+        "applications/cover-letter-new-zealand-sponsorship.html",
+        "cover_letter_concepcion_andrew_nz.pdf",
+        "/tmp/cover-letter-nz-preview.png",
+        1280,
+        1450,
+    ),
+]
 
 
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
@@ -38,24 +53,29 @@ def main():
                     "-parse-as-library",
                     str(RENDERER),
                     "-o",
-                    "/tmp/render_resume",
+                    str(RENDER_BIN),
                 ],
                 check=True,
             )
-            subprocess.run(
-                [
-                    "/tmp/render_resume",
-                    f"http://127.0.0.1:{PORT}/resume.html?phone=all",
-                    str(OUTPUT_PDF),
-                    str(OUTPUT_PNG),
-                ],
-                check=True,
-            )
+
+            for html_path, pdf_path, png_path, min_width, min_height in DOCUMENTS:
+                subprocess.run(
+                    [
+                        str(RENDER_BIN),
+                        f"http://127.0.0.1:{PORT}/{html_path}",
+                        str(ROOT / pdf_path),
+                        png_path,
+                        str(min_width),
+                        str(min_height),
+                    ],
+                    check=True,
+                )
         finally:
             httpd.shutdown()
             thread.join(timeout=2)
 
-    print(f"Generated {OUTPUT_PDF}")
+    for _, pdf_path, _, _, _ in DOCUMENTS:
+        print(f"Generated {ROOT / pdf_path}")
 
 
 if __name__ == "__main__":
