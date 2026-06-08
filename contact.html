@@ -267,7 +267,7 @@
 <a class="font-headline font-medium hover:text-tertiary transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">github.com/ac-opensource</a>
 </div>
 <div class="bg-surface-container-low p-6 flex items-center justify-between">
-<div class="font-label text-xs text-secondary">[local_time]</div>
+<div class="font-label text-xs text-secondary">[nz_time]</div>
 <div id="local-time-value" class="font-headline font-medium">--:--</div>
 </div>
 </div>
@@ -296,6 +296,7 @@
     const weatherMetaLeft = document.getElementById("weather-meta-left");
     const weatherMetaRight = document.getElementById("weather-meta-right");
     const weatherHumidityBar = document.getElementById("weather-humidity-bar");
+    const primaryTimeZone = "Pacific/Auckland";
 
     function formatTemp(value) {
       const number = Number(value);
@@ -333,7 +334,8 @@
     }
 
     function currentTimeLabel() {
-      return new Intl.DateTimeFormat(undefined, {
+      return new Intl.DateTimeFormat("en-NZ", {
+        timeZone: primaryTimeZone,
         hour: "2-digit",
         minute: "2-digit"
       }).format(new Date());
@@ -444,13 +446,15 @@
       if (!target) return;
 
       const now = new Date();
-      const hhmm = new Intl.DateTimeFormat(undefined, {
+      const hhmm = new Intl.DateTimeFormat("en-NZ", {
+        timeZone: primaryTimeZone,
         hour: "2-digit",
         minute: "2-digit",
         hour12: false
       }).format(now);
 
-      const tz = new Intl.DateTimeFormat(undefined, {
+      const tz = new Intl.DateTimeFormat("en-NZ", {
+        timeZone: primaryTimeZone,
         timeZoneName: "short"
       })
         .formatToParts(now)
