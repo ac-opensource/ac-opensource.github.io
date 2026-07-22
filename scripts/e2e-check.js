@@ -287,9 +287,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(Boolean(nextHref), 'Next post link missing href');
 
   await page.goto(BASE_URL + '/blog/case-study-ocbc-banking-experience.html', { waitUntil: 'domcontentloaded' });
-  const ocbcHero = page.locator('[data-work-hero-layout="split-vertical"]');
-  await assert((await ocbcHero.count()) === 1, 'OCBC project note is missing its split screenshot hero');
-  await assert((await ocbcHero.locator('.work-post-hero__crop').count()) === 2, 'OCBC hero does not expose two screenshot crops');
+  const ocbcHero = page.locator('[data-work-hero-layout="gallery"]');
+  await assert((await ocbcHero.count()) === 1, 'OCBC project note is missing its official app-screen gallery');
+  await assert((await ocbcHero.locator('.work-post-hero__screen').count()) === 3, 'OCBC project-note gallery does not expose all three app screens');
+  const ocbcHeroSources = await ocbcHero.locator('img').evaluateAll((images) => images.map((image) => image.getAttribute('src') || ''));
+  await assert(
+    ocbcHeroSources.every((src) => src.startsWith('/assets/images/work/img_ocbc_business_')),
+    'OCBC project-note gallery is not using the official local app-screen assets'
+  );
   await assert(((await page.locator('#post-category').textContent()) || '').trim() === '[portfolio]', 'OCBC project note does not use the portfolio label');
 
   await page.goto(BASE_URL + '/blog/case-study-openpay-bnpl-experience.html', { waitUntil: 'domcontentloaded' });
@@ -339,7 +344,21 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await assert((await page.locator('.work-case--itvx .work-player').count()) === 0, 'ITVX card still exposes the generic player mockup');
 
-  const deviceRatio = await page.locator('.work-case--ocbc .work-device').evaluate((device) => {
+  const heroIntro = ((await page.locator('.work-hero__intro').textContent()) || '').replace(/\s+/g, ' ').trim();
+  await assert(heroIntro.includes('I’m a mobile engineer'), 'Portfolio hero does not lead with mobile engineering');
+  await assert(heroIntro.includes('I lead teams') && heroIntro.includes('use AI'), 'Portfolio hero is missing leadership or AI-accelerated delivery positioning');
+  await assert((await page.locator('.work-signals > div').count()) === 4, 'Portfolio hero does not expose all four positioning signals');
+  await assert(workPageText.includes('AI-accelerated'), 'Portfolio hero is missing its AI-accelerated delivery signal');
+
+  const ocbcScreens = page.locator('.work-case--ocbc .work-ocbc-shot');
+  await assert((await ocbcScreens.count()) === 3, 'OCBC Business card does not show all three official app screens');
+  const ocbcScreenSources = await ocbcScreens.evaluateAll((images) => images.map((image) => image.getAttribute('src') || ''));
+  await assert(
+    ocbcScreenSources.every((src) => src.startsWith('/assets/images/work/img_ocbc_business_')),
+    'OCBC Business card is not using the official local app-screen assets'
+  );
+
+  const deviceRatio = await page.locator('.work-case--mystc .work-device').evaluate((device) => {
     return device.offsetHeight / device.offsetWidth;
   });
   await assert(deviceRatio >= 2.1 && deviceRatio <= 2.25, `Portfolio device ratio is ${deviceRatio.toFixed(2)}; expected a modern phone proportion`);
@@ -347,7 +366,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await mobilePage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   const ocbcMobileOrder = await mobilePage.locator('.work-case--ocbc').evaluate((card) => {
     const body = card.querySelector('.work-case__body')?.getBoundingClientRect();
-    const stage = card.querySelector('.work-device-stage')?.getBoundingClientRect();
+    const stage = card.querySelector('.work-ocbc-stage')?.getBoundingClientRect();
     return body && stage ? body.top < stage.top : false;
   });
   await assert(ocbcMobileOrder, 'OCBC mobile card shows its screenshot before its project heading');
@@ -383,10 +402,37 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     JSON.stringify(reducedMotionAfterHover) === JSON.stringify(reducedMotionBeforeHover),
     'Reduced-motion mode still moves the ITVX collage on hover'
   );
+
+  const reducedMotionOcbcCard = reducedMotionPage.locator('.work-case--ocbc');
+  const reducedMotionOcbcScreens = reducedMotionOcbcCard.locator('.work-ocbc-shot');
+  const reducedMotionOcbcBeforeHover = await reducedMotionOcbcScreens.evaluateAll((images) =>
+    images.map((image) => {
+      const rect = image.getBoundingClientRect();
+      const galleryRect = image.parentElement.getBoundingClientRect();
+      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
+    })
+  );
+  await assert(
+    new Set(reducedMotionOcbcBeforeHover.map(({ x, y }) => `${x}:${y}`)).size === 3,
+    'Reduced-motion mode collapses the OCBC Business collage into overlapping screens'
+  );
+  await reducedMotionOcbcCard.hover();
+  const reducedMotionOcbcAfterHover = await reducedMotionOcbcScreens.evaluateAll((images) =>
+    images.map((image) => {
+      const rect = image.getBoundingClientRect();
+      const galleryRect = image.parentElement.getBoundingClientRect();
+      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
+    })
+  );
+  await assert(
+    JSON.stringify(reducedMotionOcbcAfterHover) === JSON.stringify(reducedMotionOcbcBeforeHover),
+    'Reduced-motion mode still moves the OCBC Business collage on hover'
+  );
   await reducedMotion.close();
 
   const requiredProjectLinks = [
     ['ITVX', 'a[href*="play.google.com/store/apps/details?id=air.ITVMobilePlayer"]'],
+    ['OCBC Business', 'a[href*="play.google.com/store/apps/details?id=com.ocbc.mobilebv"]'],
     ['Littlepay', 'a[href^="https://littlepay.com"]'],
     ['NTU Pass', 'a[href*="play.google.com/store/apps/details?id=sg.edu.ntu.apps.ntusmartpass"]'],
     ['Solo', 'a[href*="play.google.com/store/apps/developer?id=Solo+Technologies+Services"]'],

@@ -310,7 +310,7 @@ body {
   z-index: 1;
   display: grid;
   grid-column: 1 / -1;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   margin-top: 0.5rem;
 }
@@ -426,9 +426,9 @@ body {
 
 .work-case--ocbc {
   display: grid;
-  min-height: 34rem;
+  min-height: 38rem;
   grid-column: span 7;
-  grid-template-columns: minmax(16rem, 0.85fr) minmax(15rem, 1.15fr);
+  grid-template-columns: minmax(18rem, 1.05fr) minmax(15rem, 0.95fr);
   background:
     radial-gradient(circle at 90% 10%, rgba(210, 47, 51, 0.09), transparent 19rem),
     rgba(255, 255, 252, 0.82);
@@ -642,6 +642,95 @@ body {
   bottom: 1.2rem;
   color: rgba(223, 243, 239, 0.7);
   font: 700 0.62rem/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.work-ocbc-stage {
+  position: relative;
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  overflow: hidden;
+  margin: 0;
+  padding: clamp(1.25rem, 2.5vw, 2.25rem);
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 20% 18%, rgba(210, 47, 51, 0.12), transparent 12rem),
+    radial-gradient(circle at 82% 76%, rgba(54, 159, 179, 0.12), transparent 13rem);
+}
+
+.work-ocbc-stage::before {
+  position: absolute;
+  width: 18rem;
+  height: 18rem;
+  border: 1px solid rgba(210, 47, 51, 0.12);
+  border-radius: 50%;
+  content: "";
+  transform: rotate(-18deg);
+}
+
+.work-ocbc-gallery {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 30rem);
+  height: 31rem;
+}
+
+.work-ocbc-shot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(9.75rem, 46%, 12rem);
+  aspect-ratio: 608 / 1080;
+  border: 1px solid rgba(95, 102, 98, 0.16);
+  border-radius: 0.75rem;
+  object-fit: cover;
+  box-shadow: 0 24px 48px rgba(45, 54, 49, 0.22);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), filter 320ms ease;
+}
+
+.work-ocbc-shot--cashflow {
+  z-index: 3;
+  transform: translate(-50%, -50%) rotate(-1deg);
+}
+
+.work-ocbc-shot--transactions {
+  z-index: 1;
+  filter: saturate(0.82) brightness(0.9);
+  transform: translate(-105%, -47%) rotate(-7deg) scale(0.88);
+}
+
+.work-ocbc-shot--card {
+  z-index: 2;
+  filter: saturate(0.84) brightness(0.92);
+  transform: translate(5%, -47%) rotate(7deg) scale(0.88);
+}
+
+.work-case--ocbc:hover .work-ocbc-shot--cashflow,
+.work-case--ocbc:focus-within .work-ocbc-shot--cashflow {
+  transform: translate(-50%, -53%) rotate(0deg);
+}
+
+.work-case--ocbc:hover .work-ocbc-shot--transactions,
+.work-case--ocbc:focus-within .work-ocbc-shot--transactions {
+  filter: saturate(0.96) brightness(0.98);
+  transform: translate(-113%, -48%) rotate(-4deg) scale(0.9);
+}
+
+.work-case--ocbc:hover .work-ocbc-shot--card,
+.work-case--ocbc:focus-within .work-ocbc-shot--card {
+  filter: saturate(0.97) brightness(0.99);
+  transform: translate(13%, -48%) rotate(4deg) scale(0.9);
+}
+
+.work-ocbc-gallery__caption {
+  position: absolute;
+  z-index: 4;
+  right: 1.25rem;
+  bottom: 1rem;
+  color: rgba(67, 76, 70, 0.68);
+  font: 700 0.6rem/1.2 "Space Grotesk", sans-serif;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -1122,6 +1211,10 @@ body {
   .work-archive-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .work-signals {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 860px) {
@@ -1169,7 +1262,7 @@ body {
     order: 1;
   }
 
-  .work-case--ocbc .work-device-stage,
+  .work-case--ocbc .work-ocbc-stage,
   .work-case--openpay .work-openpay-stage {
     order: 2;
   }
@@ -1180,7 +1273,7 @@ body {
   }
 
   .work-case--mystc .work-device-stage,
-  .work-case--ocbc .work-device-stage {
+  .work-case--ocbc .work-ocbc-stage {
     min-height: 25rem;
   }
 
@@ -1266,8 +1359,12 @@ body {
     height: 28rem;
   }
 
+  .work-ocbc-gallery {
+    height: 28rem;
+  }
+
   .work-case--mystc .work-device-stage,
-  .work-case--ocbc .work-device-stage {
+  .work-case--ocbc .work-ocbc-stage {
     min-height: 21rem;
   }
 
@@ -1304,6 +1401,7 @@ body {
   .work-public-card,
   .work-archive-card,
   .work-itvx-shot,
+  .work-ocbc-shot,
   .work-device,
   .work-button,
   .work-button svg,
@@ -1337,5 +1435,22 @@ body {
   .work-case--itvx:focus-within .work-itvx-shot--live {
     filter: saturate(0.82) brightness(0.86);
     transform: translate(4%, -47%) rotate(7deg) scale(0.88);
+  }
+
+  .work-case--ocbc:hover .work-ocbc-shot--cashflow,
+  .work-case--ocbc:focus-within .work-ocbc-shot--cashflow {
+    transform: translate(-50%, -50%) rotate(-1deg);
+  }
+
+  .work-case--ocbc:hover .work-ocbc-shot--transactions,
+  .work-case--ocbc:focus-within .work-ocbc-shot--transactions {
+    filter: saturate(0.82) brightness(0.9);
+    transform: translate(-105%, -47%) rotate(-7deg) scale(0.88);
+  }
+
+  .work-case--ocbc:hover .work-ocbc-shot--card,
+  .work-case--ocbc:focus-within .work-ocbc-shot--card {
+    filter: saturate(0.84) brightness(0.92);
+    transform: translate(5%, -47%) rotate(7deg) scale(0.88);
   }
 }
