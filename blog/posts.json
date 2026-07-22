@@ -1,5 +1,24 @@
 [
   {
+    "slug": "2026-07-21-what-building-persons-finder-taught-me",
+    "title": "What Building a Small Backend Taught Me About AI-Ready Engineering",
+    "author": "Andrew Concepcion",
+    "summary": "A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.",
+    "date": "2026-07-21",
+    "readingTime": "12 min read",
+    "topics": [
+      "kotlin",
+      "spring-boot",
+      "postgis",
+      "backend",
+      "ai-engineering",
+      "privacy",
+      "testing",
+      "systems-design"
+    ],
+    "category": "technical"
+  },
+  {
     "slug": "2026-04-09-how-i-use-mempalace-with-local-agents",
     "title": "How I Use MemPalace to Make Local Agents Better",
     "author": "Andrew Concepcion",

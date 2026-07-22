@@ -5,8 +5,16 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Thu, 09 Apr 2026 13:21:48 GMT</lastBuildDate>
+  <lastBuildDate>Wed, 22 Jul 2026 03:01:56 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>What Building a Small Backend Taught Me About AI-Ready Engineering</title>
+    <link>https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html</guid>
+    <pubDate>Tue, 21 Jul 2026 00:00:00 GMT</pubDate>
+    <description>A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.</description>
+<category>kotlin</category><category>spring-boot</category><category>postgis</category><category>backend</category><category>ai-engineering</category><category>privacy</category><category>testing</category><category>systems-design</category><category>technical</category>
+  </item>
   <item>
     <title>How I Use MemPalace to Make Local Agents Better</title>
     <link>https://ac-opensource.github.io/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html</link>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Small backend architecture map</title>
+  <desc id="desc">A blueprint-style diagram connecting a closed API contract to location history, a last-known projection, and a guarded AI bio boundary.</desc>
+  <rect width="1200" height="900" fill="#f4f4ee"/>
+  <g fill="none" stroke="#afb3aa" stroke-width="2" opacity=".45">
+    <path d="M0 100H1200M0 200H1200M0 300H1200M0 400H1200M0 500H1200M0 600H1200M0 700H1200M0 800H1200"/>
+    <path d="M100 0V900M200 0V900M300 0V900M400 0V900M500 0V900M600 0V900M700 0V900M800 0V900M900 0V900M1000 0V900M1100 0V900"/>
+  </g>
+  <g font-family="Space Grotesk, Arial, sans-serif" fill="#2f342d">
+    <text x="72" y="86" font-size="20" letter-spacing="4" fill="#5a5f65">SMALL_BACKEND / SYSTEM MAP</text>
+    <text x="72" y="132" font-size="42" font-weight="700">Make the boundary explicit.</text>
+    <text x="72" y="168" font-size="18" fill="#57606a">contract → history → projection → guarded prose</text>
+  </g>
+  <g stroke="#1f5cba" stroke-width="4" fill="#faf9f4">
+    <rect x="72" y="260" width="230" height="150"/>
+    <rect x="360" y="260" width="230" height="150"/>
+    <rect x="648" y="260" width="230" height="150"/>
+    <rect x="936" y="260" width="190" height="150"/>
+    <path d="M302 335H360M590 335H648M878 335H936"/>
+  </g>
+  <g font-family="Space Grotesk, Arial, sans-serif" fill="#2f342d">
+    <g transform="translate(98 292)">
+      <text font-size="15" letter-spacing="2" fill="#1f5cba">01 / API</text>
+      <text y="42" font-size="25" font-weight="700">Closed contract</text>
+      <text y="75" font-size="15" fill="#57606a">create · update · nearby</text>
+      <text y="102" font-size="15" fill="#57606a">validate before side effects</text>
+    </g>
+    <g transform="translate(386 292)">
+      <text font-size="15" letter-spacing="2" fill="#1f5cba">02 / DATA</text>
+      <text y="42" font-size="25" font-weight="700">Observation log</text>
+      <text y="75" font-size="15" fill="#57606a">immutable location samples</text>
+      <text y="102" font-size="15" fill="#57606a">idempotent client retries</text>
+    </g>
+    <g transform="translate(674 292)">
+      <text font-size="15" letter-spacing="2" fill="#1f5cba">03 / QUERY</text>
+      <text y="42" font-size="25" font-weight="700">Known projection</text>
+      <text y="75" font-size="15" fill="#57606a">PostGIS geography + GiST</text>
+      <text y="102" font-size="15" fill="#57606a">exact membership + ordering</text>
+    </g>
+    <g transform="translate(962 292)">
+      <text font-size="15" letter-spacing="2" fill="#1f5cba">04 / AI</text>
+      <text y="42" font-size="25" font-weight="700">Guarded bio</text>
+      <text y="75" font-size="15" fill="#57606a">opaque source + gates</text>
+      <text y="102" font-size="15" fill="#57606a">provider-neutral boundary</text>
+    </g>
+  </g>
+  <g stroke="#1f5cba" stroke-width="3" fill="none" opacity=".8">
+    <path d="M185 505V610M475 505V610M763 505V610M1031 505V610"/>
+    <path d="M185 610H1031"/>
+  </g>
+  <g font-family="Space Grotesk, Arial, sans-serif" fill="#2f342d">
+    <text x="72" y="700" font-size="18" letter-spacing="3" fill="#5a5f65">THE PRACTICAL LOOP</text>
+    <text x="72" y="755" font-size="30" font-weight="700">Read the live state. Make one narrow change.</text>
+    <text x="72" y="795" font-size="30" font-weight="700">Verify the behavior. Leave evidence for the next run.</text>
+    <text x="72" y="842" font-size="16" fill="#57606a">A small backend is still a systems-design exercise.</text>
+  </g>
+  <g fill="#1f5cba">
+    <circle cx="185" cy="610" r="8"/><circle cx="475" cy="610" r="8"/><circle cx="763" cy="610" r="8"/><circle cx="1031" cy="610" r="8"/>
+  </g>
+</svg>
