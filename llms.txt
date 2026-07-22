@@ -9,7 +9,7 @@ Use the canonical static pages below for public professional and technical infor
 ## Primary sections
 
 - [Home](https://ac-opensource.github.io/): Overview, current engineering focus, and recent public work.
-- [Work](https://ac-opensource.github.io/work.html): Shipped product portfolio and links to detailed case studies.
+- [Portfolio](https://ac-opensource.github.io/work.html): Selected production and public work across Android playback, transit payments, banking, telecom, geospatial systems, and agent orchestration.
 - [About](https://ac-opensource.github.io/about.html): Professional background, working style, interests, and career trajectory.
 - [Resume](https://ac-opensource.github.io/resume.html): Canonical public resume and skills summary.
 - [Blog](https://ac-opensource.github.io/blog/): Engineering logs, essays, case studies, and field notes.
@@ -18,11 +18,14 @@ Use the canonical static pages below for public professional and technical infor
 
 ## Selected engineering case studies
 
-- [MySTC at telecom scale](https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html): Android leadership, modular architecture, multilingual delivery, and reliability at large install scale.
-- [OCBC mobile banking delivery](https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html): Fintech mobile delivery, onboarding, account experiences, SDK integration, and release quality.
-- [OWTO ride-hailing platform](https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html): Cross-functional Android, iOS, and backend delivery for real-time transport flows.
-- [openpay BNPL experience](https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html): Checkout reliability, spend-control UX, partner integrations, and release hardening.
-- [ProjectBASS community network mapping](https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html): Open-source mobile work for crowdsourced connectivity data.
+- [MySTC Android delivery](https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html): First-person project note on leading five senior Android engineers through multilingual account, ordering, and support work.
+- [OCBC banking app delivery](https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html): Project note on identity verification, SDK integration, concurrency, network state, and regression safety.
+- [OWTO mobile-to-backend delivery](https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html): Project note on owning Android, iOS, GPS, payments, API contracts, and backend delivery as one journey.
+- [openpay checkout state](https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html): Project note on spend limits, merchant discovery, checkout state, partner integrations, and release hardening.
+- [Solo white-label Android platform](https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html): Project note on shared Android behavior across many restaurant-branded apps.
+- [Popslide Android experiments](https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html): Project note on rewards, notifications, lock-screen behavior, caching, and experiment cleanup.
+- [WebSafety mobile platform limits](https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html): Project note on GPS, synchronization, permissions, privacy, and constrained platform behavior.
+- [ProjectBASS community network mapping](https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html): Project note on volunteer-built Kotlin tooling for crowdsourced connectivity data.
 
 ## Selected technical writing
 

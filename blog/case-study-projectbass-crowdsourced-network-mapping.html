@@ -4,15 +4,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>Case Study: ProjectBASS Community Network Mapping | Andrew Concepcion</title>
-<meta name="description" content="Community-built signal and bandwidth mapping designed to collect useful field data through volunteer contributions."/>
+<title>ProjectBASS: Crowdsourced Network Measurements | Andrew Concepcion</title>
+<meta name="description" content="I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html"/>
-<meta property="og:title" content="Case Study: ProjectBASS Community Network Mapping | Andrew Concepcion"/>
-<meta property="og:description" content="Community-built signal and bandwidth mapping designed to collect useful field data through volunteer contributions."/>
+<meta property="og:title" content="ProjectBASS: Crowdsourced Network Measurements | Andrew Concepcion"/>
+<meta property="og:description" content="I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements."/>
 <meta property="og:image" content="https://ac-opensource.github.io/assets/images/work/img_projectbass_app-optimized.webp"/>
 <meta property="og:image:alt" content="ProjectBASS app screenshot"/>
 <meta property="article:published_time" content="2022-10-05"/>
@@ -23,8 +23,8 @@
 <meta property="article:tag" content="Kotlin">
 <meta property="article:tag" content="work">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Case Study: ProjectBASS Community Network Mapping | Andrew Concepcion"/>
-<meta name="twitter:description" content="Community-built signal and bandwidth mapping designed to collect useful field data through volunteer contributions."/>
+<meta name="twitter:title" content="ProjectBASS: Crowdsourced Network Measurements | Andrew Concepcion"/>
+<meta name="twitter:description" content="I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/work/img_projectbass_app-optimized.webp"/>
 <meta name="twitter:image:alt" content="ProjectBASS app screenshot"/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
@@ -83,6 +83,52 @@
     animation: overlayAlphaPulse 4.8s ease-in-out infinite;
     will-change: opacity;
   }
+  .work-post-hero {
+    position: relative;
+    display: grid;
+    aspect-ratio: 1;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(175, 179, 170, 0.28);
+    background: #edefe7;
+  }
+  .work-post-hero--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+  }
+  .work-post-hero__crop {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img,
+  .work-post-hero--contain > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img {
+    object-fit: cover;
+  }
+  .work-post-hero__crop--top img {
+    object-position: top center;
+  }
+  .work-post-hero__crop--bottom img {
+    object-position: bottom center;
+  }
+  .work-post-hero--cover > img {
+    object-position: 62% center;
+  }
+  .work-post-hero--contain {
+    aspect-ratio: 4 / 5;
+  }
+  .work-post-hero--contain > img {
+    object-fit: contain;
+    background: #fff;
+  }
   @keyframes overlayAlphaPulse {
     0% { opacity: 0; }
     15% { opacity: 0; }
@@ -100,8 +146,8 @@
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Case Study: ProjectBASS Community Network Mapping",
-  "description": "Community-built signal and bandwidth mapping designed to collect useful field data through volunteer contributions.",
+  "headline": "ProjectBASS: Crowdsourced Network Measurements",
+  "description": "I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -112,7 +158,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2022-10-05",
-  "dateModified": "2026-03-26T10:17:28.000Z",
+  "dateModified": "2026-07-22T13:46:22.000Z",
   "image": "https://ac-opensource.github.io/assets/images/work/img_projectbass_app-optimized.webp",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html"
 }</script>
@@ -158,14 +204,14 @@
 <main id="main-content" class="pt-32 md:pt-24 pb-32">
 <article class="max-w-screen-xl mx-auto px-6">
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
-<span id="post-category" class="bg-surface-container-low px-2 py-1">[work]</span>
+<span id="post-category" class="bg-surface-container-low px-2 py-1">[portfolio]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2022-10-05</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[6 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[2 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Case Study: ProjectBASS Community Network Mapping</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">Community-built signal and bandwidth mapping designed to collect useful field data through volunteer contributions.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">ProjectBASS: Crowdsourced Network Measurements</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -173,9 +219,10 @@
 </div>
 </div>
 
-<div class="lg:col-span-5 relative aspect-[4/5] bg-surface-container-low border border-outline-variant/20 overflow-hidden">
-<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="/assets/images/work/img_projectbass_app-optimized.webp" alt="ProjectBASS app screenshot" loading="eager" decoding="async"/>
-</div>
+<figure class="work-post-hero work-post-hero--contain lg:col-span-5" data-work-hero-layout="contain">
+  <img id="post-hero-image" src="/assets/images/work/img_projectbass_app-optimized.webp" alt="ProjectBASS app screenshot" loading="eager" decoding="async"/>
+  <figcaption class="sr-only">ProjectBASS map visualization</figcaption>
+</figure>
 
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -188,7 +235,7 @@
 </div>
 <div>
 <p id="post-author-name" class="text-sm font-bold">Andrew Concepcion</p>
-<p id="post-author-role" class="text-xs text-secondary">[work]</p>
+<p id="post-author-role" class="text-xs text-secondary">[portfolio]</p>
 </div>
 </div>
 </div>
@@ -198,28 +245,16 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">Community-built signal and bandwidth mapping designed to collect useful field data through volunteer contributions.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements.</p>
 </section>
 </aside>
-<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><h2>Context</h2>
-      <p>ProjectBASS was built by volunteers for volunteers to gather network quality measurements from real locations and real carriers.</p>
-      <h2>Stack</h2>
-      <ul>
-        <li>Kotlin client implementation</li>
-        <li>Retrofit network layer</li>
-      </ul>
-      <h2>Key Challenges</h2>
-      <ul>
-        <li>Consistent data aggregation from heterogeneous devices</li>
-        <li>Carrier and environment variability</li>
-      </ul>
-      <h2>Contributions</h2>
-      <ul>
-        <li>Open-source feature work and maintenance support</li>
-        <li>Community collaboration on quality and data usefulness</li>
-      </ul>
-      <h2>Outcome</h2>
-      <p>The app improved visibility into field network conditions and proved out a practical crowdsourcing model for connectivity insights.</p></div>
+<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><h2>A map point came from a real phone</h2>
+      <p>ProjectBASS was an open-source Android project built by volunteers. The app collected network measurements from phones and sent them through a Retrofit layer for aggregation. Different devices, carriers, locations, and radio conditions meant the input was never as tidy as the final map could look.</p>
+      <p>I contributed Kotlin feature work and maintenance support in the public codebase, including network integration and discussions about which device measurements were useful to the community.</p>
+      <h2>Small changes, shared data</h2>
+      <p>This was volunteer software, so reviewable changes mattered. I followed the existing collection and API paths, changed the part connected to the issue, and left enough context for another contributor to understand what moved.</p>
+      <p>The data also needed a careful boundary. A single measurement described one phone at one time. It did not prove that a whole neighbourhood or carrier always performed the same way. I kept device and carrier variation in mind when reasoning about what the client should collect and send.</p>
+      <p>The work combined Android maintenance with a simple data principle: each point represented one phone at one moment, so the client had to collect and describe it carefully.</p></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
 <a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/work.html">
@@ -232,7 +267,7 @@
 </a>
 <a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/case-study-websafety-parental-controls.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: WebSafety Parental Controls</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">WebSafety: Parental Controls Meet Platform Limits</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -276,7 +311,7 @@
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "case-study-projectbass-crowdsourced-network-mapping";
-    const CURRENT_POST_TITLE = "Case Study: ProjectBASS Community Network Mapping";
+    const CURRENT_POST_TITLE = "ProjectBASS: Crowdsourced Network Measurements";
     const CURRENT_POST_URL = "/blog/case-study-projectbass-crowdsourced-network-mapping.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");

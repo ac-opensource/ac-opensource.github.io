@@ -4,15 +4,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>Case Study: OCBC Mobile Banking Delivery | Andrew Concepcion</title>
-<meta name="description" content="Delivery notes from a banking app environment where trust, performance, and safe iteration all matter simultaneously."/>
+<title>OCBC: Android Work in a Banking App | Andrew Concepcion</title>
+<meta name="description" content="I worked on OCBC&#39;s Android app in Kotlin and XML, including chart UI, identity-verification integration, network behavior, and focused unit coverage."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html"/>
-<meta property="og:title" content="Case Study: OCBC Mobile Banking Delivery | Andrew Concepcion"/>
-<meta property="og:description" content="Delivery notes from a banking app environment where trust, performance, and safe iteration all matter simultaneously."/>
+<meta property="og:title" content="OCBC: Android Work in a Banking App | Andrew Concepcion"/>
+<meta property="og:description" content="I worked on OCBC&#39;s Android app in Kotlin and XML, including chart UI, identity-verification integration, network behavior, and focused unit coverage."/>
 <meta property="og:image" content="https://ac-opensource.github.io/assets/images/work/img_ocbc_app-optimized.webp"/>
 <meta property="og:image:alt" content="OCBC mobile app screenshot"/>
 <meta property="article:published_time" content="2024-11-20"/>
@@ -23,8 +23,8 @@
 <meta property="article:tag" content="Kotlin">
 <meta property="article:tag" content="work">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Case Study: OCBC Mobile Banking Delivery | Andrew Concepcion"/>
-<meta name="twitter:description" content="Delivery notes from a banking app environment where trust, performance, and safe iteration all matter simultaneously."/>
+<meta name="twitter:title" content="OCBC: Android Work in a Banking App | Andrew Concepcion"/>
+<meta name="twitter:description" content="I worked on OCBC&#39;s Android app in Kotlin and XML, including chart UI, identity-verification integration, network behavior, and focused unit coverage."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/work/img_ocbc_app-optimized.webp"/>
 <meta name="twitter:image:alt" content="OCBC mobile app screenshot"/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
@@ -83,6 +83,52 @@
     animation: overlayAlphaPulse 4.8s ease-in-out infinite;
     will-change: opacity;
   }
+  .work-post-hero {
+    position: relative;
+    display: grid;
+    aspect-ratio: 1;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(175, 179, 170, 0.28);
+    background: #edefe7;
+  }
+  .work-post-hero--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+  }
+  .work-post-hero__crop {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img,
+  .work-post-hero--contain > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img {
+    object-fit: cover;
+  }
+  .work-post-hero__crop--top img {
+    object-position: top center;
+  }
+  .work-post-hero__crop--bottom img {
+    object-position: bottom center;
+  }
+  .work-post-hero--cover > img {
+    object-position: 62% center;
+  }
+  .work-post-hero--contain {
+    aspect-ratio: 4 / 5;
+  }
+  .work-post-hero--contain > img {
+    object-fit: contain;
+    background: #fff;
+  }
   @keyframes overlayAlphaPulse {
     0% { opacity: 0; }
     15% { opacity: 0; }
@@ -100,8 +146,8 @@
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Case Study: OCBC Mobile Banking Delivery",
-  "description": "Delivery notes from a banking app environment where trust, performance, and safe iteration all matter simultaneously.",
+  "headline": "OCBC: Android Work in a Banking App",
+  "description": "I worked on OCBC's Android app in Kotlin and XML, including chart UI, identity-verification integration, network behavior, and focused unit coverage.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -112,7 +158,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2024-11-20",
-  "dateModified": "2026-03-26T10:17:28.000Z",
+  "dateModified": "2026-07-22T13:46:22.000Z",
   "image": "https://ac-opensource.github.io/assets/images/work/img_ocbc_app-optimized.webp",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html"
 }</script>
@@ -158,14 +204,14 @@
 <main id="main-content" class="pt-32 md:pt-24 pb-32">
 <article class="max-w-screen-xl mx-auto px-6">
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
-<span id="post-category" class="bg-surface-container-low px-2 py-1">[work]</span>
+<span id="post-category" class="bg-surface-container-low px-2 py-1">[portfolio]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2024-11-20</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[8 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[2 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Case Study: OCBC Mobile Banking Delivery</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">Delivery notes from a banking app environment where trust, performance, and safe iteration all matter simultaneously.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">OCBC: Android Work in a Banking App</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">I worked on OCBC&#39;s Android app in Kotlin and XML, including chart UI, identity-verification integration, network behavior, and focused unit coverage.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -173,9 +219,15 @@
 </div>
 </div>
 
-<div class="lg:col-span-5 relative aspect-[4/5] bg-surface-container-low border border-outline-variant/20 overflow-hidden">
-<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="/assets/images/work/img_ocbc_app-optimized.webp" alt="OCBC mobile app screenshot" loading="eager" decoding="async"/>
-</div>
+<figure class="work-post-hero work-post-hero--split lg:col-span-5" data-work-hero-layout="split-vertical">
+  <span class="work-post-hero__crop work-post-hero__crop--top">
+    <img id="post-hero-image" src="/assets/images/work/img_ocbc_app-optimized.webp" alt="OCBC mobile app screenshot" loading="eager" decoding="async"/>
+  </span>
+  <span class="work-post-hero__crop work-post-hero__crop--bottom" aria-hidden="true">
+    <img src="/assets/images/work/img_ocbc_app-optimized.webp" alt="" loading="eager" decoding="async"/>
+  </span>
+  <figcaption class="sr-only">OCBC production app shown as upper and lower crops side by side.</figcaption>
+</figure>
 
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -188,7 +240,7 @@
 </div>
 <div>
 <p id="post-author-name" class="text-sm font-bold">Andrew Concepcion</p>
-<p id="post-author-role" class="text-xs text-secondary">[work]</p>
+<p id="post-author-role" class="text-xs text-secondary">[portfolio]</p>
 </div>
 </div>
 </div>
@@ -198,36 +250,21 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">Delivery notes from a banking app environment where trust, performance, and safe iteration all matter simultaneously.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">I worked on OCBC&#39;s Android app in Kotlin and XML, including chart UI, identity-verification integration, network behavior, and focused unit coverage.</p>
 </section>
 </aside>
-<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><h2>Context</h2>
-      <p>Banking apps demand consistency and precision under strict reliability constraints. The goal was to improve core financial workflows while preserving user trust and regression safety.</p>
-      <h2>Stack</h2>
-      <ul>
-        <li>Kotlin + XML UI surfaces</li>
-        <li>Firebase integrations and analytics hooks</li>
-      </ul>
-      <h2>Key Challenges</h2>
-      <ul>
-        <li>Chart customizations for financial visualizations</li>
-        <li>Identity verification flow handling</li>
-        <li>Concurrency edge cases in high-touch transactions</li>
-        <li>Network call efficiency under constrained conditions</li>
-      </ul>
-      <h2>Contributions</h2>
-      <ul>
-        <li>Integrated third-party SDKs with guarded rollout strategy</li>
-        <li>Refactored selected modules to reduce coupling</li>
-        <li>Supported UI modernization and unit-test coverage improvements</li>
-      </ul>
-      <h2>Outcome</h2>
-      <p>The team shipped iterative improvements without breaking critical user paths, balancing quality controls with product velocity.</p></div>
+<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><h2>The parts I touched</h2>
+      <p>I worked on OCBC's Android app in Kotlin and XML. My scope included custom chart behavior, identity-verification integration, selected account-facing UI, and third-party SDK work.</p>
+      <p>Identity verification was more than dropping an SDK into a screen. I had to account for its callbacks and lifecycle transitions within the bank's existing navigation and state. I also worked through concurrency and network-call issues where the order of responses could affect what the app displayed.</p>
+      <p>I added or improved unit coverage around behavior that could be tested away from the UI. When a module made a feature hard to change, I reduced coupling in that area so the next change was easier to isolate and review.</p>
+      <h2>Working inside an established product</h2>
+      <p>Some of the UI was being modernized, but it still had to fit the conventions and release process of the existing app. That mattered most around identity and account state, where consistency was more valuable than introducing a second pattern.</p>
+      <p>I shipped those Android features and integrations through the bank's existing release process, with tests around behavior that would have been difficult to verify from the screen alone.</p></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
 <a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/case-study-openpay-bnpl-experience.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: openpay BNPL Experience</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">openpay: Checkout, Spend Limits, and Release Edges</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
@@ -235,7 +272,7 @@
 </a>
 <a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/case-study-mystc-scale-and-reliability.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: MySTC at Telecom Scale</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">MySTC: Leading a Five-Person Android Team</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -279,7 +316,7 @@
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "case-study-ocbc-banking-experience";
-    const CURRENT_POST_TITLE = "Case Study: OCBC Mobile Banking Delivery";
+    const CURRENT_POST_TITLE = "OCBC: Android Work in a Banking App";
     const CURRENT_POST_URL = "/blog/case-study-ocbc-banking-experience.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");

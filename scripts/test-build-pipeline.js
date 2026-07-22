@@ -24,6 +24,24 @@ function main() {
       throw new Error("The no-JavaScript blog fallback was not rebuilt from published posts.");
     }
 
+    const ocbcPage = fs.readFileSync(
+      path.join(outputRoot, "blog", "case-study-ocbc-banking-experience.html"),
+      "utf8"
+    );
+    if (!ocbcPage.includes('data-work-hero-layout="split-vertical"')) {
+      throw new Error("The OCBC project note did not use the split screenshot presentation.");
+    }
+    if (!ocbcPage.includes('id="post-category"') || !ocbcPage.includes('[portfolio]') || ocbcPage.includes('[work]')) {
+      throw new Error("The OCBC project note did not use the public portfolio label consistently.");
+    }
+    const openpayPage = fs.readFileSync(
+      path.join(outputRoot, "blog", "case-study-openpay-bnpl-experience.html"),
+      "utf8"
+    );
+    if (!openpayPage.includes('data-work-hero-layout="cover"')) {
+      throw new Error("The openpay project note did not use the edge-to-edge hero presentation.");
+    }
+
     const removedSlug = initial.posts[0].slug;
     const removedPage = path.join(outputRoot, "blog", `${removedSlug}.html`);
     const manualPage = path.join(outputRoot, "blog", "manual-page.html");

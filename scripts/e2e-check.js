@@ -81,6 +81,30 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     if (!condition) failures.push(message);
   }
 
+  async function prepareForScreenshot(targetPage) {
+    await targetPage.evaluate(async () => {
+      const images = Array.from(document.images);
+      images.forEach((image) => {
+        image.loading = 'eager';
+      });
+
+      await Promise.race([
+        Promise.all(images.map(async (image) => {
+          if (!image.complete) {
+            await new Promise((resolve) => {
+              image.addEventListener('load', resolve, { once: true });
+              image.addEventListener('error', resolve, { once: true });
+            });
+          }
+          if (typeof image.decode === 'function') {
+            await image.decode().catch(() => {});
+          }
+        })),
+        new Promise((resolve) => setTimeout(resolve, 5000)),
+      ]);
+    });
+  }
+
   async function checkInternalLinksOnPage(currentPath) {
     const links = await page.$$eval('a[href]', (anchors) => anchors.map((a) => a.getAttribute('href')).filter(Boolean));
     const unique = [...new Set(links)];
@@ -143,6 +167,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await checkInternalLinksOnPage(route.path);
 
     if (route.screenshot !== false) {
+      await prepareForScreenshot(page);
       await page.screenshot({ path: path.join(desktopDir, `${route.name}.png`), fullPage: true });
     }
 
@@ -158,6 +183,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       await assert(Boolean((titleText || '').trim()), `${route.path} mobile: #post-title is empty`);
     }
     if (route.screenshot !== false) {
+      await prepareForScreenshot(mobilePage);
       await mobilePage.screenshot({ path: path.join(mobileDir, `${route.name}.png`), fullPage: true });
     }
   }
@@ -260,6 +286,20 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(Boolean(prevHref), 'Previous post link missing href');
   await assert(Boolean(nextHref), 'Next post link missing href');
 
+  await page.goto(BASE_URL + '/blog/case-study-ocbc-banking-experience.html', { waitUntil: 'domcontentloaded' });
+  const ocbcHero = page.locator('[data-work-hero-layout="split-vertical"]');
+  await assert((await ocbcHero.count()) === 1, 'OCBC project note is missing its split screenshot hero');
+  await assert((await ocbcHero.locator('.work-post-hero__crop').count()) === 2, 'OCBC hero does not expose two screenshot crops');
+  await assert(((await page.locator('#post-category').textContent()) || '').trim() === '[portfolio]', 'OCBC project note does not use the portfolio label');
+
+  await page.goto(BASE_URL + '/blog/case-study-openpay-bnpl-experience.html', { waitUntil: 'domcontentloaded' });
+  const openpayHeroImage = page.locator('[data-work-hero-layout="cover"] > img');
+  await assert((await openpayHeroImage.count()) === 1, 'openpay project note is missing its edge-to-edge hero');
+  if ((await openpayHeroImage.count()) === 1) {
+    const openpayObjectFit = await openpayHeroImage.evaluate((image) => getComputedStyle(image).objectFit);
+    await assert(openpayObjectFit === 'cover', `openpay hero uses object-fit ${openpayObjectFit}; expected cover`);
+  }
+
   // Contact form behavior
   await page.goto(BASE_URL + '/contact.html', { waitUntil: 'domcontentloaded' });
   const action = await page.locator('form').first().getAttribute('action');
@@ -271,15 +311,121 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const emailVal = await page.locator('input[name="email"]').inputValue();
   await assert(nameVal === 'QA Runner' && emailVal === 'qa@example.com', 'Contact form fields did not accept input');
 
-  // Work page specific CTA check
+  // Work page portfolio content and progressive-enhancement checks
   await page.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  const portfolioAppLink = await page.locator('a:has-text("Open Portfolio App")').first().getAttribute('href');
+  const portfolioEntries = page.locator('[data-portfolio-entry]');
+  const portfolioEntryCount = await portfolioEntries.count();
+  await assert(portfolioEntryCount >= 12, `Work page rendered ${portfolioEntryCount} portfolio entries; expected at least 12`);
+
+  const workPageText = ((await page.locator('body').textContent()) || '').replace(/\s+/g, ' ').trim();
+  for (const projectName of ['ITVX', 'Littlepay', 'NTU Pass', 'Solo', 'Aqua Expeditions']) {
+    await assert(workPageText.includes(projectName), `Work page is missing the ${projectName} portfolio entry`);
+  }
+  await assert(!workPageText.includes('[N/A]'), 'Work page still exposes an [N/A] placeholder');
+  await assert(!workPageText.includes('Portfolio App Sync'), 'Work page still exposes the obsolete Portfolio App Sync label');
+  await assert((await page.locator('.work-flow__checkpoint').count()) === 4, 'Portfolio hero is missing its completed delivery checkpoints');
+  await assert((await page.locator('.work-flow__complete').textContent() || '').includes('ALL CHECKS COMPLETE'), 'Portfolio hero does not communicate completed verification');
   await assert(
-    Boolean(portfolioAppLink && portfolioAppLink.includes('play.google.com/store/apps/details?id=com.aconcepcion.portfolio')),
-    'Work page portfolio app CTA is missing or incorrect'
+    (await page.locator('.work-hero__art[role="img"]').getAttribute('aria-label') || '').includes('All checks complete'),
+    'Portfolio hero completion message is missing from the accessibility tree'
   );
+
+  const itvxScreens = page.locator('.work-case--itvx .work-itvx-shot');
+  await assert((await itvxScreens.count()) === 3, 'ITVX card does not show all three official app screens');
+  const itvxScreenSources = await itvxScreens.evaluateAll((images) => images.map((image) => image.getAttribute('src') || ''));
+  await assert(
+    itvxScreenSources.every((src) => src.startsWith('/assets/images/work/img_itvx_')),
+    'ITVX card is not using the local official app-screen assets'
+  );
+  await assert((await page.locator('.work-case--itvx .work-player').count()) === 0, 'ITVX card still exposes the generic player mockup');
+
+  const deviceRatio = await page.locator('.work-case--ocbc .work-device').evaluate((device) => {
+    return device.offsetHeight / device.offsetWidth;
+  });
+  await assert(deviceRatio >= 2.1 && deviceRatio <= 2.25, `Portfolio device ratio is ${deviceRatio.toFixed(2)}; expected a modern phone proportion`);
+
+  await mobilePage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  const ocbcMobileOrder = await mobilePage.locator('.work-case--ocbc').evaluate((card) => {
+    const body = card.querySelector('.work-case__body')?.getBoundingClientRect();
+    const stage = card.querySelector('.work-device-stage')?.getBoundingClientRect();
+    return body && stage ? body.top < stage.top : false;
+  });
+  await assert(ocbcMobileOrder, 'OCBC mobile card shows its screenshot before its project heading');
+
+  const reducedMotion = await browser.newContext({
+    reducedMotion: 'reduce',
+    viewport: { width: 430, height: 932 }
+  });
+  const reducedMotionPage = await reducedMotion.newPage();
+  await reducedMotionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  const reducedMotionCard = reducedMotionPage.locator('.work-case--itvx');
+  const reducedMotionScreens = reducedMotionCard.locator('.work-itvx-shot');
+  const reducedMotionBeforeHover = await reducedMotionScreens.evaluateAll((images) =>
+    images.map((image) => {
+      const rect = image.getBoundingClientRect();
+      const galleryRect = image.parentElement.getBoundingClientRect();
+      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
+    })
+  );
+  await assert(
+    new Set(reducedMotionBeforeHover.map(({ x, y }) => `${x}:${y}`)).size === 3,
+    'Reduced-motion mode collapses the ITVX collage into overlapping screens'
+  );
+  await reducedMotionCard.hover();
+  const reducedMotionAfterHover = await reducedMotionScreens.evaluateAll((images) =>
+    images.map((image) => {
+      const rect = image.getBoundingClientRect();
+      const galleryRect = image.parentElement.getBoundingClientRect();
+      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
+    })
+  );
+  await assert(
+    JSON.stringify(reducedMotionAfterHover) === JSON.stringify(reducedMotionBeforeHover),
+    'Reduced-motion mode still moves the ITVX collage on hover'
+  );
+  await reducedMotion.close();
+
+  const requiredProjectLinks = [
+    ['ITVX', 'a[href*="play.google.com/store/apps/details?id=air.ITVMobilePlayer"]'],
+    ['Littlepay', 'a[href^="https://littlepay.com"]'],
+    ['NTU Pass', 'a[href*="play.google.com/store/apps/details?id=sg.edu.ntu.apps.ntusmartpass"]'],
+    ['Solo', 'a[href*="play.google.com/store/apps/developer?id=Solo+Technologies+Services"]'],
+    ['Aqua Expeditions', 'a[href^="https://www.aquaexpeditions.com"]']
+  ];
+  for (const [projectName, selector] of requiredProjectLinks) {
+    await assert((await page.locator(selector).count()) > 0, `Work page ${projectName} source link is missing or incorrect`);
+  }
+
   const deepDiveLinks = await page.locator('a[data-work-deep-dive]').count();
   await assert(deepDiveLinks >= 3, 'Work page deep-dive links are missing');
+  const deepDiveHrefs = await page.locator('a[data-work-deep-dive]').evaluateAll((links) =>
+    links.map((link) => link.getAttribute('href')).filter(Boolean)
+  );
+  await assert(
+    new Set(deepDiveHrefs).size === deepDiveHrefs.length,
+    'Work page contains duplicate deep-dive links'
+  );
+
+  const noJavaScript = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 1280, height: 900 }
+  });
+  const noJavaScriptPage = await noJavaScript.newPage();
+  const noJavaScriptResponse = await noJavaScriptPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  await assert(
+    noJavaScriptResponse && noJavaScriptResponse.status() >= 200 && noJavaScriptResponse.status() < 400,
+    'Work page failed to load with JavaScript disabled'
+  );
+  const staticPortfolioEntryCount = await noJavaScriptPage.locator('[data-portfolio-entry]').count();
+  await assert(
+    staticPortfolioEntryCount === portfolioEntryCount,
+    `Work page exposes ${staticPortfolioEntryCount} of ${portfolioEntryCount} portfolio entries without JavaScript`
+  );
+  const staticWorkPageText = ((await noJavaScriptPage.locator('body').textContent()) || '').replace(/\s+/g, ' ').trim();
+  for (const projectName of ['ITVX', 'Littlepay', 'NTU Pass', 'Solo', 'Aqua Expeditions']) {
+    await assert(staticWorkPageText.includes(projectName), `Work page hides ${projectName} when JavaScript is disabled`);
+  }
+  await noJavaScript.close();
 
   if (consoleIssues.length) {
     warnings.push(...consoleIssues);
