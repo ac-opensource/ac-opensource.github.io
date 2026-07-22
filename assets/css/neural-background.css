@@ -44,7 +44,10 @@ body {
   z-index: 1;
 }
 
-#site-topbar,
+#site-topbar {
+  z-index: 50;
+}
+
 main,
 #site-footer {
   position: relative;

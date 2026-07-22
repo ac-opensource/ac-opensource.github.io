@@ -82,6 +82,52 @@
     animation: overlayAlphaPulse 4.8s ease-in-out infinite;
     will-change: opacity;
   }
+  .work-post-hero {
+    position: relative;
+    display: grid;
+    aspect-ratio: 1;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(175, 179, 170, 0.28);
+    background: #edefe7;
+  }
+  .work-post-hero--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+  }
+  .work-post-hero__crop {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img,
+  .work-post-hero--contain > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img {
+    object-fit: cover;
+  }
+  .work-post-hero__crop--top img {
+    object-position: top center;
+  }
+  .work-post-hero__crop--bottom img {
+    object-position: bottom center;
+  }
+  .work-post-hero--cover > img {
+    object-position: 62% center;
+  }
+  .work-post-hero--contain {
+    aspect-ratio: 4 / 5;
+  }
+  .work-post-hero--contain > img {
+    object-fit: contain;
+    background: #fff;
+  }
   @keyframes overlayAlphaPulse {
     0% { opacity: 0; }
     15% { opacity: 0; }
@@ -391,7 +437,7 @@ Planner
 </a>
 <a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/case-study-ocbc-banking-experience.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: OCBC Mobile Banking Delivery</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">OCBC: Android Work in a Banking App</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>

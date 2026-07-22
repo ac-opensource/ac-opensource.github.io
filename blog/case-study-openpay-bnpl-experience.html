@@ -4,30 +4,30 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>Case Study: openpay BNPL Experience | Andrew Concepcion</title>
-<meta name="description" content="How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work."/>
+<title>openpay: Checkout, Spend Limits, and Release Edges | Andrew Concepcion</title>
+<meta name="description" content="I worked on openpay&#39;s Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html"/>
-<meta property="og:title" content="Case Study: openpay BNPL Experience | Andrew Concepcion"/>
-<meta property="og:description" content="How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work."/>
+<meta property="og:title" content="openpay: Checkout, Spend Limits, and Release Edges | Andrew Concepcion"/>
+<meta property="og:description" content="I worked on openpay&#39;s Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths."/>
 <meta property="og:image" content="https://ac-opensource.github.io/assets/images/work/img_openpay_app-optimized.webp"/>
-<meta property="og:image:alt" content="openpay app interface showing spend limits and merchant discovery cards."/>
+<meta property="og:image:alt" content="openpay app interface showing spend limits and merchant discovery cards"/>
 <meta property="article:published_time" content="2024-09-01"/>
 <meta property="article:author" content="Andrew Concepcion"/>
 <meta property="article:tag" content="openpay">
-<meta property="article:tag" content="fintech">
-<meta property="article:tag" content="bnpl">
-<meta property="article:tag" content="android">
-<meta property="article:tag" content="checkout">
+<meta property="article:tag" content="Fintech">
+<meta property="article:tag" content="BNPL">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Checkout">
 <meta property="article:tag" content="work">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Case Study: openpay BNPL Experience | Andrew Concepcion"/>
-<meta name="twitter:description" content="How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work."/>
+<meta name="twitter:title" content="openpay: Checkout, Spend Limits, and Release Edges | Andrew Concepcion"/>
+<meta name="twitter:description" content="I worked on openpay&#39;s Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/work/img_openpay_app-optimized.webp"/>
-<meta name="twitter:image:alt" content="openpay app interface showing spend limits and merchant discovery cards."/>
+<meta name="twitter:image:alt" content="openpay app interface showing spend limits and merchant discovery cards"/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -84,6 +84,52 @@
     animation: overlayAlphaPulse 4.8s ease-in-out infinite;
     will-change: opacity;
   }
+  .work-post-hero {
+    position: relative;
+    display: grid;
+    aspect-ratio: 1;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(175, 179, 170, 0.28);
+    background: #edefe7;
+  }
+  .work-post-hero--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+  }
+  .work-post-hero__crop {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img,
+  .work-post-hero--contain > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img {
+    object-fit: cover;
+  }
+  .work-post-hero__crop--top img {
+    object-position: top center;
+  }
+  .work-post-hero__crop--bottom img {
+    object-position: bottom center;
+  }
+  .work-post-hero--cover > img {
+    object-position: 62% center;
+  }
+  .work-post-hero--contain {
+    aspect-ratio: 4 / 5;
+  }
+  .work-post-hero--contain > img {
+    object-fit: contain;
+    background: #fff;
+  }
   @keyframes overlayAlphaPulse {
     0% { opacity: 0; }
     15% { opacity: 0; }
@@ -101,8 +147,8 @@
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Case Study: openpay BNPL Experience",
-  "description": "How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work.",
+  "headline": "openpay: Checkout, Spend Limits, and Release Edges",
+  "description": "I worked on openpay's Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -113,7 +159,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2024-09-01",
-  "dateModified": "2026-03-26T15:01:18.000Z",
+  "dateModified": "2026-07-22T13:46:22.000Z",
   "image": "https://ac-opensource.github.io/assets/images/work/img_openpay_app-optimized.webp",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html"
 }</script>
@@ -159,14 +205,14 @@
 <main id="main-content" class="pt-32 md:pt-24 pb-32">
 <article class="max-w-screen-xl mx-auto px-6">
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
-<span id="post-category" class="bg-surface-container-low px-2 py-1">[work]</span>
+<span id="post-category" class="bg-surface-container-low px-2 py-1">[portfolio]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2024-09-01</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[8 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[2 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Case Study: openpay BNPL Experience</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">openpay: Checkout, Spend Limits, and Release Edges</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">I worked on openpay&#39;s Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -174,9 +220,10 @@
 </div>
 </div>
 
-<div class="lg:col-span-5 relative aspect-[4/5] bg-surface-container-low border border-outline-variant/20 overflow-hidden">
-<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="/assets/images/work/img_openpay_app-optimized.webp" alt="openpay app interface showing spend limits and merchant discovery cards." loading="eager" decoding="async"/>
-</div>
+<figure class="work-post-hero work-post-hero--cover lg:col-span-5" data-work-hero-layout="cover">
+  <img id="post-hero-image" src="/assets/images/work/img_openpay_app-optimized.webp" alt="openpay app interface showing spend limits and merchant discovery cards" loading="eager" decoding="async"/>
+  <figcaption class="sr-only">openpay purchase experience</figcaption>
+</figure>
 
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -189,7 +236,7 @@
 </div>
 <div>
 <p id="post-author-name" class="text-sm font-bold">Andrew Concepcion</p>
-<p id="post-author-role" class="text-xs text-secondary">[work]</p>
+<p id="post-author-role" class="text-xs text-secondary">[portfolio]</p>
 </div>
 </div>
 </div>
@@ -199,52 +246,21 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">I worked on openpay&#39;s Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths.</p>
 </section>
 </aside>
-<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
-  <p>
-    <strong>openpay</strong> was one of the projects where small UX decisions had outsized product impact. 
-    The core challenge was balancing conversion with responsible spend behavior: make checkout feel fast 
-    without removing trust cues around limits and repayment context.
-  </p>
-  <p>
-    My work focused on tightening the purchase journey and reducing edge-case failures in critical surfaces 
-    like spend-limit cards, merchant tiles, and payment confirmation flows.
-  </p>
-</section>
-
-<section class="grid gap-6 md:grid-cols-2">
-  <figure class="md:col-span-2 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/assets/images/work/img_openpay_app-optimized.webp" alt="openpay app journey preview" class="w-full h-auto object-contain"  loading="lazy" decoding="async" />
-    <figcaption class="mt-3 text-sm text-secondary">
-      Working model of the openpay purchase surface: spend limits, merchant discovery, and checkout direction.
-    </figcaption>
-  </figure>
-</section>
-
-<section class="space-y-4">
-  <h2 class="font-headline text-2xl font-bold tracking-tight">What I Drove</h2>
-  <ul class="list-disc pl-6 space-y-2">
-    <li>Checkout flow refinements to reduce abandonments on critical decision steps.</li>
-    <li>UI responsiveness and render optimizations on content-dense home and merchant modules.</li>
-    <li>Stability hardening before releases, especially around partner-dependent payment paths.</li>
-  </ul>
-</section>
-
-<section class="space-y-4">
-  <h2 class="font-headline text-2xl font-bold tracking-tight">Engineering Notes</h2>
-  <p>
-    In BNPL products, reliability is product experience. You can have a beautiful interface, but if one edge case
-    breaks confirmation timing, trust drops immediately. We prioritized deterministic state transitions and clear
-    loading/failure states so users always knew what the app was doing.
-  </p>
-</section></div>
+<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><h2>Spend limits weren't just decoration</h2>
+      <p>I worked on openpay's Android purchase journey. The visible pieces included spend-limit cards, merchant discovery content, and payment confirmation. The less visible work was making those screens agree about what was happening when data arrived late or a partner service returned something unexpected.</p>
+      <p>Merchant screens carried a lot of content, so I worked on UI responsiveness in the home and merchant areas. I also refined loading and completion behavior so the app did not advance a payment step before it had a result.</p>
+      <h2>The edges of checkout</h2>
+      <p>Parts of checkout depended on systems outside the Android app. During release preparation I traced edge cases at those boundaries and tightened how the app represented partner responses, loading states, completion, and failure.</p>
+      <p>I also worked on the layout and interaction details around the purchase flow. Those changes were small in code compared with an integration, but they were the part a customer saw first.</p>
+      <p>My work covered the Android path from merchant discovery and available spend through checkout and confirmation, including the partner-response states between those screens.</p></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
 <a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/case-study-solo-whitelabel-delivery-platform.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: Solo Whitelabel Delivery Platform</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Solo: Android Across a White-Label Food Platform</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
@@ -252,7 +268,7 @@
 </a>
 <a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/case-study-ocbc-banking-experience.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: OCBC Mobile Banking Delivery</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">OCBC: Android Work in a Banking App</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -296,7 +312,7 @@
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "case-study-openpay-bnpl-experience";
-    const CURRENT_POST_TITLE = "Case Study: openpay BNPL Experience";
+    const CURRENT_POST_TITLE = "openpay: Checkout, Spend Limits, and Release Edges";
     const CURRENT_POST_URL = "/blog/case-study-openpay-bnpl-experience.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");

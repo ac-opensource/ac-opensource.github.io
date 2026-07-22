@@ -315,6 +315,11 @@
         .replace(/'/g, "&#39;");
     }
 
+    function visibleCategory(value) {
+      const category = String(value || "log").trim().toLowerCase() || "log";
+      return category === "work" ? "portfolio" : category;
+    }
+
     function formatDate(raw) {
       const d = new Date(raw);
       if (Number.isNaN(d.getTime())) return raw || "";
@@ -470,7 +475,7 @@
                   <p class="font-body text-secondary text-lg leading-relaxed mb-6 max-w-2xl">${escapeHtml(post.summary || "")}</p>
                 </a>
                 <div class="flex flex-wrap gap-2">
-                  <span class="font-label text-[10px] px-2 py-1 bg-surface-container-low text-secondary border border-outline-variant/20 uppercase tracking-widest">[${escapeHtml(post.category || "log")}]</span>
+                  <span class="font-label text-[10px] px-2 py-1 bg-surface-container-low text-secondary border border-outline-variant/20 uppercase tracking-widest">[${escapeHtml(visibleCategory(post.category))}]</span>
                   ${(post.topics || []).slice(0, 2).map((t) => `<span class="font-label text-[10px] px-2 py-1 bg-surface-container-low text-secondary border border-outline-variant/20 uppercase tracking-widest">[${escapeHtml(t)}]</span>`).join("")}
                 </div>
                 <div class="mt-5 flex flex-wrap items-center gap-2">
@@ -565,7 +570,7 @@
       const allCategories = ["all", ...topCategories];
       categoryFilters.innerHTML = allCategories
         .map((category) => {
-          const label = category === "all" ? "ALL" : category.toUpperCase().replace(/_/g, " ");
+          const label = category === "all" ? "ALL" : visibleCategory(category).toUpperCase().replace(/_/g, " ");
           return `<button data-category="${category}" class="font-label text-xs px-3 py-1.5 uppercase tracking-widest">${`[${label}]`}</button>`;
         })
         .join("");

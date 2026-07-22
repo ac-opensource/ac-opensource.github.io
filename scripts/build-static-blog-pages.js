@@ -14,6 +14,10 @@ const FALLBACK_HERO_IMAGE = "/blog/images/new-zealand-aurora.png";
 const GENERATED_PAGE_MARKER = "<!-- generated: scripts/build-static-blog-pages.js -->";
 const GENERATED_MANIFEST_NAME = path.join(".site-build", "generated-blog-pages.json");
 const GENERATOR_ID = "ac-opensource-static-blog-v1";
+const WORK_HERO_LAYOUT_BY_SLUG = Object.freeze({
+  "case-study-ocbc-banking-experience": "split-vertical",
+  "case-study-openpay-bnpl-experience": "cover"
+});
 
 function escapeHtml(value) {
   return String(value || "")
@@ -22,6 +26,11 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function visibleCategory(value) {
+  const category = String(value || "log").trim().toLowerCase() || "log";
+  return category === "work" ? "portfolio" : category;
 }
 
 function stripHtml(value) {
@@ -161,11 +170,47 @@ function isWorkPost(post) {
   return category === "work" || slug.startsWith("case-study-");
 }
 
+function buildWorkHeroPanel({ post, heroImage, heroResponsiveAttributes, heroAlt, heroCaption }) {
+  const layout = WORK_HERO_LAYOUT_BY_SLUG[String(post?.slug || "")] || "contain";
+  const caption = heroCaption || heroAlt;
+
+  if (layout === "split-vertical") {
+    return `
+<figure class="work-post-hero work-post-hero--split lg:col-span-5" data-work-hero-layout="split-vertical">
+  <span class="work-post-hero__crop work-post-hero__crop--top">
+    <img id="post-hero-image" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+  </span>
+  <span class="work-post-hero__crop work-post-hero__crop--bottom" aria-hidden="true">
+    <img src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="" loading="eager" decoding="async"/>
+  </span>
+  <figcaption class="sr-only">${escapeHtml(caption)} shown as upper and lower crops side by side.</figcaption>
+</figure>
+`;
+  }
+
+  if (layout === "cover") {
+    return `
+<figure class="work-post-hero work-post-hero--cover lg:col-span-5" data-work-hero-layout="cover">
+  <img id="post-hero-image" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+  <figcaption class="sr-only">${escapeHtml(caption)}</figcaption>
+</figure>
+`;
+  }
+
+  return `
+<figure class="work-post-hero work-post-hero--contain lg:col-span-5" data-work-hero-layout="contain">
+  <img id="post-hero-image" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+  <figcaption class="sr-only">${escapeHtml(caption)}</figcaption>
+</figure>
+`;
+}
+
 function buildStaticPostHtml({ post, previous, next }) {
   const title = String(post.title || "").trim() || "Untitled";
   const author = String(post.author || "Andrew Concepcion").trim() || "Andrew Concepcion";
   const summary = String(post.summary || "").trim() || stripHtml(post.body_html).slice(0, 180);
   const category = String(post.category || "log").trim() || "log";
+  const categoryLabel = visibleCategory(category);
   const isWorkDeepDive = isWorkPost(post);
   const isReflection = category.toLowerCase() === "reflection";
   const publishedDate = String(post.published_date || "").trim();
@@ -207,11 +252,7 @@ function buildStaticPostHtml({ post, previous, next }) {
   const blogCurrent = isWorkDeepDive ? "" : ' aria-current="page"';
 
   const heroPanelHtml = isWorkDeepDive
-    ? `
-<div class="lg:col-span-5 relative aspect-[4/5] bg-surface-container-low border border-outline-variant/20 overflow-hidden">
-<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
-</div>
-`
+    ? buildWorkHeroPanel({ post, heroImage, heroResponsiveAttributes, heroAlt, heroCaption })
     : isReflection
       ? `
 <figure class="lg:col-span-5 relative aspect-square bg-surface-container-low border border-outline-variant/20 p-3 overflow-hidden">
@@ -350,6 +391,52 @@ ${articleTagsMeta}
     animation: overlayAlphaPulse 4.8s ease-in-out infinite;
     will-change: opacity;
   }
+  .work-post-hero {
+    position: relative;
+    display: grid;
+    aspect-ratio: 1;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(175, 179, 170, 0.28);
+    background: #edefe7;
+  }
+  .work-post-hero--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+  }
+  .work-post-hero__crop {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img,
+  .work-post-hero--contain > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img {
+    object-fit: cover;
+  }
+  .work-post-hero__crop--top img {
+    object-position: top center;
+  }
+  .work-post-hero__crop--bottom img {
+    object-position: bottom center;
+  }
+  .work-post-hero--cover > img {
+    object-position: 62% center;
+  }
+  .work-post-hero--contain {
+    aspect-ratio: 4 / 5;
+  }
+  .work-post-hero--contain > img {
+    object-fit: contain;
+    background: #fff;
+  }
   @keyframes overlayAlphaPulse {
     0% { opacity: 0; }
     15% { opacity: 0; }
@@ -407,7 +494,7 @@ ${articleTagsMeta}
 <main id="main-content" class="pt-32 md:pt-24 pb-32">
 <article class="max-w-screen-xl mx-auto px-6">
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
-<span id="post-category" class="bg-surface-container-low px-2 py-1">[${escapeHtml(category.toLowerCase())}]</span>
+<span id="post-category" class="bg-surface-container-low px-2 py-1">[${escapeHtml(categoryLabel)}]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">${escapeHtml(publishedDate)}</span>
 <span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[${escapeHtml(readingTime)}]</span>
 </div>
@@ -433,7 +520,7 @@ ${heroPanelHtml}
 </div>
 <div>
 <p id="post-author-name" class="text-sm font-bold">${escapeHtml(author)}</p>
-<p id="post-author-role" class="text-xs text-secondary">[${escapeHtml(category.toLowerCase())}]</p>
+<p id="post-author-role" class="text-xs text-secondary">[${escapeHtml(categoryLabel)}]</p>
 </div>
 </div>
 </div>

@@ -5,7 +5,7 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Wed, 22 Jul 2026 07:53:14 GMT</lastBuildDate>
+  <lastBuildDate>Wed, 22 Jul 2026 13:46:22 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
   <item>
     <title>It’s Not Okay to Stay “Not Okay”</title>
@@ -112,11 +112,11 @@
 <category>Travel</category><category>Family</category><category>Reflection</category><category>hobby</category>
   </item>
   <item>
-    <title>Case Study: MySTC at Telecom Scale</title>
+    <title>MySTC: Leading a Five-Person Android Team</title>
     <link>https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</guid>
     <pubDate>Wed, 05 Feb 2025 00:00:00 GMT</pubDate>
-    <description>How we delivered high-traffic telecom account flows with tighter performance budgets, multi-language support, and predictable release execution.</description>
+    <description>I led five senior Android engineers on MySTC, working in Kotlin and Java across account, ordering, support, and multilingual flows.</description>
 <category>MySTC</category><category>Android</category><category>Kotlin</category><category>Telecom</category><category>work</category>
   </item>
   <item>
@@ -128,11 +128,11 @@
 <category>Reflection</category><category>Philosophy</category><category>Creative Process</category><category>reflection</category>
   </item>
   <item>
-    <title>Case Study: OCBC Mobile Banking Delivery</title>
+    <title>OCBC: Android Work in a Banking App</title>
     <link>https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html</guid>
     <pubDate>Wed, 20 Nov 2024 00:00:00 GMT</pubDate>
-    <description>Delivery notes from a banking app environment where trust, performance, and safe iteration all matter simultaneously.</description>
+    <description>I worked on OCBC&apos;s Android app in Kotlin and XML, including chart UI, identity-verification integration, network behavior, and focused unit coverage.</description>
 <category>OCBC</category><category>Fintech</category><category>Android</category><category>Kotlin</category><category>work</category>
   </item>
   <item>
@@ -152,27 +152,27 @@
 <category>Hobby</category><category>Photography</category><category>hobby</category>
   </item>
   <item>
-    <title>Case Study: openpay BNPL Experience</title>
+    <title>openpay: Checkout, Spend Limits, and Release Edges</title>
     <link>https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html</guid>
     <pubDate>Sun, 01 Sep 2024 00:00:00 GMT</pubDate>
-    <description>How I improved checkout reliability and spend-limit UX for openpay through focused mobile flow and release hardening work.</description>
-<category>openpay</category><category>fintech</category><category>bnpl</category><category>android</category><category>checkout</category><category>work</category>
+    <description>I worked on openpay&apos;s Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths.</description>
+<category>openpay</category><category>Fintech</category><category>BNPL</category><category>Android</category><category>Checkout</category><category>work</category>
   </item>
   <item>
-    <title>Case Study: Solo Whitelabel Delivery Platform</title>
+    <title>Solo: Android Across a White-Label Food Platform</title>
     <link>https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html</guid>
     <pubDate>Sat, 10 Aug 2024 00:00:00 GMT</pubDate>
-    <description>Scaling one codebase across multiple food brands while preserving brand-specific behavior and keeping deployment overhead manageable.</description>
+    <description>I worked in Solo&apos;s shared Kotlin and XML codebase, shipping Android features and production fixes used by multiple restaurant-branded apps.</description>
 <category>Solo</category><category>Food Delivery</category><category>Android</category><category>Whitelabel</category><category>work</category>
   </item>
   <item>
-    <title>Case Study: OWTO Ride-Hailing Platform</title>
+    <title>OWTO: Android, iOS, and the Backend Between Them</title>
     <link>https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html</guid>
     <pubDate>Sat, 15 Jun 2024 00:00:00 GMT</pubDate>
-    <description>Leading full-stack mobile and backend delivery for a ride-hailing product focused on booking reliability and operational execution.</description>
+    <description>I led delivery across OWTO&apos;s Android, iOS, and backend work and stayed hands-on with booking, GPS, payments, and the APIs connecting them.</description>
 <category>OWTO</category><category>Mobility</category><category>Android</category><category>iOS</category><category>Backend</category><category>work</category>
   </item>
   <item>
@@ -184,27 +184,27 @@
 <category>KMP</category><category>SwiftUI</category><category>technical</category>
   </item>
   <item>
-    <title>Case Study: Popslide Engagement and Monetization</title>
+    <title>Popslide: Experiments on a Lockscreen Product</title>
     <link>https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html</guid>
     <pubDate>Thu, 30 Nov 2023 00:00:00 GMT</pubDate>
-    <description>Operational lessons from balancing retention, monetization, and product stability in an ad-and-task rewards app.</description>
+    <description>I built and evaluated Android experiment variants for Popslide and worked on lockscreen behavior, notifications, caching, and production state handling.</description>
 <category>Popslide</category><category>Adtech</category><category>Android</category><category>Experimentation</category><category>work</category>
   </item>
   <item>
-    <title>Case Study: WebSafety Parental Controls</title>
+    <title>WebSafety: Parental Controls Meet Platform Limits</title>
     <link>https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html</guid>
     <pubDate>Thu, 22 Jun 2023 00:00:00 GMT</pubDate>
-    <description>Building parental control features with strict privacy and platform constraints, including hard technical limits on mobile operating systems.</description>
+    <description>I worked on WebSafety features across Java and Objective-C code, including GPS, synchronization, permissions, and platform behavior that wasn&apos;t always documented.</description>
 <category>WebSafety</category><category>Security</category><category>Parental Controls</category><category>Android</category><category>work</category>
   </item>
   <item>
-    <title>Case Study: ProjectBASS Community Network Mapping</title>
+    <title>ProjectBASS: Crowdsourced Network Measurements</title>
     <link>https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html</guid>
     <pubDate>Wed, 05 Oct 2022 00:00:00 GMT</pubDate>
-    <description>Community-built signal and bandwidth mapping designed to collect useful field data through volunteer contributions.</description>
+    <description>I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements.</description>
 <category>ProjectBASS</category><category>Open Source</category><category>Network Mapping</category><category>Kotlin</category><category>work</category>
   </item>
 </channel>
