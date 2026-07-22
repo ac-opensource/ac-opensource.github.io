@@ -1,4 +1,9 @@
 node_modules/
+dist/
+.site-build/
+.agents/
+.idea/
+mempalace.yaml
 data/blog.sqlite
 data/blog.sqlite-shm
 data/blog.sqlite-wal

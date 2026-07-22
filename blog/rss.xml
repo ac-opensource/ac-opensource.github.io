@@ -5,8 +5,24 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Wed, 22 Jul 2026 03:01:56 GMT</lastBuildDate>
+  <lastBuildDate>Wed, 22 Jul 2026 07:53:14 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>It’s Not Okay to Stay “Not Okay”</title>
+    <link>https://ac-opensource.github.io/blog/2026-07-22-its-not-okay-to-stay-not-okay.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-07-22-its-not-okay-to-stay-not-okay.html</guid>
+    <pubDate>Wed, 22 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Acceptance makes room for honesty. Responsibility turns that honesty into the next workable step—without shame, denial, or pretending recovery is simple.</description>
+<category>Reflection</category><category>Mental Health</category><category>Personal Growth</category><category>Self-Awareness</category><category>Resilience</category><category>reflection</category>
+  </item>
+  <item>
+    <title>The Fortress We Mistake for Home</title>
+    <link>https://ac-opensource.github.io/blog/2026-07-22-the-fortress-we-mistake-for-home.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-07-22-the-fortress-we-mistake-for-home.html</guid>
+    <pubDate>Wed, 22 Jul 2026 00:00:00 GMT</pubDate>
+    <description>A reflection on the defenses we build from old wounds, pride, and habit—and why real change begins when we stop guarding what keeps us trapped.</description>
+<category>Self-Awareness</category><category>Personal Growth</category><category>Accountability</category><category>Healing</category><category>Reflection</category><category>reflection</category>
+  </item>
   <item>
     <title>What Building a Small Backend Taught Me About AI-Ready Engineering</title>
     <link>https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html</link>
@@ -14,6 +30,14 @@
     <pubDate>Tue, 21 Jul 2026 00:00:00 GMT</pubDate>
     <description>A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.</description>
 <category>kotlin</category><category>spring-boot</category><category>postgis</category><category>backend</category><category>ai-engineering</category><category>privacy</category><category>testing</category><category>systems-design</category><category>technical</category>
+  </item>
+  <item>
+    <title>Agents That Leave Receipts</title>
+    <link>https://ac-opensource.github.io/blog/2026-04-30-agents-that-leave-receipts.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-04-30-agents-that-leave-receipts.html</guid>
+    <pubDate>Thu, 30 Apr 2026 00:00:00 GMT</pubDate>
+    <description>A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust.</description>
+<category>ai-workflow</category><category>local-agents</category><category>engineering-discipline</category><category>android</category><category>linear</category><category>memory-systems</category><category>delivery</category><category>technical</category>
   </item>
   <item>
     <title>How I Use MemPalace to Make Local Agents Better</title>
@@ -32,12 +56,20 @@
 <category>rust</category><category>mobile</category><category>architecture</category><category>android</category><category>ios</category><category>uniffi</category><category>ffi</category><category>technical</category>
   </item>
   <item>
-    <title>Prompt Patterns That Consistently Produce Production-Ready Code</title>
-    <link>https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html</link>
-    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html</guid>
+    <title>Career Trajectory as Platform Ownership, Not Job Titles</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html</guid>
     <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
-    <description>The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.</description>
-<category>ai-workflow</category><category>prompting</category><category>engineering</category><category>delivery</category><category>quality</category><category>technical</category>
+    <description>A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression.</description>
+<category>career</category><category>leadership</category><category>platform-ownership</category><category>delivery</category><category>engineering-growth</category><category>technical</category>
+  </item>
+  <item>
+    <title>Cognitive Profile Deep Dive: Emergenetics + Harrison</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.</description>
+<category>emergenetics</category><category>harrison</category><category>paradox</category><category>self-awareness</category><category>leadership</category><category>reflection</category>
   </item>
   <item>
     <title>E2E + Visual QA for Personal Websites: What to Test and Why</title>
@@ -56,14 +88,6 @@
 <category>site-architecture</category><category>sqlite</category><category>github-pages</category><category>seo</category><category>content-system</category><category>technical</category>
   </item>
   <item>
-    <title>Career Trajectory as Platform Ownership, Not Job Titles</title>
-    <link>https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html</link>
-    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html</guid>
-    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
-    <description>A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression.</description>
-<category>career</category><category>leadership</category><category>platform-ownership</category><category>delivery</category><category>engineering-growth</category><category>technical</category>
-  </item>
-  <item>
     <title>From Mobile Developer to AI Accelerated Engineer</title>
     <link>https://ac-opensource.github.io/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html</link>
     <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html</guid>
@@ -72,20 +96,12 @@
 <category>ai-workflow</category><category>engineering</category><category>delivery</category><category>scope</category><category>systems-thinking</category><category>technical</category>
   </item>
   <item>
-    <title>Cognitive Profile Deep Dive: Emergenetics + Harrison</title>
-    <link>https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html</link>
-    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html</guid>
+    <title>Prompt Patterns That Consistently Produce Production-Ready Code</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html</guid>
     <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
-    <description>A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.</description>
-<category>emergenetics</category><category>harrison</category><category>paradox</category><category>self-awareness</category><category>leadership</category><category>reflection</category>
-  </item>
-  <item>
-    <title>Case Study: MySTC at Telecom Scale</title>
-    <link>https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</link>
-    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</guid>
-    <pubDate>Wed, 05 Feb 2025 00:00:00 GMT</pubDate>
-    <description>How we delivered high-traffic telecom account flows with tighter performance budgets, multi-language support, and predictable release execution.</description>
-<category>MySTC</category><category>Android</category><category>Kotlin</category><category>Telecom</category><category>work</category>
+    <description>The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.</description>
+<category>ai-workflow</category><category>prompting</category><category>engineering</category><category>delivery</category><category>quality</category><category>technical</category>
   </item>
   <item>
     <title>A Month in New Zealand</title>
@@ -94,6 +110,14 @@
     <pubDate>Wed, 05 Feb 2025 00:00:00 GMT</pubDate>
     <description>Family holidays in Auckland, a compressed South Island road trip, and the surprise of catching the Aurora Australis.</description>
 <category>Travel</category><category>Family</category><category>Reflection</category><category>hobby</category>
+  </item>
+  <item>
+    <title>Case Study: MySTC at Telecom Scale</title>
+    <link>https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</guid>
+    <pubDate>Wed, 05 Feb 2025 00:00:00 GMT</pubDate>
+    <description>How we delivered high-traffic telecom account flows with tighter performance budgets, multi-language support, and predictable release execution.</description>
+<category>MySTC</category><category>Android</category><category>Kotlin</category><category>Telecom</category><category>work</category>
   </item>
   <item>
     <title>Quiet Systems: Reflection Rituals For Builders</title>

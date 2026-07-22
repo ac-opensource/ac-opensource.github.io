@@ -3,10 +3,11 @@
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
 <title>About | Andrew Concepcion</title>
 <meta name="description" content="About Andrew Concepcion: AI-accelerated developer with 10+ years shipping Android, iOS, backend, and AI-assisted product work across fintech, telecom, transport, rewards, safety, and e-commerce.">
 <link rel="canonical" href="https://ac-opensource.github.io/about.html"/>
+<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="website"/>
@@ -22,7 +23,8 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<link href="/assets/css/neural-background.css?v=20260722-flow5" rel="stylesheet"/>
+<link href="/assets/css/profile-map.css?v=20260722-flow6" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -108,6 +110,7 @@
     </style>
 </head>
 <body class="font-body text-on-surface antialiased overflow-x-hidden">
+<a class="skip-link" href="#main-content">Skip to content</a>
 <div class="neural-global-bg" aria-hidden="true">
   <div class="neural-mesh-container">
     <div class="neural-mesh"></div>
@@ -129,22 +132,22 @@
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
     <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
       <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
-      <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/about.html" href="/about.html" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[about]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
     <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
   </div>
   <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
     <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
     <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
-    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/about.html" href="/about.html" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[about]</a>
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<main class="pt-32 md:pt-24 pb-12">
+<main class="pt-32 md:pt-24 pb-12" id="main-content">
 <!-- Hero Section with Animated Background -->
 <section class="relative mb-24 overflow-hidden bg-surface-container-low min-h-[60vh] flex items-center">
 <div class="absolute inset-0 bg-gradient-to-br from-surface-container-lowest/60 via-transparent to-tertiary/5 z-0"></div>
@@ -186,6 +189,101 @@
 </div>
 </div>
 </section>
+<!-- Evidence Profile Map -->
+<section class="max-w-7xl mx-auto px-6 md:px-12 mb-24" id="profile-map" aria-labelledby="profile-map-heading">
+<div class="profile-map" data-profile-map data-profile-map-mode="full" data-profile-map-default="engineering">
+  <div class="profile-map__topline">
+    <span class="profile-map__eyebrow">[HOW IT CONNECTS]</span>
+    <span class="profile-map__status" data-profile-map-status>[select a point]</span>
+  </div>
+  <h2 class="profile-map__heading" id="profile-map-heading">How my work connects.</h2>
+  <p class="profile-map__intro">I started in mobile and kept following the hard parts: backend systems, shared native code, reliability, technical leadership, and AI-assisted delivery. Away from a screen, it’s family, trails, cameras, telescopes, books, and small ventures.</p>
+  <div class="profile-map__tabs" role="tablist" aria-label="Profile map dataset">
+    <button class="profile-map__tab" type="button" role="tab" aria-selected="true" aria-controls="about-profile-map-panel" data-profile-map-tab="engineering">Engineering</button>
+    <button class="profile-map__tab" type="button" role="tab" aria-selected="false" aria-controls="about-profile-map-panel" data-profile-map-tab="interests" tabindex="-1">Interests</button>
+  </div>
+  <div class="profile-map__stage" id="about-profile-map-panel" role="tabpanel">
+    <div class="profile-map__visual" data-profile-map-visual>
+      <div class="profile-map__popover" data-profile-map-readout role="dialog" aria-modal="false" aria-live="polite" hidden></div>
+    </div>
+    <aside class="profile-map__side" aria-label="Profile map context">
+      <h3 class="profile-map__dataset-title" data-profile-map-dataset-title>Engineering</h3>
+      <p class="profile-map__dataset-description" data-profile-map-dataset-description>I build across Android, iOS, backend systems, and shared code, with architecture, reliability, and delivery running through it all.</p>
+      <div class="profile-map__legend" aria-label="Relationship legend">
+        <span class="profile-map__legend-item"><span class="profile-map__legend-line" aria-hidden="true"></span><span>In work I’ve shipped</span></span>
+        <span class="profile-map__legend-item"><span class="profile-map__legend-line profile-map__legend-line--dashed" aria-hidden="true"></span><span>In my writing / profile</span></span>
+      </div>
+      <p class="profile-map__method">Choose a point for the story behind it.</p>
+    </aside>
+  </div>
+  <div class="profile-map__fallback">
+    <section class="profile-map__fallback-panel" id="about-profile-engineering" data-profile-map-fallback-panel="engineering">
+      <h3>Engineering profile</h3>
+      <div class="profile-map__fallback-grid">
+        <div class="profile-map__fallback-group"><strong>Surfaces</strong><ul><li>Android</li><li>iOS</li><li>Backend APIs</li><li>Shared native core</li></ul></div>
+        <div class="profile-map__fallback-group"><strong>Languages</strong><ul><li>Kotlin</li><li>Swift / Objective-C</li><li>Java</li><li>SQL / Postgres / PostGIS</li><li>Rust / UniFFI</li><li>JavaScript / Node</li></ul></div>
+        <div class="profile-map__fallback-group"><strong>Craft</strong><ul><li>Clean / modular architecture</li><li>Reliability / performance</li><li>CI/CD / release hardening</li><li>Jetpack Compose</li><li>Testing / visual QA</li><li>Async / reactive data</li><li>Privacy / security</li></ul></div>
+        <div class="profile-map__fallback-group"><strong>Delivery</strong><ul><li>Technical leadership</li><li>Cross-functional delivery</li><li>AI-assisted engineering</li><li>Agent memory / orchestration</li></ul></div>
+      </div>
+    </section>
+    <section class="profile-map__fallback-panel" id="about-profile-interests" data-profile-map-fallback-panel="interests">
+      <h3>Interests</h3>
+      <div class="profile-map__fallback-grid">
+        <div class="profile-map__fallback-group"><strong>Place</strong><ul><li>Travel</li><li>Outdoors</li><li>Family time</li></ul></div>
+        <div class="profile-map__fallback-group"><strong>Observation</strong><ul><li>Photography</li><li>Astronomy</li></ul></div>
+        <div class="profile-map__fallback-group"><strong>Reflection</strong><ul><li>Reflective practice</li><li>Philosophy</li><li>Fitness</li></ul></div>
+        <div class="profile-map__fallback-group"><strong>Building</strong><ul><li>Small ventures</li><li>Financial independence</li></ul></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<details class="profile-map-evidence" id="profile-map-evidence">
+  <summary>Sources and map key</summary>
+  <div class="profile-map-evidence__body">
+    <p>These maps bring together my engineering work and personal interests. Topics connect when they appear together in the same source. Solid lines come from shipped work or public projects; dashed lines come from writing or profile material. Every point is the same size, so this is not a proficiency score. The table below lists the sources behind each topic.</p>
+    <div class="profile-map-evidence__table-wrap">
+      <table>
+        <caption class="sr-only">Sources for Andrew Concepcion’s engineering skills and personal interests</caption>
+        <thead><tr><th scope="col">Group</th><th scope="col">Topic</th><th scope="col">Sources</th><th scope="col">How it shows up</th></tr></thead>
+        <tbody>
+          <tr id="profile-map-evidence-android"><td>Engineering / Surfaces</td><th scope="row">Android</th><td><a href="/resume.html">Resume</a>; <a href="/work.html">work</a>; <a href="/blog/case-study-mystc-scale-and-reliability.html">MySTC</a></td><td>Long-running native delivery across banking, telecom, transport, rewards, and safety products.</td></tr>
+          <tr id="profile-map-evidence-ios"><td>Engineering / Surfaces</td><th scope="row">iOS</th><td><a href="/resume.html">Resume</a>; <a href="/blog/case-study-ocbc-banking-experience.html">OCBC</a>; <a href="/blog/2026-04-07-one-rust-core-across-android-and-ios.html">Rust core</a></td><td>Shipped iOS work, feature parity, and native integration.</td></tr>
+          <tr id="profile-map-evidence-backend-apis"><td>Engineering / Surfaces</td><th scope="row">Backend APIs</th><td><a href="https://github.com/ac-opensource/persons-finder">Persons Finder</a>; <a href="/blog/case-study-owto-ride-hailing-platform.html">OWTO</a>; <a href="/blog/case-study-websafety-parental-controls.html">WebSafety</a></td><td>API delivery across geospatial, transport, and safety systems.</td></tr>
+          <tr id="profile-map-evidence-shared-native"><td>Engineering / Surfaces</td><th scope="row">Shared native core</th><td><a href="/blog/2026-04-07-one-rust-core-across-android-and-ios.html">Rust core</a>; <a href="/blog/2024-05-22-building-with-kotlin-and-swift.html">Kotlin and Swift</a></td><td>Shared behavior surfaced through multiplatform and Rust-native boundaries.</td></tr>
+          <tr id="profile-map-evidence-kotlin"><td>Engineering / Languages</td><th scope="row">Kotlin</th><td><a href="/resume.html">Resume</a>; <a href="/work.html">work</a>; <a href="/blog/case-study-mystc-scale-and-reliability.html">MySTC</a></td><td>Primary production language across Android and shared-code work.</td></tr>
+          <tr id="profile-map-evidence-swift"><td>Engineering / Languages</td><th scope="row">Swift / Objective-C</th><td><a href="/resume.html">Resume</a>; <a href="/blog/case-study-ocbc-banking-experience.html">OCBC</a>; <a href="/blog/2024-05-22-building-with-kotlin-and-swift.html">Kotlin and Swift</a></td><td>Native Apple-platform delivery across modern and established code.</td></tr>
+          <tr id="profile-map-evidence-java"><td>Engineering / Languages</td><th scope="row">Java</th><td><a href="/resume.html">Resume</a>; <a href="/blog/2026-03-26-career-trajectory-platform-ownership.html">career trajectory</a></td><td>Production Android experience and modernization of established codebases.</td></tr>
+          <tr id="profile-map-evidence-sql-postgis"><td>Engineering / Languages</td><th scope="row">SQL / Postgres / PostGIS</th><td><a href="https://github.com/ac-opensource/persons-finder">Persons Finder</a>; <a href="/blog/2026-07-21-what-building-persons-finder-taught-me.html">retrospective</a></td><td>Relational and geospatial queries, migrations, and real-database tests.</td></tr>
+          <tr id="profile-map-evidence-rust-uniffi"><td>Engineering / Languages</td><th scope="row">Rust / UniFFI</th><td><a href="/blog/2026-04-07-one-rust-core-across-android-and-ios.html">Rust core</a>; <a href="/resume.html">resume</a></td><td>Recent shared-native work and platform-specific packaging.</td></tr>
+          <tr id="profile-map-evidence-javascript-node"><td>Engineering / Languages</td><th scope="row">JavaScript / Node</th><td><a href="https://github.com/ac-opensource/ac-opensource.github.io">Portfolio build repository</a></td><td>Node-based publishing, authoring tools, verification scripts, and browser-side enhancements.</td></tr>
+          <tr id="profile-map-evidence-architecture"><td>Engineering / Craft</td><th scope="row">Clean / modular architecture</th><td><a href="/resume.html">Resume</a>; <a href="/blog/case-study-mystc-scale-and-reliability.html">MySTC</a>; <a href="/blog/case-study-owto-ride-hailing-platform.html">OWTO</a></td><td>Boundary-focused architecture across mobile, backend, and shared-native systems.</td></tr>
+          <tr id="profile-map-evidence-reliability"><td>Engineering / Craft</td><th scope="row">Reliability / performance</th><td><a href="/work.html">Work</a>; <a href="/blog/case-study-mystc-scale-and-reliability.html">MySTC</a>; <a href="/blog/case-study-ocbc-banking-experience.html">OCBC</a></td><td>Performance, stability, synchronization, and production hardening.</td></tr>
+          <tr id="profile-map-evidence-release"><td>Engineering / Craft</td><th scope="row">CI/CD / release hardening</th><td><a href="/resume.html">Resume</a>; <a href="/blog/2026-07-21-what-building-persons-finder-taught-me.html">Persons Finder notes</a>; <a href="/blog/2026-04-30-agents-that-leave-receipts.html">agent receipts</a></td><td>Build, verification, release, and traceability practices.</td></tr>
+          <tr id="profile-map-evidence-compose"><td>Engineering / Craft</td><th scope="row">Jetpack Compose</th><td><a href="/resume.html">Resume</a>; <a href="/work.html">work</a>; <a href="/blog/2024-10-08-running-ai-fleet-learnings.html">AI fleet</a></td><td>Production UI delivery and architecture in Compose.</td></tr>
+          <tr id="profile-map-evidence-testing-qa"><td>Engineering / Craft</td><th scope="row">Testing / visual QA</th><td><a href="/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html">Visual QA</a>; <a href="/blog/2026-07-21-what-building-persons-finder-taught-me.html">Persons Finder notes</a></td><td>Unit, integration, real-database, browser, and visual verification.</td></tr>
+          <tr id="profile-map-evidence-async-reactive"><td>Engineering / Craft</td><th scope="row">Async / reactive data</th><td><a href="/resume.html">Resume</a>; <a href="/blog/case-study-mystc-scale-and-reliability.html">MySTC</a></td><td>Coroutines, Flow, RxJava, RxKotlin, and synchronization patterns.</td></tr>
+          <tr id="profile-map-evidence-privacy-security"><td>Engineering / Craft</td><th scope="row">Privacy / security</th><td><a href="/blog/case-study-websafety-parental-controls.html">WebSafety</a>; <a href="/resume.html">resume</a></td><td>Security-sensitive features, parental controls, permissions, and privacy-aware delivery.</td></tr>
+          <tr id="profile-map-evidence-leadership"><td>Engineering / Delivery</td><th scope="row">Technical leadership</th><td><a href="/resume.html">Resume</a>; <a href="/blog/case-study-mystc-scale-and-reliability.html">MySTC</a>; <a href="/blog/case-study-owto-ride-hailing-platform.html">OWTO</a></td><td>Technical direction, team leadership, mentoring, and architecture ownership.</td></tr>
+          <tr id="profile-map-evidence-cross-functional"><td>Engineering / Delivery</td><th scope="row">Cross-functional delivery</th><td><a href="/resume.html">Resume</a>; <a href="/blog/case-study-ocbc-banking-experience.html">OCBC</a>; <a href="/blog/case-study-owto-ride-hailing-platform.html">OWTO</a></td><td>Delivery across product, design, backend, Android, and iOS boundaries.</td></tr>
+          <tr id="profile-map-evidence-ai-engineering"><td>Engineering / Delivery</td><th scope="row">AI-assisted engineering</th><td><a href="/blog/2024-10-08-running-ai-fleet-learnings.html">AI fleet</a>; <a href="/blog/2026-04-30-agents-that-leave-receipts.html">agent receipts</a>; <a href="/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html">visual QA</a></td><td>AI-assisted planning, implementation, verification, and handoff workflows.</td></tr>
+          <tr id="profile-map-evidence-agent-memory"><td>Engineering / Delivery</td><th scope="row">Agent memory / orchestration</th><td><a href="/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html">MemPalace</a>; <a href="/blog/2026-04-30-agents-that-leave-receipts.html">agent receipts</a></td><td>Local memory, evidence-first retrieval, orchestration, and re-verifiable receipts.</td></tr>
+          <tr id="profile-map-evidence-travel"><td>Interests / Place</td><th scope="row">Travel</th><td><a href="/blog/2024-11-02-sunrise-trail-runs.html">Family trip</a>; <a href="/blog/2024-09-14-film-photography-gallery.html">photography</a></td><td>Family travel and exploration documented through writing and images.</td></tr>
+          <tr id="profile-map-evidence-outdoors"><td>Interests / Place</td><th scope="row">Outdoors</th><td><a href="/blog/2024-11-02-sunrise-trail-runs.html">Family trip</a>; <a href="/blog/2024-09-14-film-photography-gallery.html">photography</a></td><td>Trails, alpine landscapes, stargazing, and time outside.</td></tr>
+          <tr id="profile-map-evidence-family-time"><td>Interests / Place</td><th scope="row">Family time</th><td><a href="/blog/2024-11-02-sunrise-trail-runs.html">Family trip</a>; public personal profile</td><td>Family life recurs in the public travel writing and profile.</td></tr>
+          <tr id="profile-map-evidence-photography-interest"><td>Interests / Observation</td><th scope="row">Photography</th><td><a href="/blog/2024-09-14-film-photography-gallery.html">Photography gallery</a>; <a href="/blog/2024-11-02-sunrise-trail-runs.html">family trip</a></td><td>A slower observational practice and record of travel.</td></tr>
+          <tr id="profile-map-evidence-astronomy"><td>Interests / Observation</td><th scope="row">Astronomy</th><td><a href="/blog/2024-09-14-film-photography-gallery.html">Photography gallery</a>; <a href="/blog/2024-11-02-sunrise-trail-runs.html">family trip</a></td><td>Moon, planets, auroras, dark skies, and telescope observation.</td></tr>
+          <tr id="profile-map-evidence-reflective-practice"><td>Interests / Reflection</td><th scope="row">Reflective practice</th><td><a href="/blog/2024-11-21-quiet-systems-reflection.html">Quiet systems</a>; <a href="/blog/2024-09-14-film-photography-gallery.html">photography</a></td><td>Writing, observation, and deliberate pauses as feedback loops.</td></tr>
+          <tr id="profile-map-evidence-philosophy"><td>Interests / Reflection</td><th scope="row">Philosophy</th><td><a href="/blog/2024-11-21-quiet-systems-reflection.html">Quiet systems</a>; public personal profile</td><td>Reading and reflection beyond the shipping calendar.</td></tr>
+          <tr id="profile-map-evidence-fitness"><td>Interests / Reflection</td><th scope="row">Fitness</th><td><a href="/blog/2024-11-02-sunrise-trail-runs.html">Trail runs</a>; public personal profile</td><td>Trail running and fitness as recurring personal practices.</td></tr>
+          <tr id="profile-map-evidence-small-ventures"><td>Interests / Building</td><th scope="row">Small ventures</th><td>Public personal profile</td><td>Explicitly described hospitality and laundry experiments.</td></tr>
+          <tr id="profile-map-evidence-financial-independence"><td>Interests / Building</td><th scope="row">Financial independence</th><td>Public personal profile</td><td>An explicitly stated long-term direction connected to small ventures.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</details>
+</section>
 <!-- Assessment Signals -->
 <section class="max-w-7xl mx-auto px-6 md:px-12 mb-24">
 <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
@@ -202,7 +300,7 @@
 </div>
 </div>
 <p class="text-secondary font-light leading-relaxed max-w-2xl">
-                Thinking blend from your personal app profile, with behavior percentiles used as day-to-day collaboration signals.
+                Thinking blend from my published profile, with behavior percentiles used as day-to-day collaboration signals.
               </p>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
 <div class="space-y-4">
@@ -274,7 +372,7 @@
 </div>
 </div>
 <p class="text-secondary font-light leading-relaxed">
-                Selected Harrison indicators that best match your operating style in delivery, architecture, and team collaboration.
+                Selected Harrison indicators that best match my operating style in delivery, architecture, and team collaboration.
               </p>
 <ul class="mt-8 space-y-3">
 <li class="flex items-center justify-between border-b border-outline-variant/20 pb-2 text-sm">
@@ -394,12 +492,25 @@
 <section class="max-w-7xl mx-auto px-6 md:px-12 mb-24">
 <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
 <h2 class="text-4xl font-headline font-bold uppercase tracking-tight">The Lab Journal</h2>
-<p class="text-secondary text-sm font-label uppercase tracking-widest">[Personal + Hobby Entries Pulled From SQLite]</p>
+<p class="text-secondary text-sm font-label uppercase tracking-widest">[Personal + Hobby Entries From Published Manifest]</p>
 </div>
 <div id="about-lab-journal" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-<div class="md:col-span-3 bg-surface-container-low p-10 border border-outline-variant/10 text-secondary font-light">
-Loading personal and hobby entries...
-</div>
+<article class="md:col-span-2 bg-surface-container-low p-10 min-h-[360px] border border-outline-variant/10 flex flex-col justify-between">
+  <div>
+    <div class="font-label text-[10px] uppercase text-tertiary mb-6 tracking-[0.2em] font-bold">[ENTRY_01: TRAVEL]</div>
+    <a href="/blog/2024-11-02-sunrise-trail-runs.html" class="block text-3xl font-headline font-bold mb-6 leading-tight hover:text-tertiary transition-colors">Sunrise, Trail Runs, and a Family Trip</a>
+    <p class="text-secondary text-lg font-light leading-relaxed">A public travel reflection connecting family time, alpine landscapes, trail running, auroras, and the small moments that survive an itinerary.</p>
+  </div>
+  <a href="/blog/2024-11-02-sunrise-trail-runs.html" class="mt-8 font-label text-[10px] uppercase tracking-widest text-tertiary hover:text-tertiary-dim">[READ_ENTRY]</a>
+</article>
+<article class="bg-surface-container-highest p-10 border-t-4 border-tertiary shadow-sm min-h-[360px] flex flex-col justify-between">
+  <div>
+    <div class="font-label text-[10px] uppercase text-outline mb-6 tracking-[0.2em] font-bold">[ENTRY_02: PHOTOGRAPHY]</div>
+    <a href="/blog/2024-09-14-film-photography-gallery.html" class="block text-2xl font-headline font-bold mb-6 leading-tight hover:text-tertiary transition-colors">Film Photography Gallery</a>
+    <p class="text-secondary font-light leading-relaxed">Photography as a slower observational feedback loop across landscapes, moonlight, and travel.</p>
+  </div>
+  <a href="/blog/2024-09-14-film-photography-gallery.html" class="mt-8 font-label text-[10px] uppercase tracking-widest text-tertiary hover:text-tertiary-dim">[READ_ENTRY]</a>
+</article>
 </div>
 </section>
 <!-- Tech Stack Grid -->
@@ -456,14 +567,14 @@ Loading personal and hobby entries...
   <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
     <span>© 2026 Andrew Concepcion</span>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[source]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
   </div>
 </footer>
-<script src="/assets/js/blog-sqlite.js"></script>
+<script src="/assets/js/profile-map.js?v=20260722-flow6"></script>
 <script>
   (() => {
     const labJournalRoot = document.getElementById("about-lab-journal");
@@ -695,24 +806,18 @@ Loading personal and hobby entries...
     }
 
     async function hydrateLabJournal() {
-      if (!window.blogSqlite || !labJournalRoot) return;
+      if (!labJournalRoot) return;
       try {
-        const allPosts = await window.blogSqlite.getPosts();
+        const response = await fetch("/blog/posts.json", { headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error(`Post manifest request failed: ${response.status}`);
+        const allPosts = await response.json();
+        if (!Array.isArray(allPosts)) throw new Error("Post manifest is not an array");
         const personalPosts = allPosts.filter(isNonTechnicalPost).slice(0, 3);
         renderLabJournal(personalPosts);
       } catch (error) {
         renderFallbackState(`Unable to load entries: ${error.message}`);
       }
     }
-
-    const path = window.location.pathname.replace(/\/index\.html$/, "/");
-    document.querySelectorAll("#site-nav .site-nav-link").forEach((link) => {
-      const route = link.dataset.route;
-      const active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
-      if (active) {
-        link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
-      }
-    });
 
     hydrateLabJournal();
   })();

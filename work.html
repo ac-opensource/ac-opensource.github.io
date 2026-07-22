@@ -3,10 +3,11 @@
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
 <title>Work | Andrew Concepcion</title>
 <meta name="description" content="Selected work from Andrew Concepcion, an AI-Accelerated Developer with deep platform knowledge: architecture systems, performance tooling, and high-output cross-platform delivery.">
 <link rel="canonical" href="https://ac-opensource.github.io/work.html"/>
+<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="website"/>
@@ -21,7 +22,6 @@
 <meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/new-zealand-aurora.png"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&amp;family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="/assets/css/neural-background.css" rel="stylesheet"/>
 <script id="tailwind-config">
@@ -100,6 +100,7 @@
     </style>
 </head>
 <body class="bg-background text-on-background font-body selection:bg-tertiary selection:text-on-tertiary overflow-x-hidden">
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="neural-global-bg" aria-hidden="true">
   <div class="neural-mesh-container">
     <div class="neural-mesh"></div>
@@ -121,7 +122,7 @@
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
     <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+      <a data-route="/work.html" href="/work.html" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
       <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
@@ -130,33 +131,50 @@
   </div>
   <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
     <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+    <a data-route="/work.html" href="/work.html" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
     <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
     <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<main class="relative z-10 max-w-7xl mx-auto px-6 pt-32 md:pt-24 pb-12">
+<main id="main" class="relative z-10 max-w-7xl mx-auto px-6 pt-32 md:pt-24 pb-12">
   <header class="mb-14 border-l-4 border-tertiary pl-8">
     <div class="font-label text-tertiary text-sm tracking-widest mb-2">[source: portfolio-app/projects.kt]</div>
     <h1 class="font-headline text-5xl md:text-6xl font-bold tracking-tighter text-on-background">Shipped Product Portfolio</h1>
     <p class="mt-4 text-secondary max-w-3xl text-lg leading-relaxed">
-      Production projects pulled from your mobile portfolio app: fintech, telco, ride-hailing, adtech, parental safety, and community data tooling.
+      Selected production work across fintech, telecom, transport, rewards, safety, identity, and community data tooling.
     </p>
   </header>
 
   <section class="mb-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <article id="featured-project" class="lg:col-span-8 bg-surface-container-low border border-outline-variant/20 p-5 md:p-8 min-h-[420px]"></article>
+    <article id="featured-project" class="lg:col-span-8 bg-surface-container-low border border-outline-variant/20 p-5 md:p-8 min-h-[420px]">
+      <div class="flex items-center justify-between gap-3 mb-5">
+        <span class="font-label text-[10px] tracking-widest uppercase text-outline">[featured_case]</span>
+        <span class="font-label text-[10px] tracking-widest uppercase text-tertiary">[10m+ installs]</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-6">
+        <div class="bg-surface-container-high border border-outline-variant/20 p-4 min-h-[260px] flex items-center justify-center">
+          <img src="/assets/images/work/img_mystc_app-optimized.webp" alt="MySTC app screenshot" class="w-full h-[260px] md:h-[360px] object-contain" width="632" height="1322" fetchpriority="high" decoding="async"/>
+        </div>
+        <div class="flex flex-col">
+          <h2 class="font-headline text-4xl font-bold tracking-tight">MySTC</h2>
+          <p class="text-secondary text-base leading-relaxed my-5">Telecom-scale Android product where I led five senior engineers and delivered modular, multilingual reliability and performance improvements.</p>
+          <p class="font-label text-[10px] uppercase tracking-widest text-outline mb-2">[evidence]</p>
+          <ul class="space-y-1 text-sm text-secondary"><li>— Kotlin and Java delivery</li><li>— Architecture and data synchronization</li><li>— Team leadership and release confidence</li></ul>
+          <a class="mt-6 inline-flex items-center gap-2 text-[11px] font-label uppercase tracking-widest text-tertiary" href="/blog/case-study-mystc-scale-and-reliability.html">[Read case study]</a>
+        </div>
+      </div>
+    </article>
     <aside class="lg:col-span-4 bg-surface-container-highest border border-outline-variant/20 p-5 md:p-8">
       <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-3">[source_summary]</div>
       <h2 class="font-headline text-2xl font-bold tracking-tight mb-4">Portfolio App Sync</h2>
       <p class="text-sm leading-relaxed text-secondary mb-6">
-        This section mirrors production project metadata from Andrew’s Android portfolio repository, pairing each entry with its original screenshot and brand identity.
+        This section pairs public project context with representative product screenshots, brand identity, and deeper delivery evidence.
       </p>
       <dl class="space-y-4 text-sm">
         <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
           <dt class="font-label uppercase text-[10px] text-outline">[projects]</dt>
-          <dd id="source-project-count" class="font-headline text-xl font-bold text-tertiary">08</dd>
+          <dd id="source-project-count" class="font-headline text-xl font-bold text-tertiary">10</dd>
         </div>
         <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
           <dt class="font-label uppercase text-[10px] text-outline">[reported_installs]</dt>
@@ -174,7 +192,17 @@
     </aside>
   </section>
 
-  <section id="project-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></section>
+  <section id="project-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6" aria-label="Selected projects">
+    <article class="bg-surface-container-low border border-outline-variant/20 p-5"><h3 class="font-headline text-3xl font-bold">OCBC</h3><p class="mt-3 text-secondary">Mobile banking delivery across onboarding, accounts, transfers, verification, performance, and unit-tested SDK integrations.</p><a class="inline-block mt-4 text-tertiary font-label text-xs uppercase" href="/blog/case-study-ocbc-banking-experience.html">[Read case study]</a></article>
+    <article class="bg-surface-container-low border border-outline-variant/20 p-5"><h3 class="font-headline text-3xl font-bold">openpay</h3><p class="mt-3 text-secondary">BNPL checkout, merchant discovery, UI responsiveness, partner integrations, and release hardening.</p><a class="inline-block mt-4 text-tertiary font-label text-xs uppercase" href="/blog/case-study-openpay-bnpl-experience.html">[Read case study]</a></article>
+    <article class="bg-surface-container-low border border-outline-variant/20 p-5"><h3 class="font-headline text-3xl font-bold">Solo</h3><p class="mt-3 text-secondary">Whitelabel food-delivery Android work spanning legacy integration, Retrofit APIs, production fixes, and feature delivery.</p><a class="inline-block mt-4 text-tertiary font-label text-xs uppercase" href="/blog/case-study-solo-whitelabel-delivery-platform.html">[Read case study]</a></article>
+    <article class="bg-surface-container-low border border-outline-variant/20 p-5"><h3 class="font-headline text-3xl font-bold">OWTO</h3><p class="mt-3 text-secondary">Cross-functional Android, iOS, and backend leadership for real-time ride booking, payments, GPS, and APIs.</p><a class="inline-block mt-4 text-tertiary font-label text-xs uppercase" href="/blog/case-study-owto-ride-hailing-platform.html">[Read case study]</a></article>
+    <article class="bg-surface-container-low border border-outline-variant/20 p-5"><h3 class="font-headline text-3xl font-bold">Popslide</h3><p class="mt-3 text-secondary">Kotlin migration, experimentation, guardrails, caching, notifications, and monetization-critical reliability.</p><a class="inline-block mt-4 text-tertiary font-label text-xs uppercase" href="/blog/case-study-popslide-engagement-and-monetization.html">[Read case study]</a></article>
+    <article class="bg-surface-container-low border border-outline-variant/20 p-5"><h3 class="font-headline text-3xl font-bold">WebSafety</h3><p class="mt-3 text-secondary">Android, iOS, web, and backend delivery for security-sensitive parental controls, GPS, and synchronization.</p><a class="inline-block mt-4 text-tertiary font-label text-xs uppercase" href="/blog/case-study-websafety-parental-controls.html">[Read case study]</a></article>
+    <article class="bg-surface-container-low border border-outline-variant/20 p-5"><h3 class="font-headline text-3xl font-bold">ProjectBASS</h3><p class="mt-3 text-secondary">Open-source crowdsourced network mapping with Kotlin, carrier compatibility, and community data aggregation.</p><a class="inline-block mt-4 text-tertiary font-label text-xs uppercase" href="/blog/case-study-projectbass-crowdsourced-network-mapping.html">[Read case study]</a></article>
+    <article class="bg-surface-container-low border border-outline-variant/20 p-5"><h3 class="font-headline text-3xl font-bold">NTU Pass + NUS</h3><p class="mt-3 text-secondary">Android, Wear OS, and digital-identity delivery across phone and watch experiences.</p><a class="inline-block mt-4 text-tertiary font-label text-xs uppercase" href="https://play.google.com/store/apps/details?id=sg.edu.ntu.apps.ntusmartpass&amp;hl=en" target="_blank" rel="noreferrer">[Open listing]</a></article>
+    <article class="bg-surface-container-low border border-outline-variant/20 p-5"><h3 class="font-headline text-3xl font-bold">Aqua Expeditions</h3><p class="mt-3 text-secondary">Selected Android feature delivery and production support for a premium travel experience.</p><a class="inline-block mt-4 text-tertiary font-label text-xs uppercase" href="https://www.aquaexpeditions.com/home" target="_blank" rel="noreferrer">[Visit brand]</a></article>
+  </section>
 
   <section class="mt-16 bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 relative overflow-hidden">
     <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -198,7 +226,7 @@
   <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
     <span>© 2026 Andrew Concepcion</span>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[source]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
@@ -212,7 +240,7 @@
         name: "MySTC",
         desc: "App for Saudi Telecommunication Company (STC) consumer services: manage accounts and connections, order devices, and get support.",
         logo: "/assets/images/work/ic_stc_logo.png",
-        image: "/assets/images/work/img_mystc_app.png",
+        image: "/assets/images/work/img_mystc_app-optimized.webp",
         deepDivePath: "/blog/case-study-mystc-scale-and-reliability.html",
         techUsed: ["Kotlin", "Java", "MVVM", "Firebase", "SQLite"],
         challenges: ["Data synchronization", "Multi-language support"],
@@ -227,7 +255,7 @@
         name: "OCBC",
         desc: "Mobile banking and corporate finance management app for one of Singapore's largest banks.",
         logo: "/assets/images/work/ic_ocbc_logo.png",
-        image: "/assets/images/work/img_ocbc_app.png",
+        image: "/assets/images/work/img_ocbc_app-optimized.webp",
         deepDivePath: "/blog/case-study-ocbc-banking-experience.html",
         techUsed: ["Kotlin", "XML", "Firebase"],
         challenges: ["Charts customization", "Identity verification", "Concurrency handling", "Network optimization"],
@@ -238,7 +266,7 @@
         name: "openpay",
         desc: "BNPL shopping app experience focused on spend controls, merchant discovery, and frictionless checkout journeys.",
         logo: "/assets/images/work/ic_openpay_logo.svg",
-        image: "/assets/images/work/img_openpay_app.webp",
+        image: "/assets/images/work/img_openpay_app-optimized.webp",
         deepDivePath: "/blog/case-study-openpay-bnpl-experience.html",
         techUsed: ["Kotlin", "Jetpack", "Payments", "Feature Flags"],
         challenges: ["Checkout reliability", "Spending-limit UX", "Partner integrations"],
@@ -249,7 +277,7 @@
         name: "Solo",
         desc: "Whitelabel food delivery platform for brands including Burger King, Shawarma Classic, and Wayback Burgers.",
         logo: "/assets/images/work/ic_solo_logo.png",
-        image: "/assets/images/work/img_solo_app.png",
+        image: "/assets/images/work/img_solo_app-optimized.webp",
         deepDivePath: "/blog/case-study-solo-whitelabel-delivery-platform.html",
         techUsed: ["Kotlin", "XML Layouts", "Retrofit"],
         challenges: ["Legacy code integration", "API design"],
@@ -260,7 +288,7 @@
         name: "OWTO",
         desc: "Ride-hailing app for the Philippine market.",
         logo: "/assets/images/work/ic_owto_logo.webp",
-        image: "/assets/images/work/img_owto_app.png",
+        image: "/assets/images/work/img_owto_app-optimized.webp",
         deepDivePath: "/blog/case-study-owto-ride-hailing-platform.html",
         techUsed: ["Kotlin", "Swift", "Firebase", "Uber RIB Architecture", "Node.js", "Postgres"],
         challenges: ["Real-time GPS tracking", "Payment integration"],
@@ -276,7 +304,7 @@
         name: "Popslide",
         desc: "Cashback and rewards app with ad and task mechanics, including lockscreen ad/article experiences.",
         logo: "/assets/images/work/ic_popslide_logo.png",
-        image: "/assets/images/work/img_popslide_app.png",
+        image: "/assets/images/work/img_popslide_app-optimized.webp",
         deepDivePath: "/blog/case-study-popslide-engagement-and-monetization.html",
         techUsed: ["Kotlin", "Lockscreen", "Notifications", "Flux", "Firebase"],
         challenges: ["User engagement optimization", "Ad delivery optimization"],
@@ -287,7 +315,7 @@
         name: "WebSafety",
         desc: "Parental monitoring and control software for child smartphone/mobile-device safety.",
         logo: "/assets/images/work/ic_websafety_logo.webp",
-        image: "/assets/images/work/img_websafety_app.jpg",
+        image: "/assets/images/work/img_websafety_app-optimized.webp",
         deepDivePath: "/blog/case-study-websafety-parental-controls.html",
         techUsed: ["Java", "Objective-C", "AWS S3", "ElasticSearch"],
         challenges: ["Undocumented Android APIs", "GPS tracking", "Data syncing", "Security and privacy compliance"],
@@ -298,7 +326,7 @@
         name: "ProjectBASS",
         desc: "Crowdsourced bandwidth and signal-strength mapping app built by volunteers for volunteers.",
         logo: "/assets/images/work/ic_projectbass_logo.webp",
-        image: "/assets/images/work/img_projectbass_app.png",
+        image: "/assets/images/work/img_projectbass_app-optimized.webp",
         deepDivePath: "/blog/case-study-projectbass-crowdsourced-network-mapping.html",
         techUsed: ["Kotlin", "Retrofit"],
         challenges: ["Data aggregation", "Carrier compatibility"],
@@ -381,11 +409,11 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-6">
           <div class="bg-surface-container-high border border-outline-variant/20 p-4 min-h-[260px] flex items-center justify-center">
-            <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.name)} app screenshot" class="w-full h-[260px] md:h-[360px] object-contain" loading="lazy" decoding="async"/>
+            <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.name)} app screenshot" class="w-full h-[260px] md:h-[360px] object-contain" width="720" height="720" loading="eager" fetchpriority="high" decoding="async"/>
           </div>
           <div class="flex flex-col">
             <div class="flex items-center gap-3 mb-3">
-              <img src="${escapeHtml(project.logo)}" alt="${escapeHtml(project.name)} logo" class="w-9 h-9 object-contain bg-surface border border-outline-variant/20 p-1"/>
+              <img src="${escapeHtml(project.logo)}" alt="${escapeHtml(project.name)} logo" class="w-9 h-9 object-contain bg-surface border border-outline-variant/20 p-1" width="36" height="36"/>
               <h2 class="font-headline text-4xl font-bold tracking-tight">${escapeHtml(project.name)}</h2>
             </div>
             <p class="text-secondary text-base leading-relaxed mb-5">${escapeHtml(project.desc)}</p>
@@ -421,13 +449,13 @@
           <article class="bg-surface-container-low border border-outline-variant/20 p-5 flex flex-col gap-4 hover:border-tertiary/30 transition-colors">
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
-                <img src="${escapeHtml(project.logo)}" alt="${escapeHtml(project.name)} logo" class="w-8 h-8 object-contain bg-surface border border-outline-variant/20 p-1" loading="lazy" decoding="async"/>
+                <img src="${escapeHtml(project.logo)}" alt="${escapeHtml(project.name)} logo" class="w-8 h-8 object-contain bg-surface border border-outline-variant/20 p-1" width="32" height="32" loading="lazy" decoding="async"/>
                 <h3 class="font-headline text-3xl font-bold tracking-tight">${escapeHtml(project.name)}</h3>
               </div>
               <span class="font-label text-[10px] tracking-widest uppercase text-tertiary whitespace-nowrap">[${escapeHtml(project.downloads)}]</span>
             </div>
             <div class="bg-surface-container-high border border-outline-variant/10 p-3">
-              <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.name)} project screenshot" class="w-full h-48 object-contain" loading="lazy" decoding="async"/>
+              <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.name)} project screenshot" class="w-full h-48 object-contain" width="640" height="360" loading="lazy" decoding="async"/>
             </div>
             <p class="text-sm leading-relaxed text-secondary">${escapeHtml(project.desc)}</p>
             <div class="flex flex-wrap gap-2">
@@ -475,6 +503,7 @@
       const active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
       if (active) {
         link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+        link.setAttribute("aria-current", "page");
       }
     });
 

@@ -1,58 +1,57 @@
 # Andrew Concepcion Site
 
-Static multi-page portfolio/blog with SQLite-backed blog content.
+Static multi-page portfolio and technical blog. SQLite is the authoring-only source; the deployed website is a clean, published-only `dist/` artifact.
 
-## What this includes
+## Architecture
 
-- Digital Workbench-style homepage/about/blog views
-- SQLite-backed blog index (`/blog/index.html`) with static, SEO-ready blog post pages (`/blog/<slug>.html`)
-- Local WYSIWYG writer that saves posts directly into SQLite (`npm run blog:writer`)
-- Static asset references for blog images under `blog/images/`
+- `index.html`, `about.html`, `work.html`, `contact.html`, and `resume.html`: source pages for the public portfolio.
+- `assets/data/blog.sqlite`: authoring source of truth committed for reproducible builds. It is never copied to `dist/`.
+- `scripts/build-static-blog-pages.js`: generates published post pages, RSS, robots, and sitemap artifacts.
+- `scripts/build-site.js`: assembles a fresh allowlisted `dist/`, generates responsive image references, and compiles Tailwind locally.
+- `blog/posts.json`: published-only metadata used for progressive enhancement; article bodies stay in static HTML.
+- `assets/data/profile-map.json`: public evidence model for the Engineering and Interests flowing maps.
+- `scripts/blog-writer-server.js`: loopback-only writer API with a per-run session check.
+- `.github/workflows/pages.yml`: verifies and deploys only `dist/` from the default `2025` branch.
 
-## SQLite Blog Architecture
-
-- `assets/data/blog.sqlite`: source of truth for all blog post data
-- `assets/js/blog-sqlite.js`: browser client that loads and queries SQLite via `sql.js`
-- `scripts/lib/blog-db.js`: shared schema + upsert/query helpers for Node scripts
-- `scripts/init-blog-db.js`: creates schema
-- `scripts/import-blog-into-db.js`: imports existing `blog/posts.json` + post HTML into SQLite
-- `scripts/sync-blog-from-db.js`: exports DB metadata back to `blog/posts.json`
-- `scripts/build-static-blog-pages.js`: builds static blog post pages, `sitemap.xml`, and `robots.txt` from SQLite
-- `scripts/blog-writer-server.js`: local writer API + static writer page host
-- `blog/writer.html` + `assets/js/blog-writer-app.js`: WYSIWYG writer UI (Quill)
+Authoring files, hidden posts, preview routes, templates, databases, application materials, and stale generated pages are rejected from the publication artifact.
 
 ## Setup
 
-Install dependencies:
+Use the pinned Node version and install exactly the locked dependencies:
 
 ```bash
-npm install
+nvm use
+npm ci
 ```
 
-Initialize and seed SQLite from existing content:
+Initialize/import the blog database only when creating a fresh authoring store:
 
 ```bash
 npm run blog:db:init
 npm run blog:db:import
 ```
 
-Optional: sync DB metadata back to `blog/posts.json`:
+## Build and verify
 
-```bash
-npm run blog:db:sync
-```
-
-Build static blog post pages for GitHub Pages deployment:
-
-```bash
-npm run blog:build
-```
-
-Or run the full build pipeline (`posts.json` sync + static page generation):
+Build the clean public site:
 
 ```bash
 npm run build
 ```
+
+Run publication-boundary, deterministic-build, and writer-security checks:
+
+```bash
+npm run verify
+```
+
+Preview the artifact, never the repository root:
+
+```bash
+python3 -m http.server 4173 --directory dist
+```
+
+Then open `http://127.0.0.1:4173`.
 
 ## Writing workflow
 
@@ -62,15 +61,13 @@ Run the local writer:
 npm run blog:writer
 ```
 
-Open `http://localhost:4310`, write/edit in the WYSIWYG editor, and save. Entries are written into `assets/data/blog.sqlite`.
-For production/GitHub Pages, run `npm run blog:build` to generate static post pages and SEO artifacts.
+Open `http://127.0.0.1:4310`. Saved entries remain in `assets/data/blog.sqlite`; the public manifest and pages are produced only by the build.
 
-## Public Site Preview
+## Search and AI discovery
 
-Serve with any static server from repository root. Example:
+- `sitemap.xml` contains every indexable canonical route in `dist/` and only published posts.
+- `robots.txt` allows crawling and points to the sitemap.
+- `llms.txt`, RSS, JSON-LD, semantic static fallbacks, and the published post manifest provide machine-readable discovery paths.
+- Google indexing still requires deploying this artifact, completing URL-prefix ownership verification in Search Console, submitting `https://ac-opensource.github.io/sitemap.xml`, and requesting indexing for the homepage.
 
-```bash
-python3 -m http.server 8080
-```
-
-Then open `http://localhost:8080`.
+Google decides when and whether eligible pages appear in results; submission requests discovery and crawling but cannot guarantee ranking or inclusion.

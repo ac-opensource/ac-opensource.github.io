@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
   <title>Resume | Andrew Concepcion</title>
   <meta name="description" content="Resume for Andrew Concepcion, an AI-Accelerated Developer with deep platform knowledge, high-output delivery habits, and shipped product experience across Android, iOS, and backend systems."/>
   <link rel="canonical" href="https://ac-opensource.github.io/resume.html"/>
+  <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
   <meta name="robots" content="index,follow"/>
   <meta property="og:site_name" content="Andrew Concepcion"/>
   <meta property="og:type" content="website"/>
@@ -162,6 +163,7 @@
   </style>
 </head>
 <body class="font-body text-on-surface antialiased overflow-x-hidden">
+  <a class="skip-link" href="#main">Skip to content</a>
   <div class="neural-global-bg" aria-hidden="true">
     <div class="neural-mesh-container">
       <div class="neural-mesh"></div>
@@ -184,7 +186,7 @@
       <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
       <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
         <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-        <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+        <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
         <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
         <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
         <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
@@ -193,14 +195,14 @@
     </div>
     <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
       <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
   </header>
 
-  <main class="print-shell relative z-10 max-w-7xl mx-auto px-6 pt-32 md:pt-24 pb-12">
+  <main id="main" class="print-shell relative z-10 max-w-7xl mx-auto px-6 pt-32 md:pt-24 pb-12">
     <section class="mb-10 grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.9fr)] gap-6">
       <article class="print-card bg-surface-container-low border border-outline-variant/20 p-8 md:p-10">
         <div class="font-label text-tertiary text-sm tracking-widest mb-3 bracket-label">resume_snapshot</div>
@@ -445,62 +447,12 @@
     <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
       <span>© 2026 Andrew Concepcion</span>
       <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
-      <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[source]</a>
+      <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
       <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
       <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
       <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
       <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
     </div>
   </footer>
-  <script>
-    (function () {
-      const phoneRegion = document.querySelector("[data-phone-region]");
-      if (!phoneRegion || !window.fetch) return;
-
-      const phones = {
-        nz: { label: "+64 290 431 2382", href: "tel:+642904312382" },
-        ph: { label: "PH +63 917 815 4366", href: "tel:+639178154366" }
-      };
-
-      function renderPhones(showPhilippinesNumber) {
-        const visiblePhones = showPhilippinesNumber ? [
-          { label: "NZ " + phones.nz.label, href: phones.nz.href },
-          phones.ph
-        ] : [phones.nz];
-
-        phoneRegion.replaceChildren(...visiblePhones.map((phone) => {
-          const link = document.createElement("a");
-          link.className = "block hover:text-tertiary transition-colors";
-          link.href = phone.href;
-          link.textContent = phone.label;
-          return link;
-        }));
-      }
-
-      const phoneMode = new URLSearchParams(window.location.search).get("phone");
-      if (phoneMode === "all") {
-        renderPhones(true);
-        return;
-      }
-      if (phoneMode === "nz") {
-        renderPhones(false);
-        return;
-      }
-
-      fetch("https://get.geojs.io/v1/ip/country.json", {
-        cache: "no-store"
-      })
-        .then((response) => response.ok ? response.json() : null)
-        .then((location) => {
-          const country = String(location && location.country || "").toUpperCase();
-          if (country === "NZ" || country === "AU") {
-            renderPhones(false);
-          }
-        })
-        .catch(() => {
-          // Keep the static NZ + PH fallback when location lookup is unavailable.
-        });
-    })();
-  </script>
 </body>
 </html>

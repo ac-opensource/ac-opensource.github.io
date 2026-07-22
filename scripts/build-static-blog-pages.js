@@ -2,15 +2,18 @@ const fs = require("fs");
 const path = require("path");
 const {
   openDatabase,
-  ensureSchema,
+  assertSchema,
   getPostList,
   getPostWithTopics
 } = require("./lib/blog-db");
+const { resolvePublicImage } = require("./lib/public-images");
 
 const ROOT_DIR = path.join(__dirname, "..");
-const BLOG_DIR = path.join(ROOT_DIR, "blog");
 const SITE_ORIGIN = String(process.env.SITE_ORIGIN || "https://ac-opensource.github.io").replace(/\/+$/, "");
 const FALLBACK_HERO_IMAGE = "/blog/images/new-zealand-aurora.png";
+const GENERATED_PAGE_MARKER = "<!-- generated: scripts/build-static-blog-pages.js -->";
+const GENERATED_MANIFEST_NAME = path.join(".site-build", "generated-blog-pages.json");
+const GENERATOR_ID = "ac-opensource-static-blog-v1";
 
 function escapeHtml(value) {
   return String(value || "")
@@ -26,6 +29,31 @@ function stripHtml(value) {
     .replace(/<[^>]*>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function addImageDefaults(html) {
+  return String(html || "").replace(/<img\b([^>]*)>/gi, (match, attributes) => {
+    const selfClosing = /\/\s*$/.test(attributes);
+    const normalizedAttributes = attributes.replace(/\/\s*$/, "");
+    const srcMatch = normalizedAttributes.match(/\bsrc\s*=\s*(["'])([^"']+)\1/i);
+    const responsive = srcMatch ? resolvePublicImage(srcMatch[2]) : null;
+    let updatedAttributes = normalizedAttributes;
+
+    if (responsive && responsive.src && responsive.src !== srcMatch[2]) {
+      updatedAttributes = updatedAttributes.replace(srcMatch[0], `src=${srcMatch[1]}${responsive.src}${srcMatch[1]}`);
+    }
+
+    let defaults = "";
+    if (!/\bloading\s*=/i.test(updatedAttributes)) defaults += ' loading="lazy"';
+    if (!/\bdecoding\s*=/i.test(updatedAttributes)) defaults += ' decoding="async"';
+    if (responsive && responsive.srcset && !/\bsrcset\s*=/i.test(updatedAttributes)) {
+      defaults += ` srcset="${escapeHtml(responsive.srcset)}"`;
+    }
+    if (responsive && responsive.sizes && !/\bsizes\s*=/i.test(updatedAttributes)) {
+      defaults += ` sizes="${escapeHtml(responsive.sizes)}"`;
+    }
+    return `<img${updatedAttributes}${defaults}${selfClosing ? " /" : ""}>`;
+  });
 }
 
 function toAbsoluteUrl(raw) {
@@ -53,22 +81,76 @@ function postPath(slug) {
   return `/blog/${encodeURIComponent(slug)}.html`;
 }
 
+function buildBlogIndexFallback(posts, limit = 4) {
+  const articles = posts
+    .slice(0, limit)
+    .map((post) => {
+      const title = String(post.title || "").trim() || "Untitled";
+      const summary = String(post.summary || "").trim() || stripHtml(post.body_html).slice(0, 180);
+      const publishedDate = String(post.published_date || "").trim();
+      const readingTime = String(post.reading_time || "").trim() || "n/a";
+
+      return `  <article class="py-8 border-t border-outline-variant/20">
+    <time class="font-label text-xs text-outline" datetime="${escapeHtml(publishedDate)}">${escapeHtml(publishedDate)} · ${escapeHtml(readingTime)}</time>
+    <h2 class="font-headline text-3xl md:text-4xl font-bold leading-tight mt-3"><a class="hover:text-tertiary" href="${escapeHtml(postPath(post.slug))}">${escapeHtml(title)}</a></h2>
+    <p class="text-secondary text-lg leading-relaxed mt-3">${escapeHtml(summary)}</p>
+  </article>`;
+    })
+    .join("\n");
+
+  return `<section id="blog-feed" class="space-y-12" aria-label="Latest blog posts">
+${articles}
+</section>`;
+}
+
+function writeBlogIndexFallback(posts, outputBlogDir) {
+  const indexPath = path.join(outputBlogDir, "index.html");
+  if (!fs.existsSync(indexPath)) return false;
+
+  const indexHtml = fs.readFileSync(indexPath, "utf8");
+  const feedPattern =
+    /<section id="blog-feed" class="space-y-12" aria-label="Latest blog posts">[\s\S]*?<\/section>/;
+  if (!feedPattern.test(indexHtml)) {
+    throw new Error(`Cannot update the no-JavaScript blog feed in ${indexPath}.`);
+  }
+
+  fs.writeFileSync(
+    indexPath,
+    indexHtml.replace(feedPattern, buildBlogIndexFallback(posts)),
+    "utf8"
+  );
+  return true;
+}
+
+function parseDeterministicDate(raw) {
+  const value = String(raw || "").trim();
+  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)
+    ? `${value.replace(" ", "T")}Z`
+    : value;
+  return new Date(normalized);
+}
+
 function formatDisplayDate(raw) {
-  const date = new Date(raw);
+  const date = parseDeterministicDate(raw);
   if (Number.isNaN(date.getTime())) return raw || "";
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "long",
-    day: "numeric"
+    day: "numeric",
+    timeZone: "UTC"
   }).format(date);
 }
 
 function dateForSitemap(raw) {
-  const date = new Date(raw);
-  if (Number.isNaN(date.getTime())) {
-    return new Date().toISOString().slice(0, 10);
-  }
+  const date = parseDeterministicDate(raw);
+  if (Number.isNaN(date.getTime())) return null;
   return date.toISOString().slice(0, 10);
+}
+
+function dateForStructuredData(raw, fallback) {
+  const date = parseDeterministicDate(raw);
+  if (!Number.isNaN(date.getTime())) return date.toISOString();
+  return String(fallback || "").trim();
 }
 
 function isWorkPost(post) {
@@ -85,14 +167,21 @@ function buildStaticPostHtml({ post, previous, next }) {
   const summary = String(post.summary || "").trim() || stripHtml(post.body_html).slice(0, 180);
   const category = String(post.category || "log").trim() || "log";
   const isWorkDeepDive = isWorkPost(post);
+  const isReflection = category.toLowerCase() === "reflection";
   const publishedDate = String(post.published_date || "").trim();
   const readingTime = String(post.reading_time || "").trim() || "n/a";
-  const heroImage = toAssetUrl(post.hero_image);
-  const heroImageAbs = toAbsoluteUrl(post.hero_image);
+  const heroImageData = resolvePublicImage(toAssetUrl(post.hero_image));
+  const heroImage = heroImageData.src || toAssetUrl(post.hero_image);
+  const heroImageAbs = toAbsoluteUrl(heroImage);
+  const heroResponsiveAttributes = heroImageData.srcset
+    ? ` srcset="${escapeHtml(heroImageData.srcset)}" sizes="${escapeHtml(heroImageData.sizes)}"`
+    : "";
   const heroAlt = String(post.hero_alt || `${title} cover`).trim() || `${title} cover`;
+  const heroCaption = String(post.hero_caption || "").trim();
   const canonicalPath = postPath(post.slug);
   const canonicalUrl = `${SITE_ORIGIN}${canonicalPath}`;
-  const bodyHtml = String(post.body_html || "").trim() || `<p>${escapeHtml(summary)}</p>`;
+  const bodyHtml =
+    addImageDefaults(String(post.body_html || "").trim()) || `<p>${escapeHtml(summary)}</p>`;
   const tags = [...new Set([...(post.topics || []), category].filter(Boolean))];
   const articleTagsMeta = tags
     .map((tag) => `<meta property="article:tag" content="${escapeHtml(tag)}">`)
@@ -114,17 +203,26 @@ function buildStaticPostHtml({ post, previous, next }) {
   const nextHref = next ? postPath(next.slug) : fallbackNavPath;
   const nextTitle = next ? next.title : isWorkDeepDive ? "Return to Source" : "No next post";
   const navForceRoute = isWorkDeepDive ? "/work.html" : "/blog/";
+  const sourceCurrent = isWorkDeepDive ? ' aria-current="page"' : "";
+  const blogCurrent = isWorkDeepDive ? "" : ' aria-current="page"';
 
   const heroPanelHtml = isWorkDeepDive
     ? `
 <div class="lg:col-span-5 relative aspect-[4/5] bg-surface-container-low border border-outline-variant/20 overflow-hidden">
-<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="${escapeHtml(heroImage)}" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
 </div>
+`
+    : isReflection
+      ? `
+<figure class="lg:col-span-5 relative aspect-square bg-surface-container-low border border-outline-variant/20 p-3 overflow-hidden">
+<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+${heroCaption ? `<figcaption class="sr-only">${escapeHtml(heroCaption)}</figcaption>` : ""}
+</figure>
 `
     : `
 <div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
 <div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
-<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="${escapeHtml(heroImage)}" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
 </div>
 <div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
 <div class="flex justify-between items-start">
@@ -163,7 +261,7 @@ function buildStaticPostHtml({ post, previous, next }) {
         url: SITE_ORIGIN
       },
       datePublished: publishedDate,
-      dateModified: publishedDate,
+      dateModified: dateForStructuredData(post.updated_at, publishedDate),
       image: heroImageAbs,
       mainEntityOfPage: canonicalUrl
     },
@@ -171,11 +269,12 @@ function buildStaticPostHtml({ post, previous, next }) {
     2
   ).replace(/</g, "\\u003c");
 
-  return `<!DOCTYPE html>
+  return `${GENERATED_PAGE_MARKER}
+<!DOCTYPE html>
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
 <title>${escapeHtml(title)} | Andrew Concepcion</title>
 <meta name="description" content="${escapeHtml(summary)}"/>
 <link rel="canonical" href="${escapeHtml(canonicalUrl)}"/>
@@ -258,10 +357,17 @@ ${articleTagsMeta}
     80% { opacity: 1; }
     100% { opacity: 0; }
   }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-overlay-alpha {
+      animation: none;
+      opacity: 1;
+    }
+  }
 </style>
 <script type="application/ld+json">${structuredData}</script>
 </head>
 <body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
+<a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
 <div class="neural-global-bg" aria-hidden="true">
   <div class="neural-mesh-container">
     <div class="neural-mesh"></div>
@@ -283,8 +389,8 @@ ${articleTagsMeta}
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
     <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
-      <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+      <a data-route="/work.html" href="/work.html"${sourceCurrent} class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+      <a data-route="/blog/" href="/blog/"${blogCurrent} class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
@@ -292,13 +398,13 @@ ${articleTagsMeta}
   </div>
   <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
     <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
-    <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+    <a data-route="/work.html" href="/work.html"${sourceCurrent} class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+    <a data-route="/blog/" href="/blog/"${blogCurrent} class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
     <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<main class="pt-32 md:pt-24 pb-32">
+<main id="main-content" class="pt-32 md:pt-24 pb-32">
 <article class="max-w-screen-xl mx-auto px-6">
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[${escapeHtml(category.toLowerCase())}]</span>
@@ -366,7 +472,7 @@ ${heroPanelHtml}
   <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
     <span>© 2026 Andrew Concepcion</span>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[source]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
@@ -389,6 +495,9 @@ ${heroPanelHtml}
       }
       if (active) {
         link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
       }
     });
 
@@ -485,16 +594,22 @@ function escapeXml(value) {
     .replace(/'/g, "&apos;");
 }
 
-function writeSitemap(posts) {
+function writeSitemap(posts, outputRoot) {
+  const latestPostDate = posts
+    .map((post) => dateForSitemap(post.updated_at || post.published_date))
+    .filter(Boolean)
+    .sort()
+    .at(-1);
   const urls = [
-    { path: "/", lastmod: new Date().toISOString().slice(0, 10) },
-    { path: "/work.html", lastmod: new Date().toISOString().slice(0, 10) },
-    { path: "/about.html", lastmod: new Date().toISOString().slice(0, 10) },
-    { path: "/contact.html", lastmod: new Date().toISOString().slice(0, 10) },
-    { path: "/blog/", lastmod: new Date().toISOString().slice(0, 10) },
+    { path: "/" },
+    { path: "/work.html" },
+    { path: "/about.html" },
+    { path: "/contact.html" },
+    { path: "/resume.html" },
+    { path: "/blog/", lastmod: latestPostDate },
     ...posts.map((post) => ({
       path: postPath(post.slug),
-      lastmod: dateForSitemap(post.published_date)
+      lastmod: dateForSitemap(post.updated_at || post.published_date)
     }))
   ];
 
@@ -503,35 +618,49 @@ function writeSitemap(posts) {
 ${urls
   .map(
     (entry) => `  <url>
-    <loc>${escapeXml(`${SITE_ORIGIN}${entry.path}`)}</loc>
-    <lastmod>${escapeXml(entry.lastmod)}</lastmod>
+    <loc>${escapeXml(`${SITE_ORIGIN}${entry.path}`)}</loc>${
+      entry.lastmod ? `\n    <lastmod>${escapeXml(entry.lastmod)}</lastmod>` : ""
+    }
   </url>`
   )
   .join("\n")}
 </urlset>
 `;
 
-  fs.writeFileSync(path.join(ROOT_DIR, "sitemap.xml"), xml, "utf8");
+  fs.writeFileSync(path.join(outputRoot, "sitemap.xml"), xml, "utf8");
 }
 
-function writeRobots() {
+function writeRobots(outputRoot) {
   const robots = `User-agent: *
 Allow: /
 
+# Public guide for AI and language-model discovery:
+# ${SITE_ORIGIN}/llms.txt
+
 Sitemap: ${SITE_ORIGIN}/sitemap.xml
 `;
-  fs.writeFileSync(path.join(ROOT_DIR, "robots.txt"), robots, "utf8");
+  fs.writeFileSync(path.join(outputRoot, "robots.txt"), robots, "utf8");
 }
 
-function writeRssFeed(posts) {
-  const now = new Date().toUTCString();
+function deterministicFeedDate(posts) {
+  const timestamps = posts
+    .flatMap((post) => [post.updated_at, post.published_date])
+    .map(parseDeterministicDate)
+    .filter((date) => !Number.isNaN(date.getTime()))
+    .map((date) => date.getTime());
+
+  return new Date(timestamps.length ? Math.max(...timestamps) : 0).toUTCString();
+}
+
+function writeRssFeed(posts, outputBlogDir) {
+  const feedDate = deterministicFeedDate(posts);
   const items = posts
     .map((post) => {
       const title = String(post.title || "").trim() || "Untitled";
       const summary = String(post.summary || "").trim() || stripHtml(post.body_html || "").slice(0, 220);
       const link = `${SITE_ORIGIN}${postPath(post.slug)}`;
-      const pubDateRaw = new Date(String(post.published_date || ""));
-      const pubDate = Number.isNaN(pubDateRaw.getTime()) ? now : pubDateRaw.toUTCString();
+      const pubDateRaw = parseDeterministicDate(post.published_date);
+      const pubDate = Number.isNaN(pubDateRaw.getTime()) ? feedDate : pubDateRaw.toUTCString();
       const categories = [...new Set([...(post.topics || []), post.category].filter(Boolean))]
         .map((topic) => `<category>${escapeXml(topic)}</category>`)
         .join("");
@@ -554,27 +683,83 @@ ${categories}
   <link>${escapeXml(`${SITE_ORIGIN}/blog/`)}</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>${escapeXml(now)}</lastBuildDate>
+  <lastBuildDate>${escapeXml(feedDate)}</lastBuildDate>
   <atom:link href="${escapeXml(`${SITE_ORIGIN}/blog/rss.xml`)}" rel="self" type="application/rss+xml"/>
 ${items}
 </channel>
 </rss>
 `;
 
-  fs.writeFileSync(path.join(BLOG_DIR, "rss.xml"), xml, "utf8");
+  fs.writeFileSync(path.join(outputBlogDir, "rss.xml"), xml, "utf8");
 }
 
-function main() {
-  const requestedPath = process.argv.find((arg) => arg.startsWith("--db="));
-  const dbPath = requestedPath ? requestedPath.split("=")[1] : undefined;
-  const { db } = openDatabase(dbPath);
+function isSafeGeneratedPostPath(relativePath) {
+  return /^blog\/[a-z0-9][a-z0-9-]*\.html$/.test(String(relativePath || ""));
+}
+
+function readGeneratedManifest(manifestPath) {
+  if (!fs.existsSync(manifestPath)) return [];
 
   try {
-    ensureSchema(db);
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    if (manifest.generator !== GENERATOR_ID || !Array.isArray(manifest.files)) return [];
+    return manifest.files.filter(isSafeGeneratedPostPath);
+  } catch (_error) {
+    return [];
+  }
+}
+
+function pruneStaleGeneratedPages({ outputRoot, manifestPath, expectedFiles }) {
+  const expected = new Set(expectedFiles);
+  const previous = readGeneratedManifest(manifestPath);
+  const removed = [];
+
+  for (const relativePath of previous) {
+    if (expected.has(relativePath)) continue;
+
+    const absolutePath = path.resolve(outputRoot, relativePath);
+    const blogRoot = `${path.resolve(outputRoot, "blog")}${path.sep}`;
+    if (!absolutePath.startsWith(blogRoot) || !fs.existsSync(absolutePath)) continue;
+
+    const prefix = fs.readFileSync(absolutePath, "utf8").slice(0, GENERATED_PAGE_MARKER.length);
+    if (prefix !== GENERATED_PAGE_MARKER) continue;
+
+    fs.unlinkSync(absolutePath);
+    removed.push(relativePath);
+  }
+
+  return removed;
+}
+
+function writeGeneratedManifest(manifestPath, files) {
+  const manifest = {
+    generator: GENERATOR_ID,
+    version: 1,
+    files: [...files].sort()
+  };
+  fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+}
+
+function buildStaticBlog({ dbPath, outputRoot = ROOT_DIR, manifestPath } = {}) {
+  const resolvedOutputRoot = path.resolve(outputRoot);
+  const outputBlogDir = path.join(resolvedOutputRoot, "blog");
+  const resolvedManifestPath = manifestPath
+    ? path.resolve(manifestPath)
+    : path.join(resolvedOutputRoot, GENERATED_MANIFEST_NAME);
+  const { db } = openDatabase(dbPath, { readonly: true });
+
+  try {
+    assertSchema(db);
+    fs.mkdirSync(outputBlogDir, { recursive: true });
 
     const list = getPostList(db)
       .filter((post) => post.status === "published")
-      .sort((a, b) => String(b.published_date).localeCompare(String(a.published_date)));
+      .sort(
+        (a, b) =>
+          String(b.published_date).localeCompare(String(a.published_date)) ||
+          String(a.slug).localeCompare(String(b.slug))
+      );
 
     const fullPosts = list.map((post) => getPostWithTopics(db, post.slug)).filter(Boolean);
     const workPosts = fullPosts.filter(isWorkPost);
@@ -592,18 +777,61 @@ function main() {
       }
 
       const html = buildStaticPostHtml({ post, previous, next });
-      const outputPath = path.join(BLOG_DIR, `${post.slug}.html`);
+      const outputPath = path.join(outputBlogDir, `${post.slug}.html`);
       fs.writeFileSync(outputPath, html, "utf8");
     }
 
-    writeSitemap(fullPosts);
-    writeRobots();
-    writeRssFeed(fullPosts);
-    db.pragma("wal_checkpoint(TRUNCATE)");
-    console.log(`Generated ${fullPosts.length} static blog pages from SQLite.`);
+    const generatedFiles = fullPosts.map((post) => `blog/${post.slug}.html`);
+    const removed = pruneStaleGeneratedPages({
+      outputRoot: resolvedOutputRoot,
+      manifestPath: resolvedManifestPath,
+      expectedFiles: generatedFiles
+    });
+    writeGeneratedManifest(resolvedManifestPath, generatedFiles);
+    writeBlogIndexFallback(fullPosts, outputBlogDir);
+    writeSitemap(fullPosts, resolvedOutputRoot);
+    writeRobots(resolvedOutputRoot);
+    writeRssFeed(fullPosts, outputBlogDir);
+
+    return {
+      posts: fullPosts,
+      generatedFiles,
+      removedFiles: removed,
+      manifestPath: resolvedManifestPath
+    };
   } finally {
     db.close();
   }
 }
 
-main();
+function getArgValue(name) {
+  const argument = process.argv.find((value) => value.startsWith(`--${name}=`));
+  return argument ? argument.slice(name.length + 3) : undefined;
+}
+
+function main() {
+  const result = buildStaticBlog({
+    dbPath: getArgValue("db"),
+    outputRoot: getArgValue("output-root") || ROOT_DIR,
+    manifestPath: getArgValue("manifest-path")
+  });
+  console.log(
+    `Generated ${result.posts.length} published blog pages${
+      result.removedFiles.length ? ` and pruned ${result.removedFiles.length} stale generated page(s)` : ""
+    }.`
+  );
+}
+
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  GENERATED_PAGE_MARKER,
+  GENERATOR_ID,
+  buildBlogIndexFallback,
+  buildStaticBlog,
+  buildStaticPostHtml,
+  pruneStaleGeneratedPages,
+  writeBlogIndexFallback
+};

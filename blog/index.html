@@ -3,7 +3,7 @@
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
 <title>Blog | Andrew Concepcion</title>
 <meta name="description" content="Engineering logs, essays, and field notes by Andrew Concepcion on mobile systems, architecture, and product delivery.">
 <link rel="canonical" href="https://ac-opensource.github.io/blog/"/>
@@ -152,9 +152,17 @@
             50% { opacity: 1; }
             100% { top: 100%; opacity: 0; }
         }
+        @media (max-width: 767px) {
+            .archive-cube-container { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .archive-stage,
+            .shifting-line { animation: none !important; }
+        }
     </style>
 </head>
 <body class="font-body text-on-surface overflow-x-hidden">
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="neural-global-bg" aria-hidden="true">
   <div class="neural-mesh-container">
     <div class="neural-mesh"></div>
@@ -176,7 +184,7 @@
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
     <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
       <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
@@ -185,15 +193,15 @@
   </div>
   <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
     <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
+    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
     <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
     <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<main class="pt-32 md:pt-24 pb-20 max-w-6xl mx-auto px-6">
+<main id="main" class="pt-32 md:pt-24 pb-20 max-w-6xl mx-auto px-6">
 <!-- Header Section -->
-<header class="mb-20 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+<header class="mb-12 md:mb-20 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
 <div class="md:col-span-8">
 <div class="font-label text-xs uppercase tracking-[0.2em] text-tertiary mb-4">
                     [archive_mode: active]
@@ -205,7 +213,7 @@
                     Compose-first delivery notes, architecture retrospectives, and personal journals from active projects.
                 </p>
 </div>
-<div class="md:col-span-4 flex justify-end">
+<div class="hidden md:flex md:col-span-4 justify-end">
 <div class="bg-surface-container-highest p-8 aspect-square w-64 flex items-center justify-center border border-outline-variant/20 relative overflow-hidden">
 <div class="archive-cube-container">
 <div class="archive-stage">
@@ -224,7 +232,8 @@
 <!-- Search Input Field -->
 <div class="relative flex-1 group w-full">
 <span class="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-secondary text-lg group-focus-within:text-tertiary transition-colors">search</span>
-<input id="search-posts" class="w-full bg-transparent border-none focus:ring-0 font-label text-lg pl-8 py-2 text-on-surface placeholder:text-outline-variant/60 italic" placeholder="|grep /search/..." type="text"/>
+<label class="sr-only" for="search-posts">Search blog posts</label>
+<input id="search-posts" class="w-full bg-transparent border-none focus:ring-0 font-label text-lg pl-8 py-3 text-on-surface placeholder:text-outline-variant/60 italic" placeholder="|grep /search/..." type="search" autocomplete="off"/>
 </div>
 <!-- Separator -->
 <div class="hidden md:block text-outline-variant/30 font-label">-</div>
@@ -241,7 +250,28 @@
             [RSS]
           </a>
 </div>
-<section id="blog-feed" class="space-y-12"></section>
+<section id="blog-feed" class="space-y-12" aria-label="Latest blog posts">
+  <article class="py-8 border-t border-outline-variant/20">
+    <time class="font-label text-xs text-outline" datetime="2026-07-22">2026-07-22 · 8 min read</time>
+    <h2 class="font-headline text-3xl md:text-4xl font-bold leading-tight mt-3"><a class="hover:text-tertiary" href="/blog/2026-07-22-its-not-okay-to-stay-not-okay.html">It’s Not Okay to Stay “Not Okay”</a></h2>
+    <p class="text-secondary text-lg leading-relaxed mt-3">Acceptance makes room for honesty. Responsibility turns that honesty into the next workable step—without shame, denial, or pretending recovery is simple.</p>
+  </article>
+  <article class="py-8 border-t border-outline-variant/20">
+    <time class="font-label text-xs text-outline" datetime="2026-07-22">2026-07-22 · 7 min read</time>
+    <h2 class="font-headline text-3xl md:text-4xl font-bold leading-tight mt-3"><a class="hover:text-tertiary" href="/blog/2026-07-22-the-fortress-we-mistake-for-home.html">The Fortress We Mistake for Home</a></h2>
+    <p class="text-secondary text-lg leading-relaxed mt-3">A reflection on the defenses we build from old wounds, pride, and habit—and why real change begins when we stop guarding what keeps us trapped.</p>
+  </article>
+  <article class="py-8 border-t border-outline-variant/20">
+    <time class="font-label text-xs text-outline" datetime="2026-07-21">2026-07-21 · 12 min read</time>
+    <h2 class="font-headline text-3xl md:text-4xl font-bold leading-tight mt-3"><a class="hover:text-tertiary" href="/blog/2026-07-21-what-building-persons-finder-taught-me.html">What Building a Small Backend Taught Me About AI-Ready Engineering</a></h2>
+    <p class="text-secondary text-lg leading-relaxed mt-3">A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.</p>
+  </article>
+  <article class="py-8 border-t border-outline-variant/20">
+    <time class="font-label text-xs text-outline" datetime="2026-04-30">2026-04-30 · 10 min read</time>
+    <h2 class="font-headline text-3xl md:text-4xl font-bold leading-tight mt-3"><a class="hover:text-tertiary" href="/blog/2026-04-30-agents-that-leave-receipts.html">Agents That Leave Receipts</a></h2>
+    <p class="text-secondary text-lg leading-relaxed mt-3">A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust.</p>
+  </article>
+</section>
 <div id="infinite-sentinel" class="mt-20 py-12 border-t border-on-surface flex justify-center items-center">
 <div id="infinite-status" class="font-label text-sm uppercase tracking-widest flex items-center gap-2 text-outline-variant">
 <span class="material-symbols-outlined">south</span> [SCROLL_FOR_MORE]
@@ -252,14 +282,13 @@
   <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
     <span>© 2026 Andrew Concepcion</span>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[source]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
   </div>
 </footer>
-<script src="/assets/js/blog-sqlite.js"></script>
 <script>
   (() => {
     const feed = document.getElementById("blog-feed");
@@ -419,7 +448,7 @@
       }
 
       feed.innerHTML = posts
-        .map((post) => {
+        .map((post, index) => {
           const postUrl = `/blog/${encodeURIComponent(post.slug)}.html`;
           const fallbackImage = makeAbstractFallback(post.slug || post.title || "post");
           const previewImage = hasUsableHeroImage(post.heroImage)
@@ -464,7 +493,8 @@
                   <img
                     src="${previewImage}"
                     alt="${escapeHtml(previewAlt)}"
-                    loading="eager"
+                    loading="${index === 0 ? "eager" : "lazy"}"
+                    fetchpriority="${index === 0 ? "high" : "auto"}"
                     decoding="async"
                     class="w-full h-full object-contain bg-surface-container-lowest grayscale-[0.1] contrast-[1.02] group-hover:scale-[1.03] transition-transform duration-500"
                     data-fallback="${fallbackImage}"
@@ -564,9 +594,11 @@
     }
 
     async function boot() {
-      if (!window.blogSqlite) return;
-
-      allPosts = await window.blogSqlite.getPosts();
+      const response = await fetch("/blog/posts.json", { cache: "default" });
+      if (!response.ok) throw new Error(`Manifest request failed (${response.status})`);
+      const payload = await response.json();
+      if (!Array.isArray(payload)) throw new Error("Blog manifest has an invalid shape");
+      allPosts = payload;
       bookmarks = loadBookmarks();
       buildCategoryButtons(allPosts);
       setActiveCategory("all");
@@ -614,15 +646,17 @@
     }
 
     boot().catch((err) => {
-      feed.innerHTML = `<p class="text-red-700">Failed to load blog posts: ${err.message}</p>`;
+      console.error("Blog enhancement unavailable", err);
+      infiniteStatus.textContent = "[STATIC_ARCHIVE_MODE]";
     });
 
     const path = window.location.pathname.replace(/\/index\.html$/, "/");
-    document.querySelectorAll("#site-nav .site-nav-link").forEach((link) => {
+    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
       const route = link.dataset.route;
       const active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
       if (active) {
         link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+        link.setAttribute("aria-current", "page");
       }
     });
   })();
