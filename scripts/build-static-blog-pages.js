@@ -15,8 +15,24 @@ const GENERATED_PAGE_MARKER = "<!-- generated: scripts/build-static-blog-pages.j
 const GENERATED_MANIFEST_NAME = path.join(".site-build", "generated-blog-pages.json");
 const GENERATOR_ID = "ac-opensource-static-blog-v1";
 const WORK_HERO_LAYOUT_BY_SLUG = Object.freeze({
-  "case-study-ocbc-banking-experience": "split-vertical",
+  "case-study-ocbc-banking-experience": "gallery",
   "case-study-openpay-bnpl-experience": "cover"
+});
+const WORK_HERO_GALLERY_BY_SLUG = Object.freeze({
+  "case-study-ocbc-banking-experience": [
+    {
+      src: "/assets/images/work/img_ocbc_business_cashflow.webp",
+      alt: "OCBC Business Android sales, expenses, and cashflow dashboard"
+    },
+    {
+      src: "/assets/images/work/img_ocbc_business_transactions.webp",
+      alt: "OCBC Business Android transaction history and inflow-outflow filters"
+    },
+    {
+      src: "/assets/images/work/img_ocbc_business_card_controls.webp",
+      alt: "OCBC Business Android digital business debit card controls"
+    }
+  ]
 });
 
 function escapeHtml(value) {
@@ -174,16 +190,17 @@ function buildWorkHeroPanel({ post, heroImage, heroResponsiveAttributes, heroAlt
   const layout = WORK_HERO_LAYOUT_BY_SLUG[String(post?.slug || "")] || "contain";
   const caption = heroCaption || heroAlt;
 
-  if (layout === "split-vertical") {
+  if (layout === "gallery") {
+    const galleryImages = WORK_HERO_GALLERY_BY_SLUG[String(post?.slug || "")] || [];
+    const galleryHtml = galleryImages.map((image, index) => `
+  <span class="work-post-hero__screen">
+    <img${index === 0 ? ' id="post-hero-image"' : ""} src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt)}" loading="${index === 0 ? "eager" : "lazy"}" decoding="async"/>
+  </span>`).join("");
+
     return `
-<figure class="work-post-hero work-post-hero--split lg:col-span-5" data-work-hero-layout="split-vertical">
-  <span class="work-post-hero__crop work-post-hero__crop--top">
-    <img id="post-hero-image" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
-  </span>
-  <span class="work-post-hero__crop work-post-hero__crop--bottom" aria-hidden="true">
-    <img src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="" loading="eager" decoding="async"/>
-  </span>
-  <figcaption class="sr-only">${escapeHtml(caption)} shown as upper and lower crops side by side.</figcaption>
+<figure class="work-post-hero work-post-hero--gallery lg:col-span-5" data-work-hero-layout="gallery">
+${galleryHtml}
+  <figcaption class="sr-only">Official OCBC Business Android app screens from Google Play.</figcaption>
 </figure>
 `;
   }
@@ -400,32 +417,36 @@ ${articleTagsMeta}
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -448,6 +469,20 @@ ${articleTagsMeta}
     .hero-overlay-alpha {
       animation: none;
       opacity: 1;
+    }
+  }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
     }
   }
 </style>

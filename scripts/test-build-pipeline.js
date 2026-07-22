@@ -28,8 +28,11 @@ function main() {
       path.join(outputRoot, "blog", "case-study-ocbc-banking-experience.html"),
       "utf8"
     );
-    if (!ocbcPage.includes('data-work-hero-layout="split-vertical"')) {
-      throw new Error("The OCBC project note did not use the split screenshot presentation.");
+    if (!ocbcPage.includes('data-work-hero-layout="gallery"')) {
+      throw new Error("The OCBC project note did not use the official app-screen gallery.");
+    }
+    if ((ocbcPage.match(/class="work-post-hero__screen"/g) || []).length !== 3) {
+      throw new Error("The OCBC project note did not render all three official app screens.");
     }
     if (!ocbcPage.includes('id="post-category"') || !ocbcPage.includes('[portfolio]') || ocbcPage.includes('[work]')) {
       throw new Error("The OCBC project note did not use the public portfolio label consistently.");

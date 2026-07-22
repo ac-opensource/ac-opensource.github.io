@@ -29,22 +29,22 @@ const POSTS = [
   },
   {
     slug: "case-study-ocbc-banking-experience",
-    title: "OCBC: Android Work in a Banking App",
+    title: "OCBC Business: Android Banking Work",
     published_date: "2024-11-20",
     reading_time: "2 min read",
     category: "work",
     topics: ["OCBC", "Fintech", "Android", "Kotlin"],
     summary:
-      "I worked on OCBC's Android app in Kotlin and XML, including chart UI, identity-verification integration, network behavior, and focused unit coverage.",
-    hero_image: "/assets/images/work/img_ocbc_app.png",
-    hero_alt: "OCBC mobile app screenshot",
-    hero_caption: "OCBC production app",
+      "I worked on OCBC Business for Android in Kotlin and XML, covering chart UI, identity-verification integration, network behavior, and focused unit tests.",
+    hero_image: "/assets/images/work/img_ocbc_business_cashflow.webp",
+    hero_alt: "OCBC Business Android app screen showing sales, expenses, and cashflow",
+    hero_caption: "Official OCBC Business Android app screen from Google Play",
     body_html: `
-      <h2>The parts I touched</h2>
-      <p>I worked on OCBC's Android app in Kotlin and XML. My scope included custom chart behavior, identity-verification integration, selected account-facing UI, and third-party SDK work.</p>
+      <h2>Identity verification and concurrent state</h2>
+      <p>I worked on OCBC Business in Kotlin and XML. My scope included custom chart behavior, identity-verification integration, account-facing UI, and third-party SDK work.</p>
       <p>Identity verification was more than dropping an SDK into a screen. I had to account for its callbacks and lifecycle transitions within the bank's existing navigation and state. I also worked through concurrency and network-call issues where the order of responses could affect what the app displayed.</p>
       <p>I added or improved unit coverage around behavior that could be tested away from the UI. When a module made a feature hard to change, I reduced coupling in that area so the next change was easier to isolate and review.</p>
-      <h2>Working inside an established product</h2>
+      <h2>Changing a live banking product</h2>
       <p>Some of the UI was being modernized, but it still had to fit the conventions and release process of the existing app. That mattered most around identity and account state, where consistency was more valuable than introducing a second pattern.</p>
       <p>I shipped those Android features and integrations through the bank's existing release process, with tests around behavior that would have been difficult to verify from the screen alone.</p>
     `
