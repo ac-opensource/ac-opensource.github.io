@@ -1,8 +1,9 @@
+<!-- generated: scripts/build-static-blog-pages.js -->
 <!DOCTYPE html>
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
 <title>Cognitive Profile Deep Dive: Emergenetics + Harrison | Andrew Concepcion</title>
 <meta name="description" content="A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html"/>
@@ -90,6 +91,12 @@
     80% { opacity: 1; }
     100% { opacity: 0; }
   }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-overlay-alpha {
+      animation: none;
+      opacity: 1;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
@@ -106,12 +113,13 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2026-03-26",
-  "dateModified": "2026-03-26",
+  "dateModified": "2026-03-26T10:17:28.000Z",
   "image": "https://ac-opensource.github.io/blog/images/cognitive-profile-cover.svg",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html"
 }</script>
 </head>
 <body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
+<a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
 <div class="neural-global-bg" aria-hidden="true">
   <div class="neural-mesh-container">
     <div class="neural-mesh"></div>
@@ -133,8 +141,8 @@
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
     <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
-      <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+      <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
@@ -142,13 +150,13 @@
   </div>
   <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
     <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[source]</a>
-    <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+    <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
     <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<main class="pt-32 md:pt-24 pb-32">
+<main id="main-content" class="pt-32 md:pt-24 pb-32">
 <article class="max-w-screen-xl mx-auto px-6">
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[reflection]</span>
@@ -166,29 +174,10 @@
 </div>
 </div>
 
-<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
-<div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
-<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="/blog/images/cognitive-profile-cover.svg" alt="Abstract visualization of cognitive profile signals" loading="eager" decoding="async"/>
-</div>
-<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
-<div class="flex justify-between items-start">
-<span class="font-label text-xs">[state_machine_v4.svg]</span>
-<span class="material-symbols-outlined text-tertiary">schema</span>
-</div>
-<div class="space-y-4">
-<div class="h-1 w-2/3 bg-tertiary/20"></div>
-<div class="flex gap-2">
-<div class="w-4 h-4 border border-tertiary"></div>
-<div class="w-4 h-4 bg-tertiary"></div>
-<div class="w-4 h-4 border border-tertiary"></div>
-</div>
-<div class="h-px w-full bg-outline-variant/50"></div>
-<div class="flex justify-end">
-<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
-</div>
-</div>
-</div>
-</div>
+<figure class="lg:col-span-5 relative aspect-square bg-surface-container-low border border-outline-variant/20 p-3 overflow-hidden">
+<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="/blog/images/cognitive-profile-cover.svg" alt="Abstract visualization of cognitive profile signals" loading="eager" decoding="async"/>
+<figcaption class="sr-only">Emergenetics and Harrison synthesis</figcaption>
+</figure>
 
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -234,7 +223,7 @@
     In practice, this creates a two-phase rhythm: broad option synthesis first, then deterministic system framing.
   </p>
   <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/emergenetics-thinking-mix.svg" alt="Emergenetics thinking mix chart" class="w-full h-auto" loading="lazy" decoding="async"/>
+    <img src="/blog/images/emergenetics-thinking-mix.svg" alt="Emergenetics thinking mix chart" class="w-full h-auto" loading="lazy" decoding="async" />
     <figcaption class="mt-3 text-sm text-secondary">Thinking percentages sourced from the Emergenetics module in my personal app.</figcaption>
   </figure>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
@@ -253,7 +242,7 @@
     and high adaptation when context changes quickly.
   </p>
   <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/emergenetics-behavior-percentiles.svg" alt="Emergenetics behavior percentile chart" class="w-full h-auto" loading="lazy" decoding="async"/>
+    <img src="/blog/images/emergenetics-behavior-percentiles.svg" alt="Emergenetics behavior percentile chart" class="w-full h-auto" loading="lazy" decoding="async" />
     <figcaption class="mt-3 text-sm text-secondary">Behavior calibration used for cross-team communication and leadership posture.</figcaption>
   </figure>
   <p>
@@ -270,7 +259,7 @@
     A useful watchpoint is <strong>Assertive 4.1</strong>.
   </p>
   <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/harrison-trait-snapshot.svg" alt="Harrison trait score snapshot" class="w-full h-auto" loading="lazy" decoding="async"/>
+    <img src="/blog/images/harrison-trait-snapshot.svg" alt="Harrison trait score snapshot" class="w-full h-auto" loading="lazy" decoding="async" />
     <figcaption class="mt-3 text-sm text-secondary">Selected scores from Harrison Assessment completed on 2025-09-10.</figcaption>
   </figure>
   <div class="bg-surface-container-high p-5 border border-outline-variant/20">
@@ -290,7 +279,7 @@
     leverage or friction depending on context.
   </p>
   <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/harrison-paradox-map.svg" alt="Harrison paradox map" class="w-full h-auto" loading="lazy" decoding="async"/>
+    <img src="/blog/images/harrison-paradox-map.svg" alt="Harrison paradox map" class="w-full h-auto" loading="lazy" decoding="async" />
     <figcaption class="mt-3 text-sm text-secondary">Paradox map interpretation based on report language and observed delivery behavior.</figcaption>
   </figure>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
@@ -317,17 +306,17 @@
 </section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
-<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/case-study-mystc-scale-and-reliability.html">
+<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Case Study: MySTC at Telecom Scale</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">E2E + Visual QA for Personal Websites: What to Test and Why</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
 </div>
 </a>
-<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html">
+<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-career-trajectory-platform-ownership.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">From Mobile Developer to AI Accelerated Engineer</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Career Trajectory as Platform Ownership, Not Job Titles</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -340,7 +329,7 @@
   <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
     <span>© 2026 Andrew Concepcion</span>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[source]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
     <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
@@ -363,6 +352,9 @@
       }
       if (active) {
         link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
       }
     });
 

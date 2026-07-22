@@ -2,7 +2,17 @@
   "name": "ac-opensource-site",
   "version": "1.0.0",
   "private": true,
-  "description": "Agentic PRD toolkit with SQLite-backed blog authoring and static sync",
+  "description": "Static portfolio and published-only blog generated from an authoring-only SQLite database",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24 <25",
+      "onFail": "error"
+    }
+  },
   "scripts": {
     "blog:db:init": "node scripts/init-blog-db.js",
     "blog:db:import": "node scripts/import-blog-into-db.js",
@@ -12,8 +22,13 @@
     "blog:writer": "node scripts/blog-writer-server.js",
     "blog:new": "node scripts/new-post.js",
     "work:seed": "node scripts/seed-work-deep-dives.js",
-    "build": "npm run blog:db:sync && npm run blog:build",
-    "test:e2e": "npm run blog:build && node scripts/e2e-check.js"
+    "build": "node scripts/build-site.js",
+    "verify:dist": "node scripts/verify-dist.js",
+    "verify:deterministic": "node scripts/check-deterministic-build.js",
+    "test:build": "node scripts/test-build-pipeline.js",
+    "test:writer": "node scripts/test-blog-writer-security.js",
+    "verify": "npm run build && npm run verify:dist && npm run verify:deterministic && npm run test:build && npm run test:writer",
+    "test:e2e": "node scripts/run-e2e.js"
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",
@@ -21,6 +36,8 @@
     "sanitize-html": "^2.17.0"
   },
   "devDependencies": {
-    "playwright": "^1.58.2"
+    "@tailwindcss/forms": "^0.5.11",
+    "playwright": "^1.58.2",
+    "tailwindcss": "^3.4.19"
   }
 }

@@ -2,14 +2,20 @@ const { chromium, request } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
-const BASE_URL = 'http://127.0.0.1:4173';
-const postsManifestPath = path.join(__dirname, '..', 'blog', 'posts.json');
+const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:4173';
+const CHECK_EXTERNAL_LINKS = process.env.CHECK_EXTERNAL_LINKS === '1';
+const siteRoot = path.resolve(__dirname, '..', process.env.SITE_ROOT || '.');
+const postsManifestPath = path.join(siteRoot, 'blog', 'posts.json');
 let STATIC_BLOG_POST_PATH = '/blog/post.html';
+let GENERATED_BLOG_POST_PATHS = [];
 
 try {
   const manifest = JSON.parse(fs.readFileSync(postsManifestPath, 'utf8'));
   if (Array.isArray(manifest) && manifest.length > 0 && manifest[0].slug) {
-    STATIC_BLOG_POST_PATH = `/blog/${encodeURIComponent(manifest[0].slug)}.html`;
+    GENERATED_BLOG_POST_PATHS = manifest
+      .filter((post) => post && post.slug)
+      .map((post) => `/blog/${encodeURIComponent(post.slug)}.html`);
+    STATIC_BLOG_POST_PATH = GENERATED_BLOG_POST_PATHS[0];
   }
 } catch (_error) {
   // Fall back to the dynamic route if manifest is unavailable.
@@ -20,14 +26,21 @@ const routes = [
   { path: '/work.html', name: 'work' },
   { path: '/about.html', name: 'about' },
   { path: '/contact.html', name: 'contact' },
+  { path: '/resume.html', name: 'resume' },
   { path: '/blog/', name: 'blog' },
-  { path: STATIC_BLOG_POST_PATH, name: 'blog-post' }
+  ...GENERATED_BLOG_POST_PATHS.map((postPath, index) => ({
+    path: postPath,
+    name: index === 0 ? 'blog-post' : `blog-post-${index + 1}`,
+    kind: 'blog-post',
+    screenshot: index === 0
+  }))
 ];
 
 const screenshotRoot = '/tmp/ac-site-e2e';
 const desktopDir = path.join(screenshotRoot, 'desktop');
 const mobileDir = path.join(screenshotRoot, 'mobile');
 
+fs.rmSync(screenshotRoot, { recursive: true, force: true });
 for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   fs.mkdirSync(dir, { recursive: true });
 }
@@ -35,6 +48,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 (async () => {
   const failures = [];
   const warnings = [];
+  const checkedExternalLinks = new Set();
 
   const api = await request.newContext({
     baseURL: BASE_URL,
@@ -77,6 +91,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       }
 
       if (href.startsWith('http://') || href.startsWith('https://')) {
+        if (!CHECK_EXTERNAL_LINKS) continue;
+        if (checkedExternalLinks.has(href)) continue;
+        checkedExternalLinks.add(href);
         try {
           const resp = await api.get(href);
           const ok = resp.status() >= 200 && resp.status() < 400;
@@ -117,7 +134,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     if (route.path === '/blog/') {
       await page.waitForSelector('#blog-feed article', { timeout: 15000 });
     }
-    if (route.path === STATIC_BLOG_POST_PATH) {
+    if (route.kind === 'blog-post') {
       await page.waitForSelector('#post-title', { timeout: 15000 });
       const titleText = await page.locator('#post-title').textContent();
       await assert(Boolean((titleText || '').trim()), `${route.path}: #post-title is empty`);
@@ -125,7 +142,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
     await checkInternalLinksOnPage(route.path);
 
-    await page.screenshot({ path: path.join(desktopDir, `${route.name}.png`), fullPage: true });
+    if (route.screenshot !== false) {
+      await page.screenshot({ path: path.join(desktopDir, `${route.name}.png`), fullPage: true });
+    }
 
     const mobResp = await mobilePage.goto(url, { waitUntil: 'domcontentloaded' });
     await mobilePage.waitForTimeout(200);
@@ -133,18 +152,20 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     if (route.path === '/blog/') {
       await mobilePage.waitForSelector('#blog-feed article', { timeout: 15000 });
     }
-    if (route.path === STATIC_BLOG_POST_PATH) {
+    if (route.kind === 'blog-post') {
       await mobilePage.waitForSelector('#post-title', { timeout: 15000 });
       const titleText = await mobilePage.locator('#post-title').textContent();
       await assert(Boolean((titleText || '').trim()), `${route.path} mobile: #post-title is empty`);
     }
-    await mobilePage.screenshot({ path: path.join(mobileDir, `${route.name}.png`), fullPage: true });
+    if (route.screenshot !== false) {
+      await mobilePage.screenshot({ path: path.join(mobileDir, `${route.name}.png`), fullPage: true });
+    }
   }
 
   // Nav clickthrough from home
   await page.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
   const navMap = [
-    ['/work.html', '[source]'],
+    ['/work.html', '[portfolio]'],
     ['/blog/', '[logs]'],
     ['/about.html', '[about]'],
     ['/contact.html', '[contact]'],
@@ -171,7 +192,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(rssBody.includes('<rss') && rssBody.includes('<item>'), 'RSS feed content is invalid');
 
   const initialCount = await page.locator('#blog-feed article').count();
-  await assert(initialCount > 0, 'Blog feed did not render any posts from SQLite');
+  await assert(initialCount > 0, 'Blog feed did not render any posts from the public manifest');
 
   const rssLinkHref = await page.locator('a[href="/blog/rss.xml"]').first().getAttribute('href');
   await assert(rssLinkHref === '/blog/rss.xml', 'Blog RSS link is missing');
@@ -209,7 +230,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   await page.fill('#search-posts', '___unlikely___term___');
   await page.waitForTimeout(250);
-  const zeroStateVisible = await page.locator('#blog-feed p:has-text("No entries found in SQLite.")').count();
+  const zeroStateVisible = await page.locator('#blog-feed p').filter({ hasText: /No entries found/ }).count();
   await assert(zeroStateVisible > 0, 'Search zero-state message did not render');
   await page.fill('#search-posts', '');
   await page.locator('#category-filters button[data-category="all"]').click();

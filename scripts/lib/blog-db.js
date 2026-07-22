@@ -8,15 +8,68 @@ function resolveDbPath(inputPath) {
   return inputPath ? path.resolve(inputPath) : DEFAULT_DB_PATH;
 }
 
-function openDatabase(inputPath) {
+function openDatabase(inputPath, options = {}) {
   const dbPath = resolveDbPath(inputPath);
-  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  const readonly = options.readonly === true;
 
-  const db = new Database(dbPath);
-  db.pragma("journal_mode = WAL");
+  if (!readonly) {
+    fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  }
+
+  const db = new Database(dbPath, {
+    readonly,
+    fileMustExist: readonly
+  });
+
+  if (!readonly) {
+    db.pragma("journal_mode = WAL");
+  }
   db.pragma("foreign_keys = ON");
 
   return { db, dbPath };
+}
+
+function assertSchema(db) {
+  const requiredTables = ["posts", "post_topics"];
+  const tables = new Set(
+    db
+      .prepare("SELECT name FROM sqlite_master WHERE type = 'table'")
+      .all()
+      .map((row) => row.name)
+  );
+
+  const missingTables = requiredTables.filter((table) => !tables.has(table));
+  if (missingTables.length) {
+    throw new Error(`Blog database is missing required tables: ${missingTables.join(", ")}`);
+  }
+
+  const requiredPostColumns = [
+    "slug",
+    "title",
+    "author",
+    "summary",
+    "category",
+    "published_date",
+    "reading_time",
+    "hero_image",
+    "hero_alt",
+    "hero_caption",
+    "body_html",
+    "status",
+    "created_at",
+    "updated_at"
+  ];
+  const postColumns = new Set(
+    db
+      .prepare("PRAGMA table_info(posts)")
+      .all()
+      .map((column) => column.name)
+  );
+  const missingColumns = requiredPostColumns.filter((column) => !postColumns.has(column));
+
+  if (missingColumns.length) {
+    throw new Error(`Blog database is missing required columns: ${missingColumns.join(", ")}`);
+  }
 }
 
 function ensureSchema(db) {
@@ -268,6 +321,7 @@ module.exports = {
   DEFAULT_DB_PATH,
   resolveDbPath,
   openDatabase,
+  assertSchema,
   ensureSchema,
   normalizeTopics,
   upsertPost,
