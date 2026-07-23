@@ -345,7 +345,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert((await page.locator('.work-case--itvx .work-player').count()) === 0, 'ITVX card still exposes the generic player mockup');
 
   const heroIntro = ((await page.locator('.work-hero__intro').textContent()) || '').replace(/\s+/g, ' ').trim();
-  await assert(heroIntro.includes('I’m a mobile engineer'), 'Portfolio hero does not lead with mobile engineering');
+  await assert(heroIntro.includes('I’m a problem solver'), 'Portfolio hero does not lead with problem-solving positioning');
   await assert(heroIntro.includes('I lead teams') && heroIntro.includes('use AI'), 'Portfolio hero is missing leadership or AI-accelerated delivery positioning');
   await assert((await page.locator('.work-signals > div').count()) === 4, 'Portfolio hero does not expose all four positioning signals');
   await assert(workPageText.includes('AI-accelerated'), 'Portfolio hero is missing its AI-accelerated delivery signal');
