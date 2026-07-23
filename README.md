@@ -9,7 +9,7 @@ Static multi-page portfolio and technical blog. SQLite is the authoring-only sou
 - `scripts/build-static-blog-pages.js`: generates published post pages, RSS, robots, and sitemap artifacts.
 - `scripts/build-site.js`: assembles a fresh allowlisted `dist/`, generates responsive image references, and compiles Tailwind locally.
 - `blog/posts.json`: published-only metadata used for progressive enhancement; article bodies stay in static HTML.
-- `assets/data/profile-map.json`: public evidence model for the Engineering and Interests flowing maps.
+- `assets/data/profile-map.json`: public evidence model for the interactive Engineering and Interests profile tree.
 - `scripts/blog-writer-server.js`: loopback-only writer API with a per-run session check.
 - `.github/workflows/pages.yml`: verifies and deploys only `dist/` from the default `2025` branch.
 

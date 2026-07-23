@@ -13,7 +13,7 @@ Use the canonical static pages below for public professional and technical infor
 - [About](https://ac-opensource.github.io/about.html): Professional background, working style, interests, and career trajectory.
 - [Resume](https://ac-opensource.github.io/resume.html): Canonical public resume and skills summary.
 - [Blog](https://ac-opensource.github.io/blog/): Engineering logs, essays, case studies, and field notes.
-- [Evidence profile map](https://ac-opensource.github.io/about.html#profile-map): Accessible, hive-inspired flowing maps for engineering capabilities and interests, with a public evidence index.
+- [Evidence profile tree](https://ac-opensource.github.io/about.html#profile-map): Accessible, rooted branching systems for engineering capabilities and interests, with interactive junctions and a public evidence index.
 - [Contact](https://ac-opensource.github.io/contact.html): Public contact channels.
 
 ## Selected engineering case studies
