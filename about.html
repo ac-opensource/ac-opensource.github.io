@@ -24,7 +24,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="/assets/css/neural-background.css?v=20260722-flow5" rel="stylesheet"/>
-<link href="/assets/css/profile-map.css?v=20260722-flow6" rel="stylesheet"/>
+<link href="/assets/css/profile-map.css?v=20260723-worldtree17" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -194,11 +194,11 @@
 <div class="profile-map" data-profile-map data-profile-map-mode="full" data-profile-map-default="engineering">
   <div class="profile-map__topline">
     <span class="profile-map__eyebrow">[HOW IT CONNECTS]</span>
-    <span class="profile-map__status" data-profile-map-status>[select a point]</span>
+    <span class="profile-map__status" data-profile-map-status>[select a junction]</span>
   </div>
   <h2 class="profile-map__heading" id="profile-map-heading">How my work connects.</h2>
   <p class="profile-map__intro">I started in mobile and kept following the hard parts: backend systems, shared native code, reliability, technical leadership, and AI-assisted delivery. Away from a screen, it’s family, trails, cameras, telescopes, books, and small ventures.</p>
-  <div class="profile-map__tabs" role="tablist" aria-label="Profile map dataset">
+  <div class="profile-map__tabs" role="tablist" aria-label="Profile tree dataset">
     <button class="profile-map__tab" type="button" role="tab" aria-selected="true" aria-controls="about-profile-map-panel" data-profile-map-tab="engineering">Engineering</button>
     <button class="profile-map__tab" type="button" role="tab" aria-selected="false" aria-controls="about-profile-map-panel" data-profile-map-tab="interests" tabindex="-1">Interests</button>
   </div>
@@ -206,14 +206,14 @@
     <div class="profile-map__visual" data-profile-map-visual>
       <div class="profile-map__popover" data-profile-map-readout role="dialog" aria-modal="false" aria-live="polite" hidden></div>
     </div>
-    <aside class="profile-map__side" aria-label="Profile map context">
+    <aside class="profile-map__side" aria-label="Profile tree context">
       <h3 class="profile-map__dataset-title" data-profile-map-dataset-title>Engineering</h3>
       <p class="profile-map__dataset-description" data-profile-map-dataset-description>I build across Android, iOS, backend systems, and shared code, with architecture, reliability, and delivery running through it all.</p>
-      <div class="profile-map__legend" aria-label="Relationship legend">
-        <span class="profile-map__legend-item"><span class="profile-map__legend-line" aria-hidden="true"></span><span>In work I’ve shipped</span></span>
-        <span class="profile-map__legend-item"><span class="profile-map__legend-line profile-map__legend-line--dashed" aria-hidden="true"></span><span>In my writing / profile</span></span>
+      <div class="profile-map__legend" aria-label="Junction evidence legend">
+        <span class="profile-map__legend-item"><span class="profile-map__legend-line" aria-hidden="true"></span><span>Solid junction · shipped work</span></span>
+        <span class="profile-map__legend-item"><span class="profile-map__legend-line profile-map__legend-line--dashed" aria-hidden="true"></span><span>Open junction · writing / profile</span></span>
       </div>
-      <p class="profile-map__method">Choose a point for the story behind it.</p>
+      <p class="profile-map__method">Choose a junction for the story behind it. Related paths illuminate when selected.</p>
     </aside>
   </div>
   <div class="profile-map__fallback">
@@ -574,7 +574,7 @@
     <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
   </div>
 </footer>
-<script src="/assets/js/profile-map.js?v=20260722-flow6"></script>
+<script src="/assets/js/profile-map.js?v=20260723-worldtree17"></script>
 <script>
   (() => {
     const labJournalRoot = document.getElementById("about-lab-journal");

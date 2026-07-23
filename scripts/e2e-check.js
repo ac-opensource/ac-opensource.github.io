@@ -188,6 +188,191 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     }
   }
 
+  // Profile tree structure, stable selection, and responsive popover containment.
+  async function readProfileTreeGeometry(targetPage, nodeId) {
+    return targetPage.evaluate((id) => {
+      const visual = document.querySelector('.profile-map__visual').getBoundingClientRect();
+      const svg = document.querySelector('.profile-map__svg').getBoundingClientRect();
+      const junction = document.querySelector(`.profile-map__node[data-node-id="${id}"] .profile-map__node-mark`).getBoundingClientRect();
+      const hit = document.querySelector(`.profile-map__node[data-node-id="${id}"] .profile-map__node-hit`).getBoundingClientRect();
+      return {
+        junction: {
+          x: junction.x - svg.x,
+          y: junction.y - svg.y,
+          width: junction.width,
+          height: junction.height,
+        },
+        hit: { width: hit.width, height: hit.height },
+        visual: { width: visual.width, height: visual.height },
+        svg: { width: svg.width, height: svg.height },
+      };
+    }, nodeId);
+  }
+
+  async function readPopoverContainment(targetPage) {
+    return targetPage.evaluate(() => {
+      const visual = document.querySelector('.profile-map__visual').getBoundingClientRect();
+      const popover = document.querySelector('.profile-map__popover');
+      const card = popover.getBoundingClientRect();
+      return {
+        hidden: popover.hidden,
+        title: popover.querySelector('strong')?.textContent || '',
+        inside: card.left >= visual.left
+          && card.top >= visual.top
+          && card.right <= visual.right
+          && card.bottom <= visual.bottom,
+      };
+    });
+  }
+
+  async function readProfileTreeIntegrity(targetPage) {
+    return targetPage.evaluate(() => {
+      const nodes = [...document.querySelectorAll('.profile-map__node')].map((group) => {
+        const mark = group.querySelector('.profile-map__node-mark');
+        const hit = group.querySelector('.profile-map__node-hit');
+        return {
+          id: group.dataset.nodeId,
+          x: Number(mark.getAttribute('cx')),
+          y: Number(mark.getAttribute('cy')),
+          hitRadius: Number(hit.getAttribute('r')),
+          hitWidth: hit.getBoundingClientRect().width,
+        };
+      });
+      const paths = [...document.querySelectorAll('.profile-map__tendril')].map((path) => {
+        const length = path.getTotalLength();
+        return {
+          id: path.dataset.nodeId,
+          points: Array.from({ length: 49 }, (_, index) => {
+            const point = path.getPointAtLength(length * index / 48);
+            return { x: point.x, y: point.y };
+          }),
+        };
+      });
+      const labels = [...document.querySelectorAll('.profile-map__node-label, .profile-map__axis-label')]
+        .filter((label) => Number.parseFloat(getComputedStyle(label).opacity) > 0.1)
+        .map((label) => ({ text: label.textContent, box: label.getBoundingClientRect() }));
+      let minimumHitGap = Number.POSITIVE_INFINITY;
+      let minimumNodeTendrilDistance = Number.POSITIVE_INFINITY;
+      let minimumTendrilDistance = Number.POSITIVE_INFINITY;
+      let labelOverlapCount = 0;
+
+      for (let firstIndex = 0; firstIndex < nodes.length; firstIndex += 1) {
+        for (let secondIndex = firstIndex + 1; secondIndex < nodes.length; secondIndex += 1) {
+          const first = nodes[firstIndex];
+          const second = nodes[secondIndex];
+          minimumHitGap = Math.min(
+            minimumHitGap,
+            Math.hypot(first.x - second.x, first.y - second.y) - first.hitRadius - second.hitRadius,
+          );
+        }
+      }
+      paths.forEach((path) => {
+        nodes.forEach((node) => {
+          if (node.id === path.id) return;
+          path.points.forEach((point) => {
+            minimumNodeTendrilDistance = Math.min(
+              minimumNodeTendrilDistance,
+              Math.hypot(node.x - point.x, node.y - point.y),
+            );
+          });
+        });
+      });
+      for (let firstIndex = 0; firstIndex < paths.length; firstIndex += 1) {
+        for (let secondIndex = firstIndex + 1; secondIndex < paths.length; secondIndex += 1) {
+          paths[firstIndex].points.forEach((firstPoint) => {
+            paths[secondIndex].points.forEach((secondPoint) => {
+              minimumTendrilDistance = Math.min(
+                minimumTendrilDistance,
+                Math.hypot(firstPoint.x - secondPoint.x, firstPoint.y - secondPoint.y),
+              );
+            });
+          });
+        }
+      }
+      for (let firstIndex = 0; firstIndex < labels.length; firstIndex += 1) {
+        for (let secondIndex = firstIndex + 1; secondIndex < labels.length; secondIndex += 1) {
+          const first = labels[firstIndex].box;
+          const second = labels[secondIndex].box;
+          if (first.left < second.right && first.right > second.left
+            && first.top < second.bottom && first.bottom > second.top) {
+            labelOverlapCount += 1;
+          }
+        }
+      }
+      return {
+        minimumHitGap,
+        minimumHitWidth: Math.min(...nodes.map((node) => node.hitWidth)),
+        minimumNodeTendrilDistance,
+        minimumTendrilDistance,
+        labelOverlapCount,
+      };
+    });
+  }
+
+  function profileTreeGeometryDelta(before, after) {
+    return Math.max(
+      Math.abs(after.junction.x - before.junction.x),
+      Math.abs(after.junction.y - before.junction.y),
+      Math.abs(after.junction.width - before.junction.width),
+      Math.abs(after.junction.height - before.junction.height),
+      Math.abs(after.svg.width - before.svg.width),
+      Math.abs(after.svg.height - before.svg.height),
+    );
+  }
+
+  await page.goto(BASE_URL + '/about.html#profile-map', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.profile-map__svg', { timeout: 15000 });
+  await assert((await page.locator('.profile-map__trunk').count()) === 1, 'Profile tree should have one trunk');
+  await assert((await page.locator('.profile-map__branch').count()) === 4, 'Engineering profile tree should have four branches');
+  await assert((await page.locator('.profile-map__node').count()) === 21, 'Engineering profile tree should render 21 junctions');
+
+  const desktopTreeBefore = await readProfileTreeGeometry(page, 'android');
+  await page.locator('.profile-map__node[data-node-id="android"] .profile-map__node-mark').hover();
+  const desktopTreeDuringHover = await readProfileTreeGeometry(page, 'android');
+  await assert(profileTreeGeometryDelta(desktopTreeBefore, desktopTreeDuringHover) < 0.5, 'Profile tree geometry moved during hover');
+  await page.locator('.profile-map__node[data-node-id="android"] .profile-map__node-hit').click();
+  const desktopPopover = await readPopoverContainment(page);
+  await assert(!desktopPopover.hidden && desktopPopover.title === 'Android', 'Android junction should open a pinned detail card');
+  await assert(desktopPopover.inside, 'Desktop profile-tree card should stay inside the visual');
+  const desktopTreeAfter = await readProfileTreeGeometry(page, 'android');
+  const desktopJunctionDelta = profileTreeGeometryDelta(desktopTreeBefore, desktopTreeAfter);
+  await assert(desktopJunctionDelta < 0.5, `Profile tree geometry moved after selection/hover (${desktopJunctionDelta}px)`);
+  const desktopTreeIntegrity = await readProfileTreeIntegrity(page);
+  await assert(desktopTreeIntegrity.minimumHitGap >= 0, 'Desktop profile-tree hit targets overlap');
+  await assert(desktopTreeIntegrity.minimumNodeTendrilDistance >= 8, 'A desktop branchlet crosses another junction');
+  await assert(desktopTreeIntegrity.minimumTendrilDistance >= 0.75, 'Desktop branchlets cross each other');
+  await assert(desktopTreeIntegrity.labelOverlapCount === 0, 'Desktop profile-tree labels overlap');
+  await page.locator('.profile-map__popover-close').click();
+  await assert(await page.locator('.profile-map__popover').getAttribute('hidden') !== null, 'Profile-tree close button should dismiss the card');
+
+  await page.getByRole('tab', { name: 'Interests', exact: true }).click();
+  await assert((await page.locator('.profile-map__node').count()) === 10, 'Interests profile tree should render 10 junctions');
+  await assert((await page.locator('.profile-map__branch').count()) === 4, 'Interests profile tree should keep four branches');
+
+  await mobilePage.goto(BASE_URL + '/about.html#profile-map', { waitUntil: 'domcontentloaded' });
+  await mobilePage.waitForSelector('.profile-map__svg', { timeout: 15000 });
+  const mobileTreeLayout = await mobilePage.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+    junctions: document.querySelectorAll('.profile-map__node').length,
+    branches: document.querySelectorAll('.profile-map__branch').length,
+  }));
+  await assert(mobileTreeLayout.scrollWidth <= mobileTreeLayout.clientWidth, 'Mobile profile tree causes horizontal overflow');
+  await assert(mobileTreeLayout.junctions === 21 && mobileTreeLayout.branches === 4, 'Mobile engineering tree has incomplete structure');
+  const mobileTreeBefore = await readProfileTreeGeometry(mobilePage, 'android');
+  const mobileTreeIntegrity = await readProfileTreeIntegrity(mobilePage);
+  await assert(mobileTreeIntegrity.minimumHitWidth >= 32, 'A mobile profile-tree junction hit target is too small');
+  await assert(mobileTreeIntegrity.minimumHitGap >= 0, 'Mobile profile-tree hit targets overlap');
+  await assert(mobileTreeIntegrity.minimumNodeTendrilDistance >= 8, 'A mobile branchlet crosses another junction');
+  await assert(mobileTreeIntegrity.minimumTendrilDistance >= 0.75, 'Mobile branchlets cross each other');
+  await assert(mobileTreeIntegrity.labelOverlapCount === 0, 'Mobile profile-tree labels overlap');
+  await assert(mobileTreeBefore.hit.width >= 32 && mobileTreeBefore.hit.height >= 32, 'Mobile Android junction hit target is too small');
+  await mobilePage.locator('.profile-map__node[data-node-id="android"] .profile-map__node-hit').click();
+  const mobilePopover = await readPopoverContainment(mobilePage);
+  await assert(!mobilePopover.hidden && mobilePopover.inside, 'Mobile profile-tree card should open inside the visual');
+  await mobilePage.locator('.profile-map__popover-close').press('Escape');
+  await assert(await mobilePage.locator('.profile-map__popover').getAttribute('hidden') !== null, 'Escape should dismiss the mobile profile-tree card');
+
   // Nav clickthrough from home
   await page.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
   const navMap = [
