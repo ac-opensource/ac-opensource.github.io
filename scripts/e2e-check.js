@@ -197,7 +197,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(
     JSON.stringify(careerHeadings.slice(0, 4)) === JSON.stringify([
       'Senior Software Engineer — Bitcoin.com',
-      'Mobile Developer — ITV',
+      'Senior Mobile Developer — ITV',
       'Senior Android Developer — Red Airship',
       'Lead Developer — InnovationTeam',
     ]),
@@ -226,7 +226,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const resumeText = ((await page.locator('main').textContent()) || '').replace(/\s+/g, ' ').trim();
   for (const expectedText of [
     'Senior Software Engineer Bitcoin.com Bitcoin.com Wallet — Self-custody crypto wallet Jun 2024 — Present',
-    'Mobile Developer ITV ITVX — Streaming platform Jun 2023 — Jun 2024',
+    'Senior Mobile Developer ITV ITVX — Streaming platform Jun 2023 — Jun 2024',
     'Senior Android Developer Red Airship OCBC — Mobile banking OpenPay — Fintech Jun 2021 — Jun 2023',
     'Lead Developer InnovationTeam MySTC — Telecom project May 2020 — Jun 2021',
     'Team Lead iPARA Technologies and Solutions OWTO — Ride-hailing service Jun 2018 — May 2020',
