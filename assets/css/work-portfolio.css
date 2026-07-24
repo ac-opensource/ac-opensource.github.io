@@ -54,6 +54,14 @@ body {
   box-shadow: 0 0 0 0.3rem rgba(185, 234, 255, 0.12);
 }
 
+.work-eyebrow--bitcoin {
+  color: #ffad45;
+}
+
+.work-eyebrow--bitcoin::before {
+  box-shadow: 0 0 0 0.3rem rgba(255, 148, 22, 0.14);
+}
+
 .work-hero {
   position: relative;
   display: grid;
@@ -184,6 +192,16 @@ body {
 .work-button--light:hover,
 .work-button--light:focus-visible {
   background: #d0ff8e;
+}
+
+.work-button--bitcoin {
+  color: #171717;
+  background: #ff9416;
+}
+
+.work-button--bitcoin:hover,
+.work-button--bitcoin:focus-visible {
+  background: #ffad45;
 }
 
 .work-flow {
@@ -386,28 +404,46 @@ body {
   transform: translateY(-4px);
 }
 
-.work-case--itvx {
+.work-case--bitcoin {
   display: grid;
-  min-height: 38rem;
+  min-height: 42rem;
   grid-column: span 12;
-  grid-template-columns: minmax(17rem, 0.82fr) minmax(19rem, 1.18fr);
+  grid-template-columns: minmax(20rem, 0.9fr) minmax(22rem, 1.1fr);
   color: #fff;
   background:
-    radial-gradient(circle at 88% 14%, rgba(185, 240, 107, 0.11), transparent 22rem),
-    linear-gradient(145deg, #071a27 0%, #0b2a39 56%, #07394a 100%);
-  box-shadow: 0 28px 65px rgba(7, 26, 39, 0.2);
+    radial-gradient(circle at 88% 12%, rgba(255, 148, 22, 0.22), transparent 24rem),
+    radial-gradient(circle at 18% 92%, rgba(77, 109, 255, 0.12), transparent 22rem),
+    linear-gradient(145deg, #121212 0%, #1c1c1c 58%, #101010 100%);
+  box-shadow: 0 30px 72px rgba(20, 16, 11, 0.28);
+}
+
+.work-case--bitcoin:hover,
+.work-case--bitcoin:focus-within {
+  border-color: rgba(255, 148, 22, 0.48);
+  box-shadow: 0 38px 84px rgba(20, 16, 11, 0.34);
+}
+
+.work-case--itvx {
+  display: flex;
+  min-height: 0;
+  grid-column: span 5;
+  flex-direction: column;
+  color: var(--work-ink);
+  background:
+    radial-gradient(circle at 88% 14%, rgba(58, 173, 199, 0.11), transparent 17rem),
+    rgba(255, 255, 252, 0.82);
 }
 
 .work-case--itvx:hover,
 .work-case--itvx:focus-within {
-  border-color: rgba(185, 240, 107, 0.32);
-  box-shadow: 0 34px 75px rgba(7, 26, 39, 0.26);
+  border-color: rgba(31, 92, 186, 0.27);
+  box-shadow: 0 28px 68px rgba(39, 54, 45, 0.12), inset 0 1px rgba(255, 255, 255, 0.86);
 }
 
 .work-case--openpay {
   display: grid;
   min-height: 27rem;
-  grid-column: span 12;
+  grid-column: span 7;
   grid-template-columns: minmax(20rem, 0.92fr) minmax(20rem, 1.08fr);
   background:
     radial-gradient(circle at 8% 90%, rgba(115, 87, 197, 0.18), transparent 20rem),
@@ -425,13 +461,31 @@ body {
 }
 
 .work-case--ocbc {
-  display: grid;
-  min-height: 38rem;
+  display: flex;
+  min-height: 0;
   grid-column: span 7;
-  grid-template-columns: minmax(18rem, 1.05fr) minmax(15rem, 0.95fr);
+  flex-direction: column;
   background:
     radial-gradient(circle at 90% 10%, rgba(210, 47, 51, 0.09), transparent 19rem),
     rgba(255, 255, 252, 0.82);
+}
+
+.work-case--itvx .work-case__body,
+.work-case--ocbc .work-case__body {
+  order: 2;
+  flex: 1 1 auto;
+  padding: clamp(1.6rem, 2.5vw, 2.35rem);
+}
+
+.work-case--itvx .work-case__title,
+.work-case--ocbc .work-case__title {
+  font-size: clamp(2.7rem, 3.8vw, 4rem);
+}
+
+.work-case--itvx .work-case__actions,
+.work-case--ocbc .work-case__actions {
+  margin-top: auto;
+  padding-top: 1.75rem;
 }
 
 .work-case__body {
@@ -451,7 +505,11 @@ body {
 }
 
 .work-case--itvx .work-case__role {
-  color: #b9f06b;
+  color: var(--work-blue);
+}
+
+.work-case--bitcoin .work-case__role {
+  color: #ffad45;
 }
 
 .work-case__title {
@@ -472,7 +530,11 @@ body {
 }
 
 .work-case--itvx .work-case__lede {
-  color: rgba(239, 248, 249, 0.78);
+  color: var(--work-muted);
+}
+
+.work-case--bitcoin .work-case__lede {
+  color: rgba(255, 255, 255, 0.76);
 }
 
 .work-case__plain {
@@ -481,8 +543,8 @@ body {
   font: 600 0.94rem/1.62 "Manrope", sans-serif;
 }
 
-.work-case--itvx .work-case__plain {
-  color: #fff;
+.work-case--bitcoin .work-case__plain {
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .work-case__meta {
@@ -505,10 +567,10 @@ body {
   letter-spacing: 0.04em;
 }
 
-.work-case--itvx .work-chip {
-  border-color: rgba(255, 255, 255, 0.14);
-  color: #d8e8eb;
-  background: rgba(255, 255, 255, 0.055);
+.work-case--bitcoin .work-chip {
+  border-color: rgba(255, 148, 22, 0.22);
+  color: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 148, 22, 0.07);
 }
 
 .work-case__fact {
@@ -519,14 +581,14 @@ body {
   line-height: 1.5;
 }
 
-.work-case--itvx .work-case__fact {
-  color: rgba(216, 232, 235, 0.65);
+.work-case--bitcoin .work-case__fact {
+  color: rgba(255, 255, 255, 0.58);
 }
 
-.work-case--itvx .work-case__fact a {
-  color: rgba(232, 247, 240, 0.88);
+.work-case--bitcoin .work-case__fact a {
+  color: rgba(255, 196, 126, 0.94);
   text-decoration: underline;
-  text-decoration-color: rgba(185, 240, 107, 0.45);
+  text-decoration-color: rgba(255, 148, 22, 0.48);
   text-underline-offset: 0.2em;
 }
 
@@ -542,6 +604,95 @@ body {
   color: var(--work-blue);
   font: 700 0.76rem/1.2 "Space Grotesk", sans-serif;
   letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.work-bitcoin-stage {
+  position: relative;
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  overflow: hidden;
+  margin: 0;
+  padding: clamp(1.25rem, 3vw, 2.75rem);
+  isolation: isolate;
+}
+
+.work-bitcoin-stage::before {
+  position: absolute;
+  width: min(76%, 30rem);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 148, 22, 0.2);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 4rem rgba(255, 148, 22, 0.025),
+    0 0 0 8rem rgba(255, 148, 22, 0.018);
+  content: "";
+}
+
+.work-bitcoin-gallery {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 36rem);
+  height: 35rem;
+}
+
+.work-bitcoin-shot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(10.75rem, 37%, 13.5rem);
+  aspect-ratio: 443 / 788;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 1.35rem;
+  object-fit: cover;
+  box-shadow: 0 30px 62px rgba(0, 0, 0, 0.48);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), filter 320ms ease;
+}
+
+.work-bitcoin-shot--portfolio {
+  z-index: 3;
+  transform: translate(-50%, -50%) rotate(-1deg);
+}
+
+.work-bitcoin-shot--markets {
+  z-index: 1;
+  filter: saturate(0.82) brightness(0.76);
+  transform: translate(-108%, -46%) rotate(-8deg) scale(0.88);
+}
+
+.work-bitcoin-shot--trade {
+  z-index: 2;
+  filter: saturate(0.86) brightness(0.82);
+  transform: translate(8%, -46%) rotate(8deg) scale(0.88);
+}
+
+.work-case--bitcoin:hover .work-bitcoin-shot--portfolio,
+.work-case--bitcoin:focus-within .work-bitcoin-shot--portfolio {
+  transform: translate(-50%, -53%) rotate(0deg);
+}
+
+.work-case--bitcoin:hover .work-bitcoin-shot--markets,
+.work-case--bitcoin:focus-within .work-bitcoin-shot--markets {
+  filter: saturate(0.96) brightness(0.9);
+  transform: translate(-116%, -48%) rotate(-5deg) scale(0.9);
+}
+
+.work-case--bitcoin:hover .work-bitcoin-shot--trade,
+.work-case--bitcoin:focus-within .work-bitcoin-shot--trade {
+  filter: saturate(0.96) brightness(0.92);
+  transform: translate(16%, -48%) rotate(5deg) scale(0.9);
+}
+
+.work-bitcoin-gallery__caption {
+  position: absolute;
+  z-index: 4;
+  right: 1.5rem;
+  bottom: 1.2rem;
+  color: rgba(255, 255, 255, 0.62);
+  font: 700 0.62rem/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -580,6 +731,13 @@ body {
   background: rgba(58, 173, 199, 0.11);
 }
 
+.work-case--itvx .work-stream-stage {
+  order: 1;
+  min-height: 24rem;
+  flex: 0 0 24rem;
+  padding: 1rem 1.5rem;
+}
+
 .work-itvx-gallery {
   position: relative;
   z-index: 1;
@@ -587,17 +745,21 @@ body {
   height: 33rem;
 }
 
+.work-case--itvx .work-itvx-gallery {
+  height: 22rem;
+}
+
 .work-itvx-shot {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: clamp(10.5rem, 38%, 13.25rem);
+  width: clamp(8.75rem, 44%, 10.75rem);
   aspect-ratio: 944 / 2046;
   overflow: hidden;
-  border: 1px solid rgba(221, 244, 239, 0.2);
-  border-radius: 1.4rem;
+  border: 1px solid rgba(95, 102, 98, 0.16);
+  border-radius: 1rem;
   object-fit: cover;
-  box-shadow: 0 28px 55px rgba(0, 0, 0, 0.36);
+  box-shadow: 0 24px 48px rgba(45, 54, 49, 0.22);
   transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), filter 320ms ease;
 }
 
@@ -640,7 +802,7 @@ body {
   z-index: 4;
   right: 1.5rem;
   bottom: 1.2rem;
-  color: rgba(223, 243, 239, 0.7);
+  color: rgba(67, 76, 70, 0.68);
   font: 700 0.62rem/1.2 "Space Grotesk", sans-serif;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -660,6 +822,13 @@ body {
     radial-gradient(circle at 82% 76%, rgba(54, 159, 179, 0.12), transparent 13rem);
 }
 
+.work-case--ocbc .work-ocbc-stage {
+  order: 1;
+  min-height: 24rem;
+  flex: 0 0 24rem;
+  padding: 1rem 1.5rem;
+}
+
 .work-ocbc-stage::before {
   position: absolute;
   width: 18rem;
@@ -675,6 +844,10 @@ body {
   z-index: 1;
   width: min(100%, 30rem);
   height: 31rem;
+}
+
+.work-case--ocbc .work-ocbc-gallery {
+  height: 22rem;
 }
 
 .work-ocbc-shot {
@@ -855,6 +1028,11 @@ body {
   grid-template-columns: minmax(16rem, 0.9fr) minmax(15rem, 1.1fr);
 }
 
+.work-public-card--mempalace {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(18rem, 0.9fr) minmax(20rem, 1.1fr);
+}
+
 .work-public-card__body {
   display: flex;
   flex-direction: column;
@@ -872,6 +1050,14 @@ body {
   margin-top: 1.2rem;
   color: var(--work-muted);
   line-height: 1.72;
+}
+
+.work-public-card p code {
+  border-radius: 0.25rem;
+  padding: 0.08rem 0.24rem;
+  color: #24453f;
+  background: rgba(22, 140, 134, 0.09);
+  font: 600 0.9em/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .work-public-card .work-text-link {
@@ -943,6 +1129,106 @@ body {
 .work-agent-art__node:nth-of-type(3) {
   right: 12%;
   bottom: 18%;
+}
+
+.work-memory-art {
+  position: relative;
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  background:
+    linear-gradient(rgba(129, 226, 244, 0.065) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(129, 226, 244, 0.065) 1px, transparent 1px),
+    radial-gradient(circle at 50% 48%, rgba(95, 219, 243, 0.18), transparent 18rem),
+    linear-gradient(145deg, #10161c, #182933 62%, #0e151a);
+  background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+  isolation: isolate;
+}
+
+.work-memory-art::before {
+  position: absolute;
+  top: -18%;
+  left: 50%;
+  width: 0.22rem;
+  height: 72%;
+  background: linear-gradient(transparent, rgba(174, 241, 255, 0.92), transparent);
+  box-shadow: 0 0 1.2rem rgba(95, 219, 243, 0.62);
+  content: "";
+  transform: translateX(-50%);
+}
+
+.work-memory-art__glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(22rem, 62%);
+  aspect-ratio: 1;
+  border: 1px solid rgba(170, 239, 255, 0.32);
+  background: linear-gradient(145deg, rgba(162, 235, 249, 0.08), rgba(48, 154, 183, 0.025));
+  box-shadow: 0 0 4rem rgba(69, 191, 218, 0.18), inset 0 0 2rem rgba(118, 224, 246, 0.08);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.work-memory-art__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 34rem);
+  overflow: hidden;
+  border: 1px solid rgba(174, 241, 255, 0.24);
+  border-radius: 0.8rem;
+  background: rgba(11, 24, 31, 0.9);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.34), 0 0 0 0.4rem rgba(103, 216, 239, 0.04);
+}
+
+.work-memory-art__head,
+.work-memory-art__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.work-memory-art__head {
+  border-bottom: 1px solid rgba(174, 241, 255, 0.12);
+  padding: 1rem 1.15rem;
+  color: rgba(220, 247, 252, 0.68);
+  font: 700 0.62rem/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: 0.13em;
+}
+
+.work-memory-art__head span:last-child {
+  color: #b9f06b;
+}
+
+.work-memory-art__row {
+  margin: 0 1.15rem;
+  border-bottom: 1px solid rgba(174, 241, 255, 0.08);
+  padding: 1rem 0;
+}
+
+.work-memory-art__row:last-child {
+  border-bottom: 0;
+}
+
+.work-memory-art__row span {
+  color: #d8eff2;
+  font: 600 0.78rem/1.25 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.work-memory-art__row strong {
+  color: #81e2f4;
+  font: 700 0.63rem/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: 0.1em;
+}
+
+.work-memory-art__row--ignored strong {
+  color: #f1c876;
+}
+
+.work-memory-art__row--nested strong {
+  color: #b9f06b;
 }
 
 .work-archive-grid {
@@ -1201,6 +1487,7 @@ body {
 }
 
 @media (max-width: 1120px) {
+  .work-case--bitcoin,
   .work-case--itvx,
   .work-case--openpay,
   .work-case--mystc,
@@ -1243,28 +1530,39 @@ body {
     max-width: 17ch;
   }
 
+  .work-case--bitcoin,
   .work-case--itvx,
   .work-case--openpay,
   .work-case--mystc,
   .work-case--ocbc,
   .work-public-card--persons,
+  .work-public-card--mempalace,
   .work-public-grid {
     grid-template-columns: 1fr;
   }
 
+  .work-case--bitcoin,
   .work-case--itvx,
   .work-case--openpay {
     min-height: auto;
   }
 
+  .work-case--itvx .work-case__body,
   .work-case--ocbc .work-case__body,
   .work-case--openpay .work-case__body {
     order: 1;
   }
 
+  .work-case--itvx .work-stream-stage,
   .work-case--ocbc .work-ocbc-stage,
   .work-case--openpay .work-openpay-stage {
     order: 2;
+  }
+
+  .work-case--itvx .work-stream-stage,
+  .work-case--ocbc .work-ocbc-stage {
+    min-height: 25rem;
+    flex-basis: 25rem;
   }
 
   .work-stream-stage {
@@ -1279,6 +1577,10 @@ body {
 
   .work-public-card__image {
     min-height: 20rem;
+  }
+
+  .work-memory-art {
+    min-height: 22rem;
   }
 
   .work-cta {
@@ -1350,9 +1652,20 @@ body {
     padding: 0;
   }
 
+  .work-bitcoin-stage,
   .work-stream-stage {
     min-height: 20rem;
     padding: 0 1rem 1rem;
+  }
+
+  .work-case--itvx .work-stream-stage,
+  .work-case--ocbc .work-ocbc-stage {
+    min-height: 20rem;
+    flex-basis: 20rem;
+  }
+
+  .work-bitcoin-gallery {
+    height: 30rem;
   }
 
   .work-itvx-gallery {
@@ -1374,6 +1687,11 @@ body {
 
   .work-public-card__image {
     min-height: auto;
+  }
+
+  .work-memory-art {
+    min-height: 18rem;
+    padding: 1.25rem;
   }
 
   .work-archive-grid {
@@ -1400,6 +1718,7 @@ body {
   .work-case,
   .work-public-card,
   .work-archive-card,
+  .work-bitcoin-shot,
   .work-itvx-shot,
   .work-ocbc-shot,
   .work-device,
@@ -1418,6 +1737,23 @@ body {
   .work-button svg,
   .work-text-link svg {
     transform: none !important;
+  }
+
+  .work-case--bitcoin:hover .work-bitcoin-shot--portfolio,
+  .work-case--bitcoin:focus-within .work-bitcoin-shot--portfolio {
+    transform: translate(-50%, -50%) rotate(-1deg);
+  }
+
+  .work-case--bitcoin:hover .work-bitcoin-shot--markets,
+  .work-case--bitcoin:focus-within .work-bitcoin-shot--markets {
+    filter: saturate(0.82) brightness(0.76);
+    transform: translate(-108%, -46%) rotate(-8deg) scale(0.88);
+  }
+
+  .work-case--bitcoin:hover .work-bitcoin-shot--trade,
+  .work-case--bitcoin:focus-within .work-bitcoin-shot--trade {
+    filter: saturate(0.86) brightness(0.82);
+    transform: translate(8%, -46%) rotate(8deg) scale(0.88);
   }
 
   .work-case--itvx:hover .work-itvx-shot--home,
