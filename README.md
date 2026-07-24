@@ -11,7 +11,7 @@ Static multi-page portfolio and technical blog. SQLite is the authoring-only sou
 - `blog/posts.json`: published-only metadata used for progressive enhancement; article bodies stay in static HTML.
 - `assets/data/profile-map.json`: public evidence model for the interactive Engineering and Interests profile tree.
 - `scripts/blog-writer-server.js`: loopback-only writer API with a per-run session check.
-- `.github/workflows/pages.yml`: verifies and deploys only `dist/` from the default `main` branch.
+- `.github/workflows/pages.yml`: verifies and deploys only `dist/` from the default `master` branch.
 
 Authoring files, hidden posts, preview routes, templates, databases, application materials, and stale generated pages are rejected from the publication artifact.
 
