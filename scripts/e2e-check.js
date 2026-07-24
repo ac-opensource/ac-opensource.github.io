@@ -677,12 +677,87 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(deviceRatio >= 2.1 && deviceRatio <= 2.25, `Portfolio device ratio is ${deviceRatio.toFixed(2)}; expected a modern phone proportion`);
 
   await mobilePage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  const ocbcMobileOrder = await mobilePage.locator('.work-case--ocbc').evaluate((card) => {
-    const body = card.querySelector('.work-case__body')?.getBoundingClientRect();
-    const stage = card.querySelector('.work-ocbc-stage')?.getBoundingClientRect();
-    return body && stage ? body.top < stage.top : false;
+  const mobileProjectOrder = await mobilePage.evaluate(() => {
+    const failures = [];
+    const tolerance = 2;
+
+    const checkOrder = (card, name, selectors) => {
+      const elements = selectors.map((selector) => card.querySelector(selector));
+      if (elements.some((element) => !element)) {
+        failures.push(`${name}: missing ${selectors[elements.findIndex((element) => !element)]}`);
+        return;
+      }
+
+      const [label, title, visual, details] = elements.map((element) => element.getBoundingClientRect());
+      if (label.bottom > title.top + tolerance) failures.push(`${name}: label is not before title`);
+      if (title.bottom > visual.top + tolerance) failures.push(`${name}: title is not before visual`);
+      if (visual.bottom > details.top + tolerance) failures.push(`${name}: visual is not before details`);
+    };
+
+    const productionCards = [
+      ['Bitcoin.com Wallet', '.work-case--bitcoin', '.work-bitcoin-stage'],
+      ['ITVX', '.work-case--itvx', '.work-stream-stage'],
+      ['OCBC Business', '.work-case--ocbc', '.work-ocbc-stage'],
+      ['openpay', '.work-case--openpay', '.work-openpay-stage'],
+      ['MySTC', '.work-case--mystc', '.work-device-stage'],
+    ];
+    productionCards.forEach(([name, cardSelector, visualSelector]) => {
+      const card = document.querySelector(cardSelector);
+      if (!card) {
+        failures.push(`${name}: missing card`);
+        return;
+      }
+      checkOrder(card, name, [
+        '.work-case__body > .work-eyebrow',
+        '.work-case__body > .work-case__title',
+        visualSelector,
+        '.work-case__body > :is(.work-case__role, .work-case__lede)',
+      ]);
+    });
+
+    const publicCards = [
+      ['Persons Finder', '.work-public-card--persons', '.work-public-card__image'],
+      ['Orchestrum', '.work-public-card--orchestrum', '.work-agent-art'],
+      ['MemPalace', '.work-public-card--mempalace', '.work-memory-art'],
+    ];
+    publicCards.forEach(([name, cardSelector, visualSelector]) => {
+      const card = document.querySelector(cardSelector);
+      if (!card) {
+        failures.push(`${name}: missing card`);
+        return;
+      }
+      checkOrder(card, name, [
+        '.work-public-card__body > .work-eyebrow',
+        '.work-public-card__body > h3',
+        visualSelector,
+        '.work-public-card__body > p',
+      ]);
+    });
+
+    const archiveCards = Array.from(document.querySelectorAll('.work-archive-card'));
+    archiveCards.forEach((card, index) => {
+      checkOrder(card, card.querySelector('h3')?.textContent?.trim() || `Archive card ${index + 1}`, [
+        ':scope > .work-archive-card__top',
+        ':scope > h3',
+        ':scope > :is(.work-archive-card__media, .work-archive-card__asset-link)',
+        ':scope > p',
+      ]);
+    });
+
+    return {
+      archiveCount: archiveCards.length,
+      productionCount: document.querySelectorAll('.work-case').length,
+      publicCount: document.querySelectorAll('.work-public-card').length,
+      failures,
+    };
   });
-  await assert(ocbcMobileOrder, 'OCBC mobile card shows its screenshot before its project heading');
+  await assert(mobileProjectOrder.productionCount === 5, 'Mobile project-order check did not cover all production cards');
+  await assert(mobileProjectOrder.publicCount === 3, 'Mobile project-order check did not cover all public cards');
+  await assert(mobileProjectOrder.archiveCount === 8, 'Mobile project-order check did not cover all archive cards');
+  await assert(
+    mobileProjectOrder.failures.length === 0,
+    `Mobile project cards do not follow label, title, visual, details order: ${mobileProjectOrder.failures.join('; ')}`
+  );
 
   const reducedMotion = await browser.newContext({
     reducedMotion: 'reduce',
