@@ -1638,13 +1638,119 @@ body {
 
   .work-case,
   .work-public-card {
-    border-radius: 0.55rem;
-  }
-
-  .work-case--openpay {
     display: flex;
     min-height: auto;
     flex-direction: column;
+    border-radius: 0.55rem;
+  }
+
+  .work-case__body,
+  .work-public-card__body {
+    display: contents;
+  }
+
+  .work-case__body > *,
+  .work-public-card__body > * {
+    position: relative;
+    z-index: 2;
+    order: 4;
+    margin-right: 1.35rem;
+    margin-left: 1.35rem;
+  }
+
+  .work-case__body > .work-eyebrow,
+  .work-public-card__body > .work-eyebrow {
+    order: 1;
+    margin-top: 1.35rem;
+  }
+
+  .work-case__body > .work-case__title,
+  .work-public-card__body > h3 {
+    order: 2;
+  }
+
+  .work-case__body > .work-case__title {
+    margin-top: 0.8rem;
+  }
+
+  .work-case > .work-bitcoin-stage,
+  .work-case > .work-stream-stage,
+  .work-case > .work-ocbc-stage,
+  .work-case > .work-openpay-stage,
+  .work-case > .work-device-stage,
+  .work-public-card > .work-public-card__image,
+  .work-public-card > .work-agent-art,
+  .work-public-card > .work-memory-art {
+    order: 3;
+    margin-top: 1.25rem;
+  }
+
+  .work-case__body > .work-case__role {
+    order: 4;
+  }
+
+  .work-case__body > .work-case__lede {
+    order: 5;
+  }
+
+  .work-case__body > .work-case__plain {
+    order: 6;
+  }
+
+  .work-case__body > .work-case__meta {
+    order: 7;
+  }
+
+  .work-case__body > .work-case__fact {
+    order: 8;
+  }
+
+  .work-case__body > .work-case__actions {
+    order: 9;
+  }
+
+  .work-public-card__body > p {
+    order: 4;
+  }
+
+  .work-public-card__body > .work-case__meta {
+    order: 5;
+  }
+
+  .work-public-card__body > .work-text-link {
+    order: 6;
+  }
+
+  .work-case__body > :last-child,
+  .work-public-card__body > :last-child {
+    margin-bottom: 1.35rem;
+  }
+
+  .work-agent-art {
+    margin-right: 0;
+    margin-left: 0;
+    border-radius: 0;
+  }
+
+  .work-archive-card__top {
+    order: 1;
+  }
+
+  .work-archive-card h3 {
+    order: 2;
+  }
+
+  .work-archive-card > .work-archive-card__media,
+  .work-archive-card > .work-archive-card__asset-link {
+    order: 3;
+  }
+
+  .work-archive-card > p {
+    order: 4;
+  }
+
+  .work-archive-card > .work-text-link {
+    order: 5;
   }
 
   .work-openpay-stage {
