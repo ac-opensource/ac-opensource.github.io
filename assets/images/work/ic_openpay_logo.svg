@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-labelledby="t d">
+  <title id="t">openpay logo mark</title>
+  <desc id="d">Minimal openpay wordmark on warm yellow background.</desc>
+  <rect width="128" height="128" rx="14" fill="#f5b81f"/>
+  <g fill="#121212" font-family="Space Grotesk, Arial, sans-serif" font-weight="700" text-anchor="middle">
+    <text x="64" y="58" font-size="30" letter-spacing="1">open</text>
+    <text x="64" y="86" font-size="30" letter-spacing="1">pay</text>
+  </g>
+  <circle cx="24" cy="22" r="4" fill="#121212" opacity="0.85"/>
+  <circle cx="102" cy="105" r="3" fill="#121212" opacity="0.65"/>
+</svg>

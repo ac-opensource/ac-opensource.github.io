@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
+<title>Blog | Andrew Concepcion</title>
+<meta name="description" content="Engineering logs, essays, and field notes by Andrew Concepcion on mobile systems, architecture, and product delivery.">
+<link rel="canonical" href="https://ac-opensource.github.io/blog/"/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:site_name" content="Andrew Concepcion"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://ac-opensource.github.io/blog/"/>
+<meta property="og:title" content="Blog | Andrew Concepcion"/>
+<meta property="og:description" content="Engineering logs, essays, and field notes by Andrew Concepcion on mobile systems, architecture, and product delivery."/>
+<meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/blog.png"/>
+<meta property="og:image:type" content="image/png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="Andrew Concepcion's engineering logs, essays, and field notes"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Blog | Andrew Concepcion"/>
+<meta name="twitter:description" content="Engineering logs, essays, and field notes by Andrew Concepcion on mobile systems, architecture, and product delivery."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/blog.png"/>
+<meta name="twitter:image:alt" content="Andrew Concepcion's engineering logs, essays, and field notes"/>
+<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-error": "#fff7f6",
+                        "on-secondary": "#f6f9ff",
+                        "background": "#faf9f4",
+                        "tertiary": "#1f5cba",
+                        "inverse-surface": "#0d0f0c",
+                        "tertiary-fixed": "#6799fb",
+                        "on-secondary-container": "#4a535c",
+                        "tertiary-container": "#6799fb",
+                        "tertiary-dim": "#024fad",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#faf9f4",
+                        "outline": "#787c73",
+                        "inverse-primary": "#f0f4fb",
+                        "error": "#9f403d",
+                        "on-secondary-fixed": "#374049",
+                        "surface-container-low": "#f4f4ee",
+                        "on-primary-fixed": "#3b4045",
+                        "secondary-container": "#dae3ef",
+                        "secondary": "#57606a",
+                        "primary-container": "#dee3e9",
+                        "surface-tint": "#5a5f65",
+                        "primary-fixed": "#dee3e9",
+                        "on-surface-variant": "#5c6058",
+                        "on-tertiary-container": "#001b46",
+                        "on-background": "#2f342d",
+                        "surface-dim": "#d7dcd0",
+                        "on-tertiary": "#f9f8ff",
+                        "on-surface": "#2f342d",
+                        "on-error-container": "#752121",
+                        "surface-container": "#edefe7",
+                        "on-primary-fixed-variant": "#575c62",
+                        "inverse-on-surface": "#9d9d99",
+                        "secondary-dim": "#4b545d",
+                        "outline-variant": "#afb3aa",
+                        "primary": "#5a5f65",
+                        "error-container": "#fe8983",
+                        "surface-bright": "#faf9f4",
+                        "primary-fixed-dim": "#d0d5db",
+                        "tertiary-fixed-dim": "#598ced",
+                        "surface-variant": "#e0e4d9",
+                        "on-tertiary-fixed-variant": "#002559",
+                        "secondary-fixed-dim": "#ccd5e1",
+                        "primary-dim": "#4e5358",
+                        "error-dim": "#4e0309",
+                        "on-tertiary-fixed": "#000000",
+                        "surface-container-highest": "#e0e4d9",
+                        "on-primary": "#f4f8ff",
+                        "on-secondary-fixed-variant": "#535c66",
+                        "secondary-fixed": "#dae3ef",
+                        "on-primary-container": "#4d5258",
+                        "surface-container-high": "#e7e9e0"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #faf9f4;
+        }
+        .archive-cube-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .archive-stage {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotateArchive 25s infinite linear;
+        }
+        .plane {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 0.5px solid rgba(90, 95, 101, 0.3);
+            background: rgba(224, 228, 217, 0.1);
+            backdrop-filter: blur(1px);
+        }
+        .plane:nth-child(1) { transform: translateZ(40px); }
+        .plane:nth-child(2) { transform: translateZ(20px); }
+        .plane:nth-child(3) { transform: translateZ(0px); }
+        .plane:nth-child(4) { transform: translateZ(-20px); }
+        .plane:nth-child(5) { transform: translateZ(-40px); }
+        .lattice {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(to right, rgba(90, 95, 101, 0.2) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(90, 95, 101, 0.2) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .shifting-line {
+            position: absolute;
+            height: 1px;
+            width: 100%;
+            background: rgba(31, 92, 186, 0.4);
+            animation: moveLine 4s infinite ease-in-out;
+        }
+        @keyframes rotateArchive {
+            0% { transform: rotateX(-20deg) rotateY(0deg) rotateZ(0deg); }
+            50% { transform: rotateX(20deg) rotateY(180deg) rotateZ(10deg); }
+            100% { transform: rotateX(-20deg) rotateY(360deg) rotateZ(0deg); }
+        }
+        @keyframes moveLine {
+            0% { top: 0; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        @media (max-width: 767px) {
+            .archive-cube-container { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .archive-stage,
+            .shifting-line { animation: none !important; }
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface overflow-x-hidden">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="neural-global-bg" aria-hidden="true">
+  <div class="neural-mesh-container">
+    <div class="neural-mesh"></div>
+    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
+    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
+    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
+    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
+    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
+    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
+    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
+    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
+  </div>
+  <div class="bust-gradient"></div>
+  <div class="canvas-grid"></div>
+</div>
+<header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
+  <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
+    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+      <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+      <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+      <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+    </nav>
+    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
+  </div>
+  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+    <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+    <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+  </nav>
+</header>
+<main id="main" class="pt-32 md:pt-24 pb-20 max-w-6xl mx-auto px-6">
+<!-- Header Section -->
+<header class="mb-12 md:mb-20 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+<div class="md:col-span-8">
+<div class="font-label text-xs uppercase tracking-[0.2em] text-tertiary mb-4">
+                    [archive_mode: active]
+                </div>
+<h1 class="font-headline text-7xl font-bold tracking-tighter text-on-surface leading-none mb-2">
+                    logs.
+                </h1>
+<p class="font-serif text-2xl text-on-surface-variant max-w-xl leading-relaxed italic">
+                    Compose-first delivery notes, architecture retrospectives, and personal journals from active projects.
+                </p>
+</div>
+<div class="hidden md:flex md:col-span-4 justify-end">
+<div class="bg-surface-container-highest p-8 aspect-square w-64 flex items-center justify-center border border-outline-variant/20 relative overflow-hidden">
+<div class="archive-cube-container">
+<div class="archive-stage">
+<div class="plane"><div class="lattice"></div><div class="shifting-line" style="animation-delay: -1s"></div></div>
+<div class="plane"><div class="lattice"></div><div class="shifting-line" style="animation-delay: -2s"></div></div>
+<div class="plane"><div class="lattice"></div><div class="shifting-line" style="animation-delay: -3s"></div></div>
+<div class="plane"><div class="lattice"></div><div class="shifting-line" style="animation-delay: -4s"></div></div>
+<div class="plane"><div class="lattice"></div><div class="shifting-line" style="animation-delay: -5s"></div></div>
+</div>
+</div>
+<div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-tertiary/5 to-transparent h-1 w-full animate-pulse top-1/2"></div>
+</div>
+</div>
+</header><div class="mb-12 border-b border-outline-variant/10 pb-12">
+<div class="flex flex-col md:flex-row items-center gap-8">
+<!-- Search Input Field -->
+<div class="relative flex-1 group w-full">
+<span class="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-secondary text-lg group-focus-within:text-tertiary transition-colors">search</span>
+<label class="sr-only" for="search-posts">Search blog posts</label>
+<input id="search-posts" class="w-full bg-transparent border-none focus:ring-0 font-label text-lg pl-8 py-3 text-on-surface placeholder:text-outline-variant/60 italic" placeholder="|grep /search/..." type="search" autocomplete="off"/>
+</div>
+<!-- Separator -->
+<div class="hidden md:block text-outline-variant/30 font-label">-</div>
+<!-- Filters / Categories -->
+<div id="category-filters" class="flex flex-wrap items-center gap-2 md:gap-6">
+<button data-category="all" class="font-label text-xs px-3 py-1.5 bg-surface-container-highest text-on-surface border border-outline-variant/20 uppercase tracking-widest">
+                [ALL]
+            </button>
+</div>
+</div>
+</div>
+<div class="flex justify-end mb-8">
+<a class="font-label text-xs px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors" href="/blog/rss.xml">
+            [RSS]
+          </a>
+</div>
+<section id="blog-feed" class="space-y-12" aria-label="Latest blog posts">
+  <article class="py-8 border-t border-outline-variant/20">
+    <time class="font-label text-xs text-outline" datetime="2026-07-22">2026-07-22 · 8 min read</time>
+    <h2 class="font-headline text-3xl md:text-4xl font-bold leading-tight mt-3"><a class="hover:text-tertiary" href="/blog/2026-07-22-its-not-okay-to-stay-not-okay.html">It’s Not Okay to Stay “Not Okay”</a></h2>
+    <p class="text-secondary text-lg leading-relaxed mt-3">Acceptance makes room for honesty. Responsibility turns that honesty into the next workable step—without shame, denial, or pretending recovery is simple.</p>
+  </article>
+  <article class="py-8 border-t border-outline-variant/20">
+    <time class="font-label text-xs text-outline" datetime="2026-07-22">2026-07-22 · 7 min read</time>
+    <h2 class="font-headline text-3xl md:text-4xl font-bold leading-tight mt-3"><a class="hover:text-tertiary" href="/blog/2026-07-22-the-fortress-we-mistake-for-home.html">The Fortress We Mistake for Home</a></h2>
+    <p class="text-secondary text-lg leading-relaxed mt-3">A reflection on the defenses we build from old wounds, pride, and habit—and why real change begins when we stop guarding what keeps us trapped.</p>
+  </article>
+  <article class="py-8 border-t border-outline-variant/20">
+    <time class="font-label text-xs text-outline" datetime="2026-07-21">2026-07-21 · 12 min read</time>
+    <h2 class="font-headline text-3xl md:text-4xl font-bold leading-tight mt-3"><a class="hover:text-tertiary" href="/blog/2026-07-21-what-building-persons-finder-taught-me.html">What Building a Small Backend Taught Me About AI-Ready Engineering</a></h2>
+    <p class="text-secondary text-lg leading-relaxed mt-3">A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.</p>
+  </article>
+  <article class="py-8 border-t border-outline-variant/20">
+    <time class="font-label text-xs text-outline" datetime="2026-04-30">2026-04-30 · 10 min read</time>
+    <h2 class="font-headline text-3xl md:text-4xl font-bold leading-tight mt-3"><a class="hover:text-tertiary" href="/blog/2026-04-30-agents-that-leave-receipts.html">Agents That Leave Receipts</a></h2>
+    <p class="text-secondary text-lg leading-relaxed mt-3">A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust.</p>
+  </article>
+</section>
+<div id="infinite-sentinel" class="mt-20 py-12 border-t border-on-surface flex justify-center items-center">
+<div id="infinite-status" class="font-label text-sm uppercase tracking-widest flex items-center gap-2 text-outline-variant">
+<span class="material-symbols-outlined">south</span> [SCROLL_FOR_MORE]
+</div>
+</div>
+</main>
+<footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
+    <span>© 2026 Andrew Concepcion</span>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
+  </div>
+</footer>
+<script>
+  (() => {
+    const feed = document.getElementById("blog-feed");
+    const searchInput = document.getElementById("search-posts");
+    const infiniteSentinel = document.getElementById("infinite-sentinel");
+    const infiniteStatus = document.getElementById("infinite-status");
+    const categoryFilters = document.getElementById("category-filters");
+    const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
+    const PAGE_SIZE = 4;
+    let allPosts = [];
+    let filteredPosts = [];
+    let bookmarks = new Set();
+    let activeCategory = "all";
+    let visibleCount = PAGE_SIZE;
+    let isLoadingMore = false;
+    let infiniteObserver = null;
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function visibleCategory(value) {
+      const category = String(value || "log").trim().toLowerCase() || "log";
+      return category === "work" ? "portfolio" : category;
+    }
+
+    function formatDate(raw) {
+      const d = new Date(raw);
+      if (Number.isNaN(d.getTime())) return raw || "";
+      return d.toISOString().slice(0, 10);
+    }
+
+    function hashSeed(value) {
+      const text = String(value || "seed");
+      let hash = 0;
+      for (let i = 0; i < text.length; i += 1) {
+        hash = (hash << 5) - hash + text.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash);
+    }
+
+    function makeAbstractFallback(seedValue) {
+      const palettes = [
+        ["#e2e6db", "#1f5cba", "#5a7fb9", "#a5b7cf"],
+        ["#e6e6df", "#364c73", "#6b86ad", "#afbcd0"],
+        ["#e0e4dc", "#2f485f", "#5e7e9a", "#9fb4c6"],
+        ["#e7e9e2", "#355f95", "#6f8fb8", "#b7c4d6"]
+      ];
+      const hash = hashSeed(seedValue);
+      const [bg, primary, secondary, detail] = palettes[hash % palettes.length];
+      const offset = (hash % 140) + 30;
+      const svg = `
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 900'>
+          <rect width='1200' height='900' fill='${bg}' />
+          <rect x='100' y='120' width='1000' height='660' fill='none' stroke='${detail}' stroke-width='6'/>
+          <rect x='${offset}' y='140' width='640' height='360' fill='none' stroke='${secondary}' stroke-width='7' opacity='0.95'/>
+          <circle cx='860' cy='300' r='120' fill='none' stroke='${primary}' stroke-width='8' opacity='0.75'/>
+          <path d='M120 700 L1080 210' stroke='${primary}' stroke-width='6' opacity='0.55'/>
+          <path d='M240 760 L1020 340' stroke='${secondary}' stroke-width='5' opacity='0.65'/>
+          <rect x='780' y='520' width='220' height='160' fill='${detail}' opacity='0.45'/>
+          <circle cx='320' cy='260' r='10' fill='${primary}'/>
+          <circle cx='920' cy='620' r='10' fill='${primary}'/>
+          <text x='140' y='740' font-family='Space Grotesk, Arial, sans-serif' font-size='44' fill='${primary}' opacity='0.35'>ABSTRACT_PREVIEW</text>
+        </svg>
+      `;
+      return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    }
+
+    function hasUsableHeroImage(value) {
+      const url = String(value || "").trim();
+      if (!url) return false;
+      const lower = url.toLowerCase();
+      if (lower.includes("aida-public")) return false;
+      if (lower.includes("unsplash.com/photos/") && lower.includes("/download")) return false;
+      return true;
+    }
+
+    function normalizePreviewImageUrl(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      if (raw.startsWith("https://ac-opensource.github.io/")) {
+        return raw.replace("https://ac-opensource.github.io", "");
+      }
+      return raw;
+    }
+
+    function loadBookmarks() {
+      try {
+        const raw = localStorage.getItem(BOOKMARKS_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(parsed)) return new Set();
+        return new Set(parsed.map((value) => String(value || "").trim()).filter(Boolean));
+      } catch (_error) {
+        return new Set();
+      }
+    }
+
+    function saveBookmarks() {
+      try {
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(bookmarks)));
+      } catch (_error) {
+        // Ignore write failures.
+      }
+    }
+
+    function isBookmarked(slug) {
+      return bookmarks.has(String(slug || "").trim());
+    }
+
+    function toggleBookmark(slug) {
+      const key = String(slug || "").trim();
+      if (!key) return false;
+      if (bookmarks.has(key)) {
+        bookmarks.delete(key);
+      } else {
+        bookmarks.add(key);
+      }
+      saveBookmarks();
+      return bookmarks.has(key);
+    }
+
+    async function sharePost(shareUrl, title) {
+      const absoluteUrl = new URL(shareUrl, window.location.origin).href;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: String(title || "Blog post"),
+            url: absoluteUrl
+          });
+          return;
+        } catch (_error) {
+          // Continue to clipboard fallback.
+        }
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(absoluteUrl);
+          return;
+        } catch (_error) {
+          // Continue to prompt fallback.
+        }
+      }
+
+      window.prompt("Copy post URL:", absoluteUrl);
+    }
+
+    function renderPosts(posts, options = {}) {
+      if (!posts.length) {
+        const emptyMessage = options.emptyMessage || "No entries found in SQLite.";
+        feed.innerHTML = `<p class="text-on-surface-variant">${escapeHtml(emptyMessage)}</p>`;
+        if (infiniteStatus) {
+          infiniteStatus.innerHTML = '<span class="material-symbols-outlined">block</span> [NO_MORE_ENTRIES]';
+        }
+        return;
+      }
+
+      feed.innerHTML = posts
+        .map((post, index) => {
+          const postUrl = `/blog/${encodeURIComponent(post.slug)}.html`;
+          const fallbackImage = makeAbstractFallback(post.slug || post.title || "post");
+          const previewImage = hasUsableHeroImage(post.heroImage)
+            ? normalizePreviewImageUrl(post.heroImage)
+            : fallbackImage;
+          const previewAlt = post.heroAlt || `${post.title || "Blog post"} preview`;
+          const bookmarked = isBookmarked(post.slug);
+          return `
+            <article class="group relative grid grid-cols-1 md:grid-cols-12 gap-6 items-start py-12 border-t border-outline-variant/10">
+              <div class="md:col-span-2">
+                <div class="font-label text-xs text-outline-variant space-y-1">
+                  <div class="text-on-surface font-bold">[${formatDate(post.date)}]</div>
+                  <div>[${post.readingTime || "n/a"}]</div>
+                </div>
+              </div>
+              <div class="md:col-span-7">
+                <a class="block" href="${postUrl}">
+                  <h2 class="font-headline text-4xl md:text-5xl font-bold text-on-surface group-hover:text-tertiary transition-colors leading-tight mb-4">${escapeHtml(post.title)}</h2>
+                  <p class="font-body text-secondary text-lg leading-relaxed mb-6 max-w-2xl">${escapeHtml(post.summary || "")}</p>
+                </a>
+                <div class="flex flex-wrap gap-2">
+                  <span class="font-label text-[10px] px-2 py-1 bg-surface-container-low text-secondary border border-outline-variant/20 uppercase tracking-widest">[${escapeHtml(visibleCategory(post.category))}]</span>
+                  ${(post.topics || []).slice(0, 2).map((t) => `<span class="font-label text-[10px] px-2 py-1 bg-surface-container-low text-secondary border border-outline-variant/20 uppercase tracking-widest">[${escapeHtml(t)}]</span>`).join("")}
+                </div>
+                <div class="mt-5 flex flex-wrap items-center gap-2">
+                  <a class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors" href="${postUrl}">[READ]</a>
+                  <button
+                    type="button"
+                    class="share-post-btn font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors"
+                    data-share-url="${postUrl}"
+                    data-share-title="${escapeHtml(post.title)}"
+                  >[SHARE]</button>
+                  <button
+                    type="button"
+                    class="bookmark-post-btn font-label text-[10px] px-3 py-1.5 border uppercase tracking-widest transition-colors ${bookmarked ? "border-tertiary/40 text-tertiary bg-surface-container-highest" : "border-outline-variant/20 text-secondary hover:bg-surface-container-low"}"
+                    data-bookmark-slug="${escapeHtml(post.slug)}"
+                  >${bookmarked ? "[BOOKMARKED]" : "[BOOKMARK]"}</button>
+                </div>
+              </div>
+              <div class="md:col-span-3 flex justify-end">
+                <a class="w-full max-w-[240px] aspect-[4/3] bg-surface-container border border-outline-variant/20 overflow-hidden" href="${postUrl}">
+                  <img
+                    src="${previewImage}"
+                    alt="${escapeHtml(previewAlt)}"
+                    loading="${index === 0 ? "eager" : "lazy"}"
+                    fetchpriority="${index === 0 ? "high" : "auto"}"
+                    decoding="async"
+                    class="w-full h-full object-contain bg-surface-container-lowest grayscale-[0.1] contrast-[1.02] group-hover:scale-[1.03] transition-transform duration-500"
+                    data-fallback="${fallbackImage}"
+                    onerror="this.onerror=null;this.src=this.dataset.fallback;"
+                  />
+                </a>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    function updateInfiniteState() {
+      if (!infiniteStatus || !infiniteSentinel) return;
+      const hasMore = filteredPosts.length > visibleCount;
+      if (hasMore) {
+        infiniteStatus.innerHTML = '<span class="material-symbols-outlined">south</span> [SCROLL_FOR_MORE]';
+        infiniteSentinel.classList.remove("opacity-40");
+      } else {
+        infiniteStatus.innerHTML = '<span class="material-symbols-outlined">check</span> [END_OF_LOG]';
+        infiniteSentinel.classList.add("opacity-40");
+      }
+    }
+
+    function renderVisiblePosts() {
+      const emptyMessage = "No entries found in SQLite.";
+      renderPosts(filteredPosts.slice(0, visibleCount), { emptyMessage });
+      updateInfiniteState();
+    }
+
+    function loadNextPage() {
+      if (isLoadingMore) return;
+      if (visibleCount >= filteredPosts.length) return;
+
+      isLoadingMore = true;
+      visibleCount = Math.min(visibleCount + PAGE_SIZE, filteredPosts.length);
+      renderVisiblePosts();
+      isLoadingMore = false;
+    }
+
+    function setActiveCategory(category) {
+      activeCategory = category;
+      categoryFilters.querySelectorAll("button[data-category]").forEach((button) => {
+        const isActive = button.dataset.category === activeCategory;
+        button.classList.toggle("bg-surface-container-highest", isActive);
+        button.classList.toggle("text-on-surface", isActive);
+        button.classList.toggle("border", isActive);
+        button.classList.toggle("border-outline-variant/20", isActive);
+        button.classList.toggle("text-secondary", !isActive);
+        button.classList.toggle("hover:bg-surface-container-low", !isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+    }
+
+    function buildCategoryButtons(posts) {
+      const counts = posts.reduce((acc, post) => {
+        const category = String(post.category || "log").trim().toLowerCase();
+        acc.set(category, (acc.get(category) || 0) + 1);
+        return acc;
+      }, new Map());
+
+      const topCategories = Array.from(counts.entries())
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, 6)
+        .map(([category]) => category);
+
+      const allCategories = ["all", ...topCategories];
+      categoryFilters.innerHTML = allCategories
+        .map((category) => {
+          const label = category === "all" ? "ALL" : visibleCategory(category).toUpperCase().replace(/_/g, " ");
+          return `<button data-category="${category}" class="font-label text-xs px-3 py-1.5 uppercase tracking-widest">${`[${label}]`}</button>`;
+        })
+        .join("");
+
+      categoryFilters.querySelectorAll("button[data-category]").forEach((button) => {
+        button.addEventListener("click", () => {
+          visibleCount = PAGE_SIZE;
+          setActiveCategory(button.dataset.category || "all");
+          applyFilters();
+        });
+      });
+    }
+
+    function applyFilters() {
+      const q = searchInput.value.trim().toLowerCase();
+      filteredPosts = allPosts.filter((p) => {
+        const matchesCategory =
+          activeCategory === "all" || String(p.category || "").toLowerCase() === activeCategory;
+        if (!matchesCategory) return false;
+        if (!q) return true;
+        const bag = [p.title, p.summary, p.category, ...(p.topics || [])].join(" ").toLowerCase();
+        return bag.includes(q);
+      });
+
+      renderVisiblePosts();
+    }
+
+    async function boot() {
+      const response = await fetch("/blog/posts.json", { cache: "default" });
+      if (!response.ok) throw new Error(`Manifest request failed (${response.status})`);
+      const payload = await response.json();
+      if (!Array.isArray(payload)) throw new Error("Blog manifest has an invalid shape");
+      allPosts = payload;
+      bookmarks = loadBookmarks();
+      buildCategoryButtons(allPosts);
+      setActiveCategory("all");
+      applyFilters();
+
+      searchInput.addEventListener("input", () => {
+        visibleCount = PAGE_SIZE;
+        applyFilters();
+      });
+
+      if (infiniteSentinel) {
+        infiniteObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                loadNextPage();
+              }
+            });
+          },
+          {
+            root: null,
+            rootMargin: "320px 0px",
+            threshold: 0.01
+          }
+        );
+        infiniteObserver.observe(infiniteSentinel);
+      }
+
+      feed.addEventListener("click", async (event) => {
+        const shareButton = event.target.closest(".share-post-btn");
+        if (shareButton) {
+          event.preventDefault();
+          await sharePost(shareButton.dataset.shareUrl, shareButton.dataset.shareTitle);
+          return;
+        }
+
+        const bookmarkButton = event.target.closest(".bookmark-post-btn");
+        if (bookmarkButton) {
+          event.preventDefault();
+          const slug = bookmarkButton.dataset.bookmarkSlug;
+          toggleBookmark(slug);
+          renderVisiblePosts();
+        }
+      });
+    }
+
+    boot().catch((err) => {
+      console.error("Blog enhancement unavailable", err);
+      infiniteStatus.textContent = "[STATIC_ARCHIVE_MODE]";
+    });
+
+    const path = window.location.pathname.replace(/\/index\.html$/, "/");
+    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
+      const route = link.dataset.route;
+      const active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      if (active) {
+        link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+        link.setAttribute("aria-current", "page");
+      }
+    });
+  })();
+</script>
+</body></html>

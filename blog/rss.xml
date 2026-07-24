@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Andrew Concepcion Blog</title>
+  <link>https://ac-opensource.github.io/blog/</link>
+  <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
+  <language>en-us</language>
+  <lastBuildDate>Wed, 22 Jul 2026 13:46:22 GMT</lastBuildDate>
+  <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>It’s Not Okay to Stay “Not Okay”</title>
+    <link>https://ac-opensource.github.io/blog/2026-07-22-its-not-okay-to-stay-not-okay.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-07-22-its-not-okay-to-stay-not-okay.html</guid>
+    <pubDate>Wed, 22 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Acceptance makes room for honesty. Responsibility turns that honesty into the next workable step—without shame, denial, or pretending recovery is simple.</description>
+<category>Reflection</category><category>Mental Health</category><category>Personal Growth</category><category>Self-Awareness</category><category>Resilience</category><category>reflection</category>
+  </item>
+  <item>
+    <title>The Fortress We Mistake for Home</title>
+    <link>https://ac-opensource.github.io/blog/2026-07-22-the-fortress-we-mistake-for-home.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-07-22-the-fortress-we-mistake-for-home.html</guid>
+    <pubDate>Wed, 22 Jul 2026 00:00:00 GMT</pubDate>
+    <description>A reflection on the defenses we build from old wounds, pride, and habit—and why real change begins when we stop guarding what keeps us trapped.</description>
+<category>Self-Awareness</category><category>Personal Growth</category><category>Accountability</category><category>Healing</category><category>Reflection</category><category>reflection</category>
+  </item>
+  <item>
+    <title>What Building a Small Backend Taught Me About AI-Ready Engineering</title>
+    <link>https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html</guid>
+    <pubDate>Tue, 21 Jul 2026 00:00:00 GMT</pubDate>
+    <description>A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.</description>
+<category>kotlin</category><category>spring-boot</category><category>postgis</category><category>backend</category><category>ai-engineering</category><category>privacy</category><category>testing</category><category>systems-design</category><category>technical</category>
+  </item>
+  <item>
+    <title>Agents That Leave Receipts</title>
+    <link>https://ac-opensource.github.io/blog/2026-04-30-agents-that-leave-receipts.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-04-30-agents-that-leave-receipts.html</guid>
+    <pubDate>Thu, 30 Apr 2026 00:00:00 GMT</pubDate>
+    <description>A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust.</description>
+<category>ai-workflow</category><category>local-agents</category><category>engineering-discipline</category><category>android</category><category>linear</category><category>memory-systems</category><category>delivery</category><category>technical</category>
+  </item>
+  <item>
+    <title>How I Use MemPalace to Make Local Agents Better</title>
+    <link>https://ac-opensource.github.io/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html</guid>
+    <pubDate>Thu, 09 Apr 2026 00:00:00 GMT</pubDate>
+    <description>How I set up MemPalace as a practical tool for local agents: small taxonomy, verify-first retrieval, agent diaries, AAAK wake-up context, and why protocol matters more than storage.</description>
+<category>ai-workflow</category><category>mempalace</category><category>local-agents</category><category>memory-systems</category><category>mcp</category><category>technical</category>
+  </item>
+  <item>
+    <title>Deep Dive: One Rust Core Across Android and iOS</title>
+    <link>https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html</guid>
+    <pubDate>Tue, 07 Apr 2026 00:00:00 GMT</pubDate>
+    <description>A deep technical breakdown of how one Rust workspace can expose a unified core to Android and iOS through a facade crate, UniFFI, and platform-specific packaging without duplicating behavior.</description>
+<category>rust</category><category>mobile</category><category>architecture</category><category>android</category><category>ios</category><category>uniffi</category><category>ffi</category><category>technical</category>
+  </item>
+  <item>
+    <title>Career Trajectory as Platform Ownership, Not Job Titles</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression.</description>
+<category>career</category><category>leadership</category><category>platform-ownership</category><category>delivery</category><category>engineering-growth</category><category>technical</category>
+  </item>
+  <item>
+    <title>Cognitive Profile Deep Dive: Emergenetics + Harrison</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.</description>
+<category>emergenetics</category><category>harrison</category><category>paradox</category><category>self-awareness</category><category>leadership</category><category>reflection</category>
+  </item>
+  <item>
+    <title>E2E + Visual QA for Personal Websites: What to Test and Why</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>A practical QA stack for personal sites using route-level E2E checks and Playwright screenshot loops to catch regressions early.</description>
+<category>quality</category><category>e2e</category><category>playwright</category><category>qa</category><category>frontend</category><category>technical</category>
+  </item>
+  <item>
+    <title>Building an Editable Blog System That Still Works on GitHub Pages</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-editable-blog-system-on-github-pages.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-editable-blog-system-on-github-pages.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>How to keep a blog editable with SQLite and tooling while deploying static pages for GitHub Pages compatibility and SEO.</description>
+<category>site-architecture</category><category>sqlite</category><category>github-pages</category><category>seo</category><category>content-system</category><category>technical</category>
+  </item>
+  <item>
+    <title>From Mobile Developer to AI Accelerated Engineer</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>What actually changed in my day-to-day engineering: workflow became parallel, delivery got faster, and scope expanded from feature ownership to full system ownership.</description>
+<category>ai-workflow</category><category>engineering</category><category>delivery</category><category>scope</category><category>systems-thinking</category><category>technical</category>
+  </item>
+  <item>
+    <title>Prompt Patterns That Consistently Produce Production-Ready Code</title>
+    <link>https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html</guid>
+    <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+    <description>The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.</description>
+<category>ai-workflow</category><category>prompting</category><category>engineering</category><category>delivery</category><category>quality</category><category>technical</category>
+  </item>
+  <item>
+    <title>A Month in New Zealand</title>
+    <link>https://ac-opensource.github.io/blog/2024-11-02-sunrise-trail-runs.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-11-02-sunrise-trail-runs.html</guid>
+    <pubDate>Wed, 05 Feb 2025 00:00:00 GMT</pubDate>
+    <description>Family holidays in Auckland, a compressed South Island road trip, and the surprise of catching the Aurora Australis.</description>
+<category>Travel</category><category>Family</category><category>Reflection</category><category>hobby</category>
+  </item>
+  <item>
+    <title>MySTC: Leading a Five-Person Android Team</title>
+    <link>https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</guid>
+    <pubDate>Wed, 05 Feb 2025 00:00:00 GMT</pubDate>
+    <description>I led five senior Android engineers on MySTC, working in Kotlin and Java across account, ordering, support, and multilingual flows.</description>
+<category>MySTC</category><category>Android</category><category>Kotlin</category><category>Telecom</category><category>work</category>
+  </item>
+  <item>
+    <title>Quiet Systems: Reflection Rituals For Builders</title>
+    <link>https://ac-opensource.github.io/blog/2024-11-21-quiet-systems-reflection.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-11-21-quiet-systems-reflection.html</guid>
+    <pubDate>Thu, 21 Nov 2024 00:00:00 GMT</pubDate>
+    <description>A personal essay about designing focus blocks, protecting rest, and keeping philosophy close to the shipping calendar.</description>
+<category>Reflection</category><category>Philosophy</category><category>Creative Process</category><category>reflection</category>
+  </item>
+  <item>
+    <title>OCBC: Android Work in a Banking App</title>
+    <link>https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html</guid>
+    <pubDate>Wed, 20 Nov 2024 00:00:00 GMT</pubDate>
+    <description>I worked on OCBC&apos;s Android app in Kotlin and XML, including chart UI, identity-verification integration, network behavior, and focused unit coverage.</description>
+<category>OCBC</category><category>Fintech</category><category>Android</category><category>Kotlin</category><category>work</category>
+  </item>
+  <item>
+    <title>Riding The Token Storm: Notes From A Codex Fleet Wrangler</title>
+    <link>https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html</guid>
+    <pubDate>Tue, 08 Oct 2024 00:00:00 GMT</pubDate>
+    <description>An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.</description>
+<category>AI Ops</category><category>Prompt Engineering</category><category>Team Process</category><category>technical</category>
+  </item>
+  <item>
+    <title>Weekend Photo Experiments: Paradise Mist, Dobsonian Moon, and Lake Pukaki</title>
+    <link>https://ac-opensource.github.io/blog/2024-09-14-film-photography-gallery.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-09-14-film-photography-gallery.html</guid>
+    <pubDate>Sat, 14 Sep 2024 00:00:00 GMT</pubDate>
+    <description>Three frames from one trip, one ongoing experiment: motion, moon detail, and mountain light across different gear and shooting constraints.</description>
+<category>Hobby</category><category>Photography</category><category>hobby</category>
+  </item>
+  <item>
+    <title>openpay: Checkout, Spend Limits, and Release Edges</title>
+    <link>https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html</guid>
+    <pubDate>Sun, 01 Sep 2024 00:00:00 GMT</pubDate>
+    <description>I worked on openpay&apos;s Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths.</description>
+<category>openpay</category><category>Fintech</category><category>BNPL</category><category>Android</category><category>Checkout</category><category>work</category>
+  </item>
+  <item>
+    <title>Solo: Android Across a White-Label Food Platform</title>
+    <link>https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html</guid>
+    <pubDate>Sat, 10 Aug 2024 00:00:00 GMT</pubDate>
+    <description>I worked in Solo&apos;s shared Kotlin and XML codebase, shipping Android features and production fixes used by multiple restaurant-branded apps.</description>
+<category>Solo</category><category>Food Delivery</category><category>Android</category><category>Whitelabel</category><category>work</category>
+  </item>
+  <item>
+    <title>OWTO: Android, iOS, and the Backend Between Them</title>
+    <link>https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html</guid>
+    <pubDate>Sat, 15 Jun 2024 00:00:00 GMT</pubDate>
+    <description>I led delivery across OWTO&apos;s Android, iOS, and backend work and stayed hands-on with booking, GPS, payments, and the APIs connecting them.</description>
+<category>OWTO</category><category>Mobility</category><category>Android</category><category>iOS</category><category>Backend</category><category>work</category>
+  </item>
+  <item>
+    <title>Building with Kotlin and Swift</title>
+    <link>https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html</guid>
+    <pubDate>Wed, 22 May 2024 00:00:00 GMT</pubDate>
+    <description>A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.</description>
+<category>KMP</category><category>SwiftUI</category><category>technical</category>
+  </item>
+  <item>
+    <title>Popslide: Experiments on a Lockscreen Product</title>
+    <link>https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html</guid>
+    <pubDate>Thu, 30 Nov 2023 00:00:00 GMT</pubDate>
+    <description>I built and evaluated Android experiment variants for Popslide and worked on lockscreen behavior, notifications, caching, and production state handling.</description>
+<category>Popslide</category><category>Adtech</category><category>Android</category><category>Experimentation</category><category>work</category>
+  </item>
+  <item>
+    <title>WebSafety: Parental Controls Meet Platform Limits</title>
+    <link>https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html</guid>
+    <pubDate>Thu, 22 Jun 2023 00:00:00 GMT</pubDate>
+    <description>I worked on WebSafety features across Java and Objective-C code, including GPS, synchronization, permissions, and platform behavior that wasn&apos;t always documented.</description>
+<category>WebSafety</category><category>Security</category><category>Parental Controls</category><category>Android</category><category>work</category>
+  </item>
+  <item>
+    <title>ProjectBASS: Crowdsourced Network Measurements</title>
+    <link>https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html</guid>
+    <pubDate>Wed, 05 Oct 2022 00:00:00 GMT</pubDate>
+    <description>I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements.</description>
+<category>ProjectBASS</category><category>Open Source</category><category>Network Mapping</category><category>Kotlin</category><category>work</category>
+  </item>
+</channel>
+</rss>

@@ -1,0 +1,513 @@
+<!-- generated: scripts/build-static-blog-pages.js -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
+<title>Agents That Leave Receipts | Andrew Concepcion</title>
+<meta name="description" content="A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust."/>
+<link rel="canonical" href="https://ac-opensource.github.io/blog/2026-04-30-agents-that-leave-receipts.html"/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:site_name" content="Andrew Concepcion"/>
+<meta property="og:type" content="article"/>
+<meta property="og:url" content="https://ac-opensource.github.io/blog/2026-04-30-agents-that-leave-receipts.html"/>
+<meta property="og:title" content="Agents That Leave Receipts | Andrew Concepcion"/>
+<meta property="og:description" content="A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust."/>
+<meta property="og:image" content="https://ac-opensource.github.io/blog/images/agent-handoff-loop-hero.svg"/>
+<meta property="og:image:alt" content="Blueprint-style diagram of a durable agent workflow connecting tickets, local agents, verification, memory, and handoff notes."/>
+<meta property="article:published_time" content="2026-04-30"/>
+<meta property="article:author" content="Andrew Concepcion"/>
+<meta property="article:tag" content="ai-workflow">
+<meta property="article:tag" content="local-agents">
+<meta property="article:tag" content="engineering-discipline">
+<meta property="article:tag" content="android">
+<meta property="article:tag" content="linear">
+<meta property="article:tag" content="memory-systems">
+<meta property="article:tag" content="delivery">
+<meta property="article:tag" content="technical">
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Agents That Leave Receipts | Andrew Concepcion"/>
+<meta name="twitter:description" content="A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/agent-handoff-loop-hero.svg"/>
+<meta name="twitter:image:alt" content="Blueprint-style diagram of a durable agent workflow connecting tickets, local agents, verification, memory, and handoff notes."/>
+<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#faf9f4",
+          "tertiary": "#1f5cba",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f4f4ee",
+          "surface-container": "#edefe7",
+          "surface-container-highest": "#e0e4d9",
+          "secondary": "#57606a",
+          "on-surface": "#2f342d",
+          "outline": "#787c73",
+          "outline-variant": "#afb3aa",
+          "primary": "#5a5f65",
+          "on-primary": "#f4f8ff"
+        },
+        fontFamily: {
+          "headline": ["Space Grotesk"],
+          "body": ["Manrope"],
+          "label": ["Space Grotesk"]
+        },
+        borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"}
+      }
+    }
+  }
+</script>
+<style>
+  body {
+    background-color: #faf9f4;
+  }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .code-block {
+    background: #1A1C1E;
+    color: #DEE3E9;
+    font-family: 'Space Grotesk', monospace;
+    padding: 1.5rem;
+    border-left: 4px solid #1F5CBA;
+  }
+  .code-keyword { color: #6799FB; }
+  .code-type { color: #FE8983; }
+  .code-func { color: #E0E4D9; }
+  .hero-overlay-alpha {
+    opacity: 0;
+    animation: overlayAlphaPulse 4.8s ease-in-out infinite;
+    will-change: opacity;
+  }
+  .work-post-hero {
+    position: relative;
+    display: grid;
+    aspect-ratio: 1;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(175, 179, 170, 0.28);
+    background: #edefe7;
+  }
+  .work-post-hero--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+  }
+  .work-post-hero__crop {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img,
+  .work-post-hero--contain > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img {
+    object-fit: cover;
+  }
+  .work-post-hero__crop--top img {
+    object-position: top center;
+  }
+  .work-post-hero__crop--bottom img {
+    object-position: bottom center;
+  }
+  .work-post-hero--cover > img {
+    object-position: 62% center;
+  }
+  .work-post-hero--contain {
+    aspect-ratio: 4 / 5;
+  }
+  .work-post-hero--contain > img {
+    object-fit: contain;
+    background: #fff;
+  }
+  @keyframes overlayAlphaPulse {
+    0% { opacity: 0; }
+    15% { opacity: 0; }
+    35% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-overlay-alpha {
+      animation: none;
+      opacity: 1;
+    }
+  }
+</style>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Agents That Leave Receipts",
+  "description": "A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust.",
+  "author": {
+    "@type": "Person",
+    "name": "Andrew Concepcion"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Andrew Concepcion",
+    "url": "https://ac-opensource.github.io"
+  },
+  "datePublished": "2026-04-30",
+  "dateModified": "2026-07-22T07:53:14.000Z",
+  "image": "https://ac-opensource.github.io/blog/images/agent-handoff-loop-hero.svg",
+  "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-04-30-agents-that-leave-receipts.html"
+}</script>
+</head>
+<body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
+<a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
+<div class="neural-global-bg" aria-hidden="true">
+  <div class="neural-mesh-container">
+    <div class="neural-mesh"></div>
+    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
+    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
+    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
+    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
+    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
+    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
+    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
+    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
+  </div>
+  <div class="bust-gradient"></div>
+  <div class="canvas-grid"></div>
+</div>
+<header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
+  <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
+    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+      <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+      <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+      <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+    </nav>
+    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
+  </div>
+  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+    <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+    <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+  </nav>
+</header>
+<main id="main-content" class="pt-32 md:pt-24 pb-32">
+<article class="max-w-screen-xl mx-auto px-6">
+<div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
+<span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
+<span id="post-date" class="bg-surface-container-low px-2 py-1">2026-04-30</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[10 min read]</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
+<div class="lg:col-span-7">
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Agents That Leave Receipts</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust.</p>
+<div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
+<button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
+<button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
+<a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[RSS]</a>
+</div>
+</div>
+
+<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
+<div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
+<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="/blog/images/agent-handoff-loop-hero.svg" alt="Blueprint-style diagram of a durable agent workflow connecting tickets, local agents, verification, memory, and handoff notes." loading="eager" decoding="async"/>
+</div>
+<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
+<div class="flex justify-between items-start">
+<span class="font-label text-xs">[state_machine_v4.svg]</span>
+<span class="material-symbols-outlined text-tertiary">schema</span>
+</div>
+<div class="space-y-4">
+<div class="h-1 w-2/3 bg-tertiary/20"></div>
+<div class="flex gap-2">
+<div class="w-4 h-4 border border-tertiary"></div>
+<div class="w-4 h-4 bg-tertiary"></div>
+<div class="w-4 h-4 border border-tertiary"></div>
+</div>
+<div class="h-px w-full bg-outline-variant/50"></div>
+<div class="flex justify-end">
+<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<aside class="lg:col-span-3 hidden lg:block space-y-12">
+<div class="pt-4 border-t border-outline-variant/20">
+<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[author_identity]</h4>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">account_tree</span>
+</div>
+<div>
+<p id="post-author-name" class="text-sm font-bold">Andrew Concepcion</p>
+<p id="post-author-role" class="text-xs text-secondary">[technical]</p>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/20">
+<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
+<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ai-workflow</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#local-agents</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#engineering-discipline</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#android</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#linear</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#memory-systems</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#delivery</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#technical</span></div>
+</div>
+<section class="p-6 bg-surface-container-low space-y-4">
+<h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust.</p>
+</section>
+</aside>
+<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
+  <p>
+    Lately the interesting work has not been one feature, one repo, or one language. The common thread has been building a more durable way to use local agents on real engineering work. Android bugs, release notes, PR reviews, Linear tickets, memory lookup, and orchestration prototypes all started to point at the same lesson: an agent is only useful if it can leave behind enough evidence for the next run to trust it.
+  </p>
+  <p>
+    That sounds less exciting than "AI writes code", but it is the difference between a demo and a workflow. A demo ends when the generated patch looks plausible. A workflow ends when the code has been checked, the assumptions are recorded, the blocker is named, and the next agent or human can re-enter without reconstructing the whole story from terminal scrollback.
+  </p>
+</section>
+
+<section class="space-y-6">
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. The Work Is Broader Than One Codebase</h2>
+  <p>
+    Some days the work is very product-shaped: fixing an Android rewards flow, tracing why a QA build sees a coin differently from a debug build, or making remote config parsing tolerate the shape the server actually sends. Other days it is systems-shaped: wiring a ticket tracker into an agent runner, teaching the workflow to survive restarts, or adding dashboard visibility so an operator can tell what the agent is doing.
+  </p>
+  <p>
+    On the surface those look unrelated. One is mobile app delivery. One is agent infrastructure. One is personal-site tooling and memory. But the same operating rule keeps coming up: read the live state first, make the narrowest useful change, and leave a receipt that lets the next person verify what happened.
+  </p>
+  <p>
+    That is why I have started thinking less in terms of "can an agent change files?" and more in terms of "can this workflow preserve engineering continuity?" The file edit is the easy part. The continuity is the hard part.
+  </p>
+</section>
+
+<section class="space-y-6">
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. Start From the Real State, Not the Prompt</h2>
+  <p>
+    A recurring failure mode in agent work is trusting the request more than the environment. The prompt says there is a build issue, so the agent starts guessing at the build issue. The ticket says the dashboard is missing, so the agent starts inventing a dashboard. The pasted error mentions one method, so the agent assumes the local checkout still contains that method.
+  </p>
+  <p>
+    The better loop is slower for the first five minutes and faster for the rest of the task. Reproduce the failing command. Read the current code path. Check the ticket state. Look for the existing workpad. Confirm whether the branch is dirty. If the live state disagrees with the request, the live state wins.
+  </p>
+  <p>
+    This has changed how I frame work for agents. I do not want them to begin with architecture proposals. I want them to begin with inventory. Which files own the behavior? Which command fails? Which API call mutates server state? Which local changes are already present and must not be reverted? Once those answers are visible, the implementation usually becomes smaller.
+  </p>
+</section>
+
+<section class="space-y-6">
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. A Handoff Is Part of the Feature</h2>
+  <p>
+    The most useful pattern lately has been the persistent handoff note. In ticket-driven work, that note lives with the issue. In repo work, it can live in the final report. In longer-running agent work, it becomes the difference between resuming and restarting.
+  </p>
+  <p>
+    The note does not need to be poetic. It needs to answer practical questions: what changed, why it changed, how it was verified, what is still blocked, and what should be re-checked if someone comes back later. A good handoff note is not a status update. It is a re-entry point.
+  </p>
+  <div class="code-block my-8"><pre>ticket state
+repo state
+implemented change
+verification command and result
+known blocker
+next re-check command</pre></div>
+  <p>
+    This matters because agent sessions are disposable. The work is not. If the next run cannot tell whether a failure is a product bug, a sandbox limitation, a network/auth problem, or an unrelated dirty file, then the previous run did not really finish the job.
+  </p>
+</section>
+
+<section class="space-y-6">
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. Side Effects Deserve More Respect</h2>
+  <p>
+    Another theme has been treating API calls and external writes as behavioral facts, not implementation details. It is tempting during cleanup to replace a server write with a local datastore update, remove a call that looks duplicated, or move tracker writes behind a nicer abstraction. Those changes can be correct, but only after proving what state the call mutates and who depends on that mutation.
+  </p>
+  <p>
+    The same rule applies in mobile code. If a backend response decides whether a rewards prompt should appear, the UI should not grow a local whitelist because it happens to pass one scenario. If a coin model already owns its resource color, the composable should use the model instead of hardcoding a hex value. If QA and debug behave differently, trace the gating path before declaring the asset unsupported.
+  </p>
+  <p>
+    Agent-assisted work makes this more important, not less. Agents are good at making code look consistent. They are less naturally good at knowing which ugly-looking call is actually the sync point that keeps the product honest. The workflow has to force that question into the open.
+  </p>
+</section>
+
+<section class="space-y-6">
+  <h2 class="font-headline text-4xl font-bold leading-tight">05. Verification Is the Product Surface</h2>
+  <p>
+    I have become much less impressed by a patch that has no proof attached. The proof does not always need to be a giant test suite. Sometimes it is the exact Gradle task that failed before. Sometimes it is a focused ExUnit subset with a sandbox workaround. Sometimes it is an E2E route check for a static site. Sometimes it is a clear statement that publish is blocked even though the code-level validation passed.
+  </p>
+  <p>
+    That last distinction is important. "The code is valid" and "the branch is published" are different states. If git metadata is read-only, GitHub auth is broken, or the environment cannot open a listener, the agent should not blur that into a generic failure. It should preserve the evidence: the checks that passed, the operation that failed, and the exact blocker.
+  </p>
+  <blockquote class="border-l-4 border-tertiary pl-6 my-8 text-xl text-secondary font-light">
+    A task is not complete because the agent changed code. It is complete when the next reviewer can cheaply prove whether the change still holds.
+  </blockquote>
+</section>
+
+<section class="space-y-6">
+  <h2 class="font-headline text-4xl font-bold leading-tight">06. Memory Only Counts When It Changes Behavior</h2>
+  <p>
+    Long-term memory has been useful, but only when it is treated as a retrieval protocol rather than a scrapbook. The point is not to remember everything. The point is to remember the recurring traps: do not clean an expensive Android module unless asked, use typed Ktor bodies for success responses, preserve the general-error guard, keep one workpad comment, re-check recurring PR review points before handoff.
+  </p>
+  <p>
+    The memory is valuable because it changes what happens at the start of the next task. It makes the agent ask better first questions. It narrows the search. It prevents the same bad fix from being rediscovered with different words. It also creates accountability, because the agent has to say when it is relying on old context and when it has verified the live code path again.
+  </p>
+  <p>
+    That is the practical shape of the work lately: build agents that do not just generate output, but accumulate operational judgment in a form that can be checked.
+  </p>
+</section>
+
+<section class="space-y-6">
+  <h2 class="font-headline text-4xl font-bold leading-tight">07. Where This Is Going</h2>
+  <p>
+    The next step is not a more magical agent. It is a tighter loop around ordinary engineering discipline: issue intake, environment inventory, scoped implementation, verification, handoff, memory update, and re-verification. The more reliable that loop becomes, the more comfortable I am letting agents operate across larger surfaces.
+  </p>
+  <p>
+    That is the work I care about right now. Not replacing engineering judgment, and not turning every task into an autonomous black box. The interesting part is building a system where local agents can participate in real delivery without erasing context, ignoring side effects, or forcing every task to start from zero.
+  </p>
+  <p>
+    In short: I want agents that leave receipts. The receipt is what lets speed compound instead of turning into cleanup debt.
+  </p>
+</section></div>
+</div>
+<div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
+<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html">
+<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">How I Use MemPalace to Make Local Agents Better</h5>
+<div class="mt-6 flex items-center gap-2 text-tertiary">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="font-label text-xs">read_entry</span>
+</div>
+</a>
+<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-07-21-what-building-persons-finder-taught-me.html">
+<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">What Building a Small Backend Taught Me About AI-Ready Engineering</h5>
+<div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
+<span class="font-label text-xs">read_entry</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</a>
+</div>
+</article>
+</main>
+<footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
+    <span>© 2026 Andrew Concepcion</span>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
+  </div>
+</footer>
+<script>
+  (() => {
+    const FORCE_ACTIVE_ROUTE = "/blog/";
+    const path = window.location.pathname.replace(/\/index\.html$/, "/");
+    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
+      const route = link.dataset.route;
+      let active = false;
+      if (route === FORCE_ACTIVE_ROUTE) {
+        active = true;
+      } else if (FORCE_ACTIVE_ROUTE === "/work.html" && route === "/blog/") {
+        active = false;
+      } else {
+        active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      }
+      if (active) {
+        link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+
+    const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
+    const CURRENT_POST_SLUG = "2026-04-30-agents-that-leave-receipts";
+    const CURRENT_POST_TITLE = "Agents That Leave Receipts";
+    const CURRENT_POST_URL = "/blog/2026-04-30-agents-that-leave-receipts.html";
+    const sharePostButton = document.getElementById("share-post-button");
+    const bookmarkPostButton = document.getElementById("bookmark-post-button");
+
+    function loadBookmarks() {
+      try {
+        const raw = localStorage.getItem(BOOKMARKS_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(parsed)) return new Set();
+        return new Set(parsed.map((value) => String(value || "").trim()).filter(Boolean));
+      } catch (_error) {
+        return new Set();
+      }
+    }
+
+    function saveBookmarks(set) {
+      try {
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(set)));
+      } catch (_error) {
+        // Ignore write failures.
+      }
+    }
+
+    function setBookmarkButtonState(active) {
+      if (!bookmarkPostButton) return;
+      bookmarkPostButton.textContent = active ? "[BOOKMARKED]" : "[BOOKMARK]";
+      bookmarkPostButton.classList.toggle("border-tertiary/40", active);
+      bookmarkPostButton.classList.toggle("text-tertiary", active);
+      bookmarkPostButton.classList.toggle("bg-surface-container-highest", active);
+      bookmarkPostButton.classList.toggle("border-outline-variant/20", !active);
+      bookmarkPostButton.classList.toggle("text-secondary", !active);
+    }
+
+    async function shareCurrentPost() {
+      const absoluteUrl = new URL(CURRENT_POST_URL, window.location.origin).href;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: CURRENT_POST_TITLE || "Blog post",
+            url: absoluteUrl
+          });
+          return;
+        } catch (_error) {
+          // Continue to fallback.
+        }
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(absoluteUrl);
+          return;
+        } catch (_error) {
+          // Continue to prompt fallback.
+        }
+      }
+      window.prompt("Copy post URL:", absoluteUrl);
+    }
+
+    if (sharePostButton) {
+      sharePostButton.addEventListener("click", () => {
+        shareCurrentPost();
+      });
+    }
+
+    if (bookmarkPostButton && CURRENT_POST_SLUG) {
+      const bookmarks = loadBookmarks();
+      setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      bookmarkPostButton.addEventListener("click", () => {
+        if (bookmarks.has(CURRENT_POST_SLUG)) {
+          bookmarks.delete(CURRENT_POST_SLUG);
+        } else {
+          bookmarks.add(CURRENT_POST_SLUG);
+        }
+        saveBookmarks(bookmarks);
+        setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      });
+    }
+  })();
+</script>
+</body></html>

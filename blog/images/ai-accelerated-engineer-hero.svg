@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="t d">
+  <title id="t">From Mobile Developer to AI Accelerated Engineer</title>
+  <desc id="d">Abstract transition from layered mobile stacks to an expanded AI-assisted systems graph.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f5f6f1"/>
+      <stop offset="100%" stop-color="#e7ebe2"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1f5cba"/>
+      <stop offset="100%" stop-color="#6799fb"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <g opacity="0.6" stroke="#d4dacc" stroke-width="1">
+    <path d="M0 120h1600M0 240h1600M0 360h1600M0 480h1600M0 600h1600M0 720h1600"/>
+    <path d="M120 0v900M320 0v900M520 0v900M720 0v900M920 0v900M1120 0v900M1320 0v900M1520 0v900"/>
+  </g>
+
+  <g transform="translate(130 170)">
+    <rect x="0" y="0" width="470" height="560" fill="#fafaf6" stroke="#d9dfd0" stroke-width="3"/>
+    <text x="34" y="60" font-family="Space Grotesk, Arial, sans-serif" font-size="24" fill="#2f342d" font-weight="700">MOBILE_STACK</text>
+    <rect x="36" y="110" width="398" height="52" fill="#e5e9df"/>
+    <rect x="36" y="186" width="398" height="52" fill="#e5e9df"/>
+    <rect x="36" y="262" width="398" height="52" fill="#e5e9df"/>
+    <rect x="36" y="338" width="398" height="52" fill="#e5e9df"/>
+    <text x="52" y="144" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">UI / Platform Runtime</text>
+    <text x="52" y="220" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">State + Networking</text>
+    <text x="52" y="296" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Storage + Analytics</text>
+    <text x="52" y="372" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Release + QA</text>
+  </g>
+
+  <path d="M670 450h240" stroke="url(#beam)" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="910" cy="450" r="12" fill="#1f5cba"/>
+
+  <g transform="translate(970 120)">
+    <rect x="0" y="0" width="500" height="620" fill="#f7f9f4" stroke="#d7ddce" stroke-width="3"/>
+    <text x="36" y="58" font-family="Space Grotesk, Arial, sans-serif" font-size="24" fill="#1f5cba" font-weight="700">AI_ACCELERATED_GRAPH</text>
+    <g stroke="#8e9db2" stroke-width="3" fill="none">
+      <path d="M86 184 L226 122 L342 196 L418 136"/>
+      <path d="M86 184 L170 286 L320 330 L432 260"/>
+      <path d="M170 286 L280 438 L424 404"/>
+      <path d="M342 196 L350 356 L280 438"/>
+    </g>
+    <g fill="#1f5cba">
+      <circle cx="86" cy="184" r="13"/><circle cx="226" cy="122" r="11"/><circle cx="342" cy="196" r="12"/>
+      <circle cx="418" cy="136" r="10"/><circle cx="170" cy="286" r="11"/><circle cx="320" cy="330" r="12"/>
+      <circle cx="432" cy="260" r="10"/><circle cx="280" cy="438" r="13"/><circle cx="424" cy="404" r="12"/>
+    </g>
+    <text x="36" y="540" font-family="Manrope, Arial, sans-serif" font-size="24" fill="#2f342d" font-weight="600">Workflow • Speed • Scope</text>
+  </g>
+
+  <text x="130" y="830" font-family="Space Grotesk, Arial, sans-serif" font-size="30" fill="#1f5cba" letter-spacing="3">[AI_ACCELERATED_ENGINEER]</text>
+</svg>

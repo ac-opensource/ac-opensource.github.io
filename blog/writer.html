@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
+  <title>Blog Writer — Andrew Concepcion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: "#fdfcf8",
+            panel: "#f3f0e8",
+            panel2: "#ece9df",
+            ink: "#30312f",
+            muted: "#6f716b",
+            accent: "#3568d4",
+            stroke: "#d8d4c9"
+          },
+          fontFamily: {
+            body: ["Space Grotesk", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+      background-size: 22px 22px;
+      background-color: #11151f;
+    }
+
+    .shell-grid {
+      background-image:
+        linear-gradient(to right, rgba(167, 161, 146, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(167, 161, 146, 0.12) 1px, transparent 1px);
+      background-size: 120px 120px;
+    }
+
+    .ql-toolbar.ql-snow,
+    .ql-container.ql-snow {
+      border-color: #d8d4c9;
+    }
+
+    .ql-editor {
+      min-height: 300px;
+      font-family: "Space Grotesk", sans-serif;
+      color: #30312f;
+    }
+
+    .writer-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: #d8d4c9 transparent;
+    }
+  </style>
+</head>
+<body class="font-body text-ink min-h-screen p-4 md:p-6">
+  <div class="max-w-[1380px] mx-auto bg-surface border border-stroke rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.28)] shell-grid">
+    <header class="flex flex-wrap items-center justify-between gap-4 px-4 md:px-6 py-4 border-b border-stroke bg-surface/95">
+      <div class="font-mono text-xs uppercase tracking-widest">[Blog Writer]</div>
+      <div class="flex items-center gap-3 text-[10px] font-mono uppercase tracking-wider text-muted">
+        <a href="/blog/" class="hover:text-ink">Public Blog</a>
+        <a href="/" class="hover:text-ink">Homepage</a>
+      </div>
+    </header>
+
+    <main class="grid lg:grid-cols-[320px_1fr] min-h-[80vh]">
+      <aside class="border-r border-stroke bg-panel p-4 md:p-5 flex flex-col gap-4">
+        <div class="flex items-center justify-between gap-2">
+          <h2 class="font-mono text-[11px] uppercase tracking-widest text-muted">[Entries]</h2>
+          <button id="new-post-btn" type="button" class="border border-stroke px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider hover:bg-surface">New</button>
+        </div>
+
+        <label for="search-posts" class="font-mono text-[10px] uppercase tracking-wider text-muted">Search</label>
+        <input id="search-posts" type="text" placeholder="find by title, slug, tag" class="border-stroke bg-surface text-sm focus:border-accent focus:ring-accent" />
+
+        <div id="posts-list" class="writer-scroll overflow-y-auto space-y-2 pr-1"></div>
+      </aside>
+
+      <section class="p-4 md:p-6 lg:p-8">
+        <form id="writer-form" class="space-y-5">
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label for="title-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Title</label>
+              <input id="title-input" type="text" required class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" />
+            </div>
+            <div>
+              <label for="slug-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Slug</label>
+              <input id="slug-input" type="text" class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" placeholder="yyyy-mm-dd-title" />
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-5 gap-4">
+            <div>
+              <label for="date-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Date</label>
+              <input id="date-input" type="date" class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" />
+            </div>
+            <div>
+              <label for="author-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Author</label>
+              <input id="author-input" type="text" class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" placeholder="Andrew Concepcion" />
+            </div>
+            <div>
+              <label for="category-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Category</label>
+              <input id="category-input" type="text" class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" placeholder="technical" />
+            </div>
+            <div>
+              <label for="reading-time-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Reading Time</label>
+              <input id="reading-time-input" type="text" class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" placeholder="8 min read" />
+            </div>
+            <div>
+              <label for="topics-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Topics</label>
+              <input id="topics-input" type="text" class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" placeholder="Kotlin, Architecture" />
+            </div>
+          </div>
+
+          <div>
+            <label for="summary-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Summary</label>
+            <textarea id="summary-input" rows="2" class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" placeholder="Short overview for index and sharing cards"></textarea>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-4">
+            <div>
+              <label for="hero-image-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Hero Image URL / Path</label>
+              <input id="hero-image-input" type="text" class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" placeholder="/blog/images/file.jpg" />
+            </div>
+            <div>
+              <label for="hero-alt-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Hero Alt</label>
+              <input id="hero-alt-input" type="text" class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" placeholder="Describe image" />
+            </div>
+            <div>
+              <label for="hero-caption-input" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1">Hero Caption</label>
+              <input id="hero-caption-input" type="text" class="w-full border-stroke bg-white text-sm focus:border-accent focus:ring-accent" placeholder="Optional caption" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Body (WYSIWYG)</label>
+            <div id="editor"></div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <button id="save-btn" type="submit" class="bg-[#5e6064] text-white px-5 py-3 text-xs font-mono uppercase tracking-wider hover:bg-[#4f5257]">Save Entry</button>
+            <button id="delete-post-btn" type="button" class="border border-red-300 text-red-700 px-5 py-3 text-xs font-mono uppercase tracking-wider hover:bg-red-50">Delete Entry</button>
+            <a id="preview-link" href="/blog/" target="_blank" rel="noreferrer" class="border border-stroke px-5 py-3 text-xs font-mono uppercase tracking-wider hover:bg-panel">Open Public View</a>
+            <span id="status-text" class="text-xs font-mono uppercase tracking-wider text-muted">Idle</span>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+  <script src="/assets/js/blog-writer-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Cognitive Profile Deep Dive Cover</title>
+  <desc id="desc">Abstract geometric illustration representing Emergenetics and Harrison assessment signals.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f4f4ee"/>
+      <stop offset="100%" stop-color="#e8ece4"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1f5cba"/>
+      <stop offset="100%" stop-color="#6799fb"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <g stroke="#cfd5c7" stroke-width="1" opacity="0.7">
+    <path d="M0 130h1600M0 260h1600M0 390h1600M0 520h1600M0 650h1600M0 780h1600"/>
+    <path d="M120 0v900M320 0v900M520 0v900M720 0v900M920 0v900M1120 0v900M1320 0v900M1520 0v900"/>
+  </g>
+  <g transform="translate(180 150)">
+    <rect x="0" y="0" width="580" height="580" fill="#faf9f4" stroke="#d8ddd0" stroke-width="4"/>
+    <path d="M290 70 L510 290 L290 510 L70 290 Z" fill="none" stroke="url(#accent)" stroke-width="6" opacity="0.85"/>
+    <path d="M290 145 L435 290 L290 435 L145 290 Z" fill="#1f5cba14" stroke="#6799fb" stroke-width="4"/>
+    <circle cx="290" cy="290" r="54" fill="#6799fb22" stroke="#1f5cba" stroke-width="4"/>
+    <circle cx="290" cy="290" r="8" fill="#1f5cba"/>
+  </g>
+  <g transform="translate(860 150)">
+    <rect x="0" y="0" width="560" height="580" fill="#f1f4ec" stroke="#d6dccd" stroke-width="4"/>
+    <rect x="56" y="96" width="448" height="22" fill="#e4e8de"/>
+    <rect x="56" y="96" width="380" height="22" fill="#5a7fb9"/>
+    <rect x="56" y="164" width="448" height="22" fill="#e4e8de"/>
+    <rect x="56" y="164" width="364" height="22" fill="#6799fb"/>
+    <rect x="56" y="232" width="448" height="22" fill="#e4e8de"/>
+    <rect x="56" y="232" width="316" height="22" fill="#7a8ca8"/>
+    <rect x="56" y="300" width="448" height="22" fill="#e4e8de"/>
+    <rect x="56" y="300" width="292" height="22" fill="#8896ad"/>
+    <rect x="56" y="398" width="448" height="120" fill="#f8f8f3" stroke="#dde2d5"/>
+    <text x="82" y="440" font-family="Space Grotesk, Arial, sans-serif" font-size="26" fill="#2f342d" font-weight="700">Open / Reflective 9.8</text>
+    <text x="82" y="476" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Flexible 9.7</text>
+    <text x="82" y="504" font-family="Manrope, Arial, sans-serif" font-size="20" fill="#5a5f65">Analytical 9.3</text>
+  </g>
+  <text x="182" y="84" font-family="Space Grotesk, Arial, sans-serif" font-size="30" letter-spacing="3" fill="#1f5cba">[PROFILE_SIGNAL_MAP]</text>
+  <text x="182" y="838" font-family="Manrope, Arial, sans-serif" font-size="40" fill="#2f342d" font-weight="700">Emergenetics + Harrison Deep Dive</text>
+</svg>

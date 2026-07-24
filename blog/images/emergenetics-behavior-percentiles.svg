@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Emergenetics Behavior Percentiles</title>
+  <desc id="desc">Bar chart for Expressiveness, Assertiveness, and Flexibility.</desc>
+  <rect width="1200" height="620" fill="#f7f7f2"/>
+  <rect x="110" y="70" width="980" height="500" fill="#fcfcf8" stroke="#dde2d6" stroke-width="3"/>
+  <text x="150" y="122" font-family="Space Grotesk, Arial, sans-serif" font-size="26" letter-spacing="2" fill="#1f5cba">[EMERGENETICS_BEHAVIOR_PERCENTILES]</text>
+  <g font-family="Manrope, Arial, sans-serif" fill="#2f342d">
+    <text x="150" y="210" font-size="28" font-weight="700">Expressiveness</text>
+    <rect x="430" y="183" width="520" height="36" fill="#e5e9df"/>
+    <rect x="430" y="183" width="255" height="36" fill="#5a7fb9"/>
+    <text x="970" y="210" font-size="28" text-anchor="end">49%</text>
+
+    <text x="150" y="310" font-size="28" font-weight="700">Assertiveness</text>
+    <rect x="430" y="283" width="520" height="36" fill="#e5e9df"/>
+    <rect x="430" y="283" width="265" height="36" fill="#6799fb"/>
+    <text x="970" y="310" font-size="28" text-anchor="end">51%</text>
+
+    <text x="150" y="410" font-size="28" font-weight="700">Flexibility</text>
+    <rect x="430" y="383" width="520" height="36" fill="#e5e9df"/>
+    <rect x="430" y="383" width="312" height="36" fill="#1f5cba"/>
+    <text x="970" y="410" font-size="28" text-anchor="end">60%</text>
+  </g>
+  <text x="150" y="500" font-family="Manrope, Arial, sans-serif" font-size="22" fill="#5a5f65">
+    Collaboration signal: measured communication, balanced advocacy, and high adaptation under changing constraints.
+  </text>
+</svg>

@@ -1,0 +1,169 @@
+{
+  "name": "A-AR ANDREW V. CONCEPCION",
+  "headline": "AI-Accelerated Developer (with deep platform knowledge) | Kotlin | Jetpack Compose | Compose Multiplatform",
+  "contact": {
+    "phone": "+64 290 431 2382",
+    "philippinesPhone": "+63 917 815 4366",
+    "email": "aarconcepcion@gmail.com",
+    "website": "https://ac-opensource.github.io",
+    "github": "https://github.com/ac-opensource",
+    "linkedin": "https://www.linkedin.com/in/aarconcepcion"
+  },
+  "summary": "AI-accelerated developer with deep platform knowledge and 10+ years of experience shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce. Strong in Kotlin, Jetpack Compose, mobile architecture, performance tuning, release hardening, and third-party integrations. Known for high-output execution, strong engineering judgment, and moving effectively across Android, iOS, backend, product, and design to ship reliable user-facing systems.",
+  "skills": [
+    {
+      "label": "Android",
+      "items": [
+        "Kotlin",
+        "Java",
+        "Jetpack Compose",
+        "XML layouts",
+        "Android SDK",
+        "Coroutines",
+        "Flow",
+        "RxJava",
+        "RxKotlin"
+      ]
+    },
+    {
+      "label": "Architecture",
+      "items": [
+        "Clean Architecture",
+        "MVVM",
+        "modularization",
+        "SDK integration",
+        "unit testing",
+        "CI/CD",
+        "release hardening",
+        "performance tuning"
+      ]
+    },
+    {
+      "label": "Cross-Platform / Adjacent",
+      "items": [
+        "Compose Multiplatform",
+        "Kotlin Multiplatform",
+        "Rust",
+        "UniFFI",
+        "SwiftUI",
+        "Swift",
+        "Firebase",
+        "Retrofit",
+        "SQLite",
+        "REST APIs"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "dates": "Jun 2024 - Present",
+      "title": "Senior Software Engineer",
+      "company": "Bitcoin.com",
+      "projects": [
+        "Bitcoin.com Wallet — Self-custody crypto wallet"
+      ],
+      "bullets": [
+        "Solve correctness and reliability problems across multichain transactions, Earn and rewards, routing, and deep links by tracing behavior end to end across UI, domain, APIs, and shared native layers.",
+        "Modernize a large Android wallet through API migrations, shared Rust and UniFFI integration, and design-system adoption while preserving established product behavior.",
+        "Carry changes through focused regression tests, emulator proof, CI and build hardening, code review, and release-candidate delivery."
+      ]
+    },
+    {
+      "dates": "Jun 2023 - Jun 2024",
+      "title": "Senior Mobile Developer",
+      "company": "ITV",
+      "projects": [
+        "ITVX — Streaming platform"
+      ],
+      "bullets": [
+        "Worked on the Android media player for ITVX live and on-demand streaming.",
+        "Shipped player behavior and reliability improvements inside a large production streaming platform.",
+        "Collaborated within the media player team to deliver maintainable Android changes across core playback experiences."
+      ]
+    },
+    {
+      "dates": "Jun 2021 - Jun 2023",
+      "title": "Senior Android Developer",
+      "company": "Red Airship",
+      "projects": [
+        "OCBC — Mobile banking",
+        "OpenPay — Fintech"
+      ],
+      "bullets": [
+        "Built and launched OCBC Business mobile banking flows spanning onboarding, account dashboards, transfers, and digital account opening.",
+        "Integrated third-party SDKs, refactored selected modules to reduce coupling, and improved unit-test coverage for critical fintech flows.",
+        "Improved OpenPay checkout reliability, UI responsiveness, partner-integrated payment flows, and release hardening."
+      ]
+    },
+    {
+      "dates": "May 2020 - Jun 2021",
+      "title": "Lead Developer",
+      "company": "InnovationTeam",
+      "projects": [
+        "MySTC — Telecom project"
+      ],
+      "bullets": [
+        "Led an offshore team of five senior Android engineers on MySTC, serving 10M+ installs across multilingual customer journeys.",
+        "Drove Clean Architecture and MVVM adoption with RxJava and RxKotlin, improving modular boundaries and release confidence.",
+        "Delivered performance, stability, and data synchronization improvements across account, ordering, and support flows."
+      ]
+    },
+    {
+      "dates": "Jun 2018 - May 2020",
+      "title": "Team Lead",
+      "company": "iPARA Technologies and Solutions",
+      "projects": [
+        "OWTO — Ride-hailing service"
+      ],
+      "bullets": [
+        "Led cross-functional delivery across Android, iOS, and backend for a ride-hailing platform that grew to 500K+ downloads.",
+        "Architected the mobile app with Uber RIB-inspired patterns to support modular growth and clearer ownership boundaries.",
+        "Improved booking reliability, payment-path handling, and backend API coordination for real-time transport flows."
+      ]
+    },
+    {
+      "dates": "Jun 2016 - Jun 2018",
+      "title": "Senior Android Developer",
+      "company": "YOYO Holdings Pte. Ltd.",
+      "projects": [
+        "PopSlide — Rewards platform"
+      ],
+      "bullets": [
+        "Led Android development for a rewards app with 1M+ downloads across Southeast Asia.",
+        "Migrated large Java surfaces to Kotlin, reduced regressions in fragile areas, and shipped safer feature rollouts through A/B testing and guardrails.",
+        "Improved API and caching behavior while keeping monetization-critical lockscreen and notification surfaces stable."
+      ]
+    },
+    {
+      "dates": "May 2014 - Jun 2016",
+      "title": "Full-Stack Web and Mobile Developer",
+      "company": "Internet Strategy Branding and Execution (ISBX)",
+      "projects": [
+        "WebSafety — Parental controls"
+      ],
+      "bullets": [
+        "Delivered end-to-end features for WebSafety across Android, iOS, web, and backend systems.",
+        "Worked through undocumented Android APIs, GPS and sync reliability, and security-sensitive feature requirements.",
+        "Helped ship a robust parental-controls platform with stronger operational and compliance posture."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "ITVX",
+      "description": "Android media-player work for ITV's live and on-demand streaming platform, focused on playback behavior, reliability, and maintainable delivery."
+    },
+    {
+      "name": "OCBC",
+      "description": "Mobile banking delivery for a major Singaporean bank, including onboarding, account dashboards, transfers, digital account opening, and guarded third-party SDK integration."
+    },
+    {
+      "name": "OpenPay",
+      "description": "Fintech checkout, spending-limit, performance, and partner-integration work with an emphasis on reliable payment completion and release hardening."
+    },
+    {
+      "name": "MySTC",
+      "description": "Telecom-scale Android product serving 10M+ installs, where I led a team of five senior engineers and drove modular, multilingual stability improvements."
+    }
+  ]
+}

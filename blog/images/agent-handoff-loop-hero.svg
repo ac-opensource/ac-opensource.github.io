@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Agent Handoff Loop</title>
+  <desc id="desc">A blueprint-style workflow showing tickets, local agents, verification, memory, and handoff notes connected in a durable engineering loop.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FAF9F4"/>
+      <stop offset="100%" stop-color="#E7EBE2"/>
+    </linearGradient>
+    <linearGradient id="signal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1F5CBA"/>
+      <stop offset="100%" stop-color="#6799FB"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect x="44" y="44" width="1512" height="812" fill="none" stroke="#D7DCD0" stroke-width="2"/>
+
+  <g opacity="0.5" stroke="#D7DCD0" stroke-width="1">
+    <path d="M0 130H1600M0 260H1600M0 390H1600M0 520H1600M0 650H1600M0 780H1600"/>
+    <path d="M180 0V900M380 0V900M580 0V900M780 0V900M980 0V900M1180 0V900M1380 0V900"/>
+  </g>
+
+  <text x="86" y="112" fill="#1F5CBA" font-family="Space Grotesk, Arial, sans-serif" font-size="24" letter-spacing="3">[DURABLE_AGENT_WORKFLOW]</text>
+  <text x="86" y="210" fill="#2F342D" font-family="Space Grotesk, Arial, sans-serif" font-size="84" font-weight="700">Agents that</text>
+  <text x="86" y="306" fill="#1F5CBA" font-family="Space Grotesk, Arial, sans-serif" font-size="84" font-weight="700">leave receipts</text>
+  <text x="90" y="374" fill="#57606A" font-family="Manrope, Arial, sans-serif" font-size="32">A ticket is not done when code changes.</text>
+  <text x="90" y="418" fill="#57606A" font-family="Manrope, Arial, sans-serif" font-size="32">It is done when the next run can verify it.</text>
+
+  <g transform="translate(865 116)">
+    <rect x="0" y="0" width="620" height="650" fill="#F3F4EC" stroke="#C8CEC0" stroke-width="2"/>
+    <text x="40" y="58" fill="#7A8176" font-family="Space Grotesk, Arial, sans-serif" font-size="20" letter-spacing="2">[EXECUTION_LOOP]</text>
+
+    <g fill="#FFFFFF" stroke="#C8CEC0" stroke-width="2">
+      <rect x="46" y="106" width="230" height="128"/>
+      <rect x="344" y="106" width="230" height="128"/>
+      <rect x="344" y="312" width="230" height="128"/>
+      <rect x="46" y="312" width="230" height="128"/>
+      <rect x="128" y="500" width="366" height="96"/>
+    </g>
+
+    <g font-family="Space Grotesk, Arial, sans-serif" font-size="17" letter-spacing="1.6" fill="#7A8176">
+      <text x="74" y="148">[TICKET]</text>
+      <text x="372" y="148">[AGENT]</text>
+      <text x="372" y="354">[PROOF]</text>
+      <text x="74" y="354">[MEMORY]</text>
+      <text x="160" y="536">[HANDOFF_NOTE]</text>
+    </g>
+
+    <g font-family="Manrope, Arial, sans-serif" font-size="23" font-weight="700" fill="#2F342D">
+      <text x="74" y="184">scope and state</text>
+      <text x="372" y="184">change the code</text>
+      <text x="372" y="390">run the checks</text>
+      <text x="74" y="390">save context</text>
+      <text x="160" y="570">what changed, how to re-check</text>
+    </g>
+
+    <g font-family="Manrope, Arial, sans-serif" font-size="18" fill="#57606A">
+      <text x="74" y="214">read the real issue first</text>
+      <text x="372" y="214">use local patterns</text>
+      <text x="372" y="420">separate code from publish</text>
+      <text x="74" y="420">keep the next run warm</text>
+    </g>
+
+    <g fill="none" stroke="url(#signal)" stroke-width="8" stroke-linecap="square">
+      <path d="M276 170H344"/>
+      <path d="M459 234V312"/>
+      <path d="M344 376H276"/>
+      <path d="M161 440V500"/>
+      <path d="M494 548H548V170H574"/>
+    </g>
+    <g fill="#1F5CBA">
+      <rect x="302" y="158" width="24" height="24"/>
+      <rect x="447" y="264" width="24" height="24"/>
+      <rect x="292" y="364" width="24" height="24"/>
+      <rect x="149" y="468" width="24" height="24"/>
+      <rect x="536" y="536" width="24" height="24"/>
+    </g>
+  </g>
+
+  <g transform="translate(90 590)">
+    <rect x="0" y="0" width="640" height="126" fill="#202821"/>
+    <text x="34" y="48" fill="#AAB4A4" font-family="Space Grotesk, Arial, sans-serif" font-size="18" letter-spacing="2">[OPERATING_RULE]</text>
+    <text x="34" y="90" fill="#FAF9F4" font-family="Manrope, Arial, sans-serif" font-size="28" font-weight="700">read > change > prove > handoff > remember</text>
+  </g>
+
+  <text x="90" y="812" fill="#57606A" font-family="Space Grotesk, Arial, sans-serif" font-size="22" letter-spacing="2">local agents / Android delivery / Linear workflows / memory systems</text>
+</svg>

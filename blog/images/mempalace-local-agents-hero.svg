@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" fill="none">
+  <rect width="1600" height="900" fill="#FAF9F4"/>
+  <rect x="44" y="44" width="1512" height="812" stroke="#D7DCD0"/>
+  <g opacity="0.45" stroke="#D7DCD0">
+    <path d="M0 120H1600"/>
+    <path d="M0 260H1600"/>
+    <path d="M0 400H1600"/>
+    <path d="M0 540H1600"/>
+    <path d="M0 680H1600"/>
+    <path d="M220 0V900"/>
+    <path d="M520 0V900"/>
+    <path d="M820 0V900"/>
+    <path d="M1120 0V900"/>
+    <path d="M1420 0V900"/>
+  </g>
+  <text x="82" y="102" fill="#205DBD" font-family="Space Grotesk, Arial, sans-serif" font-size="24" letter-spacing="2">[LOCAL_MEMORY_PROTOCOL]</text>
+  <text x="82" y="204" fill="#2F342D" font-family="Space Grotesk, Arial, sans-serif" font-size="88" font-weight="700">MemPalace for</text>
+  <text x="82" y="300" fill="#205DBD" font-family="Space Grotesk, Arial, sans-serif" font-size="88" font-weight="700">Local Agents</text>
+  <text x="86" y="374" fill="#57606A" font-family="Manrope, Arial, sans-serif" font-size="34">I use it less like a memory database and more like a discipline:</text>
+  <text x="86" y="420" fill="#57606A" font-family="Manrope, Arial, sans-serif" font-size="34">wake up, verify, write the diary, update facts.</text>
+
+  <rect x="920" y="120" width="560" height="612" fill="#F3F4EC" stroke="#C8CEC0"/>
+  <text x="958" y="176" fill="#7A8176" font-family="Space Grotesk, Arial, sans-serif" font-size="20" letter-spacing="2">[ACTIVE_PALACE]</text>
+  <text x="1180" y="176" fill="#205DBD" font-family="Space Grotesk, Arial, sans-serif" font-size="20" letter-spacing="2">77613_DRAWERS</text>
+
+  <rect x="958" y="214" width="212" height="136" fill="#FFFFFF" stroke="#C8CEC0"/>
+  <rect x="1198" y="214" width="240" height="136" fill="#FFFFFF" stroke="#C8CEC0"/>
+  <rect x="958" y="378" width="480" height="132" fill="#FFFFFF" stroke="#C8CEC0"/>
+  <rect x="958" y="538" width="480" height="146" fill="#202821"/>
+
+  <text x="986" y="252" fill="#7A8176" font-family="Space Grotesk, Arial, sans-serif" font-size="18" letter-spacing="1.8">[WAKE_UP]</text>
+  <text x="986" y="288" fill="#2F342D" font-family="Manrope, Arial, sans-serif" font-size="24" font-weight="700">status + AAAK</text>
+  <text x="986" y="320" fill="#57606A" font-family="Manrope, Arial, sans-serif" font-size="20">load the palace before</text>
+  <text x="986" y="346" fill="#57606A" font-family="Manrope, Arial, sans-serif" font-size="20">the model starts speaking</text>
+
+  <text x="1226" y="252" fill="#7A8176" font-family="Space Grotesk, Arial, sans-serif" font-size="18" letter-spacing="1.8">[VERIFY]</text>
+  <text x="1226" y="288" fill="#2F342D" font-family="Manrope, Arial, sans-serif" font-size="24" font-weight="700">search or KG first</text>
+  <text x="1226" y="320" fill="#57606A" font-family="Manrope, Arial, sans-serif" font-size="20">memory only counts</text>
+  <text x="1226" y="346" fill="#57606A" font-family="Manrope, Arial, sans-serif" font-size="20">if the agent checks it</text>
+
+  <text x="986" y="416" fill="#7A8176" font-family="Space Grotesk, Arial, sans-serif" font-size="18" letter-spacing="1.8">[TAXONOMY]</text>
+  <text x="986" y="452" fill="#2F342D" font-family="Manrope, Arial, sans-serif" font-size="22" font-weight="700">wing: ac_opensource.github.io</text>
+  <text x="986" y="486" fill="#57606A" font-family="Manrope, Arial, sans-serif" font-size="20">rooms: blog / scripts / design / general</text>
+
+  <text x="986" y="578" fill="#AAB4A4" font-family="Space Grotesk, Arial, sans-serif" font-size="18" letter-spacing="1.8">[AGENT_DIARY]</text>
+  <text x="986" y="618" fill="#FAF9F4" font-family="Manrope, Arial, sans-serif" font-size="22" font-weight="700">record what happened</text>
+  <text x="986" y="652" fill="#D8DECF" font-family="Manrope, Arial, sans-serif" font-size="20">after each session so the next agent</text>
+  <text x="986" y="680" fill="#D8DECF" font-family="Manrope, Arial, sans-serif" font-size="20">starts from continuity instead of amnesia</text>
+
+  <path d="M150 610H770" stroke="#205DBD" stroke-width="8" stroke-linecap="square"/>
+  <rect x="148" y="636" width="34" height="34" fill="#205DBD"/>
+  <rect x="196" y="636" width="34" height="34" stroke="#205DBD" stroke-width="3"/>
+  <rect x="244" y="636" width="34" height="34" fill="#205DBD" fill-opacity="0.18" stroke="#205DBD" stroke-width="3"/>
+  <text x="86" y="756" fill="#57606A" font-family="Space Grotesk, Arial, sans-serif" font-size="22" letter-spacing="2">wake_up → verify → diary → kg_update</text>
+</svg>

@@ -1,0 +1,43 @@
+# Andrew Concepcion
+
+> Personal engineering portfolio and technical blog of Andrew Concepcion, an AI-accelerated developer with 10+ years of experience across Android, iOS, backend systems, architecture, and product delivery.
+
+Canonical site: https://ac-opensource.github.io/
+
+Use the canonical static pages below for public professional and technical information. Prefer each page's title, publication date, structured metadata, and canonical URL when quoting or citing it. Do not infer credentials, endorsements, employers, or current availability beyond what the cited page states.
+
+## Primary sections
+
+- [Home](https://ac-opensource.github.io/): Overview, current engineering focus, and recent public work.
+- [Portfolio](https://ac-opensource.github.io/work.html): Selected mobile and public work across streaming, payments, banking, telecom, backend systems, technical leadership, and AI-accelerated delivery.
+- [About](https://ac-opensource.github.io/about.html): Professional background, working style, interests, and career trajectory.
+- [Resume](https://ac-opensource.github.io/resume.html): Canonical public resume and skills summary.
+- [Blog](https://ac-opensource.github.io/blog/): Engineering logs, essays, case studies, and field notes.
+- [Evidence profile tree](https://ac-opensource.github.io/about.html#profile-map): Accessible, rooted branching systems for engineering capabilities and interests, with interactive junctions and a public evidence index.
+- [Contact](https://ac-opensource.github.io/contact.html): Public contact channels.
+
+## Selected engineering case studies
+
+- [MySTC Android delivery](https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html): First-person project note on leading five senior Android engineers through multilingual account, ordering, and support work.
+- [OCBC Business Android work](https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html): Project note on identity verification, SDK integration, concurrency, network state, and regression safety.
+- [OWTO mobile-to-backend delivery](https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html): Project note on owning Android, iOS, GPS, payments, API contracts, and backend delivery as one journey.
+- [openpay checkout state](https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html): Project note on spend limits, merchant discovery, checkout state, partner integrations, and release hardening.
+- [Solo white-label Android platform](https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html): Project note on shared Android behavior across many restaurant-branded apps.
+- [Popslide Android experiments](https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html): Project note on rewards, notifications, lock-screen behavior, caching, and experiment cleanup.
+- [WebSafety mobile platform limits](https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html): Project note on GPS, synchronization, permissions, privacy, and constrained platform behavior.
+- [ProjectBASS community network mapping](https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html): Project note on volunteer-built Kotlin tooling for crowdsourced connectivity data.
+
+## Selected technical writing
+
+- [What Building Persons Finder Taught Me About AI-Ready Backend Work](https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html)
+- [One Rust Core Across Android and iOS](https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html)
+- [Prompt Patterns for Production-Ready Code](https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html)
+- [E2E and Visual QA for Personal Websites](https://ac-opensource.github.io/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html)
+
+## Content discovery
+
+- [XML sitemap](https://ac-opensource.github.io/sitemap.xml): Canonical public page inventory.
+- [RSS feed](https://ac-opensource.github.io/blog/rss.xml): Published blog updates.
+- [Published post manifest](https://ac-opensource.github.io/blog/posts.json): Structured metadata for public blog entries.
+
+Use static `/blog/<slug>.html` URLs as canonical articles. Preview, writer, template, database, and other tooling routes are not canonical content sources.

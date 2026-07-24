@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Aqua Expeditions placeholder artwork</title>
+  <desc id="desc">Concept artwork representing a premium travel mobile experience.</desc>
+  <defs>
+    <linearGradient id="sea" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#E9F5F8"/>
+      <stop offset="100%" stop-color="#B8DEE8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="#F7F4EE"/>
+  <rect x="100" y="100" width="1000" height="700" rx="28" fill="#0E4B63"/>
+  <rect x="130" y="130" width="940" height="640" rx="20" fill="url(#sea)"/>
+  <path d="M130 620c120-40 180-40 300 0s180 40 300 0 180-40 340 0v150H130z" fill="#0C6A85"/>
+  <path d="M130 560c120-40 180-40 300 0s180 40 300 0 180-40 340 0v90H130z" fill="#148AA7"/>
+  <path d="M730 410c52-98 178-145 260-118-42 22-87 94-93 166l-167 12z" fill="#F3D7A1"/>
+  <rect x="220" y="220" width="270" height="420" rx="34" fill="#10394C"/>
+  <rect x="248" y="255" width="214" height="350" rx="18" fill="#F9FBFC"/>
+  <rect x="276" y="295" width="160" height="24" fill="#0E4B63"/>
+  <rect x="276" y="350" width="150" height="120" rx="16" fill="#D7F0F6"/>
+  <rect x="276" y="495" width="120" height="18" fill="#5F6B73"/>
+  <rect x="276" y="530" width="150" height="18" fill="#5F6B73"/>
+  <text x="220" y="90" fill="#0E4B63" font-family="Space Grotesk, Arial, sans-serif" font-size="52" font-weight="700">Aqua Expeditions</text>
+  <text x="220" y="760" fill="#EAF7FA" font-family="Manrope, Arial, sans-serif" font-size="30">Selected Android contributions for a premium travel brand</text>
+</svg>

@@ -1,0 +1,478 @@
+<!-- generated: scripts/build-static-blog-pages.js -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
+<title>What Building a Small Backend Taught Me About AI-Ready Engineering | Andrew Concepcion</title>
+<meta name="description" content="A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output."/>
+<link rel="canonical" href="https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html"/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:site_name" content="Andrew Concepcion"/>
+<meta property="og:type" content="article"/>
+<meta property="og:url" content="https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html"/>
+<meta property="og:title" content="What Building a Small Backend Taught Me About AI-Ready Engineering | Andrew Concepcion"/>
+<meta property="og:description" content="A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output."/>
+<meta property="og:image" content="https://ac-opensource.github.io/blog/images/persons-finder-architecture-hero.svg"/>
+<meta property="og:image:alt" content="Blueprint-style diagram connecting an API contract to location history, a last-known projection, and a guarded AI bio boundary."/>
+<meta property="article:published_time" content="2026-07-21"/>
+<meta property="article:author" content="Andrew Concepcion"/>
+<meta property="article:tag" content="kotlin">
+<meta property="article:tag" content="spring-boot">
+<meta property="article:tag" content="postgis">
+<meta property="article:tag" content="backend">
+<meta property="article:tag" content="ai-engineering">
+<meta property="article:tag" content="privacy">
+<meta property="article:tag" content="testing">
+<meta property="article:tag" content="systems-design">
+<meta property="article:tag" content="technical">
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="What Building a Small Backend Taught Me About AI-Ready Engineering | Andrew Concepcion"/>
+<meta name="twitter:description" content="A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/persons-finder-architecture-hero.svg"/>
+<meta name="twitter:image:alt" content="Blueprint-style diagram connecting an API contract to location history, a last-known projection, and a guarded AI bio boundary."/>
+<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#faf9f4",
+          "tertiary": "#1f5cba",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f4f4ee",
+          "surface-container": "#edefe7",
+          "surface-container-highest": "#e0e4d9",
+          "secondary": "#57606a",
+          "on-surface": "#2f342d",
+          "outline": "#787c73",
+          "outline-variant": "#afb3aa",
+          "primary": "#5a5f65",
+          "on-primary": "#f4f8ff"
+        },
+        fontFamily: {
+          "headline": ["Space Grotesk"],
+          "body": ["Manrope"],
+          "label": ["Space Grotesk"]
+        },
+        borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"}
+      }
+    }
+  }
+</script>
+<style>
+  body {
+    background-color: #faf9f4;
+  }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .code-block {
+    background: #1A1C1E;
+    color: #DEE3E9;
+    font-family: 'Space Grotesk', monospace;
+    padding: 1.5rem;
+    border-left: 4px solid #1F5CBA;
+  }
+  .code-keyword { color: #6799FB; }
+  .code-type { color: #FE8983; }
+  .code-func { color: #E0E4D9; }
+  .hero-overlay-alpha {
+    opacity: 0;
+    animation: overlayAlphaPulse 4.8s ease-in-out infinite;
+    will-change: opacity;
+  }
+  .work-post-hero {
+    position: relative;
+    display: grid;
+    aspect-ratio: 1;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(175, 179, 170, 0.28);
+    background: #edefe7;
+  }
+  .work-post-hero--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+  }
+  .work-post-hero__crop {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img,
+  .work-post-hero--contain > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .work-post-hero__crop img,
+  .work-post-hero--cover > img {
+    object-fit: cover;
+  }
+  .work-post-hero__crop--top img {
+    object-position: top center;
+  }
+  .work-post-hero__crop--bottom img {
+    object-position: bottom center;
+  }
+  .work-post-hero--cover > img {
+    object-position: 62% center;
+  }
+  .work-post-hero--contain {
+    aspect-ratio: 4 / 5;
+  }
+  .work-post-hero--contain > img {
+    object-fit: contain;
+    background: #fff;
+  }
+  @keyframes overlayAlphaPulse {
+    0% { opacity: 0; }
+    15% { opacity: 0; }
+    35% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-overlay-alpha {
+      animation: none;
+      opacity: 1;
+    }
+  }
+</style>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "What Building a Small Backend Taught Me About AI-Ready Engineering",
+  "description": "A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.",
+  "author": {
+    "@type": "Person",
+    "name": "Andrew Concepcion"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Andrew Concepcion",
+    "url": "https://ac-opensource.github.io"
+  },
+  "datePublished": "2026-07-21",
+  "dateModified": "2026-07-22T03:01:17.000Z",
+  "image": "https://ac-opensource.github.io/blog/images/persons-finder-architecture-hero.svg",
+  "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html"
+}</script>
+</head>
+<body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
+<a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
+<div class="neural-global-bg" aria-hidden="true">
+  <div class="neural-mesh-container">
+    <div class="neural-mesh"></div>
+    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
+    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
+    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
+    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
+    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
+    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
+    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
+    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
+  </div>
+  <div class="bust-gradient"></div>
+  <div class="canvas-grid"></div>
+</div>
+<header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
+  <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
+    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+      <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+      <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+      <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+    </nav>
+    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
+  </div>
+  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+    <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+    <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+  </nav>
+</header>
+<main id="main-content" class="pt-32 md:pt-24 pb-32">
+<article class="max-w-screen-xl mx-auto px-6">
+<div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
+<span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
+<span id="post-date" class="bg-surface-container-low px-2 py-1">2026-07-21</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[12 min read]</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
+<div class="lg:col-span-7">
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">What Building a Small Backend Taught Me About AI-Ready Engineering</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.</p>
+<div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
+<button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
+<button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
+<a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[RSS]</a>
+</div>
+</div>
+
+<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
+<div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
+<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="/blog/images/persons-finder-architecture-hero.svg" alt="Blueprint-style diagram connecting an API contract to location history, a last-known projection, and a guarded AI bio boundary." loading="eager" decoding="async"/>
+</div>
+<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
+<div class="flex justify-between items-start">
+<span class="font-label text-xs">[state_machine_v4.svg]</span>
+<span class="material-symbols-outlined text-tertiary">schema</span>
+</div>
+<div class="space-y-4">
+<div class="h-1 w-2/3 bg-tertiary/20"></div>
+<div class="flex gap-2">
+<div class="w-4 h-4 border border-tertiary"></div>
+<div class="w-4 h-4 bg-tertiary"></div>
+<div class="w-4 h-4 border border-tertiary"></div>
+</div>
+<div class="h-px w-full bg-outline-variant/50"></div>
+<div class="flex justify-end">
+<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<aside class="lg:col-span-3 hidden lg:block space-y-12">
+<div class="pt-4 border-t border-outline-variant/20">
+<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[author_identity]</h4>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">account_tree</span>
+</div>
+<div>
+<p id="post-author-name" class="text-sm font-bold">Andrew Concepcion</p>
+<p id="post-author-role" class="text-xs text-secondary">[technical]</p>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/20">
+<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
+<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#kotlin</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#spring-boot</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#postgis</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#backend</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ai-engineering</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#privacy</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#testing</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#systems-design</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#technical</span></div>
+</div>
+<section class="p-6 bg-surface-container-low space-y-4">
+<h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.</p>
+</section>
+</aside>
+<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section>
+  <p>I recently built a compact backend that creates people, updates their locations, finds nearby results, and generates a short AI-assisted bio from a person’s job and hobbies. The surface area was small enough to look straightforward. The implementation was a useful reminder that small APIs are often compressed systems-design exercises.</p>
+  <p>The interesting work was not choosing Kotlin or wiring up three controllers. It was deciding what the API promised, what the database had to remember, what the model was allowed to do, and what evidence would make those decisions trustworthy.</p>
+</section>
+
+<section>
+  <h2>1. Turn requirements into a contract before turning them into code</h2>
+  <p>The first lesson was that a short requirements list hides a lot of policy. “Update a location” does not answer whether updates are history, whether an old phone event can arrive late, or what a client retry should do. “Find nearby people” does not answer which distance model is authoritative, whether the radius boundary is inclusive, or whether returned coordinates are the same point used for filtering.</p>
+  <p>I got better results once those questions became an explicit contract instead of being left to controller code. The API has only three public routes—<code>POST /persons</code>, <code>PUT /persons/{id}/location</code>, and <code>GET /persons/nearby</code>—but each has a deliberately closed request and response shape. Unknown fields are rejected. Coordinates are canonicalized consistently. Errors use stable machine-readable codes rather than leaking rejected values or implementation details.</p>
+  <p>This sounds formal for a small backend, but it creates a useful order of operations: decide the behavior, encode it in tests and documentation, then implement the path that satisfies it. Without that order, “clean architecture” can become a collection of reasonable guesses that disagree at the edges.</p>
+</section>
+
+<section>
+  <h2>2. Current state and history are different products</h2>
+  <p>The most important data-model decision was to stop treating a person’s location as one mutable column. A location update is both a current-state change and an observation about what happened. Those are related, but they are not the same thing.</p>
+  <p>The system stores accepted observations as immutable history and maintains a rebuildable last-known projection for reads. A late observation can remain in the history without incorrectly rewinding the current projection. A client update can carry a timestamp and an idempotency key, so replaying the same request returns the original observation instead of creating another row. Reusing a key with different content is a conflict, not a second interpretation of the event.</p>
+  <p>This made me think more carefully about “update” APIs. If the system may need to explain why a current value won, or recover a projection after a bug, overwriting the past is the wrong optimization. The projection makes the common query fast; the log preserves the facts needed to rebuild and reason about it.</p>
+  <blockquote>When a write can arrive late, be retried, or be audited later, model the observation and the projection separately.</blockquote>
+</section>
+
+<section>
+  <h2>3. Geospatial correctness lives in the database semantics</h2>
+  <p>Nearby search is easy to demonstrate and surprisingly easy to get subtly wrong. An in-memory Haversine loop can return plausible results while disagreeing with the storage model, the index, or the meaning of a kilometre near the edge of a radius.</p>
+  <p>The implementation uses PostGIS <code>geography(Point, 4326)</code>, a GiST index on the last-known projection, and <code>ST_DWithin</code> for indexed candidate selection. Final membership and ordering use the same spheroidal distance semantics, with unrounded distance deciding the result and a stable UUID tie-breaker making ordering deterministic. The response’s one-decimal distance is presentation; it is not the value used to decide whether someone matched.</p>
+  <p>The broader lesson is to make the domain’s physical meaning explicit. Latitude and longitude are not just two decimals. Axis order, longitude normalization, poles, the radius boundary, exact-location matches, and the point returned to the caller all belong in the contract. Once the semantics were written down, the query shape became easier to judge: nearby reads query the projection, not the full history and not an application-memory scan.</p>
+</section>
+
+<section>
+  <h2>4. AI should own prose, not truth</h2>
+  <p>The AI requirement created a useful boundary question: what exactly is the model responsible for? The answer became narrower than “generate a bio.” The model may propose short prose. The application remains responsible for input validation, privacy policy, grounding, output shape, length, sentence count, and persistence.</p>
+  <p>That boundary led to several practical decisions. The bio generator is provider-neutral, so the application does not depend on OpenAI-, Gemini-, or Anthropic-specific response types. The default runtime is deterministic and does not require credentials. Remote generation is explicit and fail-closed. User profile fields are canonicalized before they are used, and the model receives structured, opaque source values rather than a prompt assembled from free-form instructions. The generated result is checked again before it can cross into the stored domain model.</p>
+  <p>Prompt injection is therefore not treated as a clever prompt-writing problem. It is an input and output boundary problem. A hobby can be valid domain data and still contain language that tries to control the model. High-confidence instruction, credential, contact, URL, and control-token patterns are handled by policy; model output is still treated as untrusted even after the input passes. In a higher-security product, the privacy question would be larger still: a name, job, hobby, and location should not leave the system simply because a model makes the feature more interesting.</p>
+  <p>The most useful mental model is: the model is a fallible component behind an application-owned interface. It is not the source of truth, the security boundary, or the final validator.</p>
+</section>
+
+<section>
+  <h2>5. Nondeterministic features need invariant tests</h2>
+  <p>Exact-string assertions are the wrong test for AI-authored prose. The useful tests ask whether the output is grounded in the allowed source, stays within the length and sentence limits, avoids forbidden structure, and remains safe when the provider returns malformed or adversarial content.</p>
+  <p>The test suite consequently has several layers: deterministic unit tests for policy and bounds, contract tests for the HTTP behavior, adapter tests for provider response parsing, and live-provider evaluation that is opt-in rather than part of the ordinary build. The live harness precommits its corpus, call budget, provider, and pacing. It does not retry, choose the best of several answers, or silently fall back to a different provider. That makes a result auditable instead of making the score look better.</p>
+  <p>One fixed-corpus evaluation produced 300 passing outputs, with no retries, top-ups, fallback, or boundary failures. That is useful revision-scoped evidence that the policy and adapter worked under those recorded conditions. It is not a claim that every future provider response—or production traffic—will behave the same way. The distinction matters. A green experiment is evidence about an experiment, not a warranty about a system.</p>
+</section>
+
+<section>
+  <h2>6. A benchmark harness is not benchmark evidence</h2>
+  <p>The system included a one-million-record benchmark harness. Building the harness clarified another engineering habit: separate the ability to measure something from the result of having measured it.</p>
+  <p>The implementation includes seed data, query scenarios, write-replay cases, correctness checks, and query-plan inspection. Those artifacts make a future run repeatable. They do not justify a performance headline until the run has actually happened on a named environment with captured timings, plans, cardinalities, and write behavior. In particular, an indexed query plan is not the same as a measured service-level result, and a small local database is not a production workload.</p>
+  <p>This is a less glamorous lesson than “it scales to a million rows,” but it is more durable: preserve the harness, label the evidence, and keep unknowns visible.</p>
+</section>
+
+<section>
+  <h2>7. Verification is part of the feature</h2>
+  <p>For this backend, Docker Compose, Flyway migrations, real PostGIS tests, HTTP smoke checks, dashboard checks, and traceability documents were not cleanup tasks after the implementation. They were part of the implementation.</p>
+  <p>That changed how I worked. A migration was not finished until the application could start against it. A nearby query was not finished until the database semantics and response shape agreed. A security rule was not finished until hostile input and provider-shaped failures were tested. A live evaluation was not finished until its evidence was sanitized and its limits were recorded.</p>
+  <p>The repository is also a record of decisions: why the projection exists, why the public routes remain unversioned, why the deterministic generator is the default, and what the live tests do and do not prove. Documentation became a design tool because writing down the boundary exposed contradictions earlier than code review did.</p>
+</section>
+
+<section>
+  <h2>What I’m taking forward</h2>
+  <p>This work reinforced a simple operating loop for AI-assisted backend work:</p>
+  <ol>
+    <li>Read the live requirements and repository state before making assumptions.</li>
+    <li>Make the contract and the failure behavior explicit.</li>
+    <li>Separate durable facts from derived read models.</li>
+    <li>Keep AI behind a small application-owned boundary.</li>
+    <li>Test invariants, hostile inputs, and integration semantics—not just happy-path strings.</li>
+    <li>Label measured evidence separately from scaffolding, intention, and speculation.</li>
+  </ol>
+  <p>The system is small, but the lesson is not. A backend becomes trustworthy at the boundaries: where a request becomes a domain fact, where history becomes current state, where coordinates become a distance, where user text becomes model input, and where a test result becomes a claim. Those boundaries are where I want to spend more of my engineering attention.</p>
+</section></div>
+</div>
+<div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
+<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-04-30-agents-that-leave-receipts.html">
+<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Agents That Leave Receipts</h5>
+<div class="mt-6 flex items-center gap-2 text-tertiary">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="font-label text-xs">read_entry</span>
+</div>
+</a>
+<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-07-22-the-fortress-we-mistake-for-home.html">
+<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">The Fortress We Mistake for Home</h5>
+<div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
+<span class="font-label text-xs">read_entry</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</a>
+</div>
+</article>
+</main>
+<footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
+    <span>© 2026 Andrew Concepcion</span>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
+  </div>
+</footer>
+<script>
+  (() => {
+    const FORCE_ACTIVE_ROUTE = "/blog/";
+    const path = window.location.pathname.replace(/\/index\.html$/, "/");
+    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
+      const route = link.dataset.route;
+      let active = false;
+      if (route === FORCE_ACTIVE_ROUTE) {
+        active = true;
+      } else if (FORCE_ACTIVE_ROUTE === "/work.html" && route === "/blog/") {
+        active = false;
+      } else {
+        active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      }
+      if (active) {
+        link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+
+    const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
+    const CURRENT_POST_SLUG = "2026-07-21-what-building-persons-finder-taught-me";
+    const CURRENT_POST_TITLE = "What Building a Small Backend Taught Me About AI-Ready Engineering";
+    const CURRENT_POST_URL = "/blog/2026-07-21-what-building-persons-finder-taught-me.html";
+    const sharePostButton = document.getElementById("share-post-button");
+    const bookmarkPostButton = document.getElementById("bookmark-post-button");
+
+    function loadBookmarks() {
+      try {
+        const raw = localStorage.getItem(BOOKMARKS_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(parsed)) return new Set();
+        return new Set(parsed.map((value) => String(value || "").trim()).filter(Boolean));
+      } catch (_error) {
+        return new Set();
+      }
+    }
+
+    function saveBookmarks(set) {
+      try {
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(set)));
+      } catch (_error) {
+        // Ignore write failures.
+      }
+    }
+
+    function setBookmarkButtonState(active) {
+      if (!bookmarkPostButton) return;
+      bookmarkPostButton.textContent = active ? "[BOOKMARKED]" : "[BOOKMARK]";
+      bookmarkPostButton.classList.toggle("border-tertiary/40", active);
+      bookmarkPostButton.classList.toggle("text-tertiary", active);
+      bookmarkPostButton.classList.toggle("bg-surface-container-highest", active);
+      bookmarkPostButton.classList.toggle("border-outline-variant/20", !active);
+      bookmarkPostButton.classList.toggle("text-secondary", !active);
+    }
+
+    async function shareCurrentPost() {
+      const absoluteUrl = new URL(CURRENT_POST_URL, window.location.origin).href;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: CURRENT_POST_TITLE || "Blog post",
+            url: absoluteUrl
+          });
+          return;
+        } catch (_error) {
+          // Continue to fallback.
+        }
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(absoluteUrl);
+          return;
+        } catch (_error) {
+          // Continue to prompt fallback.
+        }
+      }
+      window.prompt("Copy post URL:", absoluteUrl);
+    }
+
+    if (sharePostButton) {
+      sharePostButton.addEventListener("click", () => {
+        shareCurrentPost();
+      });
+    }
+
+    if (bookmarkPostButton && CURRENT_POST_SLUG) {
+      const bookmarks = loadBookmarks();
+      setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      bookmarkPostButton.addEventListener("click", () => {
+        if (bookmarks.has(CURRENT_POST_SLUG)) {
+          bookmarks.delete(CURRENT_POST_SLUG);
+        } else {
+          bookmarks.add(CURRENT_POST_SLUG);
+        }
+        saveBookmarks(bookmarks);
+        setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      });
+    }
+  })();
+</script>
+</body></html>

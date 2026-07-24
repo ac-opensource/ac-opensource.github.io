@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Public guide for AI and language-model discovery:
+# https://ac-opensource.github.io/llms.txt
+
+Sitemap: https://ac-opensource.github.io/sitemap.xml

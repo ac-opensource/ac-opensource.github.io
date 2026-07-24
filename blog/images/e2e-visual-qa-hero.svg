@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="t d">
+  <title id="t">E2E + Visual QA for Personal Websites</title>
+  <desc id="d">Abstract split-screen showing automated user flows and visual regression diffs.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f5f6f1"/>
+      <stop offset="100%" stop-color="#e9ece4"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1f5cba"/>
+      <stop offset="100%" stop-color="#7ca5f7"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <g stroke="#d3d9cb" stroke-width="1" opacity="0.64">
+    <path d="M0 120h1600M0 240h1600M0 360h1600M0 480h1600M0 600h1600M0 720h1600"/>
+    <path d="M120 0v900M320 0v900M520 0v900M720 0v900M920 0v900M1120 0v900M1320 0v900M1520 0v900"/>
+  </g>
+
+  <g transform="translate(120 120)">
+    <rect x="0" y="0" width="640" height="660" fill="#fafbf7" stroke="#d7ddce" stroke-width="4"/>
+    <text x="36" y="62" font-family="Space Grotesk, Arial, sans-serif" font-size="24" fill="#1f5cba" letter-spacing="2">[PLAYWRIGHT_E2E]</text>
+
+    <rect x="36" y="102" width="568" height="158" fill="#141a23"/>
+    <g font-family="JetBrains Mono, monospace" font-size="20" fill="#8fb3ff">
+      <text x="58" y="152">test('core pages load and navigate', async () =&gt; {</text>
+      <text x="78" y="186">await page.goto('/');</text>
+      <text x="78" y="220">await page.getByRole('link', { name: 'Source' }).click();</text>
+      <text x="58" y="248">});</text>
+    </g>
+
+    <rect x="36" y="296" width="568" height="334" fill="#f3f6ef" stroke="#dce2d3"/>
+    <rect x="70" y="336" width="220" height="240" fill="#e5eae0" stroke="#d3daca"/>
+    <rect x="350" y="336" width="220" height="240" fill="#e5eae0" stroke="#d3daca"/>
+    <path d="M70 336l220 240M290 336L70 576" stroke="#da5f5f" stroke-width="3" opacity="0.6"/>
+    <path d="M350 336l220 240M570 336L350 576" stroke="#63b36e" stroke-width="3" opacity="0.6"/>
+    <text x="100" y="610" font-family="JetBrains Mono, monospace" font-size="19" fill="#5c646f">baseline.png</text>
+    <text x="392" y="610" font-family="JetBrains Mono, monospace" font-size="19" fill="#5c646f">current.png</text>
+  </g>
+
+  <g transform="translate(830 180)">
+    <rect x="0" y="0" width="650" height="540" fill="#f2f5ee" stroke="#d9dfd0" stroke-width="4"/>
+    <text x="42" y="64" font-family="Space Grotesk, Arial, sans-serif" font-size="24" fill="#2f342d" font-weight="700">VISUAL_QA_LOOP</text>
+
+    <g transform="translate(42 112)">
+      <circle cx="84" cy="84" r="54" fill="#1f5cba1f" stroke="#1f5cba" stroke-width="4"/>
+      <circle cx="294" cy="84" r="54" fill="#1f5cba1f" stroke="#1f5cba" stroke-width="4"/>
+      <circle cx="504" cy="84" r="54" fill="#1f5cba1f" stroke="#1f5cba" stroke-width="4"/>
+      <path d="M138 84h102M348 84h102" stroke="url(#accent)" stroke-width="8" stroke-linecap="round"/>
+
+      <text x="44" y="92" font-family="JetBrains Mono, monospace" font-size="18" fill="#2f342d">CAPTURE</text>
+      <text x="246" y="92" font-family="JetBrains Mono, monospace" font-size="18" fill="#2f342d">COMPARE</text>
+      <text x="462" y="92" font-family="JetBrains Mono, monospace" font-size="18" fill="#2f342d">FIX</text>
+    </g>
+
+    <rect x="42" y="302" width="566" height="176" fill="#fbfbf8" stroke="#dfe5d7"/>
+    <text x="66" y="356" font-family="Manrope, Arial, sans-serif" font-size="28" fill="#2f342d" font-weight="600">Stable nav, readable typography, predictable flows.</text>
+    <text x="66" y="404" font-family="Manrope, Arial, sans-serif" font-size="24" fill="#5a5f65">Catch regressions before they reach production.</text>
+  </g>
+
+  <text x="120" y="836" font-family="Space Grotesk, Arial, sans-serif" font-size="30" fill="#1f5cba" letter-spacing="3">[E2E_VISUAL_REGRESSION_DISCIPLINE]</text>
+</svg>

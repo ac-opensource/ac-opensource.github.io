@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-07-22",
+  "method": {
+    "nodeOrder": "Within each axis, nodes are ordered by distinct public evidence contexts, then by the most recent evidence date.",
+    "nodeSize": "All nodes are the same size. Position and size are not proficiency scores.",
+    "edgeMeaning": "Every edge means the two topics were co-demonstrated in at least one cited public context.",
+    "edgeStyles": {
+      "shipped": "Solid line: shipped work or a public project demonstrates the relationship.",
+      "published": "Dashed line: a published article demonstrates the relationship.",
+      "self-described": "Dashed line: an explicit public self-description supports the relationship."
+    }
+  },
+  "evidence": {
+    "resume": {
+      "label": "Public resume",
+      "url": "/resume.html",
+      "kind": "self-described",
+      "date": null
+    },
+    "work": {
+      "label": "Selected work and case studies",
+      "url": "/work.html",
+      "kind": "shipped",
+      "date": "2026-03-26"
+    },
+    "career": {
+      "label": "Career trajectory: platform ownership",
+      "url": "/blog/2026-03-26-career-trajectory-platform-ownership.html",
+      "kind": "published",
+      "date": "2026-03-26"
+    },
+    "persons-finder": {
+      "label": "Persons Finder public repository",
+      "url": "https://github.com/ac-opensource/persons-finder",
+      "kind": "shipped",
+      "date": "2026-07-21"
+    },
+    "persons-finder-notes": {
+      "label": "What Building Persons Finder Taught Me",
+      "url": "/blog/2026-07-21-what-building-persons-finder-taught-me.html",
+      "kind": "published",
+      "date": "2026-07-21"
+    },
+    "rust-core": {
+      "label": "One Rust Core Across Android and iOS",
+      "url": "/blog/2026-04-07-one-rust-core-across-android-and-ios.html",
+      "kind": "published",
+      "date": "2026-04-07"
+    },
+    "kotlin-swift": {
+      "label": "Building with Kotlin and Swift",
+      "url": "/blog/2024-05-22-building-with-kotlin-and-swift.html",
+      "kind": "published",
+      "date": "2024-05-22"
+    },
+    "ai-fleet": {
+      "label": "Running an AI Fleet: Learnings",
+      "url": "/blog/2024-10-08-running-ai-fleet-learnings.html",
+      "kind": "published",
+      "date": "2024-10-08"
+    },
+    "mempalace": {
+      "label": "How I Use MemPalace with Local Agents",
+      "url": "/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html",
+      "kind": "published",
+      "date": "2026-04-09"
+    },
+    "agent-receipts": {
+      "label": "Agents That Leave Receipts",
+      "url": "/blog/2026-04-30-agents-that-leave-receipts.html",
+      "kind": "published",
+      "date": "2026-04-30"
+    },
+    "visual-qa": {
+      "label": "E2E and Visual QA for Personal Websites",
+      "url": "/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html",
+      "kind": "published",
+      "date": "2026-03-26"
+    },
+    "mystc": {
+      "label": "MySTC scale and reliability case study",
+      "url": "/blog/case-study-mystc-scale-and-reliability.html",
+      "kind": "shipped",
+      "date": "2026-03-26"
+    },
+    "ocbc": {
+      "label": "OCBC banking experience case study",
+      "url": "/blog/case-study-ocbc-banking-experience.html",
+      "kind": "shipped",
+      "date": "2026-03-26"
+    },
+    "owto": {
+      "label": "OWTO ride-hailing case study",
+      "url": "/blog/case-study-owto-ride-hailing-platform.html",
+      "kind": "shipped",
+      "date": "2026-03-26"
+    },
+    "websafety": {
+      "label": "WebSafety parental-controls case study",
+      "url": "/blog/case-study-websafety-parental-controls.html",
+      "kind": "shipped",
+      "date": "2026-03-26"
+    },
+    "travel-log": {
+      "label": "Sunrise, Trail Runs, and a Family Trip",
+      "url": "/blog/2024-11-02-sunrise-trail-runs.html",
+      "kind": "published",
+      "date": "2024-11-02"
+    },
+    "photography": {
+      "label": "Film Photography Gallery",
+      "url": "/blog/2024-09-14-film-photography-gallery.html",
+      "kind": "published",
+      "date": "2024-09-14"
+    },
+    "quiet-systems": {
+      "label": "Quiet Systems, Focus, and Reflection",
+      "url": "/blog/2024-11-21-quiet-systems-reflection.html",
+      "kind": "published",
+      "date": "2024-11-21"
+    },
+    "about-personal": {
+      "label": "Public personal profile",
+      "url": "/about.html#profile-map",
+      "kind": "self-described",
+      "date": null
+    },
+    "portfolio-repo": {
+      "label": "Portfolio build and authoring repository",
+      "url": "https://github.com/ac-opensource/ac-opensource.github.io",
+      "kind": "shipped",
+      "date": null
+    }
+  },
+  "datasets": {
+    "engineering": {
+      "label": "Engineering",
+      "description": "I build across Android, iOS, backend systems, and shared code, with architecture, reliability, and delivery running through it all.",
+      "axes": [
+        { "id": "surfaces", "label": "Surfaces", "description": "Product surfaces", "color": "#1f5cba" },
+        { "id": "languages", "label": "Languages", "description": "Languages and data systems", "color": "#9b4d18" },
+        { "id": "craft", "label": "Craft", "description": "Architecture and quality", "color": "#28725e" },
+        { "id": "delivery", "label": "Delivery", "description": "Leadership and agent-assisted work", "color": "#70469b" }
+      ],
+      "nodes": [
+        { "id": "android", "label": "Android", "axis": "surfaces", "maturity": "shipped", "homepage": true, "evidenceRefs": ["resume", "work", "career", "mystc", "ocbc"], "evidenceContextCount": 5, "lastEvidencedAt": "2026-03-26", "reviewedAt": "2026-07-22", "summary": "Much of my career has been native Android, across banking, telecom, transport, rewards, and safety." },
+        { "id": "ios", "label": "iOS", "axis": "surfaces", "maturity": "shipped", "homepage": true, "evidenceRefs": ["resume", "work", "career", "ocbc", "rust-core"], "evidenceContextCount": 5, "lastEvidencedAt": "2026-04-07", "reviewedAt": "2026-07-22", "summary": "I’ve shipped native iOS work and led feature parity across Android and iOS." },
+        { "id": "backend-apis", "label": "Backend APIs", "axis": "surfaces", "maturity": "shipped", "homepage": true, "evidenceRefs": ["resume", "work", "persons-finder", "owto", "websafety"], "evidenceContextCount": 5, "lastEvidencedAt": "2026-07-21", "reviewedAt": "2026-07-22", "summary": "I build APIs for geospatial search, transport, and safety products." },
+        { "id": "shared-native", "label": "Shared native core", "axis": "surfaces", "maturity": "published", "homepage": false, "evidenceRefs": ["rust-core", "kotlin-swift", "resume"], "evidenceContextCount": 3, "lastEvidencedAt": "2026-04-07", "reviewedAt": "2026-07-22", "summary": "I’m exploring shared mobile cores with Kotlin Multiplatform, Rust, and UniFFI." },
+
+        { "id": "kotlin", "label": "Kotlin", "axis": "languages", "maturity": "shipped", "homepage": true, "evidenceRefs": ["resume", "work", "career", "mystc", "kotlin-swift"], "evidenceContextCount": 5, "lastEvidencedAt": "2026-03-26", "reviewedAt": "2026-07-22", "summary": "My primary production language for Android and shared mobile work." },
+        { "id": "swift", "label": "Swift / Objective-C", "axis": "languages", "maturity": "shipped", "homepage": true, "evidenceRefs": ["resume", "work", "ocbc", "kotlin-swift"], "evidenceContextCount": 4, "lastEvidencedAt": "2026-03-26", "reviewedAt": "2026-07-22", "summary": "I use Swift and Objective-C for native iOS delivery and integrations." },
+        { "id": "rust-uniffi", "label": "Rust / UniFFI", "axis": "languages", "maturity": "published", "homepage": true, "evidenceRefs": ["rust-core", "resume"], "evidenceContextCount": 2, "lastEvidencedAt": "2026-04-07", "reviewedAt": "2026-07-22", "summary": "I’m using Rust and UniFFI to share core logic across Android and iOS." },
+        { "id": "java", "label": "Java", "axis": "languages", "maturity": "shipped", "homepage": false, "evidenceRefs": ["resume", "career", "mystc"], "evidenceContextCount": 3, "lastEvidencedAt": "2026-03-26", "reviewedAt": "2026-07-22", "summary": "I’ve shipped and modernized production Android codebases in Java." },
+        { "id": "sql-postgis", "label": "SQL / Postgres / PostGIS", "axis": "languages", "maturity": "shipped", "homepage": false, "evidenceRefs": ["persons-finder", "persons-finder-notes", "resume"], "evidenceContextCount": 3, "lastEvidencedAt": "2026-07-21", "reviewedAt": "2026-07-22", "summary": "I use Postgres and PostGIS for geospatial queries, migrations, and real-database tests." },
+        { "id": "javascript-node", "label": "JavaScript / Node", "axis": "languages", "maturity": "shipped", "homepage": false, "evidenceRefs": ["portfolio-repo"], "evidenceContextCount": 1, "lastEvidencedAt": null, "reviewedAt": "2026-07-22", "summary": "I use Node and browser JavaScript to build this site’s publishing and verification tools." },
+
+        { "id": "compose", "label": "Jetpack Compose", "axis": "craft", "maturity": "shipped", "homepage": true, "evidenceRefs": ["resume", "work", "career", "ai-fleet"], "evidenceContextCount": 4, "lastEvidencedAt": "2026-03-26", "reviewedAt": "2026-07-22", "summary": "I build production Android UI and architecture with Jetpack Compose." },
+        { "id": "architecture", "label": "Clean / modular architecture", "axis": "craft", "maturity": "shipped", "homepage": true, "evidenceRefs": ["resume", "career", "mystc", "owto", "rust-core"], "evidenceContextCount": 5, "lastEvidencedAt": "2026-04-07", "reviewedAt": "2026-07-22", "summary": "I prefer modular systems with clear boundaries across mobile, backend, and shared code." },
+        { "id": "reliability", "label": "Reliability / performance", "axis": "craft", "maturity": "shipped", "homepage": true, "evidenceRefs": ["resume", "work", "career", "mystc", "ocbc"], "evidenceContextCount": 5, "lastEvidencedAt": "2026-03-26", "reviewedAt": "2026-07-22", "summary": "I tune performance, synchronization, and stability in production products." },
+        { "id": "release", "label": "CI/CD / release hardening", "axis": "craft", "maturity": "shipped", "homepage": true, "evidenceRefs": ["resume", "career", "mystc", "persons-finder-notes", "agent-receipts"], "evidenceContextCount": 5, "lastEvidencedAt": "2026-07-21", "reviewedAt": "2026-07-22", "summary": "I harden builds, CI, verification, and releases so shipping stays predictable." },
+        { "id": "async-reactive", "label": "Async / reactive data", "axis": "craft", "maturity": "shipped", "homepage": false, "evidenceRefs": ["resume", "career", "mystc"], "evidenceContextCount": 3, "lastEvidencedAt": "2026-03-26", "reviewedAt": "2026-07-22", "summary": "I work with coroutines, Flow, RxJava, and RxKotlin for async data and synchronization." },
+        { "id": "testing-qa", "label": "Testing / visual QA", "axis": "craft", "maturity": "shipped", "homepage": false, "evidenceRefs": ["resume", "work", "visual-qa", "persons-finder-notes"], "evidenceContextCount": 4, "lastEvidencedAt": "2026-07-21", "reviewedAt": "2026-07-22", "summary": "I test from unit and integration layers through real databases, browsers, and visual QA." },
+        { "id": "privacy-security", "label": "Privacy / security", "axis": "craft", "maturity": "shipped", "homepage": false, "evidenceRefs": ["websafety", "resume", "career"], "evidenceContextCount": 3, "lastEvidencedAt": "2026-03-26", "reviewedAt": "2026-07-22", "summary": "I’ve built permission-heavy, parental-control, and other privacy-sensitive mobile features." },
+
+        { "id": "leadership", "label": "Technical leadership", "axis": "delivery", "maturity": "shipped", "homepage": true, "evidenceRefs": ["resume", "career", "mystc", "owto"], "evidenceContextCount": 4, "lastEvidencedAt": "2026-03-26", "reviewedAt": "2026-07-22", "summary": "I lead technical direction, mentor teams, and own architecture across product work." },
+        { "id": "cross-functional", "label": "Cross-functional delivery", "axis": "delivery", "maturity": "shipped", "homepage": false, "evidenceRefs": ["resume", "career", "ocbc", "owto"], "evidenceContextCount": 4, "lastEvidencedAt": "2026-03-26", "reviewedAt": "2026-07-22", "summary": "I work across product, design, backend, Android, and iOS to get features shipped." },
+        { "id": "ai-engineering", "label": "AI-assisted engineering", "axis": "delivery", "maturity": "published", "homepage": true, "evidenceRefs": ["ai-fleet", "mempalace", "agent-receipts", "visual-qa"], "evidenceContextCount": 4, "lastEvidencedAt": "2026-04-30", "reviewedAt": "2026-07-22", "summary": "I use AI agents across planning, implementation, review, testing, and handoff." },
+        { "id": "agent-memory", "label": "Agent memory / orchestration", "axis": "delivery", "maturity": "published", "homepage": false, "evidenceRefs": ["mempalace", "agent-receipts", "ai-fleet"], "evidenceContextCount": 3, "lastEvidencedAt": "2026-04-30", "reviewedAt": "2026-07-22", "summary": "I build local memory and orchestration workflows that leave work easy to verify." }
+      ],
+      "edges": [
+        { "id": "android-kotlin", "source": "android", "target": "kotlin", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["resume", "career", "mystc"], "weight": 3 },
+        { "id": "android-compose", "source": "android", "target": "compose", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["resume", "work"], "weight": 2 },
+        { "id": "android-architecture", "source": "android", "target": "architecture", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["resume", "career", "mystc"], "weight": 3 },
+        { "id": "android-reliability", "source": "android", "target": "reliability", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["mystc", "career"], "weight": 2 },
+        { "id": "android-release", "source": "android", "target": "release", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["resume", "career"], "weight": 2 },
+        { "id": "android-leadership", "source": "android", "target": "leadership", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["resume", "mystc"], "weight": 2 },
+        { "id": "ios-swift", "source": "ios", "target": "swift", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["resume", "ocbc"], "weight": 2 },
+        { "id": "ios-reliability", "source": "ios", "target": "reliability", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["ocbc", "career"], "weight": 2 },
+        { "id": "ios-cross-functional", "source": "ios", "target": "cross-functional", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["ocbc", "owto"], "weight": 2 },
+        { "id": "backend-sql", "source": "backend-apis", "target": "sql-postgis", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["persons-finder"], "weight": 1 },
+        { "id": "backend-reliability", "source": "backend-apis", "target": "reliability", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["persons-finder", "owto"], "weight": 2 },
+        { "id": "backend-release", "source": "backend-apis", "target": "release", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["persons-finder", "persons-finder-notes"], "weight": 2 },
+        { "id": "backend-testing", "source": "backend-apis", "target": "testing-qa", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["persons-finder", "persons-finder-notes"], "weight": 2 },
+        { "id": "shared-rust", "source": "shared-native", "target": "rust-uniffi", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["rust-core"], "weight": 1 },
+        { "id": "shared-architecture", "source": "shared-native", "target": "architecture", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["rust-core", "kotlin-swift"], "weight": 2 },
+        { "id": "rust-architecture", "source": "rust-uniffi", "target": "architecture", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["rust-core"], "weight": 1 },
+        { "id": "kotlin-compose", "source": "kotlin", "target": "compose", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["resume", "work"], "weight": 2 },
+        { "id": "kotlin-async", "source": "kotlin", "target": "async-reactive", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["resume", "mystc"], "weight": 2 },
+        { "id": "java-architecture", "source": "java", "target": "architecture", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["resume", "career"], "weight": 2 },
+        { "id": "swift-cross-functional", "source": "swift", "target": "cross-functional", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["ocbc", "kotlin-swift"], "weight": 2 },
+        { "id": "sql-testing", "source": "sql-postgis", "target": "testing-qa", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["persons-finder", "persons-finder-notes"], "weight": 2 },
+        { "id": "architecture-leadership", "source": "architecture", "target": "leadership", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["mystc", "owto", "career"], "weight": 3 },
+        { "id": "reliability-cross-functional", "source": "reliability", "target": "cross-functional", "relation": "co-demonstrated", "maturity": "shipped", "evidenceRefs": ["ocbc", "owto"], "weight": 2 },
+        { "id": "release-ai", "source": "release", "target": "ai-engineering", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["agent-receipts", "visual-qa"], "weight": 2 },
+        { "id": "testing-ai", "source": "testing-qa", "target": "ai-engineering", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["visual-qa", "agent-receipts"], "weight": 2 },
+        { "id": "ai-memory", "source": "ai-engineering", "target": "agent-memory", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["mempalace", "agent-receipts", "ai-fleet"], "weight": 3 }
+      ]
+    },
+    "interests": {
+      "label": "Interests",
+      "description": "Family trips, trails, photography, astronomy, philosophy, fitness, and small ventures.",
+      "axes": [
+        { "id": "place", "label": "Place", "description": "Travel, outdoors, and family", "color": "#1f5cba" },
+        { "id": "observation", "label": "Observation", "description": "Photography and astronomy", "color": "#9b4d18" },
+        { "id": "reflection", "label": "Reflection", "description": "Philosophy and fitness", "color": "#28725e" },
+        { "id": "building", "label": "Building", "description": "Ventures and independence", "color": "#70469b" }
+      ],
+      "nodes": [
+        { "id": "travel", "label": "Travel", "axis": "place", "maturity": "published", "homepage": true, "evidenceRefs": ["travel-log", "photography", "about-personal"], "evidenceContextCount": 3, "lastEvidencedAt": "2024-11-02", "reviewedAt": "2026-07-22", "summary": "I like seeing new places with my family—and keeping a record in words and photographs." },
+        { "id": "outdoors", "label": "Outdoors", "axis": "place", "maturity": "published", "homepage": true, "evidenceRefs": ["travel-log", "photography", "about-personal"], "evidenceContextCount": 3, "lastEvidencedAt": "2024-11-02", "reviewedAt": "2026-07-22", "summary": "I make time for trails, alpine landscapes, stargazing, and the outdoors." },
+        { "id": "family-time", "label": "Family time", "axis": "place", "maturity": "published", "homepage": true, "evidenceRefs": ["travel-log", "about-personal"], "evidenceContextCount": 2, "lastEvidencedAt": "2024-11-02", "reviewedAt": "2026-07-22", "summary": "Family time sits at the center of how I travel and spend my time." },
+        { "id": "photography-interest", "label": "Photography", "axis": "observation", "maturity": "published", "homepage": true, "evidenceRefs": ["photography", "travel-log", "about-personal"], "evidenceContextCount": 3, "lastEvidencedAt": "2024-11-02", "reviewedAt": "2026-07-22", "summary": "I use photography to slow down, pay attention, and remember where I’ve been." },
+        { "id": "astronomy", "label": "Astronomy", "axis": "observation", "maturity": "published", "homepage": true, "evidenceRefs": ["photography", "travel-log", "about-personal"], "evidenceContextCount": 3, "lastEvidencedAt": "2024-11-02", "reviewedAt": "2026-07-22", "summary": "I observe the Moon, planets, auroras, and dark skies with an 8-inch Dobsonian." },
+        { "id": "philosophy", "label": "Philosophy", "axis": "reflection", "maturity": "published", "homepage": true, "evidenceRefs": ["quiet-systems", "about-personal"], "evidenceContextCount": 2, "lastEvidencedAt": "2024-11-21", "reviewedAt": "2026-07-22", "summary": "I read philosophy to think beyond the next thing I need to ship." },
+        { "id": "reflective-practice", "label": "Reflective practice", "axis": "reflection", "maturity": "published", "homepage": false, "evidenceRefs": ["quiet-systems", "travel-log", "photography"], "evidenceContextCount": 3, "lastEvidencedAt": "2024-11-21", "reviewedAt": "2026-07-22", "summary": "I write, photograph, and make quiet space to think." },
+        { "id": "fitness", "label": "Fitness", "axis": "reflection", "maturity": "published", "homepage": true, "evidenceRefs": ["travel-log", "about-personal"], "evidenceContextCount": 2, "lastEvidencedAt": "2024-11-02", "reviewedAt": "2026-07-22", "summary": "Trail running and regular training keep me moving." },
+        { "id": "small-ventures", "label": "Small ventures", "axis": "building", "maturity": "self-described", "homepage": true, "evidenceRefs": ["about-personal"], "evidenceContextCount": 1, "lastEvidencedAt": null, "reviewedAt": "2026-07-22", "summary": "I’ve experimented with small hospitality and laundry ventures." },
+        { "id": "financial-independence", "label": "Financial independence", "axis": "building", "maturity": "self-described", "homepage": false, "evidenceRefs": ["about-personal"], "evidenceContextCount": 1, "lastEvidencedAt": null, "reviewedAt": "2026-07-22", "summary": "I’m working toward more independence through small, practical businesses." }
+      ],
+      "edges": [
+        { "id": "travel-photography", "source": "travel", "target": "photography-interest", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["travel-log", "photography"], "weight": 2 },
+        { "id": "travel-astronomy", "source": "travel", "target": "astronomy", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["travel-log", "photography"], "weight": 2 },
+        { "id": "family-photography", "source": "family-time", "target": "photography-interest", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["travel-log"], "weight": 1 },
+        { "id": "family-small-ventures", "source": "family-time", "target": "small-ventures", "relation": "co-demonstrated", "maturity": "self-described", "evidenceRefs": ["about-personal"], "weight": 1 },
+        { "id": "outdoors-photography", "source": "outdoors", "target": "photography-interest", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["photography", "travel-log"], "weight": 2 },
+        { "id": "outdoors-fitness", "source": "outdoors", "target": "fitness", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["travel-log"], "weight": 1 },
+        { "id": "travel-reflection", "source": "travel", "target": "reflective-practice", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["travel-log"], "weight": 1 },
+        { "id": "photography-reflection", "source": "photography-interest", "target": "reflective-practice", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["photography"], "weight": 1 },
+        { "id": "philosophy-reflection", "source": "philosophy", "target": "reflective-practice", "relation": "co-demonstrated", "maturity": "published", "evidenceRefs": ["quiet-systems"], "weight": 1 },
+        { "id": "small-ventures-independence", "source": "small-ventures", "target": "financial-independence", "relation": "co-demonstrated", "maturity": "self-described", "evidenceRefs": ["about-personal"], "weight": 1 }
+      ]
+    }
+  }
+}
