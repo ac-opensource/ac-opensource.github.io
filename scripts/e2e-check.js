@@ -188,6 +188,55 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     }
   }
 
+  // Career timeline and resume stay aligned on the current employer sequence.
+  await page.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
+  const careerSection = page.getByRole('heading', { name: 'Career Trajectory', exact: true }).locator('xpath=ancestor::section[1]');
+  const careerHeadings = await careerSection.locator('h3').evaluateAll((headings) =>
+    headings.map((heading) => (heading.textContent || '').replace(/\s+/g, ' ').trim())
+  );
+  await assert(
+    JSON.stringify(careerHeadings.slice(0, 4)) === JSON.stringify([
+      'Senior Software Engineer — Bitcoin.com',
+      'Senior Mobile Developer — ITV',
+      'Senior Android Developer — Red Airship',
+      'Lead Developer — InnovationTeam',
+    ]),
+    'About career timeline does not use the requested reverse-chronological employer order'
+  );
+  const careerSectionText = ((await careerSection.textContent()) || '').replace(/\s+/g, ' ').trim();
+  for (const expectedText of [
+    'JUN 2024 — PRESENT',
+    'Bitcoin.com Wallet — Self-custody crypto wallet',
+    'JUN 2023 — JUN 2024',
+    'ITVX — Streaming platform',
+    'JUN 2021 — JUN 2023',
+    'OCBC — Mobile banking',
+    'OpenPay — Fintech',
+    'MAY 2020 — JUN 2021',
+    'MySTC — Telecom project',
+    'OWTO — Ride-hailing service',
+    'PopSlide — Rewards platform',
+    'WebSafety — Parental controls',
+  ]) {
+    await assert(careerSectionText.includes(expectedText), `About career timeline is missing: ${expectedText}`);
+  }
+  await assert(!careerSectionText.includes('Littlepay'), 'About career timeline still exposes Littlepay');
+
+  await page.goto(BASE_URL + '/resume.html', { waitUntil: 'domcontentloaded' });
+  const resumeText = ((await page.locator('main').textContent()) || '').replace(/\s+/g, ' ').trim();
+  for (const expectedText of [
+    'Senior Software Engineer Bitcoin.com Bitcoin.com Wallet — Self-custody crypto wallet Jun 2024 — Present',
+    'Senior Mobile Developer ITV ITVX — Streaming platform Jun 2023 — Jun 2024',
+    'Senior Android Developer Red Airship OCBC — Mobile banking OpenPay — Fintech Jun 2021 — Jun 2023',
+    'Lead Developer InnovationTeam MySTC — Telecom project May 2020 — Jun 2021',
+    'Team Lead iPARA Technologies and Solutions OWTO — Ride-hailing service Jun 2018 — May 2020',
+    'Senior Android Developer YOYO Holdings Pte. Ltd. PopSlide — Rewards platform Jun 2016 — Jun 2018',
+    'Full-Stack Web and Mobile Developer Internet Strategy Branding and Execution (ISBX) WebSafety — Parental controls May 2014 — Jun 2016',
+  ]) {
+    await assert(resumeText.includes(expectedText), `Resume is missing the experience sequence: ${expectedText}`);
+  }
+  await assert(!resumeText.includes('Littlepay'), 'Resume still exposes Littlepay');
+
   // Profile tree structure, stable selection, and responsive popover containment.
   async function readProfileTreeGeometry(targetPage, nodeId) {
     return targetPage.evaluate((id) => {
@@ -505,20 +554,72 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await page.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   const portfolioEntries = page.locator('[data-portfolio-entry]');
   const portfolioEntryCount = await portfolioEntries.count();
-  await assert(portfolioEntryCount >= 12, `Work page rendered ${portfolioEntryCount} portfolio entries; expected at least 12`);
+  await assert(portfolioEntryCount >= 16, `Work page rendered ${portfolioEntryCount} portfolio entries; expected at least 16`);
 
   const workPageText = ((await page.locator('body').textContent()) || '').replace(/\s+/g, ' ').trim();
-  for (const projectName of ['ITVX', 'Littlepay', 'NTU Pass', 'Solo', 'Aqua Expeditions']) {
+  for (const projectName of ['Bitcoin.com Wallet', 'ITVX', 'MemPalace', 'Persons Finder', 'Orchestrum', 'Littlepay', 'NTU Pass', 'Solo', 'Aqua Expeditions']) {
     await assert(workPageText.includes(projectName), `Work page is missing the ${projectName} portfolio entry`);
   }
   await assert(!workPageText.includes('[N/A]'), 'Work page still exposes an [N/A] placeholder');
   await assert(!workPageText.includes('Portfolio App Sync'), 'Work page still exposes the obsolete Portfolio App Sync label');
+  const publicWorkLayout = await page.evaluate(() => {
+    const archive = document.querySelector('#more-work');
+    const publicBuilds = document.querySelector('#public-builds');
+    const publicGrid = document.querySelector('.work-public-grid');
+    const persons = document.querySelector('.work-public-card--persons');
+    const orchestrum = document.querySelector('.work-public-card--orchestrum');
+    const mempalace = document.querySelector('.work-public-card--mempalace');
+    const archiveRect = archive.getBoundingClientRect();
+    const publicRect = publicBuilds.getBoundingClientRect();
+    const gridRect = publicGrid.getBoundingClientRect();
+    const personsRect = persons.getBoundingClientRect();
+    const orchestrumRect = orchestrum.getBoundingClientRect();
+    const mempalaceRect = mempalace.getBoundingClientRect();
+    return {
+      archiveBeforePublic: archiveRect.top < publicRect.top
+        && Boolean(archive.compareDocumentPosition(publicBuilds) & Node.DOCUMENT_POSITION_FOLLOWING),
+      archiveLabel: (archive.querySelector('.work-section__head .work-eyebrow')?.textContent || '').trim(),
+      publicLabel: (publicBuilds.querySelector('.work-section__head .work-eyebrow')?.textContent || '').trim(),
+      publicCardCount: publicGrid.querySelectorAll('.work-public-card').length,
+      personsAndOrchestrumShareRow: Math.abs(personsRect.top - orchestrumRect.top) <= 2,
+      mempalaceIsFeaturedWidth: mempalaceRect.width >= gridRect.width - 2,
+    };
+  });
+  await assert(publicWorkLayout.archiveBeforePublic, 'Other apps and platforms does not appear before Recent work you can open');
+  await assert(publicWorkLayout.archiveLabel === '[02 / archive]', 'Archive section does not use the [02 / archive] label');
+  await assert(publicWorkLayout.publicLabel === '[03 / public]', 'Public work section does not use the [03 / public] label');
+  await assert(publicWorkLayout.publicCardCount === 3, `Public work section has ${publicWorkLayout.publicCardCount} cards; expected 3`);
+  await assert(publicWorkLayout.personsAndOrchestrumShareRow, 'Persons Finder and Orchestrum no longer share the first public-work row');
+  await assert(publicWorkLayout.mempalaceIsFeaturedWidth, 'MemPalace contribution is not featured at full public-grid width');
+  const mempalaceCardText = ((await page.locator('.work-public-card--mempalace').textContent()) || '').replace(/\s+/g, ' ').trim();
+  await assert(
+    mempalaceCardText.includes('nested .gitignore-aware project mining')
+      && mempalaceCardText.includes('merged change'),
+    'MemPalace card does not describe the merged nested .gitignore contribution'
+  );
   await assert((await page.locator('.work-flow__checkpoint').count()) === 4, 'Portfolio hero is missing its completed delivery checkpoints');
   await assert((await page.locator('.work-flow__complete').textContent() || '').includes('ALL CHECKS COMPLETE'), 'Portfolio hero does not communicate completed verification');
   await assert(
     (await page.locator('.work-hero__art[role="img"]').getAttribute('aria-label') || '').includes('All checks complete'),
     'Portfolio hero completion message is missing from the accessibility tree'
   );
+
+  const firstProductionCard = page.locator('.work-case-grid > .work-case').first();
+  await assert(
+    await firstProductionCard.evaluate((card) => card.classList.contains('work-case--bitcoin')),
+    'Bitcoin.com Wallet is not the lead production case study'
+  );
+  const bitcoinScreens = page.locator('.work-case--bitcoin .work-bitcoin-shot');
+  await assert((await bitcoinScreens.count()) === 3, 'Bitcoin.com Wallet card does not show all three official app screens');
+  const bitcoinScreenSources = await bitcoinScreens.evaluateAll((images) => images.map((image) => image.getAttribute('src') || ''));
+  await assert(
+    bitcoinScreenSources.every((src) => src.startsWith('/assets/images/work/img_bitcoin_wallet_')),
+    'Bitcoin.com Wallet card is not using the local official app-screen assets'
+  );
+  const bitcoinCardText = ((await page.locator('.work-case--bitcoin').textContent()) || '').replace(/\s+/g, ' ').trim();
+  for (const capability of ['Multichain Android', 'Rust + UniFFI', 'Reliability', 'Release engineering']) {
+    await assert(bitcoinCardText.includes(capability), `Bitcoin.com Wallet card is missing the ${capability} capability`);
+  }
 
   const itvxScreens = page.locator('.work-case--itvx .work-itvx-shot');
   await assert((await itvxScreens.count()) === 3, 'ITVX card does not show all three official app screens');
@@ -528,6 +629,33 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     'ITVX card is not using the local official app-screen assets'
   );
   await assert((await page.locator('.work-case--itvx .work-player').count()) === 0, 'ITVX card still exposes the generic player mockup');
+  const supportingCardLayout = await page.evaluate(() => {
+    const itvx = document.querySelector('.work-case--itvx');
+    const ocbc = document.querySelector('.work-case--ocbc');
+    const mystc = document.querySelector('.work-case--mystc');
+    const openpay = document.querySelector('.work-case--openpay');
+    const bitcoin = document.querySelector('.work-case--bitcoin');
+    const itvxRect = itvx.getBoundingClientRect();
+    const ocbcRect = ocbc.getBoundingClientRect();
+    const mystcRect = mystc.getBoundingClientRect();
+    const openpayRect = openpay.getBoundingClientRect();
+    const bitcoinRect = bitcoin.getBoundingClientRect();
+    const background = getComputedStyle(itvx).backgroundColor.match(/[\d.]+/g)?.map(Number) || [];
+    return {
+      itvxAndOcbcShareRow: Math.abs(itvxRect.top - ocbcRect.top) <= 2 && itvxRect.right < ocbcRect.left,
+      openpayAndMystcShareRow: Math.abs(mystcRect.top - openpayRect.top) <= 2 && openpayRect.right < mystcRect.left,
+      firstRowUsesFiveSevenSplit: itvxRect.width < ocbcRect.width,
+      secondRowUsesSevenFiveSplit: openpayRect.width > mystcRect.width,
+      itvxIsSupportingWidth: itvxRect.width < bitcoinRect.width * 0.6,
+      itvxHasLightBackground: background.length >= 3 && background[0] >= 245 && background[1] >= 245 && background[2] >= 245,
+    };
+  });
+  await assert(supportingCardLayout.itvxAndOcbcShareRow, 'ITVX is not paired beside OCBC on desktop');
+  await assert(supportingCardLayout.openpayAndMystcShareRow, 'Openpay is not positioned left of MySTC on the second supporting-project row');
+  await assert(supportingCardLayout.firstRowUsesFiveSevenSplit, 'ITVX and OCBC do not use the intended 5/7 split');
+  await assert(supportingCardLayout.secondRowUsesSevenFiveSplit, 'Openpay and MySTC do not use the intended 7/5 split');
+  await assert(supportingCardLayout.itvxIsSupportingWidth, 'ITVX still reads as a full-width hero card');
+  await assert(supportingCardLayout.itvxHasLightBackground, 'ITVX does not use the light supporting-card background');
 
   const heroIntro = ((await page.locator('.work-hero__intro').textContent()) || '').replace(/\s+/g, ' ').trim();
   await assert(heroIntro.includes('I’m a problem solver'), 'Portfolio hero does not lead with problem-solving positioning');
@@ -562,6 +690,31 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   });
   const reducedMotionPage = await reducedMotion.newPage();
   await reducedMotionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  const reducedMotionBitcoinCard = reducedMotionPage.locator('.work-case--bitcoin');
+  const reducedMotionBitcoinScreens = reducedMotionBitcoinCard.locator('.work-bitcoin-shot');
+  const reducedMotionBitcoinBeforeHover = await reducedMotionBitcoinScreens.evaluateAll((images) =>
+    images.map((image) => {
+      const rect = image.getBoundingClientRect();
+      const galleryRect = image.parentElement.getBoundingClientRect();
+      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
+    })
+  );
+  await assert(
+    new Set(reducedMotionBitcoinBeforeHover.map(({ x, y }) => `${x}:${y}`)).size === 3,
+    'Reduced-motion mode collapses the Bitcoin.com Wallet collage into overlapping screens'
+  );
+  await reducedMotionBitcoinCard.hover();
+  const reducedMotionBitcoinAfterHover = await reducedMotionBitcoinScreens.evaluateAll((images) =>
+    images.map((image) => {
+      const rect = image.getBoundingClientRect();
+      const galleryRect = image.parentElement.getBoundingClientRect();
+      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
+    })
+  );
+  await assert(
+    JSON.stringify(reducedMotionBitcoinAfterHover) === JSON.stringify(reducedMotionBitcoinBeforeHover),
+    'Reduced-motion mode still moves the Bitcoin.com Wallet collage on hover'
+  );
   const reducedMotionCard = reducedMotionPage.locator('.work-case--itvx');
   const reducedMotionScreens = reducedMotionCard.locator('.work-itvx-shot');
   const reducedMotionBeforeHover = await reducedMotionScreens.evaluateAll((images) =>
@@ -616,8 +769,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await reducedMotion.close();
 
   const requiredProjectLinks = [
+    ['Bitcoin.com Wallet', 'a[href*="play.google.com/store/apps/details?id=com.bitcoin.mwallet"]'],
     ['ITVX', 'a[href*="play.google.com/store/apps/details?id=air.ITVMobilePlayer"]'],
     ['OCBC Business', 'a[href*="play.google.com/store/apps/details?id=com.ocbc.mobilebv"]'],
+    ['MemPalace', 'a[href="https://github.com/MemPalace/mempalace/pull/78"]'],
     ['Littlepay', 'a[href^="https://littlepay.com"]'],
     ['NTU Pass', 'a[href*="play.google.com/store/apps/details?id=sg.edu.ntu.apps.ntusmartpass"]'],
     ['Solo', 'a[href*="play.google.com/store/apps/developer?id=Solo+Technologies+Services"]'],
@@ -653,7 +808,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `Work page exposes ${staticPortfolioEntryCount} of ${portfolioEntryCount} portfolio entries without JavaScript`
   );
   const staticWorkPageText = ((await noJavaScriptPage.locator('body').textContent()) || '').replace(/\s+/g, ' ').trim();
-  for (const projectName of ['ITVX', 'Littlepay', 'NTU Pass', 'Solo', 'Aqua Expeditions']) {
+  for (const projectName of ['Bitcoin.com Wallet', 'ITVX', 'MemPalace', 'Persons Finder', 'Orchestrum', 'Littlepay', 'NTU Pass', 'Solo', 'Aqua Expeditions']) {
     await assert(staticWorkPageText.includes(projectName), `Work page hides ${projectName} when JavaScript is disabled`);
   }
   await noJavaScript.close();
