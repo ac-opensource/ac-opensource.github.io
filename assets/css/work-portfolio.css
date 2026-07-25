@@ -204,113 +204,112 @@ body {
   background: #ffad45;
 }
 
-.work-flow {
+.work-pipeline {
   width: min(100%, 34rem);
   margin-left: auto;
   filter: drop-shadow(0 24px 40px rgba(31, 92, 186, 0.12));
 }
 
-.work-flow__rail,
-.work-flow__track,
-.work-flow__signal {
+.work-pipeline__line,
+.work-pipeline__flow {
   fill: none;
   stroke-linecap: round;
 }
 
-.work-flow__rail {
-  stroke: rgba(54, 74, 63, 0.13);
-  stroke-width: 12;
+.work-pipeline__line {
+  stroke: rgba(54, 74, 63, 0.18);
+  stroke-width: 2;
 }
 
-.work-flow__track {
-  stroke: url(#work-flow-gradient);
-  stroke-width: 4;
+.work-pipeline__line--ai {
+  stroke: rgba(117, 92, 198, 0.44);
+  stroke-dasharray: 5 7;
 }
 
-.work-flow__signal {
-  stroke: rgba(255, 255, 255, 0.9);
-  stroke-width: 7;
-  stroke-dasharray: 14 600;
-  filter: drop-shadow(0 0 8px rgba(31, 92, 186, 0.55));
-  animation: workSignal 4.8s linear infinite;
+.work-pipeline__flow {
+  stroke: #1f5cba;
+  stroke-width: 3;
+  stroke-dasharray: 7 180;
+  filter: drop-shadow(0 0 6px rgba(31, 92, 186, 0.5));
+  animation: workPipelineFlow 4.6s linear infinite;
 }
 
-.work-flow__halo {
+.work-pipeline__flow--delay-one { animation-delay: -1.4s; }
+.work-pipeline__flow--delay-two { animation-delay: -2.8s; }
+
+.work-pipeline__halo {
   fill: rgba(31, 92, 186, 0.08);
   transform-origin: center;
-  animation: workPulse 4.8s ease-in-out infinite;
+  animation: workPipelinePulse 5.6s ease-in-out infinite;
 }
 
-.work-flow__kicker,
-.work-flow__status text,
-.work-flow__label,
-.work-flow__complete text {
+.work-pipeline__kicker,
+.work-pipeline__status text,
+.work-pipeline__node text,
+.work-pipeline__ai text {
   font-family: "Space Grotesk", sans-serif;
   font-weight: 700;
   letter-spacing: 0.13em;
 }
 
-.work-flow__kicker {
+.work-pipeline__kicker {
   fill: #5a625c;
   font-size: 12px;
 }
 
-.work-flow__status rect {
+.work-pipeline__status rect {
   fill: rgba(255, 255, 252, 0.82);
   stroke: rgba(31, 92, 186, 0.22);
 }
 
-.work-flow__status text {
+.work-pipeline__status text {
   fill: #17201b;
-  font-size: 12px;
+  font-size: 11px;
 }
 
-.work-flow__status-dot {
+.work-pipeline__status circle {
   fill: #168c86;
-  transform-origin: 24px 22px;
+  transform-origin: 21px 19px;
   animation: workStatusPulse 2.8s ease-in-out infinite;
 }
 
-.work-flow__checkpoint-ring {
-  fill: rgba(255, 255, 252, 0.8);
-  stroke: rgba(31, 92, 186, 0.2);
-  stroke-width: 2;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: workCheckpoint 6.4s ease-in-out infinite;
+.work-pipeline__node rect {
+  fill: rgba(255, 255, 252, 0.84);
+  stroke: rgba(54, 74, 63, 0.2);
+  transition: fill 180ms ease, stroke 180ms ease;
 }
 
-.work-flow__checkpoint--two .work-flow__checkpoint-ring { animation-delay: 0.55s; }
-.work-flow__checkpoint--three .work-flow__checkpoint-ring { animation-delay: 1.1s; }
-.work-flow__checkpoint--four .work-flow__checkpoint-ring { animation-delay: 1.65s; }
-
-.work-flow__checkpoint-fill {
-  fill: #1f5cba;
-}
-
-.work-flow__checkpoint--one .work-flow__checkpoint-fill { fill: #168c86; }
-.work-flow__checkpoint--four .work-flow__checkpoint-fill { fill: #755cc6; }
-
-.work-flow__check {
-  fill: none;
-  stroke: #fff;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 3;
-}
-
-.work-flow__label {
+.work-pipeline__node text,
+.work-pipeline__ai text {
   fill: #39443d;
-  font-size: 10px;
+  font-size: 11px;
   text-anchor: middle;
 }
 
-.work-flow__complete rect {
-  fill: rgba(255, 255, 252, 0.78);
-  stroke: rgba(22, 140, 134, 0.24);
+.work-pipeline__node--core rect {
+  stroke: rgba(31, 92, 186, 0.52);
 }
 
-.work-flow__complete path {
+.work-pipeline__meta {
+  fill: #68726b !important;
+  font-size: 7px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.09em !important;
+}
+
+.work-pipeline__ai circle {
+  fill: rgba(117, 92, 198, 0.08);
+  stroke: rgba(117, 92, 198, 0.42);
+  transform-origin: center;
+  animation: workAiPulse 5.6s ease-in-out infinite;
+}
+
+.work-pipeline__node--release rect {
+  fill: rgba(22, 140, 134, 0.07);
+  stroke: rgba(22, 140, 134, 0.46);
+}
+
+.work-pipeline__node--release path {
   fill: none;
   stroke: #168c86;
   stroke-linecap: round;
@@ -318,9 +317,9 @@ body {
   stroke-width: 3;
 }
 
-.work-flow__complete text {
-  fill: #17201b;
-  font-size: 11px;
+.work-hero__art:hover .work-pipeline__node--release rect {
+  fill: rgba(22, 140, 134, 0.12);
+  stroke: #168c86;
 }
 
 .work-signals {
@@ -1467,18 +1466,18 @@ body {
   background: rgba(255, 255, 255, 0.12);
 }
 
-@keyframes workSignal {
-  to { stroke-dashoffset: -614; }
+@keyframes workPipelineFlow {
+  to { stroke-dashoffset: -187; }
 }
 
-@keyframes workPulse {
+@keyframes workPipelinePulse {
   0%, 100% { opacity: 0.5; transform: scale(0.96); }
   50% { opacity: 1; transform: scale(1.05); }
 }
 
-@keyframes workCheckpoint {
-  0%, 72%, 100% { opacity: 0.65; transform: scale(1); }
-  80% { opacity: 1; transform: scale(1.14); }
+@keyframes workAiPulse {
+  0%, 100% { opacity: 0.62; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.08); }
 }
 
 @keyframes workStatusPulse {
@@ -1511,11 +1510,12 @@ body {
   }
 
   .work-hero__art {
-    position: absolute;
-    top: 1rem;
-    right: -9rem;
-    width: 26rem;
-    opacity: 0.16;
+    position: relative;
+    top: auto;
+    right: auto;
+    width: min(100%, 34rem);
+    margin: 1rem auto 0;
+    opacity: 1;
   }
 
   .work-hero__copy {
@@ -1814,10 +1814,10 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .work-flow__signal,
-  .work-flow__halo,
-  .work-flow__checkpoint-ring,
-  .work-flow__status-dot {
+  .work-pipeline__flow,
+  .work-pipeline__halo,
+  .work-pipeline__ai circle,
+  .work-pipeline__status circle {
     animation: none;
   }
 
