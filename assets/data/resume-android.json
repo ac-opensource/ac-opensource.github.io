@@ -150,6 +150,10 @@
   ],
   "projects": [
     {
+      "name": "Bitcoin.com Wallet",
+      "description": "Self-custody wallet delivery across multichain transactions, Earn and rewards, API migrations, shared Rust and UniFFI, reliability, and release hardening."
+    },
+    {
       "name": "ITVX",
       "description": "Android media-player work for ITV's live and on-demand streaming platform, focused on playback behavior, reliability, and maintainable delivery."
     },

@@ -278,6 +278,20 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await assert(resumeText.includes(expectedText), `Resume is missing the experience sequence: ${expectedText}`);
   }
   await assert(!resumeText.includes('Littlepay'), 'Resume still exposes Littlepay');
+  const resumeProjectsSection = page.getByRole('heading', { name: 'Projects', exact: true }).locator('xpath=ancestor::section[1]');
+  const resumeProjectHeadings = await resumeProjectsSection.locator('article .font-headline').evaluateAll((headings) =>
+    headings.map((heading) => (heading.textContent || '').replace(/\s+/g, ' ').trim())
+  );
+  await assert(
+    JSON.stringify(resumeProjectHeadings) === JSON.stringify([
+      'Bitcoin.com Wallet',
+      'ITVX',
+      'OCBC',
+      'OpenPay',
+      'MySTC',
+    ]),
+    'Resume projects do not lead with Bitcoin.com Wallet'
+  );
 
   // Profile tree structure, stable selection, and responsive popover containment.
   async function readProfileTreeGeometry(targetPage, nodeId) {
