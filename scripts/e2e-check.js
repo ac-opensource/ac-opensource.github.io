@@ -193,6 +193,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     );
     const routeMobileChromeFontSizes = await mobilePage.evaluate(() => {
       const selectors = {
+        brand: '#site-topbar > div > a:first-child',
         status: '#site-topbar > div > div:last-child',
         navigation: '#site-nav-mobile',
         footer: '#site-footer > div'
@@ -204,6 +205,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         })
       );
     });
+    await assert(
+      await mobilePage.locator('#site-topbar > div > div:last-child').isVisible(),
+      `${route.path}: mobile status indicator is hidden`
+    );
     await assert(
       Object.values(routeMobileChromeFontSizes).every(Boolean),
       `${route.path}: mobile site chrome is missing a typography target`
