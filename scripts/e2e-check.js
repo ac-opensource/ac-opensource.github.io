@@ -62,6 +62,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   const page = await desktop.newPage();
   const mobilePage = await mobile.newPage();
+  let mobileChromeFontSizes = null;
 
   const consoleIssues = [];
   page.on('pageerror', (err) => consoleIssues.push(`desktop pageerror: ${err.message}`));
@@ -154,6 +155,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const hasFooter = await page.locator('#site-footer').count();
     await assert(hasTopbar > 0, `${route.path}: missing #site-topbar`);
     await assert(hasFooter > 0, `${route.path}: missing #site-footer`);
+    const desktopPortfolioLabels = await page.locator(
+      '#site-nav a[href="/work.html"], #site-footer a[href="/work.html"]'
+    ).allTextContents();
+    await assert(
+      desktopPortfolioLabels.length === 2
+        && desktopPortfolioLabels.every((label) => label.trim() === '[portfolio]'),
+      `${route.path}: desktop navigation must label /work.html as [portfolio]`
+    );
 
     if (route.path === '/blog/') {
       await page.waitForSelector('#blog-feed article', { timeout: 15000 });
@@ -174,6 +183,39 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const mobResp = await mobilePage.goto(url, { waitUntil: 'domcontentloaded' });
     await mobilePage.waitForTimeout(200);
     await assert(mobResp && mobResp.status() >= 200 && mobResp.status() < 400, `Mobile route ${route.path} failed`);
+    const mobilePortfolioLabels = await mobilePage.locator(
+      '#site-nav-mobile a[href="/work.html"], #site-footer a[href="/work.html"]'
+    ).allTextContents();
+    await assert(
+      mobilePortfolioLabels.length === 2
+        && mobilePortfolioLabels.every((label) => label.trim() === '[portfolio]'),
+      `${route.path}: mobile navigation must label /work.html as [portfolio]`
+    );
+    const routeMobileChromeFontSizes = await mobilePage.evaluate(() => {
+      const selectors = {
+        status: '#site-topbar > div > div:last-child',
+        navigation: '#site-nav-mobile',
+        footer: '#site-footer > div'
+      };
+      return Object.fromEntries(
+        Object.entries(selectors).map(([name, selector]) => {
+          const element = document.querySelector(selector);
+          return [name, element ? getComputedStyle(element).fontSize : null];
+        })
+      );
+    });
+    await assert(
+      Object.values(routeMobileChromeFontSizes).every(Boolean),
+      `${route.path}: mobile site chrome is missing a typography target`
+    );
+    if (!mobileChromeFontSizes) {
+      mobileChromeFontSizes = routeMobileChromeFontSizes;
+    } else {
+      await assert(
+        JSON.stringify(routeMobileChromeFontSizes) === JSON.stringify(mobileChromeFontSizes),
+        `${route.path}: mobile site chrome font sizes ${JSON.stringify(routeMobileChromeFontSizes)} differ from ${JSON.stringify(mobileChromeFontSizes)}`
+      );
+    }
     if (route.path === '/blog/') {
       await mobilePage.waitForSelector('#blog-feed article', { timeout: 15000 });
     }
