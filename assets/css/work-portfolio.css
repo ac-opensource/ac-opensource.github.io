@@ -1597,21 +1597,6 @@ body {
     padding-top: 8.8rem;
   }
 
-  #site-topbar > div:first-of-type {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  #site-topbar > div:first-of-type > a {
-    overflow: hidden;
-    font-size: 0.92rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  #site-topbar > div:first-of-type > div:last-child {
-    display: none;
-  }
-
   .work-hero {
     padding: 1.25rem 0;
   }
