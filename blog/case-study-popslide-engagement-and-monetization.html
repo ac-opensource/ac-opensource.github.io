@@ -92,32 +92,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -142,6 +146,20 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
@@ -158,7 +176,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2023-11-30",
-  "dateModified": "2026-07-22T13:46:22.000Z",
+  "dateModified": "2026-07-22T15:37:47.000Z",
   "image": "https://ac-opensource.github.io/assets/images/work/img_popslide_app-optimized.webp",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html"
 }</script>

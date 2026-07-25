@@ -4,15 +4,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>Career Trajectory as Platform Ownership, Not Job Titles | Andrew Concepcion</title>
-<meta name="description" content="A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression."/>
+<title>Career Growth as Ownership, Not Just Job Titles | Andrew Concepcion</title>
+<meta name="description" content="A practical framework for reading engineering growth through scope, decision quality, operational responsibility, and durable outcomes."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html"/>
-<meta property="og:title" content="Career Trajectory as Platform Ownership, Not Job Titles | Andrew Concepcion"/>
-<meta property="og:description" content="A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression."/>
+<meta property="og:title" content="Career Growth as Ownership, Not Just Job Titles | Andrew Concepcion"/>
+<meta property="og:description" content="A practical framework for reading engineering growth through scope, decision quality, operational responsibility, and durable outcomes."/>
 <meta property="og:image" content="https://ac-opensource.github.io/blog/images/career-platform-ownership-hero.svg"/>
 <meta property="og:image:alt" content="Career timeline from feature delivery to platform ownership and organizational impact."/>
 <meta property="article:published_time" content="2026-03-26"/>
@@ -24,8 +24,8 @@
 <meta property="article:tag" content="engineering-growth">
 <meta property="article:tag" content="technical">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Career Trajectory as Platform Ownership, Not Job Titles | Andrew Concepcion"/>
-<meta name="twitter:description" content="A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression."/>
+<meta name="twitter:title" content="Career Growth as Ownership, Not Just Job Titles | Andrew Concepcion"/>
+<meta name="twitter:description" content="A practical framework for reading engineering growth through scope, decision quality, operational responsibility, and durable outcomes."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/career-platform-ownership-hero.svg"/>
 <meta name="twitter:image:alt" content="Career timeline from feature delivery to platform ownership and organizational impact."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
@@ -93,32 +93,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -143,12 +147,26 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Career Trajectory as Platform Ownership, Not Job Titles",
-  "description": "A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression.",
+  "headline": "Career Growth as Ownership, Not Just Job Titles",
+  "description": "A practical framework for reading engineering growth through scope, decision quality, operational responsibility, and durable outcomes.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -159,7 +177,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2026-03-26",
-  "dateModified": "2026-03-26T11:17:59.000Z",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://ac-opensource.github.io/blog/images/career-platform-ownership-hero.svg",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html"
 }</script>
@@ -207,12 +225,12 @@
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2026-03-26</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[8 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[3 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Career Trajectory as Platform Ownership, Not Job Titles</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Career Growth as Ownership, Not Just Job Titles</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A practical framework for reading engineering growth through scope, decision quality, operational responsibility, and durable outcomes.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -265,53 +283,107 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A practical framework for reading engineering growth through scope, decision quality, operational responsibility, and durable outcomes.</p>
 </section>
 </aside>
 <div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
   <p>
-    Titles are useful for org charts, not for understanding engineering growth.
-    The signal I care about is ownership depth: what systems you can shape end-to-end and keep healthy over time.
+    Job titles are useful shorthand, but they are a lossy way to describe engineering growth. The
+    same title can mean maintaining one feature in one company and owning a critical product surface
+    in another. The better question is not only, “What were you called?” It is, “What could people
+    trust you to carry from ambiguity to production?”
+  </p>
+  <p>
+    I use ownership depth as one lens for answering that question. It is not a universal ladder and
+    it does not make platform work more valuable than specialist work. It simply makes the evidence
+    of growth easier to discuss: decisions made, boundaries understood, failures handled, and useful
+    systems left behind.
   </p>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">01. Ownership Maturity Levels</h2>
-  <ol class="list-decimal pl-6 space-y-2">
-    <li><strong>Task ownership</strong>: ship scoped tickets reliably.</li>
-    <li><strong>Feature ownership</strong>: drive UX + logic + release for complete user flows.</li>
-    <li><strong>System ownership</strong>: define architecture boundaries and reliability posture.</li>
-    <li><strong>Platform ownership</strong>: create reusable patterns that uplift multiple teams/products.</li>
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. Four useful ownership scopes</h2>
+  <ol class="list-decimal pl-6 space-y-4">
+    <li>
+      <strong>Task ownership:</strong> complete a scoped change reliably, follow the surrounding
+      conventions, and surface uncertainty before it becomes rework.
+    </li>
+    <li>
+      <strong>Feature ownership:</strong> carry a user flow across UI, data, failure states,
+      verification, rollout, and the awkward integration points between them.
+    </li>
+    <li>
+      <strong>System ownership:</strong> understand how several features share state, APIs,
+      observability, release constraints, and operational risk.
+    </li>
+    <li>
+      <strong>Platform ownership:</strong> create a reusable capability or operating pattern that
+      helps several products or teams move with fewer repeated mistakes.
+    </li>
   </ol>
-</section>
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">02. Better Career Metrics</h2>
   <p>
-    Instead of “what was your title?”, I ask what production surfaces you owned, what reliability constraints you improved,
-    and what systems still scale after team changes.
+    These scopes overlap. A senior engineer still needs to handle small tasks well, and a narrowly
+    focused specialist can have enormous system impact. Growth is visible when the engineer can move
+    between scopes deliberately instead of treating every problem as an excuse for a larger
+    abstraction.
   </p>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">03. Platform Ownership in Practice</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. Evidence is better than title inflation</h2>
   <p>
-    Platform ownership is visible when your work reduces repeated effort and failure modes through shared quality gates,
-    reusable architecture modules, and clear operational playbooks.
+    Ownership becomes credible through evidence. Did the engineer clarify an ambiguous contract
+    before implementation? Could they trace a production failure across client, service, and stored
+    state? Did the release include a rollback path? Did a pattern they introduced reduce repeated
+    work, or did it merely add another layer?
+  </p>
+  <div class="bg-surface-container-low border border-outline-variant/20 p-5">
+    <p class="font-semibold text-on-surface mb-3">Questions I use to assess growth:</p>
+    <ul class="list-disc pl-6 space-y-2">
+      <li>What decisions became clearer because this person was involved?</li>
+      <li>Which failure modes did they make easier to detect or recover from?</li>
+      <li>Can someone else maintain the result without inheriting hidden context?</li>
+      <li>Did they improve the path to delivery, not only the code produced on that path?</li>
+      <li>What did they choose not to build, and why?</li>
+    </ul>
+  </div>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. Ownership includes maintenance and restraint</h2>
+  <p>
+    The glamorous version of ownership is starting something. The durable version includes operating
+    it after launch, responding when assumptions fail, and simplifying it when the original design
+    becomes too expensive. It also includes saying no to changes that create more surface area than
+    value.
+  </p>
+  <p>
+    A platform is not mature because it has many consumers or an impressive diagram. It is mature
+    when its contract is clear, its failure modes are visible, and its maintainers can change it
+    without coordinating a small emergency. Sometimes the best platform decision is to keep a
+    solution local until a second real use case proves that sharing is worthwhile.
   </p>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">04. Why This Framing Matters Now</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. AI changes the economics, not the accountability</h2>
   <p>
-    AI has compressed implementation time. As coding gets faster, the differentiator shifts toward systems judgment,
-    decision quality, and long-term ownership discipline.
+    Agentic tools have made implementation and exploration faster. That makes ownership more
+    important, not less. When it is cheap to generate several plausible solutions, the scarce work is
+    deciding which one belongs in the product, proving that it integrates with the real system, and
+    preserving enough evidence for someone else to review it.
   </p>
   <p>
-    The engineers who grow fastest are those who can repeatedly convert ambiguity into durable, maintainable platforms.
+    I do not read career growth as a race away from coding. I read it as a widening ability to connect
+    code with product intent, operational reality, and team continuity. Titles may eventually reflect
+    that. The ownership usually appears first.
   </p>
 </section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
 <a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-cognitive-profile-deep-dive.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Cognitive Profile Deep Dive: Emergenetics + Harrison</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Using Emergenetics and Harrison as Calibration Tools</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
@@ -363,7 +435,7 @@
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "2026-03-26-career-trajectory-platform-ownership";
-    const CURRENT_POST_TITLE = "Career Trajectory as Platform Ownership, Not Job Titles";
+    const CURRENT_POST_TITLE = "Career Growth as Ownership, Not Just Job Titles";
     const CURRENT_POST_URL = "/blog/2026-03-26-career-trajectory-platform-ownership.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");

@@ -91,32 +91,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -141,6 +145,20 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
@@ -157,7 +175,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2025-02-05",
-  "dateModified": "2026-03-26T10:17:28.000Z",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://ac-opensource.github.io/blog/images/new-zealand-aurora-1600.jpg",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2024-11-02-sunrise-trail-runs.html"
 }</script>
@@ -205,7 +223,7 @@
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[hobby]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2025-02-05</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[8 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[4 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
@@ -274,13 +292,13 @@
                         happens when you’re surrounded by family you haven’t seen in a while.
                     </p>
                     <p>
-                        We did explore of course, but in a very unhurried way. Parks, botanical gardens, beaches, waterfalls, Mount Eden are
+                        We did explore of course, but in a very unhurried way. Parks, botanical gardens, beaches, waterfalls, and Mount Eden are
                         classic North Island staples that you don’t need to rush. One morning we even went strawberry picking, which somehow
                         made the kids more excited than any tourist attraction we saw the whole month.
                     </p>
                     <p>
                         New Year’s Eve was a shift from the quiet routines. We headed to the CBD for the Sky Tower countdown, expecting a big
-                        show. The fireworks display, well, it wasn’t exactly Manila standards. There was no booming barangay-level chaos, no
+                        show. The fireworks display wasn’t exactly up to Manila standards. There was no booming barangay-level chaos, no
                         citywide lightshow, none of the insanity we grew up with. But even if it was underwhelming, it was still a different
                         kind of nice. It was calmer, a little colder, and something you only really appreciate by being there.
                     </p>
@@ -294,7 +312,7 @@
                     <h2 class="text-xl font-semibold">South Island: A Week of Cold Mornings, Wild Landscapes, and One Unforgettable Sky</h2>
                     <p>
                         The moment we stepped outside the airport, the temperature slapped us awake. Single-digit cold for the first time was
-                        a novelty for someone used to living in the tropics. Suddenly jackets weren’t fashion pieces, they were survival
+                        a novelty for someone used to living in the tropics. Suddenly jackets weren’t fashion pieces; they were survival
                         equipment.
                     </p>
                     <p>Our route took us around some of the best scenery in the South Island:</p>
@@ -315,7 +333,7 @@
                             Remarkables, and Lake Wakatipu. No crowds, no rush, just you and the wind.
                         </li>
                         <li>
-                            <strong>Aoraki / Mount Cook:</strong> The five-hour drive from Queenstown was absolutely worth it. The dramatic shifts in landscape and the beautiful route to Mount Cook are stunning. You won't get bored driving, and the mountain itself is famous for being the default Windows 8 lockscreen, a road I ended up driving down 13 years after first seeing the image. Fate is a funny thing.
+                            <strong>Aoraki / Mount Cook:</strong> The five-hour drive from Queenstown was absolutely worth it. The landscape kept changing, and the road beside Lake Pukaki made the long day feel like part of the destination rather than time lost between stops.
                         </li>
                         <li>
                             <strong>Ben Ohau Area (Airbnb stay):</strong> The unexpected highlight. One night in complete darkness, with no light pollution at
@@ -330,7 +348,7 @@
                 </section>
 
 <section class="mt-8 space-y-4 text-slate-700 leading-relaxed">
-                    <h2 class="text-xl font-semibold">What We Learned &amp; What We Want Next</h2>
+                    <h2 class="text-xl font-semibold">What We Learned—and What We Want Next</h2>
                     <p>
                         North Island gave us slow days, family time, and small adventures without pressure. But we barely scratched the surface.
                         Next time we want to explore more: Coromandel, Rotorua, Hobbiton, Taupo, the rest of Auckland beyond the suburbs.
@@ -355,9 +373,9 @@
 <span class="font-label text-xs">read_entry</span>
 </div>
 </a>
-<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-prompt-patterns-for-production-ready-code.html">
+<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2024-10-08-running-ai-fleet-learnings.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Prompt Patterns That Consistently Produce Production-Ready Code</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Running an Agent Fleet Without Losing the Plot</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>

@@ -17,7 +17,6 @@
 <meta property="og:image:alt" content="Misty ridge and sun rays over Glenorchy valley, captured from a moving vehicle."/>
 <meta property="article:published_time" content="2024-09-14"/>
 <meta property="article:author" content="Andrew Concepcion"/>
-<meta property="article:tag" content="Hobby">
 <meta property="article:tag" content="Photography">
 <meta property="article:tag" content="hobby">
 <meta name="twitter:card" content="summary_large_image"/>
@@ -90,32 +89,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -140,6 +143,20 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
@@ -156,7 +173,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2024-09-14",
-  "dateModified": "2026-03-26T14:06:06.000Z",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://ac-opensource.github.io/blog/images/photography-misty-mountains-1600.jpg",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2024-09-14-film-photography-gallery.html"
 }</script>
@@ -204,7 +221,7 @@
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[hobby]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2024-09-14</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[6 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[2 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
@@ -258,7 +275,7 @@
 </div>
 <div class="pt-4 border-t border-outline-variant/20">
 <h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
-<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#hobby</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#photography</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#hobby</span></div>
+<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#photography</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#hobby</span></div>
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
@@ -314,7 +331,7 @@
 
 <section class="mt-8 text-slate-700 space-y-5">
   <p>
-    If you're into this kind of field-note format, I can publish more raw breakdowns: what I carried, what settings I changed mid-shot, and what I'd do differently if I had ten more minutes on location.
+    The next version of this log should go one level deeper: what I carried, which settings changed in the moment, and what I would try differently with ten more minutes on location. The image is the result; those decisions are the part worth preserving.
   </p>
 </section></div>
 </div>
@@ -327,9 +344,9 @@
 <span class="font-label text-xs">read_entry</span>
 </div>
 </a>
-<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2024-10-08-running-ai-fleet-learnings.html">
+<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/case-study-ocbc-banking-experience.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Riding The Token Storm: Notes From A Codex Fleet Wrangler</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">OCBC Business: Android Banking Work</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>

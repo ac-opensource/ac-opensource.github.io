@@ -1,13 +1,12 @@
 [
   {
     "slug": "2026-07-22-its-not-okay-to-stay-not-okay",
-    "title": "It’s Not Okay to Stay “Not Okay”",
+    "title": "It’s Okay Not to Be Okay—and Okay to Ask What Comes Next",
     "author": "Andrew Concepcion",
-    "summary": "Acceptance makes room for honesty. Responsibility turns that honesty into the next workable step—without shame, denial, or pretending recovery is simple.",
+    "summary": "Acceptance creates an honest starting point. Care, support, and one workable next step can keep pain from becoming a permanent verdict.",
     "date": "2026-07-22",
     "readingTime": "8 min read",
     "topics": [
-      "Reflection",
       "Mental Health",
       "Personal Growth",
       "Self-Awareness",
@@ -17,7 +16,7 @@
     "heroImage": "/blog/images/not-okay-is-a-starting-point.jpg",
     "heroAlt": "A person faces a house engulfed in flames while overlaid text compares saying I’m not okay to noticing a fire without taking action or calling for help.",
     "heroCaption": "Acknowledging the fire matters. Deciding what to do next matters too.",
-    "updatedAt": "2026-07-22 07:53:14",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-07-22 07:53:14"
   },
   {
@@ -26,28 +25,27 @@
     "author": "Andrew Concepcion",
     "summary": "A reflection on the defenses we build from old wounds, pride, and habit—and why real change begins when we stop guarding what keeps us trapped.",
     "date": "2026-07-22",
-    "readingTime": "7 min read",
+    "readingTime": "6 min read",
     "topics": [
       "Self-Awareness",
       "Personal Growth",
       "Accountability",
-      "Healing",
-      "Reflection"
+      "Healing"
     ],
     "category": "reflection",
     "heroImage": "/blog/images/fortress-we-mistake-for-home.jpg",
     "heroAlt": "An open notebook illustration with a Carl Jung quotation above a person crouched between a mirror and a fortress of labeled distractions and excuses.",
     "heroCaption": "The walls that feel safe can also keep us from seeing ourselves.",
-    "updatedAt": "2026-07-22 07:53:14",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-07-22 07:53:14"
   },
   {
     "slug": "2026-07-21-what-building-persons-finder-taught-me",
     "title": "What Building a Small Backend Taught Me About AI-Ready Engineering",
     "author": "Andrew Concepcion",
-    "summary": "A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.",
+    "summary": "Lessons from a compact backend: explicit API contracts, append-only location history, PostGIS semantics, guarded AI prose, and evidence-based verification.",
     "date": "2026-07-21",
-    "readingTime": "12 min read",
+    "readingTime": "8 min read",
     "topics": [
       "kotlin",
       "spring-boot",
@@ -62,22 +60,21 @@
     "heroImage": "/blog/images/persons-finder-architecture-hero.svg",
     "heroAlt": "Blueprint-style diagram connecting an API contract to location history, a last-known projection, and a guarded AI bio boundary.",
     "heroCaption": "A small backend still benefits from explicit boundaries between API, history, query state, and generated prose.",
-    "updatedAt": "2026-07-22 03:01:17",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-07-22 03:01:17"
   },
   {
     "slug": "2026-04-30-agents-that-leave-receipts",
     "title": "Agents That Leave Receipts",
     "author": "Andrew Concepcion",
-    "summary": "A practical reflection on recent Android, Linear, memory, and orchestration work: local agents become useful when they preserve state, verify changes, and leave a handoff the next run can trust.",
+    "summary": "A practical reflection on local agents, memory, verification, and the handoffs that let the next run trust what happened.",
     "date": "2026-04-30",
-    "readingTime": "10 min read",
+    "readingTime": "7 min read",
     "topics": [
       "ai-workflow",
       "local-agents",
       "engineering-discipline",
       "android",
-      "linear",
       "memory-systems",
       "delivery"
     ],
@@ -85,7 +82,7 @@
     "heroImage": "/blog/images/agent-handoff-loop-hero.svg",
     "heroAlt": "Blueprint-style diagram of a durable agent workflow connecting tickets, local agents, verification, memory, and handoff notes.",
     "heroCaption": "A practical loop for local agents that preserve engineering continuity.",
-    "updatedAt": "2026-07-22 07:53:14",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-07-22 07:53:14"
   },
   {
@@ -94,29 +91,28 @@
     "author": "Andrew Concepcion",
     "summary": "How I set up MemPalace as a practical tool for local agents: small taxonomy, verify-first retrieval, agent diaries, AAAK wake-up context, and why protocol matters more than storage.",
     "date": "2026-04-09",
-    "readingTime": "11 min read",
+    "readingTime": "7 min read",
     "topics": [
       "ai-workflow",
       "mempalace",
       "local-agents",
       "memory-systems",
-      "mcp",
-      "technical"
+      "mcp"
     ],
     "category": "technical",
     "heroImage": "/blog/images/mempalace-local-agents-hero.svg",
     "heroAlt": "Blueprint-style diagram showing MemPalace workflow for local agents with wake-up, verify, taxonomy, and diary layers.",
     "heroCaption": "A local memory protocol is more useful than a vague promise of persistence.",
-    "updatedAt": "2026-04-09 13:21:48",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-04-09 13:21:48"
   },
   {
     "slug": "2026-04-07-one-rust-core-across-android-and-ios",
     "title": "Deep Dive: One Rust Core Across Android and iOS",
     "author": "Andrew Concepcion",
-    "summary": "A deep technical breakdown of how one Rust workspace can expose a unified core to Android and iOS through a facade crate, UniFFI, and platform-specific packaging without duplicating behavior.",
+    "summary": "How a Rust facade, UniFFI bindings, and platform packaging can give Android and iOS one domain core without duplicating behavior.",
     "date": "2026-04-07",
-    "readingTime": "14 min read",
+    "readingTime": "8 min read",
     "topics": [
       "rust",
       "mobile",
@@ -130,16 +126,16 @@
     "heroImage": "/blog/images/cross-platform-rust-core-hero.svg",
     "heroAlt": "Diagram showing one Rust core feeding both Android and iOS through a unified runtime boundary.",
     "heroCaption": "One Rust core, two mobile platforms, and a deliberately thin native shell.",
-    "updatedAt": "2026-04-07 12:03:29",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-04-07 12:03:29"
   },
   {
     "slug": "2026-03-26-career-trajectory-platform-ownership",
-    "title": "Career Trajectory as Platform Ownership, Not Job Titles",
+    "title": "Career Growth as Ownership, Not Just Job Titles",
     "author": "Andrew Concepcion",
-    "summary": "A framework for reading career growth through ownership depth, technical influence, and shipped outcomes rather than title progression.",
+    "summary": "A practical framework for reading engineering growth through scope, decision quality, operational responsibility, and durable outcomes.",
     "date": "2026-03-26",
-    "readingTime": "8 min read",
+    "readingTime": "3 min read",
     "topics": [
       "career",
       "leadership",
@@ -151,38 +147,37 @@
     "heroImage": "/blog/images/career-platform-ownership-hero.svg",
     "heroAlt": "Career timeline from feature delivery to platform ownership and organizational impact.",
     "heroCaption": "Career growth framed by platform ownership and multiplied product impact.",
-    "updatedAt": "2026-03-26 11:17:59",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-26 11:17:59"
   },
   {
     "slug": "2026-03-26-cognitive-profile-deep-dive",
-    "title": "Cognitive Profile Deep Dive: Emergenetics + Harrison",
+    "title": "Using Emergenetics and Harrison as Calibration Tools",
     "author": "Andrew Concepcion",
-    "summary": "A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.",
+    "summary": "How I use two assessment profiles as prompts for better decisions and communication—without treating their scores as identity or proof of ability.",
     "date": "2026-03-26",
-    "readingTime": "13 min read",
+    "readingTime": "3 min read",
     "topics": [
       "emergenetics",
       "harrison",
       "paradox",
       "self-awareness",
-      "leadership",
-      "reflection"
+      "leadership"
     ],
     "category": "reflection",
     "heroImage": "/blog/images/cognitive-profile-cover.svg",
-    "heroAlt": "Abstract visualization of cognitive profile signals",
-    "heroCaption": "Emergenetics and Harrison synthesis",
-    "updatedAt": "2026-03-26 10:17:28",
+    "heroAlt": "Abstract visualization of assessment signals used for personal calibration.",
+    "heroCaption": "Emergenetics and Harrison results treated as reflection prompts, not identity.",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-26 04:58:03"
   },
   {
     "slug": "2026-03-26-e2e-and-visual-qa-for-personal-websites",
-    "title": "E2E + Visual QA for Personal Websites: What to Test and Why",
+    "title": "End-to-End and Visual QA for Personal Websites",
     "author": "Andrew Concepcion",
-    "summary": "A practical QA stack for personal sites using route-level E2E checks and Playwright screenshot loops to catch regressions early.",
+    "summary": "A practical quality loop for static personal sites: verify the publication boundary, exercise critical routes, and review desktop and mobile rendering.",
     "date": "2026-03-26",
-    "readingTime": "11 min read",
+    "readingTime": "3 min read",
     "topics": [
       "quality",
       "e2e",
@@ -194,16 +189,16 @@
     "heroImage": "/blog/images/e2e-visual-qa-hero.svg",
     "heroAlt": "Playwright-style test and visual regression loop represented as a technical blueprint.",
     "heroCaption": "An E2E and visual QA loop that prevents regressions before deployment.",
-    "updatedAt": "2026-03-26 11:17:59",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-26 11:17:59"
   },
   {
     "slug": "2026-03-26-editable-blog-system-on-github-pages",
-    "title": "Building an Editable Blog System That Still Works on GitHub Pages",
+    "title": "Building an Editable Blog That Still Works on GitHub Pages",
     "author": "Andrew Concepcion",
-    "summary": "How to keep a blog editable with SQLite and tooling while deploying static pages for GitHub Pages compatibility and SEO.",
+    "summary": "How SQLite authoring, deterministic static generation, and a public-only build artifact create an editable blog without shipping a runtime database.",
     "date": "2026-03-26",
-    "readingTime": "12 min read",
+    "readingTime": "3 min read",
     "topics": [
       "site-architecture",
       "sqlite",
@@ -215,16 +210,16 @@
     "heroImage": "/blog/images/editable-blog-github-pages-hero.svg",
     "heroAlt": "Diagram showing editor input saved to SQLite then generated as static blog outputs.",
     "heroCaption": "Editable authoring in SQLite with static output optimized for GitHub Pages.",
-    "updatedAt": "2026-03-26 11:17:59",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-26 11:17:59"
   },
   {
     "slug": "2026-03-26-from-mobile-developer-to-ai-accelerated-engineer",
-    "title": "From Mobile Developer to AI Accelerated Engineer",
+    "title": "From Mobile Developer to AI-Accelerated Engineer",
     "author": "Andrew Concepcion",
-    "summary": "What actually changed in my day-to-day engineering: workflow became parallel, delivery got faster, and scope expanded from feature ownership to full system ownership.",
+    "summary": "How agentic tools widened my engineering workflow without replacing mobile depth, explicit ownership, or evidence-based delivery.",
     "date": "2026-03-26",
-    "readingTime": "9 min read",
+    "readingTime": "3 min read",
     "topics": [
       "ai-workflow",
       "engineering",
@@ -236,16 +231,16 @@
     "heroImage": "/blog/images/ai-accelerated-engineer-hero.svg",
     "heroAlt": "Abstract transition from mobile stack modules into an AI-accelerated engineering graph.",
     "heroCaption": "A workflow shift from app delivery to AI-accelerated engineering scope.",
-    "updatedAt": "2026-03-26 11:06:10",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-26 11:06:10"
   },
   {
     "slug": "2026-03-26-prompt-patterns-for-production-ready-code",
-    "title": "Prompt Patterns That Consistently Produce Production-Ready Code",
+    "title": "Prompt Patterns for Reviewable, Production-Ready Code",
     "author": "Andrew Concepcion",
-    "summary": "The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.",
+    "summary": "A practical prompt structure for coding agents: live context, real constraints, side-effect boundaries, observable acceptance evidence, and reproducible handoffs.",
     "date": "2026-03-26",
-    "readingTime": "10 min read",
+    "readingTime": "3 min read",
     "topics": [
       "ai-workflow",
       "prompting",
@@ -255,10 +250,29 @@
     ],
     "category": "technical",
     "heroImage": "/blog/images/prompt-patterns-hero.svg",
-    "heroAlt": "Structured prompt components flowing into automated checks and production release.",
-    "heroCaption": "Prompt patterns that repeatedly produce code ready for release gates.",
-    "updatedAt": "2026-03-26 11:17:59",
+    "heroAlt": "Structured prompt components flow into review and verification checks.",
+    "heroCaption": "A prompt makes production work more reviewable when it keeps evidence in the loop.",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-26 11:17:59"
+  },
+  {
+    "slug": "2024-10-08-running-ai-fleet-learnings",
+    "title": "Running an Agent Fleet Without Losing the Plot",
+    "author": "Andrew Concepcion",
+    "summary": "Lessons from multi-agent engineering work: define output contracts, instrument repeated effort, match verification to risk, and preserve trustworthy handoffs.",
+    "date": "2025-09-28",
+    "readingTime": "4 min read",
+    "topics": [
+      "AI Ops",
+      "Prompt Engineering",
+      "Team Process"
+    ],
+    "category": "technical",
+    "heroImage": "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1600&q=80",
+    "heroAlt": "A hand holds a smartphone against blurred colored lights.",
+    "heroCaption": "More screens do not create coordination; the workflow between them does.",
+    "updatedAt": "2026-07-25 00:00:00",
+    "createdAt": "2026-03-25 11:55:16"
   },
   {
     "slug": "2024-11-02-sunrise-trail-runs",
@@ -266,7 +280,7 @@
     "author": "Andrew Concepcion",
     "summary": "Family holidays in Auckland, a compressed South Island road trip, and the surprise of catching the Aurora Australis.",
     "date": "2025-02-05",
-    "readingTime": "8 min read",
+    "readingTime": "4 min read",
     "topics": [
       "Travel",
       "Family",
@@ -276,7 +290,7 @@
     "heroImage": "/blog/images/new-zealand-aurora-1600.jpg",
     "heroAlt": "Golden sunset reflecting on Lake Wakatipu with mountains in the distance.",
     "heroCaption": "Queenstown waterfront minutes before the sky exploded with color.",
-    "updatedAt": "2026-03-26 10:17:28",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-25 11:55:16"
   },
   {
@@ -296,35 +310,34 @@
     "heroImage": "/assets/images/work/img_mystc_app-optimized.webp",
     "heroAlt": "MySTC mobile app screenshot",
     "heroCaption": "MySTC production app",
-    "updatedAt": "2026-07-22 13:46:22",
+    "updatedAt": "2026-07-22 15:37:47",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
     "slug": "2024-11-21-quiet-systems-reflection",
-    "title": "Quiet Systems: Reflection Rituals For Builders",
+    "title": "Quiet Systems: Reflection Rituals for Builders",
     "author": "Andrew Concepcion",
     "summary": "A personal essay about designing focus blocks, protecting rest, and keeping philosophy close to the shipping calendar.",
     "date": "2024-11-21",
-    "readingTime": "10 min read",
+    "readingTime": "2 min read",
     "topics": [
-      "Reflection",
       "Philosophy",
       "Creative Process"
     ],
     "category": "reflection",
     "heroImage": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
-    "heroAlt": "Notion page open beside a pen and espresso on a minimal desk.",
-    "heroCaption": "Weekly reflection desk setup. I use Notion for a digital notebook, a cup of espresso, and focus before sunrise standups.",
-    "updatedAt": "2026-03-26 10:17:28",
+    "heroAlt": "Layered mountain ridges fading into a pale sunrise sky.",
+    "heroCaption": "Quiet systems create enough distance to see what the noise was hiding.",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-25 11:55:16"
   },
   {
     "slug": "case-study-ocbc-banking-experience",
-    "title": "OCBC: Android Work in a Banking App",
+    "title": "OCBC Business: Android Banking Work",
     "author": "Andrew Concepcion",
-    "summary": "I worked on OCBC's Android app in Kotlin and XML, including chart UI, identity-verification integration, network behavior, and focused unit coverage.",
+    "summary": "I worked on OCBC Business for Android in Kotlin and XML, covering chart UI, identity-verification integration, network behavior, and focused unit tests.",
     "date": "2024-11-20",
-    "readingTime": "2 min read",
+    "readingTime": "1 min read",
     "topics": [
       "OCBC",
       "Fintech",
@@ -332,30 +345,11 @@
       "Kotlin"
     ],
     "category": "work",
-    "heroImage": "/assets/images/work/img_ocbc_app-optimized.webp",
-    "heroAlt": "OCBC mobile app screenshot",
-    "heroCaption": "OCBC production app",
-    "updatedAt": "2026-07-22 13:46:22",
+    "heroImage": "/assets/images/work/img_ocbc_business_cashflow.webp",
+    "heroAlt": "OCBC Business Android app screen showing sales, expenses, and cashflow",
+    "heroCaption": "Official OCBC Business Android app screen from Google Play",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-26 02:18:28"
-  },
-  {
-    "slug": "2024-10-08-running-ai-fleet-learnings",
-    "title": "Riding The Token Storm: Notes From A Codex Fleet Wrangler",
-    "author": "Andrew Concepcion",
-    "summary": "An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.",
-    "date": "2024-10-08",
-    "readingTime": "14 min read",
-    "topics": [
-      "AI Ops",
-      "Prompt Engineering",
-      "Team Process"
-    ],
-    "category": "technical",
-    "heroImage": "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1600&q=80",
-    "heroAlt": "Laptop screens glowing with dashboards and system diagrams in a dark room.",
-    "heroCaption": "",
-    "updatedAt": "2026-03-26 10:17:28",
-    "createdAt": "2026-03-25 11:55:16"
   },
   {
     "slug": "2024-09-14-film-photography-gallery",
@@ -363,16 +357,15 @@
     "author": "Andrew Concepcion",
     "summary": "Three frames from one trip, one ongoing experiment: motion, moon detail, and mountain light across different gear and shooting constraints.",
     "date": "2024-09-14",
-    "readingTime": "6 min read",
+    "readingTime": "2 min read",
     "topics": [
-      "Hobby",
       "Photography"
     ],
     "category": "hobby",
     "heroImage": "/blog/images/photography-misty-mountains-1600.jpg",
     "heroAlt": "Misty ridge and sun rays over Glenorchy valley, captured from a moving vehicle.",
     "heroCaption": "Paradise, Glenorchy through a moving window — a lucky break in the mist.",
-    "updatedAt": "2026-03-26 14:06:06",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-25 11:55:16"
   },
   {
@@ -381,7 +374,7 @@
     "author": "Andrew Concepcion",
     "summary": "I worked on openpay's Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths.",
     "date": "2024-09-01",
-    "readingTime": "2 min read",
+    "readingTime": "1 min read",
     "topics": [
       "openpay",
       "Fintech",
@@ -393,7 +386,7 @@
     "heroImage": "/assets/images/work/img_openpay_app-optimized.webp",
     "heroAlt": "openpay app interface showing spend limits and merchant discovery cards",
     "heroCaption": "openpay purchase experience",
-    "updatedAt": "2026-07-22 13:46:22",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-26 14:57:56"
   },
   {
@@ -413,7 +406,7 @@
     "heroImage": "/assets/images/work/img_solo_app-optimized.webp",
     "heroAlt": "Solo food delivery app screenshot",
     "heroCaption": "Solo whitelabel app family",
-    "updatedAt": "2026-07-22 13:46:22",
+    "updatedAt": "2026-07-22 15:37:47",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
@@ -434,25 +427,25 @@
     "heroImage": "/assets/images/work/img_owto_app-optimized.webp",
     "heroAlt": "OWTO ride-hailing app screenshot",
     "heroCaption": "OWTO app booking flow",
-    "updatedAt": "2026-07-22 13:46:22",
+    "updatedAt": "2026-07-22 15:37:47",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
     "slug": "2024-05-22-building-with-kotlin-and-swift",
-    "title": "Building with Kotlin and Swift",
+    "title": "Building Across Kotlin and Swift Without Blurring Platform Boundaries",
     "author": "Andrew Concepcion",
-    "summary": "A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.",
+    "summary": "A practical way to divide shared domain behavior, state, packaging, and native UI responsibilities across Kotlin and Swift.",
     "date": "2024-05-22",
-    "readingTime": "5 min read",
+    "readingTime": "3 min read",
     "topics": [
       "KMP",
       "SwiftUI"
     ],
     "category": "technical",
     "heroImage": "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=1600&q=80",
-    "heroAlt": "Laptop with Kotlin and Swift code open beside a cup of coffee.",
-    "heroCaption": "",
-    "updatedAt": "2026-03-26 10:17:28",
+    "heroAlt": "A developer works between a Windows laptop and a MacBook.",
+    "heroCaption": "Two native toolchains, one product boundary to design deliberately.",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-25 11:55:16"
   },
   {
@@ -472,7 +465,7 @@
     "heroImage": "/assets/images/work/img_popslide_app-optimized.webp",
     "heroAlt": "Popslide app screenshot",
     "heroCaption": "Popslide lockscreen and rewards experience",
-    "updatedAt": "2026-07-22 13:46:22",
+    "updatedAt": "2026-07-22 15:37:47",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
@@ -492,7 +485,7 @@
     "heroImage": "/assets/images/work/img_websafety_app-optimized.webp",
     "heroAlt": "WebSafety app screenshot",
     "heroCaption": "WebSafety monitoring dashboard",
-    "updatedAt": "2026-07-22 13:46:22",
+    "updatedAt": "2026-07-22 15:37:47",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
@@ -501,7 +494,7 @@
     "author": "Andrew Concepcion",
     "summary": "I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements.",
     "date": "2022-10-05",
-    "readingTime": "2 min read",
+    "readingTime": "1 min read",
     "topics": [
       "ProjectBASS",
       "Open Source",
@@ -512,7 +505,7 @@
     "heroImage": "/assets/images/work/img_projectbass_app-optimized.webp",
     "heroAlt": "ProjectBASS app screenshot",
     "heroCaption": "ProjectBASS map visualization",
-    "updatedAt": "2026-07-22 13:46:22",
+    "updatedAt": "2026-07-25 00:00:00",
     "createdAt": "2026-03-26 02:18:28"
   }
 ]

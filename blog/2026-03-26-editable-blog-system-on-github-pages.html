@@ -4,15 +4,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>Building an Editable Blog System That Still Works on GitHub Pages | Andrew Concepcion</title>
-<meta name="description" content="How to keep a blog editable with SQLite and tooling while deploying static pages for GitHub Pages compatibility and SEO."/>
+<title>Building an Editable Blog That Still Works on GitHub Pages | Andrew Concepcion</title>
+<meta name="description" content="How SQLite authoring, deterministic static generation, and a public-only build artifact create an editable blog without shipping a runtime database."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/2026-03-26-editable-blog-system-on-github-pages.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/2026-03-26-editable-blog-system-on-github-pages.html"/>
-<meta property="og:title" content="Building an Editable Blog System That Still Works on GitHub Pages | Andrew Concepcion"/>
-<meta property="og:description" content="How to keep a blog editable with SQLite and tooling while deploying static pages for GitHub Pages compatibility and SEO."/>
+<meta property="og:title" content="Building an Editable Blog That Still Works on GitHub Pages | Andrew Concepcion"/>
+<meta property="og:description" content="How SQLite authoring, deterministic static generation, and a public-only build artifact create an editable blog without shipping a runtime database."/>
 <meta property="og:image" content="https://ac-opensource.github.io/blog/images/editable-blog-github-pages-hero.svg"/>
 <meta property="og:image:alt" content="Diagram showing editor input saved to SQLite then generated as static blog outputs."/>
 <meta property="article:published_time" content="2026-03-26"/>
@@ -24,8 +24,8 @@
 <meta property="article:tag" content="content-system">
 <meta property="article:tag" content="technical">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Building an Editable Blog System That Still Works on GitHub Pages | Andrew Concepcion"/>
-<meta name="twitter:description" content="How to keep a blog editable with SQLite and tooling while deploying static pages for GitHub Pages compatibility and SEO."/>
+<meta name="twitter:title" content="Building an Editable Blog That Still Works on GitHub Pages | Andrew Concepcion"/>
+<meta name="twitter:description" content="How SQLite authoring, deterministic static generation, and a public-only build artifact create an editable blog without shipping a runtime database."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/editable-blog-github-pages-hero.svg"/>
 <meta name="twitter:image:alt" content="Diagram showing editor input saved to SQLite then generated as static blog outputs."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
@@ -93,32 +93,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -143,12 +147,26 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Building an Editable Blog System That Still Works on GitHub Pages",
-  "description": "How to keep a blog editable with SQLite and tooling while deploying static pages for GitHub Pages compatibility and SEO.",
+  "headline": "Building an Editable Blog That Still Works on GitHub Pages",
+  "description": "How SQLite authoring, deterministic static generation, and a public-only build artifact create an editable blog without shipping a runtime database.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -159,7 +177,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2026-03-26",
-  "dateModified": "2026-03-26T11:17:59.000Z",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://ac-opensource.github.io/blog/images/editable-blog-github-pages-hero.svg",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-03-26-editable-blog-system-on-github-pages.html"
 }</script>
@@ -207,12 +225,12 @@
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2026-03-26</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[12 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[3 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Building an Editable Blog System That Still Works on GitHub Pages</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">How to keep a blog editable with SQLite and tooling while deploying static pages for GitHub Pages compatibility and SEO.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Building an Editable Blog That Still Works on GitHub Pages</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">How SQLite authoring, deterministic static generation, and a public-only build artifact create an editable blog without shipping a runtime database.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -265,71 +283,108 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">How to keep a blog editable with SQLite and tooling while deploying static pages for GitHub Pages compatibility and SEO.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">How SQLite authoring, deterministic static generation, and a public-only build artifact create an editable blog without shipping a runtime database.</p>
 </section>
 </aside>
 <div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
   <p>
-    GitHub Pages is static. Editorial workflows are dynamic. The trick is separating authoring/query concerns
-    from deployment constraints without duplicating truth.
+    GitHub Pages serves static files. A comfortable editorial workflow wants drafts, structured
+    metadata, search, and a way to update one post without hand-editing several generated artifacts.
+    The architecture works when those concerns are separated instead of pretending a static host is
+    a database server.
   </p>
   <p>
-    My solution: <strong>SQLite as source of truth</strong> + <strong>static page generation at build time</strong>.
+    On this site, SQLite is the authoring source of truth and a build step turns published rows into
+    a clean static site. The database is committed for reproducible authoring, but it is never copied
+    into the public artifact.
   </p>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">01. Content Model</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. The authoring model</h2>
   <p>
-    Posts live in SQLite with normalized topics and metadata. This supports querying, filtering, and authoring updates
-    without touching many flat files by hand.
+    The database keeps post metadata, HTML bodies, status, and ordered topics. A small local writer
+    runs only on loopback and saves back to SQLite. That gives me one place to edit without requiring
+    a public CMS or shipping an authenticated admin surface.
   </p>
   <ul class="list-disc pl-6 space-y-2">
-    <li><strong>posts</strong>: slug, title, summary, category, hero, body_html, status.</li>
-    <li><strong>post_topics</strong>: many-to-one tags with stable ordering.</li>
-    <li><strong>status</strong>: published or hidden for governance.</li>
+    <li><strong>posts:</strong> slug, title, summary, category, dates, hero metadata, body, and status.</li>
+    <li><strong>post_topics:</strong> normalized tags with stable display order.</li>
+    <li><strong>status:</strong> a publication decision, not a CSS class applied after deployment.</li>
   </ul>
-</section>
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">02. Build-Time Static Generation</h2>
   <p>
-    Build scripts read published rows and generate static blog post pages, posts.json manifest, RSS feed,
-    and sitemap plus robots files.
-  </p>
-  <p>
-    This gives full static deploy compatibility while preserving dynamic authoring internally.
+    Keeping HTML in the database is a tradeoff: binary diffs are less readable than Markdown diffs.
+    The benefit is that the writer, generator, and query tools all use one schema. Focused checks and
+    generated-page diffs make the resulting public change reviewable.
   </p>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">03. Runtime Query Behavior</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. The build is the publication boundary</h2>
   <p>
-    On the blog index, SQLite-backed querying powers filtering/search semantics. On direct post routes,
-    static HTML guarantees fast loading and crawler-friendly content.
+    The build reads only rows marked <code>published</code>. It writes one static page per post,
+    refreshes the blog manifest, RSS feed, sitemap, robots metadata, and adjacent-post navigation,
+    then assembles an allowlisted <code>dist/</code> directory.
   </p>
   <p>
-    This hybrid avoids the tradeoff between editability and static hosting requirements.
+    That distinction matters. A hidden draft can exist in the authoring database without appearing in
+    the manifest, sitemap, RSS, generated pages, or deployment artifact. The database, local writer,
+    templates, and preview-only routes are also rejected from <code>dist/</code>.
+  </p>
+  <blockquote class="border-l-4 border-tertiary pl-6 my-8 text-xl text-secondary font-light">
+    Hidden content is safe only when the build excludes it, not when the interface merely declines to
+    link to it.
+  </blockquote>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. The public site does not query SQLite</h2>
+  <p>
+    This is the easy detail to describe incorrectly. GitHub Pages cannot open the authoring database
+    on the server. The blog index fetches a generated <code>posts.json</code> manifest and performs
+    search, category filtering, pagination, sharing, and bookmarks in the browser. Article bodies
+    live in generated static HTML, so a direct post URL remains complete without client-side database
+    access.
+  </p>
+  <p>
+    The manifest contains public metadata only. It is useful for progressive enhancement, but it is
+    not the canonical content store and it does not need to carry every article body.
   </p>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">04. SEO + Reliability Benefits</h2>
-  <ul class="list-disc pl-6 space-y-2">
-    <li>Canonical URLs and OG tags are deterministic per post.</li>
-    <li>RSS and sitemap stay synchronized with published status.</li>
-    <li>Hidden posts are excluded from generated artifacts.</li>
-    <li>Static output removes runtime dependency risk on public pages.</li>
-  </ul>
-</section>
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">05. Why This Architecture Scales</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. Determinism keeps generated content reviewable</h2>
   <p>
-    It supports editor-friendly workflows today and cleaner migration paths later.
-    If needed, the same SQLite model can feed APIs, admin tools, or headless delivery without redoing content structure.
+    Generated files become frustrating when a build changes timestamps, ordering, or formatting for
+    no content reason. The generator sorts posts deterministically, derives metadata from stored
+    values, and can be built twice to prove the second output is identical.
+  </p>
+  <p>
+    Publication checks then verify that canonical URLs, Open Graph metadata, RSS, sitemap entries, and
+    static pages agree. This turns “the generator ran” into a stronger claim: the public artifact is
+    complete, contains only allowed files, and can be reproduced from the committed source.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">05. What this architecture is—and is not</h2>
+  <p>
+    This is a good fit for one author, modest content volume, and Git-based review. It avoids a hosted
+    CMS, a production database, and a public admin attack surface. It also means edits require a local
+    tool and a build, and collaborators cannot review the SQLite body as comfortably as a plain-text
+    source.
+  </p>
+  <p>
+    If those tradeoffs change, the schema can feed a different editor or deployment target. Until
+    then, the important property is simple: authoring can be dynamic while publication stays static,
+    inspectable, and intentionally small.
   </p>
 </section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
 <a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">From Mobile Developer to AI Accelerated Engineer</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">From Mobile Developer to AI-Accelerated Engineer</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
@@ -337,7 +392,7 @@
 </a>
 <a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">E2E + Visual QA for Personal Websites: What to Test and Why</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">End-to-End and Visual QA for Personal Websites</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -381,7 +436,7 @@
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "2026-03-26-editable-blog-system-on-github-pages";
-    const CURRENT_POST_TITLE = "Building an Editable Blog System That Still Works on GitHub Pages";
+    const CURRENT_POST_TITLE = "Building an Editable Blog That Still Works on GitHub Pages";
     const CURRENT_POST_URL = "/blog/2026-03-26-editable-blog-system-on-github-pages.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");

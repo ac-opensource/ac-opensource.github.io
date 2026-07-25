@@ -4,27 +4,27 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>Building with Kotlin and Swift | Andrew Concepcion</title>
-<meta name="description" content="A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively."/>
+<title>Building Across Kotlin and Swift Without Blurring Platform Boundaries | Andrew Concepcion</title>
+<meta name="description" content="A practical way to divide shared domain behavior, state, packaging, and native UI responsibilities across Kotlin and Swift."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html"/>
-<meta property="og:title" content="Building with Kotlin and Swift | Andrew Concepcion"/>
-<meta property="og:description" content="A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively."/>
+<meta property="og:title" content="Building Across Kotlin and Swift Without Blurring Platform Boundaries | Andrew Concepcion"/>
+<meta property="og:description" content="A practical way to divide shared domain behavior, state, packaging, and native UI responsibilities across Kotlin and Swift."/>
 <meta property="og:image" content="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&amp;fit=crop&amp;w=1600&amp;q=80"/>
-<meta property="og:image:alt" content="Laptop with Kotlin and Swift code open beside a cup of coffee."/>
+<meta property="og:image:alt" content="A developer works between a Windows laptop and a MacBook."/>
 <meta property="article:published_time" content="2024-05-22"/>
 <meta property="article:author" content="Andrew Concepcion"/>
 <meta property="article:tag" content="KMP">
 <meta property="article:tag" content="SwiftUI">
 <meta property="article:tag" content="technical">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Building with Kotlin and Swift | Andrew Concepcion"/>
-<meta name="twitter:description" content="A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively."/>
+<meta name="twitter:title" content="Building Across Kotlin and Swift Without Blurring Platform Boundaries | Andrew Concepcion"/>
+<meta name="twitter:description" content="A practical way to divide shared domain behavior, state, packaging, and native UI responsibilities across Kotlin and Swift."/>
 <meta name="twitter:image" content="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&amp;fit=crop&amp;w=1600&amp;q=80"/>
-<meta name="twitter:image:alt" content="Laptop with Kotlin and Swift code open beside a cup of coffee."/>
+<meta name="twitter:image:alt" content="A developer works between a Windows laptop and a MacBook."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -90,32 +90,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -140,12 +144,26 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Building with Kotlin and Swift",
-  "description": "A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.",
+  "headline": "Building Across Kotlin and Swift Without Blurring Platform Boundaries",
+  "description": "A practical way to divide shared domain behavior, state, packaging, and native UI responsibilities across Kotlin and Swift.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -156,7 +174,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2024-05-22",
-  "dateModified": "2026-03-26T10:17:28.000Z",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=1600&q=80",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html"
 }</script>
@@ -204,12 +222,12 @@
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2024-05-22</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[5 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[3 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Building with Kotlin and Swift</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Building Across Kotlin and Swift Without Blurring Platform Boundaries</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A practical way to divide shared domain behavior, state, packaging, and native UI responsibilities across Kotlin and Swift.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -219,7 +237,7 @@
 
 <div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
 <div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
-<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&amp;fit=crop&amp;w=1600&amp;q=80" alt="Laptop with Kotlin and Swift code open beside a cup of coffee." loading="eager" decoding="async"/>
+<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&amp;fit=crop&amp;w=1600&amp;q=80" alt="A developer works between a Windows laptop and a MacBook." loading="eager" decoding="async"/>
 </div>
 <div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
 <div class="flex justify-between items-start">
@@ -262,15 +280,98 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A quick reflection on pairing Compose Multiplatform with SwiftUI to deliver features natively.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A practical way to divide shared domain behavior, state, packaging, and native UI responsibilities across Kotlin and Swift.</p>
 </section>
 </aside>
-<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><h1 class="text-2xl font-semibold mb-4">Building with Kotlin and Swift</h1>
-            <p class="text-sm text-slate-500 uppercase tracking-wide mb-4">
-                Published
-                <time datetime="2024-05-22">May 22, 2024</time>
-            </p>
-            <p class="text-slate-700 leading-relaxed">Exploring multiplatform mobile development.</p></div>
+<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
+  <p>
+    Kotlin and Swift can share a product without pretending the two platforms are identical. The
+    useful question is not “How much code can I reuse?” It is “Which decisions should have one owner,
+    and which decisions should remain native to Android and iOS?”
+  </p>
+  <p>
+    Compose Multiplatform and SwiftUI make several arrangements possible. The durable one depends less
+    on the headline reuse percentage than on the boundary between domain behavior, state, and
+    platform experience.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. Share rules before sharing screens</h2>
+  <p>
+    Validation, request construction, persistence policy, and domain state are strong candidates for
+    one implementation when both apps must make the same decision. Duplicating those rules creates
+    two places for edge cases to drift.
+  </p>
+  <p>
+    UI is different. Navigation, accessibility, text input, system sheets, back behavior, and
+    lifecycle expectations belong to the platform. Sharing a screen is worthwhile when the
+    experience is genuinely common and the shared layer can still expose the hooks each platform
+    needs. It is not worthwhile when every native behavior becomes an exception.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. Design the state boundary explicitly</h2>
+  <p>
+    The shared layer should expose a small state and event contract rather than leaking its internal
+    architecture into Swift. Names, nullability, collections, errors, and asynchronous work all cross
+    the boundary differently than they feel inside Kotlin.
+  </p>
+  <div class="bg-surface-container-low border border-outline-variant/20 p-5">
+    <p class="font-semibold text-on-surface mb-3">Questions I ask at the boundary:</p>
+    <ul class="list-disc pl-6 space-y-2">
+      <li>Can Swift understand the model without knowing Kotlin implementation details?</li>
+      <li>Is cancellation tied to the correct native lifecycle?</li>
+      <li>Are failures typed well enough for each UI to choose its own presentation?</li>
+      <li>Does one event have one owner, or can both shells trigger it accidentally?</li>
+      <li>Can the shared behavior be tested without either UI framework?</li>
+    </ul>
+  </div>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. Keep the native shell honest</h2>
+  <p>
+    A thin shell should still be a real native application layer. SwiftUI should own iOS navigation,
+    scene behavior, accessibility, and system integrations when those are native concerns. Compose
+    should do the same on Android. The shared core can decide that a session expired; each platform
+    decides how that fact becomes a screen transition or alert.
+  </p>
+  <p>
+    This avoids two common failures: rebuilding platform conventions inside shared code, and leaving
+    so much behavior in the shells that the “shared” core is only a set of data classes.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. Packaging and interop are product work</h2>
+  <p>
+    A shared module is not finished when its Kotlin tests pass. The iOS framework must build for the
+    required targets, Swift names must remain usable, and dependency updates must not surprise one
+    platform days after the other has integrated them. Generated interfaces are part of the public
+    API even when they never leave the repository.
+  </p>
+  <p>
+    I prefer a small integration sample or smoke path on both platforms. It catches the class of
+    failure that unit tests cannot: the core is correct, but the artifact, symbol, lifecycle, or
+    binding is wrong.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">05. Reuse is an outcome, not the goal</h2>
+  <p>
+    The best cross-platform boundary reduces duplicated reasoning while preserving a native product
+    experience. Sometimes that means a shared domain core with SwiftUI and Compose screens. Sometimes
+    a shared Compose screen is the simpler choice. The decision should follow the feature, team, and
+    integration cost—not a target reuse percentage.
+  </p>
+  <p>
+    Kotlin and Swift work well together when each side has a clear job. The shared layer owns the
+    decisions that must agree. The native layers own the experiences that should feel at home.
+  </p>
+</section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
 <a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/case-study-popslide-engagement-and-monetization.html">
@@ -327,7 +428,7 @@
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "2024-05-22-building-with-kotlin-and-swift";
-    const CURRENT_POST_TITLE = "Building with Kotlin and Swift";
+    const CURRENT_POST_TITLE = "Building Across Kotlin and Swift Without Blurring Platform Boundaries";
     const CURRENT_POST_URL = "/blog/2024-05-22-building-with-kotlin-and-swift.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");

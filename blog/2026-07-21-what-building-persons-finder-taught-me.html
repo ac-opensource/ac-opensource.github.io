@@ -5,14 +5,14 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
 <title>What Building a Small Backend Taught Me About AI-Ready Engineering | Andrew Concepcion</title>
-<meta name="description" content="A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output."/>
+<meta name="description" content="Lessons from a compact backend: explicit API contracts, append-only location history, PostGIS semantics, guarded AI prose, and evidence-based verification."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html"/>
 <meta property="og:title" content="What Building a Small Backend Taught Me About AI-Ready Engineering | Andrew Concepcion"/>
-<meta property="og:description" content="A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output."/>
+<meta property="og:description" content="Lessons from a compact backend: explicit API contracts, append-only location history, PostGIS semantics, guarded AI prose, and evidence-based verification."/>
 <meta property="og:image" content="https://ac-opensource.github.io/blog/images/persons-finder-architecture-hero.svg"/>
 <meta property="og:image:alt" content="Blueprint-style diagram connecting an API contract to location history, a last-known projection, and a guarded AI bio boundary."/>
 <meta property="article:published_time" content="2026-07-21"/>
@@ -28,7 +28,7 @@
 <meta property="article:tag" content="technical">
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="What Building a Small Backend Taught Me About AI-Ready Engineering | Andrew Concepcion"/>
-<meta name="twitter:description" content="A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output."/>
+<meta name="twitter:description" content="Lessons from a compact backend: explicit API contracts, append-only location history, PostGIS semantics, guarded AI prose, and evidence-based verification."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/persons-finder-architecture-hero.svg"/>
 <meta name="twitter:image:alt" content="Blueprint-style diagram connecting an API contract to location history, a last-known projection, and a guarded AI bio boundary."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
@@ -96,32 +96,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -146,12 +150,26 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   "headline": "What Building a Small Backend Taught Me About AI-Ready Engineering",
-  "description": "A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.",
+  "description": "Lessons from a compact backend: explicit API contracts, append-only location history, PostGIS semantics, guarded AI prose, and evidence-based verification.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -162,7 +180,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2026-07-21",
-  "dateModified": "2026-07-22T03:01:17.000Z",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://ac-opensource.github.io/blog/images/persons-finder-architecture-hero.svg",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html"
 }</script>
@@ -210,12 +228,12 @@
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2026-07-21</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[12 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[8 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
 <h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">What Building a Small Backend Taught Me About AI-Ready Engineering</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.</p>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">Lessons from a compact backend: explicit API contracts, append-only location history, PostGIS semantics, guarded AI prose, and evidence-based verification.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -268,7 +286,7 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A retrospective on the engineering lessons from building a small backend: explicit contracts, append-only state, real geospatial semantics, provider-neutral AI, and evidence-based testing for nondeterministic output.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">Lessons from a compact backend: explicit API contracts, append-only location history, PostGIS semantics, guarded AI prose, and evidence-based verification.</p>
 </section>
 </aside>
 <div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section>

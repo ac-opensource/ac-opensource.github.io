@@ -4,28 +4,28 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>Riding The Token Storm: Notes From A Codex Fleet Wrangler | Andrew Concepcion</title>
-<meta name="description" content="An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable."/>
+<title>Running an Agent Fleet Without Losing the Plot | Andrew Concepcion</title>
+<meta name="description" content="Lessons from multi-agent engineering work: define output contracts, instrument repeated effort, match verification to risk, and preserve trustworthy handoffs."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html"/>
-<meta property="og:title" content="Riding The Token Storm: Notes From A Codex Fleet Wrangler | Andrew Concepcion"/>
-<meta property="og:description" content="An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable."/>
+<meta property="og:title" content="Running an Agent Fleet Without Losing the Plot | Andrew Concepcion"/>
+<meta property="og:description" content="Lessons from multi-agent engineering work: define output contracts, instrument repeated effort, match verification to risk, and preserve trustworthy handoffs."/>
 <meta property="og:image" content="https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&amp;fit=crop&amp;w=1600&amp;q=80"/>
-<meta property="og:image:alt" content="Laptop screens glowing with dashboards and system diagrams in a dark room."/>
-<meta property="article:published_time" content="2024-10-08"/>
+<meta property="og:image:alt" content="A hand holds a smartphone against blurred colored lights."/>
+<meta property="article:published_time" content="2025-09-28"/>
 <meta property="article:author" content="Andrew Concepcion"/>
 <meta property="article:tag" content="AI Ops">
 <meta property="article:tag" content="Prompt Engineering">
 <meta property="article:tag" content="Team Process">
 <meta property="article:tag" content="technical">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Riding The Token Storm: Notes From A Codex Fleet Wrangler | Andrew Concepcion"/>
-<meta name="twitter:description" content="An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable."/>
+<meta name="twitter:title" content="Running an Agent Fleet Without Losing the Plot | Andrew Concepcion"/>
+<meta name="twitter:description" content="Lessons from multi-agent engineering work: define output contracts, instrument repeated effort, match verification to risk, and preserve trustworthy handoffs."/>
 <meta name="twitter:image" content="https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&amp;fit=crop&amp;w=1600&amp;q=80"/>
-<meta name="twitter:image:alt" content="Laptop screens glowing with dashboards and system diagrams in a dark room."/>
+<meta name="twitter:image:alt" content="A hand holds a smartphone against blurred colored lights."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -91,32 +91,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -141,12 +145,26 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Riding The Token Storm: Notes From A Codex Fleet Wrangler",
-  "description": "An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.",
+  "headline": "Running an Agent Fleet Without Losing the Plot",
+  "description": "Lessons from multi-agent engineering work: define output contracts, instrument repeated effort, match verification to risk, and preserve trustworthy handoffs.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -156,8 +174,8 @@
     "name": "Andrew Concepcion",
     "url": "https://ac-opensource.github.io"
   },
-  "datePublished": "2024-10-08",
-  "dateModified": "2026-03-26T10:17:28.000Z",
+  "datePublished": "2025-09-28",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1600&q=80",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html"
 }</script>
@@ -204,13 +222,13 @@
 <article class="max-w-screen-xl mx-auto px-6">
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
-<span id="post-date" class="bg-surface-container-low px-2 py-1">2024-10-08</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[14 min read]</span>
+<span id="post-date" class="bg-surface-container-low px-2 py-1">2025-09-28</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[4 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Riding The Token Storm: Notes From A Codex Fleet Wrangler</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Running an Agent Fleet Without Losing the Plot</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">Lessons from multi-agent engineering work: define output contracts, instrument repeated effort, match verification to risk, and preserve trustworthy handoffs.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -220,7 +238,7 @@
 
 <div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
 <div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
-<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&amp;fit=crop&amp;w=1600&amp;q=80" alt="Laptop screens glowing with dashboards and system diagrams in a dark room." loading="eager" decoding="async"/>
+<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&amp;fit=crop&amp;w=1600&amp;q=80" alt="A hand holds a smartphone against blurred colored lights." loading="eager" decoding="async"/>
 </div>
 <div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
 <div class="flex justify-between items-start">
@@ -263,181 +281,152 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">An operations diary covering how we tuned prompts, instrumentation, and workflows to keep a multi-agent AI fleet shippable.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">Lessons from multi-agent engineering work: define output contracts, instrument repeated effort, match verification to risk, and preserve trustworthy handoffs.</p>
 </section>
 </aside>
-<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><blockquote>
+<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
+  <p>
+    Running several coding agents at once looks like a capacity problem: add more workers and finish
+    more tasks. In practice, the bottleneck moves quickly from typing to coordination. Agents need
+    clear ownership, short feedback loops, and a shared definition of what counts as evidence.
+  </p>
+  <p>
+    The useful lesson from my early fleet experiments was not that one stack “wins” or that a large
+    token budget fixes weak instructions. It was that agent throughput is constrained by the same
+    things that constrain teams: ambiguous plans, slow integration feedback, duplicated work, and
+    handoffs that do not preserve state.
+  </p>
+</section>
 
-</blockquote>
-<p>Expect a detailed tour through plan hygiene, prompt surgery, token economics, and cross-project whiplash. It is technical, occasionally snarky, and aimed at anyone trying to bend a multi-agent workflow to their will.</p>
-<hr/>
-<h2>0. Setup: Why I Even Tried This</h2>
-<p>OpenAI gives Codex an almost ridiculous runway. Our noisiest implementer log chewed through <strong>461,139 tokens</strong> in a single pass and the quota manager never flinched. That headroom encouraged bold experiments: rebuild an entire product surface with agents, let five roles negotiate plan items live, and freeze the roadmap to keep everyone honest.</p>
-<p>Platform choice decided the outcome. On an earlier project, a 100% React web app, I ran the same fleet. The planner, implementer, tester loop flew. Hot reloads, Jest snapshots, and Storybook diffs gave the agents instant feedback. The Compose Multiplatform stack I am working on now behaved very differently. Gradle builds, multiplatform previews, and mysteriously missing imports humbled the automation. Hence the investigation.</p>
-<hr/>
-<h2>1. Archaeology: Every Prompt Left A Fossil</h2>
-<p>I started by walking the history of our automation scripts. Every exasperated message ended up as a change in the orchestrator, and every change taught the fleet a new trick.</p>
-<ol>
-<li><strong>Launch Phase</strong> — The orchestrator started as a strict planner that demanded exactly two roadmap entries per iteration and forced every role to run the heaviest validation command. The upside was predictability; the downside was a 15-minute tax on even the tiniest documentation tweak.</li>
-<li><strong>Import Amnesty</strong> — After a streak of broken builds, we updated the implementer instructions to insist on adding imports immediately, to log the exact lint and test commands they ran, and to stop dumping entire files when a surgical snippet would do.</li>
-<li><strong>Smoke Signals</strong> — The first time the app crashed on launch we added a dedicated integration checklist, then wired the implementer and tester prompts so they could not exit without recording desktop and web smoke notes whenever navigation changed.</li>
-<li><strong>Freeze Era</strong> — Once the roadmap ballooned to fifteen UI overhauls, we introduced a frozen plan document, added an environment flag that told the planner to reuse it, and taught the orchestrator to skip heavy validation when only prose changed.</li>
-</ol>
-<p>Each stage is a direct translation of someone shouting “stop doing that” during a review.</p>
-<hr/>
-<h2>2. Anatomy Of The Orchestrator</h2>
-<p>After a few close readings the script finally made sense. Here is the cheat sheet so you do not have to stare at bash for an afternoon.</p>
-<h3>2.1 Planner Discipline</h3>
-<ul>
-<li>The planner reads the roadmap, respects any items already checked off, and, when the freeze flag is set, simply announces the next unfinished task instead of drafting new ones. That single environment variable eliminated thrash.</li>
-</ul>
-<h3>2.2 Implementer Checklist</h3>
-<ol>
-<li>Run <code>make lint</code> and <code>make test</code>, only escalate to heavier builds if packaging actually matters.</li>
-<li>Keep shared code multiplatform-friendly, stash platform specifics behind interfaces.</li>
-<li>Confirm imports and dependencies exist before exiting, no parking missing symbols for the next person.</li>
-<li>Use targeted reads: find the right file path first, then peek at the exact span you need.</li>
-<li>When a feature touches several modules, build an allowlist file and iterate through it instead of hammering <code>rg</code> repeatedly.</li>
-<li>Record desktop and web smoke results whenever interactive flows change, following the integration checklist.</li>
-</ol>
-<h3>2.3 Tester Playbook</h3>
-<ul>
-<li>Inspect the diff first. If only text changed, say so. Otherwise, run the narrowest Gradle tasks possible before defaulting to the full suite, and echo every command with its exit code.</li>
-<li>After UI changes, run the desktop bundle, attempt a web build, walk through the smoke checklist, and report anything you observe.</li>
-</ul>
-<h3>2.4 Reviewer Routine</h3>
-<ul>
-<li>Reviewers lean on the implementer and tester summaries, confirm the roadmap item can be checked off, stage everything, and leave a checkpoint commit even if validation fails. Nothing disappears silently.</li>
-</ul>
-<hr/>
-<h2>3. Instrumentation: Listening To The Logs</h2>
-<p>The fleet was noisy long before it was helpful. Building a log summarizer changed that. The script parses every role’s transcript, captures duration, maximum tokens consumed, and the top repeated commands. A typical run looks like this:</p>
-<pre><code>Implementer
-  Runs: 24
-  Average duration: 10:51
-  Longest run: 24:28
-  Average tokens: 163,550
-  Max tokens: 461,139
-  Top commands: make lint (32), git status (31)
-Planner
-  Average duration: 02:46
-  Average tokens: 84,184
-</code></pre>
-<p>Three insights landed immediately:</p>
-<ul>
-<li>Eleven-minute implementer passes were caused by redundant file reads and repeated lint cycles.</li>
-<li>Token peaks north of 400k were tolerable only because Codex’s quota is generous; without instrumentation we never would have noticed.</li>
-<li>Command spam proved the implementer was not sharing results. Once we forced them to include command summaries, downstream roles stopped re-running <code>make lint</code> out of paranoia.</li>
-</ul>
-<hr/>
-<h2>4. Roadmap Hygiene And Freeze Discipline</h2>
-<p>The roadmap now mirrors our UI overhaul checklist. Each entry lists the goal, the surfaces it touches, the expected deliverables, and the exact commands we consider mandatory. When a task is complete, the orchestrator marks the matching goal as done and leaves the roadmap in place for the next pass.</p>
-<p>Skipping heavy validation when the diff only touches texts shaved minutes off documentation updates. More importantly, freezing the roadmap stopped the planner from inventing new work mid-iteration. Focus went up, token burn went down.</p>
-<hr/>
-<h2>5. Integration Testing Went From Afterthought To Law</h2>
-<p>The integration checklist covers the flows that kept breaking:</p>
-<ol>
-<li>Create a report with media and location, submit, and confirm it lands in the feed.</li>
-<li>Follow and unfollow an issue while watching counts adjust.</li>
-<li>Trigger an escalation from the activity view and ensure the timeline updates.</li>
-<li>Visit the account hub, switch between saved items, rotate the anonymous ID, and return without crashes.</li>
-<li>Open the notification bell and the digest preview to confirm they render.</li>
-</ol>
-<p>Until we automate those flows, every implementer and tester documents the desktop and web passes manually. Reviewers refuse to merge without evidence. The process is slower than I would like, but the crash rate plummeted after we adopted it.</p>
-<hr/>
-<h2>6. Token Economics And Quota Reality</h2>
-<p>Codex’s generous limits let us experiment without fear. Multi-role iterations ship even for documentation changes, gigantic screen rewrites flow through in one request, and the prompts themselves can stay verbose.</p>
-<p>That freedom masks inefficiency. Without tracking, we were burning hundreds of thousands of tokens per iteration without accountability. The log summarizer gave us the numbers we needed to justify prompt surgery, freeze the roadmap, and tighten expectations for every role.</p>
-<hr/>
-<h2>7. Cross-Project Reality Check: React Web vs Compose Multiplatform</h2>
-<table>
-<thead>
-<tr>
-<th>Aspect</th>
-<th>React Web Fleet</th>
-<th>Compose Multiplatform Fleet</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Build/Run</td>
-<td><code>npm run build</code>, Vite dev server, Playwright</td>
-<td><code>make desktop</code>, <code>make web</code>, Gradle tasks, emulator smoke</td>
-</tr>
-<tr>
-<td>Test Loop</td>
-<td>Jest/Vitest plus Cypress in roughly 3–5 minutes</td>
-<td><code>make lint</code> + <code>make test</code> + manual desktop/web smoke, often 15–25 minutes</td>
-</tr>
-<tr>
-<td>File Scale</td>
-<td>Dozens of small components</td>
-<td>Monolithic screens (300–1400 LOC) plus multiplatform utilities</td>
-</tr>
-<tr>
-<td>Import Issues</td>
-<td>Rare because ESM handles it</td>
-<td>Frequent due to platform-specific targets</td>
-</tr>
-<tr>
-<td>Fleet Velocity</td>
-<td>Two planner passes per day, implementer/tester done in under an hour</td>
-<td>One frozen plan item per day, implementer passes routinely exceed ten minutes</td>
-</tr>
-<tr>
-<td>Token Use</td>
-<td>Around 80k per run</td>
-<td>Around 160k per run</td>
-</tr>
-</tbody>
-</table>
-<p>The React project thrived because hot reload tightened feedback loops, TypeScript and ESLint caught mistakes early, and snapshot tooling gave testers near-instant diffs. Compose punished every misstep with another Gradle build. Same token budget, wildly different velocity.</p>
-<p>Conclusion: Codex fleets shine when build and test cycles are short and the component graph stays modular. They struggle when multiplatform packaging or binary builds enter the mix.</p>
-<hr/>
-<h2>8. War Stories And Favorite Log Lines</h2>
-<ul>
-<li>An implementer once ran the same search command eight times in a single log. After the prompt started recommending allowlists, repetition vanished.</li>
-<li>Planner logs during a freeze became blissfully quiet: “Using existing plan, freeze flag enabled” and nothing else. Sometimes the best automation knows when to stay silent.</li>
-<li>Reviewer checkpoints ensured even failed runs left an audit trail. No more mystery regressions.</li>
-</ul>
-<hr/>
-<h2>9. Lessons I Will Not Forget</h2>
-<ol>
-<li><strong>Translate pain into prompts.</strong> Every rule—from import hygiene to smoke testing—started as a complaint.</li>
-<li><strong>Freeze plans to fight thrash.</strong> Frozen roadmaps plus a friendly environment flag kept the fleet aligned.</li>
-<li><strong>Instrument everything.</strong> Without token and duration metrics we were flying blind.</li>
-<li><strong>Respect platform reality.</strong> Compose needs heavier smoke coverage; React did not.</li>
-<li><strong>Generous quotas are not an excuse to waste them.</strong> The capacity exists for exploration, not sloppiness.</li>
-<li><strong>Documentation is infrastructure.</strong> The speed plan, integration checklist, and this post are part of the system.</li>
-</ol>
-<hr/>
-<h2>10. To-Do List For Future Me</h2>
-<ol>
-<li><strong>Automate the smoke checklist.</strong> Build a shared Compose UI harness, add a desktop headless run, wire Playwright into the web build, and let testers trigger all of it with one command.</li>
-<li><strong>Diff-driven command planner.</strong> Teach the orchestrator to map file changes directly to the tests they require.</li>
-<li><strong>Token anomaly alerts.</strong> Flag any role that blasts past 250k tokens so we can intervene quickly.</li>
-<li><strong>Parallel doc/test mode.</strong> Once builds stabilize, experiment with overlapping roles to cut wall-clock time.</li>
-<li><strong>Back-port the lessons.</strong> The React fleet should inherit the good parts—freeze plans and logs—even if it does not need heavy smoke checks.</li>
-<li><strong>Share the playbook.</strong> New contributors should not have to rediscover these guardrails the hard way.</li>
-</ol>
-<hr/>
-<h2>11. Closing Thoughts</h2>
-<p>The fleet now obeys a frozen roadmap, keeps imports tidy, logs every detour, and refuses to ship UI changes without smoke evidence. We have also learned to admit that some ecosystems, particularly TypeScript and React, are simply better suited for high-frequency agent iteration than a multiplatform Kotlin stack.</p>
-<p>OpenAI’s permissive Codex limits gave us the runway. Constant feedback supplied the urgency. This write-up captures the messy, detailed process of turning “the fleet sux at working at tasks” into a disciplined automation pipeline.</p>
-<p>If the Compose branch keeps fighting tomorrow, at least we have metrics, documentation, and a frozen plan. And if all else fails, there is always that React project waiting for another lightning-fast iteration.</p></div>
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. More agents amplify the plan they receive</h2>
+  <p>
+    A vague task given to one agent produces one vague implementation. Given to several agents, it
+    produces several interpretations that now have to be reconciled. Before parallel work starts, I
+    want one written outcome, explicit non-goals, and a map of which surfaces can change independently.
+  </p>
+  <p>
+    A frozen plan helped when the work was already understood. It stopped a planning role from
+    inventing a new roadmap every iteration. But freezing uncertainty is not discipline. If the live
+    repository or a failing check disproves the plan, the right move is to reopen the decision and
+    record why.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. Roles need outputs, not personalities</h2>
+  <p>
+    Planner, implementer, tester, and reviewer can be useful labels, but only when each role leaves a
+    concrete artifact for the next one.
+  </p>
+  <ul class="list-disc pl-6 space-y-3">
+    <li><strong>Planner:</strong> owning files, behavioral boundary, risks, and acceptance evidence.</li>
+    <li><strong>Implementer:</strong> focused diff, assumptions, and the checks already run.</li>
+    <li><strong>Tester:</strong> scenario coverage, commands, results, and what was not exercised.</li>
+    <li><strong>Reviewer:</strong> findings ordered by impact, accidental scope, and the final re-check.</li>
+  </ul>
+  <p>
+    The reviewer should not blindly stage or publish whatever the preceding roles produced. External
+    actions still require the user's authority, and failed validation remains a blocker or an
+    explicitly documented limitation—not a reason to create a reassuring checkpoint.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. Feedback latency shapes fleet velocity</h2>
+  <p>
+    Web projects often give agents quick signals through type checks, component tests, and browser
+    automation. Mobile and multiplatform projects may require slower compilers, packaging, emulators,
+    devices, signing, or platform-specific integration. That does not make one ecosystem inherently
+    better for agents. It changes the cost of a wrong assumption.
+  </p>
+  <p>
+    When feedback is slow, the fleet benefits from smaller patches and more selective checks. Run the
+    narrow task that can falsify the current assumption first; reserve full packaging and broad smoke
+    coverage for the point where integration risk justifies them.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. Instrument repetition, not just token totals</h2>
+  <p>
+    Raw token counts can show that a run was expensive, but repeated behavior explains why. I pay more
+    attention to the same file being reread, the same command being run by several roles, or a tester
+    recreating evidence the implementer already captured.
+  </p>
+  <pre class="code-block overflow-x-auto"><code>role
+duration
+files inspected
+commands and exit codes
+repeated commands
+changed paths
+handoff completeness</code></pre>
+  <p>
+    Once those signals are visible, prompt changes can target a real waste pattern. “Be more
+    efficient” is vague. “Reuse the previous role's passing lint result unless the relevant files
+    changed” is an operating rule.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">05. Verification should follow the diff and the risk</h2>
+  <p>
+    Every role running the heaviest validation command is not rigor; it is duplication. The fleet
+    needs a shared map from changed surface to relevant evidence. A prose-only edit may need link,
+    rendering, and publication checks. A state-management change may need focused unit tests plus an
+    end-to-end scenario. A release change may need the full build and artifact inspection.
+  </p>
+  <p>
+    The important distinction is between “a command passed” and “the behavior is proven.” Build
+    success does not prove a user flow. A screenshot does not prove persistence. A local check does
+    not prove a remote deployment.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">06. Handoffs make parallel work durable</h2>
+  <p>
+    Agent sessions are disposable; repository state and external side effects are not. Each bounded
+    task should leave a short re-entry point: what changed, why, what passed, what remains uncertain,
+    and the next command that would verify the result again.
+  </p>
+  <p>
+    This is also where privacy and company context matter. A fleet that moves between repositories
+    can easily paste the wrong ticket, client detail, or account identity into a public artifact.
+    Visible text needs a final context scrub just as code needs a diff review.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">07. The operating rules I kept</h2>
+  <ol class="list-decimal pl-6 space-y-2">
+    <li>Parallelize independent discovery before parallelizing edits.</li>
+    <li>Give every role an output contract another role can consume.</li>
+    <li>Freeze understood scope, not unresolved assumptions.</li>
+    <li>Use the narrowest check that can disprove the current hypothesis.</li>
+    <li>Measure repeated work and handoff gaps, not activity for its own sake.</li>
+    <li>Keep external writes and publication behind explicit authority.</li>
+    <li>End with evidence a human can reproduce.</li>
+  </ol>
+  <p>
+    The fleet became more useful when it behaved less like a swarm and more like a disciplined
+    delivery pipeline. Coordination is not overhead added after the agents become fast. It is the
+    system that lets their speed survive contact with real work.
+  </p>
+</section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
-<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2024-09-14-film-photography-gallery.html">
+<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2024-11-02-sunrise-trail-runs.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Weekend Photo Experiments: Paradise Mist, Dobsonian Moon, and Lake Pukaki</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">A Month in New Zealand</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
 </div>
 </a>
-<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/case-study-ocbc-banking-experience.html">
+<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-prompt-patterns-for-production-ready-code.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">OCBC: Android Work in a Banking App</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Prompt Patterns for Reviewable, Production-Ready Code</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -481,7 +470,7 @@ Planner
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "2024-10-08-running-ai-fleet-learnings";
-    const CURRENT_POST_TITLE = "Riding The Token Storm: Notes From A Codex Fleet Wrangler";
+    const CURRENT_POST_TITLE = "Running an Agent Fleet Without Losing the Plot";
     const CURRENT_POST_URL = "/blog/2024-10-08-running-ai-fleet-learnings.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");
