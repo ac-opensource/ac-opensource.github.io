@@ -4,15 +4,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>E2E + Visual QA for Personal Websites: What to Test and Why | Andrew Concepcion</title>
-<meta name="description" content="A practical QA stack for personal sites using route-level E2E checks and Playwright screenshot loops to catch regressions early."/>
+<title>End-to-End and Visual QA for Personal Websites | Andrew Concepcion</title>
+<meta name="description" content="A practical quality loop for static personal sites: verify the publication boundary, exercise critical routes, and review desktop and mobile rendering."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html"/>
-<meta property="og:title" content="E2E + Visual QA for Personal Websites: What to Test and Why | Andrew Concepcion"/>
-<meta property="og:description" content="A practical QA stack for personal sites using route-level E2E checks and Playwright screenshot loops to catch regressions early."/>
+<meta property="og:title" content="End-to-End and Visual QA for Personal Websites | Andrew Concepcion"/>
+<meta property="og:description" content="A practical quality loop for static personal sites: verify the publication boundary, exercise critical routes, and review desktop and mobile rendering."/>
 <meta property="og:image" content="https://ac-opensource.github.io/blog/images/e2e-visual-qa-hero.svg"/>
 <meta property="og:image:alt" content="Playwright-style test and visual regression loop represented as a technical blueprint."/>
 <meta property="article:published_time" content="2026-03-26"/>
@@ -24,8 +24,8 @@
 <meta property="article:tag" content="frontend">
 <meta property="article:tag" content="technical">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="E2E + Visual QA for Personal Websites: What to Test and Why | Andrew Concepcion"/>
-<meta name="twitter:description" content="A practical QA stack for personal sites using route-level E2E checks and Playwright screenshot loops to catch regressions early."/>
+<meta name="twitter:title" content="End-to-End and Visual QA for Personal Websites | Andrew Concepcion"/>
+<meta name="twitter:description" content="A practical quality loop for static personal sites: verify the publication boundary, exercise critical routes, and review desktop and mobile rendering."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/e2e-visual-qa-hero.svg"/>
 <meta name="twitter:image:alt" content="Playwright-style test and visual regression loop represented as a technical blueprint."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
@@ -93,32 +93,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -143,12 +147,26 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "E2E + Visual QA for Personal Websites: What to Test and Why",
-  "description": "A practical QA stack for personal sites using route-level E2E checks and Playwright screenshot loops to catch regressions early.",
+  "headline": "End-to-End and Visual QA for Personal Websites",
+  "description": "A practical quality loop for static personal sites: verify the publication boundary, exercise critical routes, and review desktop and mobile rendering.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -159,7 +177,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2026-03-26",
-  "dateModified": "2026-03-26T11:17:59.000Z",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://ac-opensource.github.io/blog/images/e2e-visual-qa-hero.svg",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html"
 }</script>
@@ -207,12 +225,12 @@
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2026-03-26</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[11 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[3 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">E2E + Visual QA for Personal Websites: What to Test and Why</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A practical QA stack for personal sites using route-level E2E checks and Playwright screenshot loops to catch regressions early.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">End-to-End and Visual QA for Personal Websites</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A practical quality loop for static personal sites: verify the publication boundary, exercise critical routes, and review desktop and mobile rendering.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -265,72 +283,113 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A practical QA stack for personal sites using route-level E2E checks and Playwright screenshot loops to catch regressions early.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A practical quality loop for static personal sites: verify the publication boundary, exercise critical routes, and review desktop and mobile rendering.</p>
 </section>
 </aside>
 <div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
   <p>
-    Personal websites are products. They deserve the same regression protection as client systems,
-    especially once content, navigation, and build pipelines get more complex.
+    A personal website is still a product surface. A broken résumé link, an empty blog feed, or a
+    mobile navigation overlap can undermine the credibility of an otherwise strong portfolio.
+    Because the site is small, the quality loop can also stay small—as long as it checks the artifact
+    that will actually be published.
   </p>
   <p>
-    My QA setup has two pillars: functional E2E checks and fast visual review loops with Playwright screenshots.
+    My current loop combines deterministic publication checks, route-level end-to-end tests, and
+    desktop/mobile visual review. Each layer catches a different class of mistake.
   </p>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">01. Functional E2E: Core Coverage</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. Test the built site, not the repository</h2>
   <p>
-    I test routes that matter for user flow and credibility: home, source, logs, about, contact, and post pages.
+    This site has authoring tools and a SQLite database that must never be public. Serving the
+    repository root can make a local preview look healthy while accidentally testing files that the
+    deployment should exclude. The first rule is therefore to build a fresh <code>dist/</code>
+    artifact and serve that directory.
+  </p>
+  <pre class="code-block overflow-x-auto"><code>npm run verify
+npm run test:e2e</code></pre>
+  <p>
+    The publication verifier also rejects unexpected files, hidden posts, authoring routes, database
+    files, and stale generated pages. That boundary check is as important as confirming that the
+    homepage returns HTTP 200.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. Functional checks cover the credibility path</h2>
+  <p>
+    I exercise the routes a visitor is likely to use: home, portfolio, about, contact, résumé, the
+    blog index, and every generated post page. The useful assertions are about behavior, not just
+    status codes.
   </p>
   <ul class="list-disc pl-6 space-y-2">
-    <li>HTTP success for each route.</li>
-    <li>Topbar/footer presence consistency.</li>
-    <li>Internal link validity across pages.</li>
-    <li>Blog behaviors: filters, search, infinite scroll, share/bookmark.</li>
-    <li>Contact form basic input behavior and action wiring.</li>
+    <li>Desktop and mobile navigation expose the same core destinations.</li>
+    <li>Internal links resolve inside the built artifact.</li>
+    <li>The résumé and portfolio surfaces contain their expected primary content.</li>
+    <li>The blog can search, filter, load more entries, share, and store bookmarks locally.</li>
+    <li>Generated post pages expose canonical metadata, article content, and adjacent navigation.</li>
+    <li>The contact form accepts input and preserves its intended mail action.</li>
   </ul>
-</section>
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">02. Visual QA: Screenshot Loops</h2>
   <p>
-    Visual regressions usually slip through functional tests. I capture desktop and mobile screenshots on every critical route,
-    then review diffs for spacing, clipping, typography drift, and broken media.
+    These checks are deliberately user-facing. A successful build proves that files were produced; it
+    does not prove that the visitor can reach or use them.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. Visual review answers different questions</h2>
+  <p>
+    Functional tests can miss a heading hidden behind a sticky bar, a hero image cropped around the
+    subject, or a card grid that collapses awkwardly at a narrow width. I capture representative
+    desktop and mobile screenshots after the functional state is stable, then inspect typography,
+    clipping, spacing, contrast, and media treatment.
   </p>
   <div class="bg-surface-container-low border border-outline-variant/20 p-5">
-    <h3 class="font-headline text-2xl font-bold mb-3">Common catches</h3>
+    <p class="font-semibold text-on-surface mb-3">The visual pass looks for:</p>
     <ul class="list-disc pl-6 space-y-2">
-      <li>Text truncation after content updates.</li>
-      <li>Navigation hidden or overlapping on mobile.</li>
-      <li>Hero/animated modules too large for smaller viewports.</li>
-      <li>Inconsistent font/rendering between sections.</li>
+      <li>navigation that overlaps, disappears, or wraps unexpectedly;</li>
+      <li>text clipped after a content or font change;</li>
+      <li>images loaded at the wrong aspect ratio or resolution;</li>
+      <li>layout assumptions that work on desktop but fail on a phone;</li>
+      <li>focus, hover, and selected states that are hard to distinguish.</li>
     </ul>
   </div>
-</section>
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">03. Why This Matters for Personal Sites</h2>
   <p>
-    A portfolio is a trust surface. Broken links, cut-off copy, and inconsistent layout reduce perceived engineering quality immediately.
-    Quick QA loops preserve trust while still allowing fast iteration.
+    A screenshot is evidence, not an assertion by itself. The review still needs an expected state and
+    a human decision about whether the change is intentional.
   </p>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">04. Lightweight Operating Model</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. Keep external failures separate</h2>
+  <p>
+    Third-party links can rate-limit an automated check or return different results by region. I
+    report those separately from internal route failures. A LinkedIn response problem should not be
+    presented as proof that the local blog is broken, and a green internal suite should not be
+    presented as proof that every external service is available.
+  </p>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">05. The operating loop</h2>
   <ol class="list-decimal pl-6 space-y-2">
-    <li>Build static outputs.</li>
-    <li>Run E2E route/link checks.</li>
-    <li>Capture desktop/mobile screenshots.</li>
-    <li>Patch only the observed regression.</li>
-    <li>Repeat until clean.</li>
+    <li>Build a fresh, allowlisted publication artifact.</li>
+    <li>Run deterministic and publication-boundary checks.</li>
+    <li>Serve the artifact and exercise critical routes at desktop and mobile widths.</li>
+    <li>Review screenshots for layout regressions the assertions cannot see.</li>
+    <li>Patch the observed problem, then repeat the smallest relevant checks.</li>
   </ol>
   <p>
-    This gives high confidence without heavyweight process. It is enough rigor for a fast-moving personal site.
+    The result is not heavyweight QA. It is a short feedback loop tied to the real deployment
+    boundary—which is exactly what a frequently changing personal site needs.
   </p>
 </section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
 <a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-editable-blog-system-on-github-pages.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Building an Editable Blog System That Still Works on GitHub Pages</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Building an Editable Blog That Still Works on GitHub Pages</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
@@ -338,7 +397,7 @@
 </a>
 <a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-cognitive-profile-deep-dive.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Cognitive Profile Deep Dive: Emergenetics + Harrison</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Using Emergenetics and Harrison as Calibration Tools</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -382,7 +441,7 @@
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "2026-03-26-e2e-and-visual-qa-for-personal-websites";
-    const CURRENT_POST_TITLE = "E2E + Visual QA for Personal Websites: What to Test and Why";
+    const CURRENT_POST_TITLE = "End-to-End and Visual QA for Personal Websites";
     const CURRENT_POST_URL = "/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");

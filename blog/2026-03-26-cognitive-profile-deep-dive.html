@@ -4,17 +4,17 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>Cognitive Profile Deep Dive: Emergenetics + Harrison | Andrew Concepcion</title>
-<meta name="description" content="A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior."/>
+<title>Using Emergenetics and Harrison as Calibration Tools | Andrew Concepcion</title>
+<meta name="description" content="How I use two assessment profiles as prompts for better decisions and communication—without treating their scores as identity or proof of ability."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html"/>
-<meta property="og:title" content="Cognitive Profile Deep Dive: Emergenetics + Harrison | Andrew Concepcion"/>
-<meta property="og:description" content="A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior."/>
+<meta property="og:title" content="Using Emergenetics and Harrison as Calibration Tools | Andrew Concepcion"/>
+<meta property="og:description" content="How I use two assessment profiles as prompts for better decisions and communication—without treating their scores as identity or proof of ability."/>
 <meta property="og:image" content="https://ac-opensource.github.io/blog/images/cognitive-profile-cover.svg"/>
-<meta property="og:image:alt" content="Abstract visualization of cognitive profile signals"/>
+<meta property="og:image:alt" content="Abstract visualization of assessment signals used for personal calibration."/>
 <meta property="article:published_time" content="2026-03-26"/>
 <meta property="article:author" content="Andrew Concepcion"/>
 <meta property="article:tag" content="emergenetics">
@@ -24,10 +24,10 @@
 <meta property="article:tag" content="leadership">
 <meta property="article:tag" content="reflection">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Cognitive Profile Deep Dive: Emergenetics + Harrison | Andrew Concepcion"/>
-<meta name="twitter:description" content="A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior."/>
+<meta name="twitter:title" content="Using Emergenetics and Harrison as Calibration Tools | Andrew Concepcion"/>
+<meta name="twitter:description" content="How I use two assessment profiles as prompts for better decisions and communication—without treating their scores as identity or proof of ability."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/cognitive-profile-cover.svg"/>
-<meta name="twitter:image:alt" content="Abstract visualization of cognitive profile signals"/>
+<meta name="twitter:image:alt" content="Abstract visualization of assessment signals used for personal calibration."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -93,32 +93,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -143,12 +147,26 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Cognitive Profile Deep Dive: Emergenetics + Harrison",
-  "description": "A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.",
+  "headline": "Using Emergenetics and Harrison as Calibration Tools",
+  "description": "How I use two assessment profiles as prompts for better decisions and communication—without treating their scores as identity or proof of ability.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -159,7 +177,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2026-03-26",
-  "dateModified": "2026-03-26T10:17:28.000Z",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://ac-opensource.github.io/blog/images/cognitive-profile-cover.svg",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-03-26-cognitive-profile-deep-dive.html"
 }</script>
@@ -207,12 +225,12 @@
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[reflection]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2026-03-26</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[13 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[3 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Cognitive Profile Deep Dive: Emergenetics + Harrison</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Using Emergenetics and Harrison as Calibration Tools</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">How I use two assessment profiles as prompts for better decisions and communication—without treating their scores as identity or proof of ability.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -221,8 +239,8 @@
 </div>
 
 <figure class="lg:col-span-5 relative aspect-square bg-surface-container-low border border-outline-variant/20 p-3 overflow-hidden">
-<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="/blog/images/cognitive-profile-cover.svg" alt="Abstract visualization of cognitive profile signals" loading="eager" decoding="async"/>
-<figcaption class="sr-only">Emergenetics and Harrison synthesis</figcaption>
+<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="/blog/images/cognitive-profile-cover.svg" alt="Abstract visualization of assessment signals used for personal calibration." loading="eager" decoding="async"/>
+<figcaption class="sr-only">Emergenetics and Harrison results treated as reflection prompts, not identity.</figcaption>
 </figure>
 
 </div>
@@ -246,115 +264,98 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A practical deep dive on how Emergenetics and Harrison results translate into architecture decisions, delivery style, and collaboration behavior.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">How I use two assessment profiles as prompts for better decisions and communication—without treating their scores as identity or proof of ability.</p>
 </section>
 </aside>
 <div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
   <p>
-    I use assessment results the same way I use profiling data in production systems: as signals to tune behavior,
-    not labels to hide behind. This deep dive merges two artifacts I actually use in planning and leadership loops:
-    <strong>Emergenetics</strong> (from my personal app profile) and my <strong>Harrison Assessment</strong> report.
+    I treat assessment results as prompts for reflection, not measurements of engineering ability.
+    They do not prove how I will behave in every situation, and they are not a substitute for
+    feedback from people who have worked with me. Their value is narrower: they give me language for
+    tendencies I can compare against actual delivery.
   </p>
   <p>
-    The point is operational clarity. If a trait does not improve decision quality, collaboration, or delivery speed,
-    it stays trivia. If it improves outcomes, it becomes part of my engineering operating model.
+    The two artifacts I revisit are an Emergenetics profile and a Harrison Assessment report. I use
+    them to ask practical questions about decision-making, communication, and the conditions under
+    which a strength can become a blind spot.
   </p>
 </section>
 
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">01. Emergenetics: Thinking Mix</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. Emergenetics: thinking preferences</h2>
   <p>
-    My thinking mix is <strong>Analytical 33%</strong>, <strong>Conceptual 32%</strong>,
-    <strong>Structural 20%</strong>, and <strong>Social 15%</strong>.
-    In practice, this creates a two-phase rhythm: broad option synthesis first, then deterministic system framing.
+    My recorded thinking mix is <strong>Analytical 33%</strong>, <strong>Conceptual 32%</strong>,
+    <strong>Structural 20%</strong>, and <strong>Social 15%</strong>. I read that as a preference for
+    exploring a problem broadly, testing the logic, and then giving the decision enough structure to
+    survive implementation.
   </p>
   <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/emergenetics-thinking-mix.svg" alt="Emergenetics thinking mix chart" class="w-full h-auto" loading="lazy" decoding="async" />
-    <figcaption class="mt-3 text-sm text-secondary">Thinking percentages sourced from the Emergenetics module in my personal app.</figcaption>
+    <img src="/blog/images/emergenetics-thinking-mix.svg" alt="Emergenetics thinking preference percentages: Analytical 33, Conceptual 32, Structural 20, and Social 15" class="w-full h-auto" loading="lazy" decoding="async" />
+    <figcaption class="mt-3 text-sm text-secondary">The percentages describe preferences in this assessment; they are not performance scores.</figcaption>
   </figure>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Analytical + Conceptual</strong><br/>Useful for converting ambiguous product intent into executable architecture.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Structural support</strong><br/>Enough structure-bias to keep execution stable through shifting constraints.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Lower social weighting</strong><br/>I counterbalance with explicit context notes, tradeoff docs, and decision records.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Delivery effect</strong><br/>Fast framing, fewer ambiguous handoffs, cleaner feedback loops.</div>
+    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Analytical + Conceptual</strong><br/>Useful when turning ambiguous product intent into options and explicit tradeoffs.</div>
+    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Structural support</strong><br/>A reminder to turn the chosen option into milestones, contracts, and checks.</div>
+    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Lower Social preference</strong><br/>Not a measure of empathy or skill; it reminds me to seek human context deliberately instead of assuming the system view is complete.</div>
+    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Delivery effect</strong><br/>The combination works best when exploration has a decision deadline.</div>
   </div>
 </section>
 
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">02. Emergenetics: Behavior Percentiles</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. Emergenetics: behavioral preferences</h2>
   <p>
-    Behavior percentiles are <strong>Expressiveness 49%</strong>, <strong>Assertiveness 51%</strong>, and
-    <strong>Flexibility 60%</strong>. This profile usually reads as measured communication, balanced advocacy,
-    and high adaptation when context changes quickly.
+    The report records <strong>Expressiveness 49%</strong>, <strong>Assertiveness 51%</strong>, and
+    <strong>Flexibility 60%</strong>. My practical interpretation is measured communication, balanced
+    advocacy, and a willingness to adjust when the evidence changes.
   </p>
   <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/emergenetics-behavior-percentiles.svg" alt="Emergenetics behavior percentile chart" class="w-full h-auto" loading="lazy" decoding="async" />
-    <figcaption class="mt-3 text-sm text-secondary">Behavior calibration used for cross-team communication and leadership posture.</figcaption>
+    <img src="/blog/images/emergenetics-behavior-percentiles.svg" alt="Emergenetics behavioral preference percentiles: Expressiveness 49, Assertiveness 51, and Flexibility 60" class="w-full h-auto" loading="lazy" decoding="async" />
+    <figcaption class="mt-3 text-sm text-secondary">I use these results as discussion prompts, then compare them with observed behavior.</figcaption>
   </figure>
   <p>
-    Practical outcome: I can move between contributor mode and architecture-lead mode without defaulting to forceful command style.
-    That tends to preserve trust while still shipping under pressure.
+    Flexibility helps when plans change, but too much accommodation can blur a decision. The operating
+    habit I use is simple: invite revision while a decision is open, then make the owner, deadline,
+    and reason explicit once it closes.
   </p>
 </section>
 
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">03. Harrison: High-Signal Traits</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. Harrison: strengths and watchpoints</h2>
   <p>
-    Harrison highlights in my report include <strong>Open / Reflective 9.8</strong>, <strong>Flexible 9.7</strong>,
-    <strong>Analytical 9.3</strong>, <strong>Helpful 8.3</strong>, and <strong>Optimistic 8.0</strong>.
-    A useful watchpoint is <strong>Assertive 4.1</strong>.
+    Selected scores in my report include <strong>Open / Reflective 9.8</strong>,
+    <strong>Flexible 9.7</strong>, <strong>Analytical 9.3</strong>, <strong>Helpful 8.3</strong>, and
+    <strong>Optimistic 8.0</strong>. A useful watchpoint is <strong>Assertive 4.1</strong>.
   </p>
   <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/harrison-trait-snapshot.svg" alt="Harrison trait score snapshot" class="w-full h-auto" loading="lazy" decoding="async" />
-    <figcaption class="mt-3 text-sm text-secondary">Selected scores from Harrison Assessment completed on 2025-09-10.</figcaption>
+    <img src="/blog/images/harrison-trait-snapshot.svg" alt="Selected Harrison Assessment trait scores" class="w-full h-auto" loading="lazy" decoding="async" />
+    <figcaption class="mt-3 text-sm text-secondary">Selected scores from the Harrison Assessment I completed on September 10, 2025.</figcaption>
   </figure>
-  <div class="bg-surface-container-high p-5 border border-outline-variant/20">
-    <h3 class="font-headline text-2xl font-bold mb-2">What this means in delivery</h3>
-    <p>
-      The profile favors broad perspective intake, rapid adaptation, and careful synthesis.
-      The assertiveness watchpoint reminds me to state boundaries and priorities explicitly,
-      especially when helping-mode can overtake prioritization.
-    </p>
-  </div>
+  <p>
+    The useful tension is between openness and closure, and between helpfulness and directness. I can
+    take in a wide range of perspectives and still need to state a boundary earlier. Helping a team
+    is not the same as absorbing every priority it produces.
+  </p>
 </section>
 
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">04. Harrison Paradoxes (The Useful Part)</h2>
-  <p>
-    Harrison paradoxes are where the report becomes actionable. They expose tension-pairs that can produce either
-    leverage or friction depending on context.
-  </p>
-  <figure class="my-8 bg-surface-container-low border border-outline-variant/20 p-4">
-    <img src="/blog/images/harrison-paradox-map.svg" alt="Harrison paradox map" class="w-full h-auto" loading="lazy" decoding="async" />
-    <figcaption class="mt-3 text-sm text-secondary">Paradox map interpretation based on report language and observed delivery behavior.</figcaption>
-  </figure>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Certain vs Open / Reflective</strong><br/>High openness enables strong exploration; I prevent over-analysis by decision timeboxing.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Assertive vs Helpful</strong><br/>Supportive bias strengthens team trust; I force explicit priority statements to avoid self-sacrificing loops.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Organised vs Flexible</strong><br/>High adaptability is a strength; I anchor execution with milestone gates and written contracts.</div>
-    <div class="bg-surface-container-low p-4 border border-outline-variant/20"><strong>Optimistic vs Analyses Pitfalls</strong><br/>Realistic optimism helps momentum; risk scans keep me out of blind-optimism traps.</div>
-  </div>
-</section>
-
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">05. Cool Stuff I Actually Use</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. Practices I actually use</h2>
   <ul class="list-disc pl-6 space-y-2">
-    <li><strong>Decision logs:</strong> every major tradeoff gets a short reason + fallback path.</li>
-    <li><strong>Boundary prompts:</strong> I explicitly ask, “What are we not doing this sprint?”</li>
-    <li><strong>Risk pairing:</strong> each optimistic plan item gets one concrete failure mode.</li>
-    <li><strong>Conflict hygiene:</strong> disagree early in architecture, align hard before implementation.</li>
-    <li><strong>Post-ship review:</strong> compare expected impact versus real telemetry, then recalibrate.</li>
+    <li><strong>Decision logs:</strong> record the choice, the reason, and the condition that would reopen it.</li>
+    <li><strong>Boundary questions:</strong> ask what is explicitly outside the current scope.</li>
+    <li><strong>Risk pairing:</strong> give each optimistic plan one concrete failure mode and detection signal.</li>
+    <li><strong>Conflict hygiene:</strong> disagree while the architecture is still cheap to change, then align on execution.</li>
+    <li><strong>Post-ship review:</strong> compare the expected result with real evidence instead of defending the original plan.</li>
   </ul>
   <p>
-    Net result: this profile works best as a calibration loop. The value is not identity language;
-    the value is shipping better systems with clearer decisions and healthier team dynamics.
+    The assessment language is useful only when it changes a behavior I can observe. If a score becomes
+    an excuse—“that is just how I am”—it has stopped being a calibration tool and become another label.
   </p>
 </section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
 <a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">E2E + Visual QA for Personal Websites: What to Test and Why</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">End-to-End and Visual QA for Personal Websites</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
@@ -362,7 +363,7 @@
 </a>
 <a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-career-trajectory-platform-ownership.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Career Trajectory as Platform Ownership, Not Job Titles</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Career Growth as Ownership, Not Just Job Titles</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -406,7 +407,7 @@
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "2026-03-26-cognitive-profile-deep-dive";
-    const CURRENT_POST_TITLE = "Cognitive Profile Deep Dive: Emergenetics + Harrison";
+    const CURRENT_POST_TITLE = "Using Emergenetics and Harrison as Calibration Tools";
     const CURRENT_POST_URL = "/blog/2026-03-26-cognitive-profile-deep-dive.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");

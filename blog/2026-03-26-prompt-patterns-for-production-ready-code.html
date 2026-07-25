@@ -4,17 +4,17 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>Prompt Patterns That Consistently Produce Production-Ready Code | Andrew Concepcion</title>
-<meta name="description" content="The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions."/>
+<title>Prompt Patterns for Reviewable, Production-Ready Code | Andrew Concepcion</title>
+<meta name="description" content="A practical prompt structure for coding agents: live context, real constraints, side-effect boundaries, observable acceptance evidence, and reproducible handoffs."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html"/>
-<meta property="og:title" content="Prompt Patterns That Consistently Produce Production-Ready Code | Andrew Concepcion"/>
-<meta property="og:description" content="The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions."/>
+<meta property="og:title" content="Prompt Patterns for Reviewable, Production-Ready Code | Andrew Concepcion"/>
+<meta property="og:description" content="A practical prompt structure for coding agents: live context, real constraints, side-effect boundaries, observable acceptance evidence, and reproducible handoffs."/>
 <meta property="og:image" content="https://ac-opensource.github.io/blog/images/prompt-patterns-hero.svg"/>
-<meta property="og:image:alt" content="Structured prompt components flowing into automated checks and production release."/>
+<meta property="og:image:alt" content="Structured prompt components flow into review and verification checks."/>
 <meta property="article:published_time" content="2026-03-26"/>
 <meta property="article:author" content="Andrew Concepcion"/>
 <meta property="article:tag" content="ai-workflow">
@@ -24,10 +24,10 @@
 <meta property="article:tag" content="quality">
 <meta property="article:tag" content="technical">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Prompt Patterns That Consistently Produce Production-Ready Code | Andrew Concepcion"/>
-<meta name="twitter:description" content="The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions."/>
+<meta name="twitter:title" content="Prompt Patterns for Reviewable, Production-Ready Code | Andrew Concepcion"/>
+<meta name="twitter:description" content="A practical prompt structure for coding agents: live context, real constraints, side-effect boundaries, observable acceptance evidence, and reproducible handoffs."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/prompt-patterns-hero.svg"/>
-<meta name="twitter:image:alt" content="Structured prompt components flowing into automated checks and production release."/>
+<meta name="twitter:image:alt" content="Structured prompt components flow into review and verification checks."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -93,32 +93,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -143,12 +147,26 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Prompt Patterns That Consistently Produce Production-Ready Code",
-  "description": "The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.",
+  "headline": "Prompt Patterns for Reviewable, Production-Ready Code",
+  "description": "A practical prompt structure for coding agents: live context, real constraints, side-effect boundaries, observable acceptance evidence, and reproducible handoffs.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -159,7 +177,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2026-03-26",
-  "dateModified": "2026-03-26T11:17:59.000Z",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://ac-opensource.github.io/blog/images/prompt-patterns-hero.svg",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html"
 }</script>
@@ -207,12 +225,12 @@
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2026-03-26</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[10 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[3 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Prompt Patterns That Consistently Produce Production-Ready Code</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Prompt Patterns for Reviewable, Production-Ready Code</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">A practical prompt structure for coding agents: live context, real constraints, side-effect boundaries, observable acceptance evidence, and reproducible handoffs.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -222,7 +240,7 @@
 
 <div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
 <div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
-<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="/blog/images/prompt-patterns-hero.svg" alt="Structured prompt components flowing into automated checks and production release." loading="eager" decoding="async"/>
+<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="/blog/images/prompt-patterns-hero.svg" alt="Structured prompt components flow into review and verification checks." loading="eager" decoding="async"/>
 </div>
 <div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
 <div class="flex justify-between items-start">
@@ -265,83 +283,113 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">The prompt structures I use to get reliable code output: constraint framing, verification loops, and integration-first instructions.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">A practical prompt structure for coding agents: live context, real constraints, side-effect boundaries, observable acceptance evidence, and reproducible handoffs.</p>
 </section>
 </aside>
 <div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
   <p>
-    Prompt quality is now part of engineering quality. If prompts are vague, code quality becomes stochastic.
-    If prompts are structured, outputs become predictable enough for production workflows.
+    No prompt produces production-ready code by itself. A good prompt can make the work more
+    reviewable: it gives the agent the right context, narrows the allowed change, and defines what
+    evidence should exist before anyone calls the task complete.
   </p>
   <p>
-    This post documents the patterns I use when I want AI output that is fast, testable, and integration-safe.
+    The patterns I reuse are less about magic wording and more about an engineering contract between
+    the requester and the tool.
   </p>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">01. Start With Constraints, Not Solutions</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. Start with the outcome and the live context</h2>
   <p>
-    I define environment and acceptance constraints first: repository path, coding conventions, non-goals,
-    and what “done” means. This narrows output variance before implementation starts.
+    State the user-visible or system-visible outcome first. Then point the agent at the repository and
+    require it to inspect the existing path before proposing a solution. This prevents a familiar
+    failure: solving a generic version of the problem while ignoring the architecture already in
+    front of it.
   </p>
-  <div class="code-block text-sm leading-relaxed">
-    <span class="code-keyword">Goal</span>: Add feature X without changing existing UX language.<br/>
-    <span class="code-keyword">Constraints</span>: keep SQLite source of truth, static output required for GitHub Pages.<br/>
-    <span class="code-keyword">Validation</span>: route checks + E2E + visual smoke.
-  </div>
+  <pre class="code-block overflow-x-auto"><code>Outcome
+The published blog must exclude hidden drafts.
+
+Context
+SQLite is the authoring source. GitHub Pages serves only static files.
+Inspect the current generator and publication verifier before editing.</code></pre>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">02. Ask for an Execution Loop</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. Write constraints as decisions</h2>
   <p>
-    Instead of one-shot code generation, I ask for this cycle: inspect, patch, run checks, summarize deltas.
-    That loop enforces incremental quality and catches integration drift early.
+    Useful constraints remove choices that have already been made. They name the source of truth,
+    existing project patterns, compatibility boundaries, and actions that are outside the task.
   </p>
   <ul class="list-disc pl-6 space-y-2">
-    <li>Inspect current files and call out assumptions.</li>
-    <li>Apply smallest viable patch.</li>
-    <li>Run tests/checks immediately.</li>
-    <li>Report unresolved risks explicitly.</li>
+    <li>Preserve unrelated dirty changes.</li>
+    <li>Reuse the existing model or helper when the behavior already matches.</li>
+    <li>Do not move an API call until its server-side effect is understood.</li>
+    <li>Do not commit, push, publish, or message another person unless requested.</li>
+    <li>Keep the change narrow enough that a reviewer can explain it.</li>
   </ul>
-</section>
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">03. Require Environment-Aware Behavior</h2>
   <p>
-    Production-ready prompts include deployment context. In this site, that means static blog pages,
-    SQLite for query/search behavior, and SEO metadata consistency.
-  </p>
-  <p>
-    I also request non-destructive git behavior and explicit handling of existing edits to avoid accidental rollback.
+    A constraint should protect a real boundary. A giant style guide pasted into every request mostly
+    adds noise; a sentence identifying the canonical data source can prevent an entire wrong design.
   </p>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">04. Demand Verification Artifacts</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. Ask for a loop, not a one-shot answer</h2>
   <p>
-    “Looks good” is not enough. I ask for objective checks: command outputs, route status, and screenshot evidence when needed.
+    I ask the agent to inspect, make the smallest useful change, run the relevant checks, and report
+    what remains uncertain. If the evidence changes the diagnosis, the plan should change with it.
+  </p>
+  <ol class="list-decimal pl-6 space-y-2">
+    <li>Inventory the owning files and current state.</li>
+    <li>State the assumption that determines the implementation.</li>
+    <li>Patch the narrow path that satisfies the outcome.</li>
+    <li>Run checks proportionate to the behavior and risk.</li>
+    <li>Review the diff for accidental scope and context leakage.</li>
+    <li>Leave reproducible handoff evidence.</li>
+  </ol>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. Define “done” with observable evidence</h2>
+  <p>
+    “Make sure it works” is too vague. Name the proof that would convince a reviewer: a focused unit
+    test, a successful build task, an HTTP response, a database assertion, a screenshot of the final
+    state, or a remote check after publishing.
   </p>
   <div class="bg-surface-container-low border border-outline-variant/20 p-5">
-    <h3 class="font-headline text-2xl font-bold mb-3">Minimum verification bar</h3>
+    <p class="font-semibold text-on-surface mb-3">A useful acceptance block distinguishes:</p>
     <ul class="list-disc pl-6 space-y-2">
-      <li>Build succeeds.</li>
-      <li>E2E passes on critical routes.</li>
-      <li>No broken internal links.</li>
-      <li>Changed behavior is described with file-level references.</li>
+      <li><strong>code evidence:</strong> the changed path behaves as intended;</li>
+      <li><strong>integration evidence:</strong> surrounding systems still agree;</li>
+      <li><strong>user-visible evidence:</strong> the final state is actually observable;</li>
+      <li><strong>delivery evidence:</strong> a commit, PR, or deployment exists only if that action was requested and verified.</li>
     </ul>
   </div>
 </section>
+
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">05. Prompt Template I Reuse</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">05. Use a compact reusable template</h2>
+  <pre class="code-block overflow-x-auto"><code>Outcome:
+Context to inspect:
+Constraints and non-goals:
+Known side effects:
+Acceptance evidence:
+Allowed external actions:
+Handoff format:</code></pre>
   <p>
-    The reusable shape is simple: objective, constraints, acceptance criteria, test command, and output format.
-    That structure turns AI from autocomplete into a dependable implementation partner.
+    The template is intentionally short. The repository supplies most of the detail; the prompt tells
+    the agent where to look, which boundaries matter, and how the work will be judged.
   </p>
   <p>
-    The pattern is less about “magic words” and more about clarity, bounded scope, and verification discipline.
+    Production readiness still comes from review, testing, and operational judgment. The prompt's job
+    is to make those steps harder to skip.
   </p>
 </section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
-<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2024-11-02-sunrise-trail-runs.html">
+<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2024-10-08-running-ai-fleet-learnings.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">A Month in New Zealand</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Running an Agent Fleet Without Losing the Plot</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
@@ -349,7 +397,7 @@
 </a>
 <a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">From Mobile Developer to AI Accelerated Engineer</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">From Mobile Developer to AI-Accelerated Engineer</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -393,7 +441,7 @@
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "2026-03-26-prompt-patterns-for-production-ready-code";
-    const CURRENT_POST_TITLE = "Prompt Patterns That Consistently Produce Production-Ready Code";
+    const CURRENT_POST_TITLE = "Prompt Patterns for Reviewable, Production-Ready Code";
     const CURRENT_POST_URL = "/blog/2026-03-26-prompt-patterns-for-production-ready-code.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");

@@ -4,15 +4,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>From Mobile Developer to AI Accelerated Engineer | Andrew Concepcion</title>
-<meta name="description" content="What actually changed in my day-to-day engineering: workflow became parallel, delivery got faster, and scope expanded from feature ownership to full system ownership."/>
+<title>From Mobile Developer to AI-Accelerated Engineer | Andrew Concepcion</title>
+<meta name="description" content="How agentic tools widened my engineering workflow without replacing mobile depth, explicit ownership, or evidence-based delivery."/>
 <link rel="canonical" href="https://ac-opensource.github.io/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html"/>
-<meta property="og:title" content="From Mobile Developer to AI Accelerated Engineer | Andrew Concepcion"/>
-<meta property="og:description" content="What actually changed in my day-to-day engineering: workflow became parallel, delivery got faster, and scope expanded from feature ownership to full system ownership."/>
+<meta property="og:title" content="From Mobile Developer to AI-Accelerated Engineer | Andrew Concepcion"/>
+<meta property="og:description" content="How agentic tools widened my engineering workflow without replacing mobile depth, explicit ownership, or evidence-based delivery."/>
 <meta property="og:image" content="https://ac-opensource.github.io/blog/images/ai-accelerated-engineer-hero.svg"/>
 <meta property="og:image:alt" content="Abstract transition from mobile stack modules into an AI-accelerated engineering graph."/>
 <meta property="article:published_time" content="2026-03-26"/>
@@ -24,8 +24,8 @@
 <meta property="article:tag" content="systems-thinking">
 <meta property="article:tag" content="technical">
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="From Mobile Developer to AI Accelerated Engineer | Andrew Concepcion"/>
-<meta name="twitter:description" content="What actually changed in my day-to-day engineering: workflow became parallel, delivery got faster, and scope expanded from feature ownership to full system ownership."/>
+<meta name="twitter:title" content="From Mobile Developer to AI-Accelerated Engineer | Andrew Concepcion"/>
+<meta name="twitter:description" content="How agentic tools widened my engineering workflow without replacing mobile depth, explicit ownership, or evidence-based delivery."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/ai-accelerated-engineer-hero.svg"/>
 <meta name="twitter:image:alt" content="Abstract transition from mobile stack modules into an AI-accelerated engineering graph."/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
@@ -93,32 +93,36 @@
     border: 1px solid rgba(175, 179, 170, 0.28);
     background: #edefe7;
   }
-  .work-post-hero--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
   }
-  .work-post-hero__crop {
+  .work-post-hero__screen {
     display: block;
-    min-width: 0;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
     overflow: hidden;
-    background: #fff;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img,
   .work-post-hero--contain > img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .work-post-hero__crop img,
+  .work-post-hero__screen img,
   .work-post-hero--cover > img {
     object-fit: cover;
-  }
-  .work-post-hero__crop--top img {
-    object-position: top center;
-  }
-  .work-post-hero__crop--bottom img {
-    object-position: bottom center;
   }
   .work-post-hero--cover > img {
     object-position: 62% center;
@@ -143,12 +147,26 @@
       opacity: 1;
     }
   }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
 </style>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "From Mobile Developer to AI Accelerated Engineer",
-  "description": "What actually changed in my day-to-day engineering: workflow became parallel, delivery got faster, and scope expanded from feature ownership to full system ownership.",
+  "headline": "From Mobile Developer to AI-Accelerated Engineer",
+  "description": "How agentic tools widened my engineering workflow without replacing mobile depth, explicit ownership, or evidence-based delivery.",
   "author": {
     "@type": "Person",
     "name": "Andrew Concepcion"
@@ -159,7 +177,7 @@
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2026-03-26",
-  "dateModified": "2026-03-26T11:06:10.000Z",
+  "dateModified": "2026-07-25T00:00:00.000Z",
   "image": "https://ac-opensource.github.io/blog/images/ai-accelerated-engineer-hero.svg",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html"
 }</script>
@@ -207,12 +225,12 @@
 <div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
 <span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
 <span id="post-date" class="bg-surface-container-low px-2 py-1">2026-03-26</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[9 min read]</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[3 min read]</span>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
 <div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">From Mobile Developer to AI Accelerated Engineer</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">What actually changed in my day-to-day engineering: workflow became parallel, delivery got faster, and scope expanded from feature ownership to full system ownership.</p>
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">From Mobile Developer to AI-Accelerated Engineer</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">How agentic tools widened my engineering workflow without replacing mobile depth, explicit ownership, or evidence-based delivery.</p>
 <div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
 <button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
 <button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
@@ -265,118 +283,108 @@
 </div>
 <section class="p-6 bg-surface-container-low space-y-4">
 <h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">What actually changed in my day-to-day engineering: workflow became parallel, delivery got faster, and scope expanded from feature ownership to full system ownership.</p>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">How agentic tools widened my engineering workflow without replacing mobile depth, explicit ownership, or evidence-based delivery.</p>
 </section>
 </aside>
 <div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
   <p>
-    For most of my career, my identity was simple: <strong>mobile developer</strong>. I shipped Android and iOS features,
-    optimized rendering and networking paths, and drove releases with platform-specific depth.
+    Mobile engineering is still the foundation of how I work. Years of Android and iOS delivery
+    taught me to respect lifecycle, state, network failure, release constraints, and the difference
+    between code that compiles and a feature that survives production.
   </p>
   <p>
-    That foundation still matters. What changed is the operating model. With modern agentic tooling,
-    I now work as an <strong>AI Accelerated Engineer</strong>: same quality bar, much faster loops, and much broader scope.
+    Agentic tools did not replace that foundation. They changed the shape of the loop around it. I can
+    inspect a larger surface, compare implementation paths, and automate repetitive edits faster—but
+    I still own the choice, the integration, and the evidence that the result works.
   </p>
 </section>
 
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">01. Workflow: From Linear to Parallel</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">01. Acceleration starts with inspection</h2>
   <p>
-    My old workflow was mostly linear: implement, test, revise, then repeat. It worked, but context switching was expensive.
-    The new workflow is parallel and system-oriented.
+    The tempting workflow is prompt, generate, accept. The useful workflow starts by reading the real
+    environment: current branch, dirty files, existing patterns, failing command, and the code path
+    that owns the behavior. An agent can synthesize quickly only after it has the right problem.
   </p>
   <div class="bg-surface-container-low border border-outline-variant/20 p-5">
-    <h3 class="font-headline text-2xl font-bold mb-3">Current loop</h3>
+    <p class="font-semibold text-on-surface mb-3">The loop I use now:</p>
     <ol class="list-decimal pl-6 space-y-2">
-      <li>Define intent and constraints in plain language.</li>
-      <li>Generate or patch implementation paths quickly.</li>
-      <li>Run local verification immediately (E2E, visual checks, route checks).</li>
-      <li>Tighten wording, UX details, and edge-case behavior.</li>
-      <li>Commit only when behavior is defensible.</li>
+      <li>Define the outcome, constraints, and non-goals.</li>
+      <li>Inspect the live repository and identify the owning path.</li>
+      <li>Delegate bounded work that can be checked independently.</li>
+      <li>Integrate the smallest defensible change.</li>
+      <li>Run proportionate functional, build, and visual checks.</li>
+      <li>Leave a handoff that records evidence and remaining uncertainty.</li>
     </ol>
   </div>
+</section>
+
+<section class="space-y-5 mt-12">
+  <h2 class="font-headline text-4xl font-bold leading-tight">02. Parallel work is useful only when the boundaries are real</h2>
   <p>
-    The practical shift is that AI handles repetitive synthesis and scaffold work, while I spend more time on
-    architecture, tradeoffs, and final quality decisions.
+    Some work can run in parallel: one pass can inspect a data contract while another audits the UI
+    path. Other work cannot. Two agents editing the same state model or making assumptions about an
+    unverified API usually create faster conflict, not faster delivery.
+  </p>
+  <p>
+    I use parallelism for discovery, independent verification, and clearly separated changes. I keep
+    the final integration and acceptance decision in one place. The goal is shorter feedback time,
+    not the appearance of more activity.
   </p>
 </section>
 
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">02. Speed: Faster Iteration, Not Lower Standards</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">03. The scope can widen without becoming vague</h2>
   <p>
-    Speed gains came from reducing cycle friction, not from skipping rigor.
-  </p>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="bg-surface-container-low border border-outline-variant/20 p-4">
-      <h3 class="font-headline text-xl font-bold mb-2">Before</h3>
-      <ul class="list-disc pl-5 space-y-1 text-secondary">
-        <li>Long hand-coded passes for repetitive structure.</li>
-        <li>Manual cross-page consistency checks.</li>
-        <li>Validation mostly at the end of a change-set.</li>
-      </ul>
-    </div>
-    <div class="bg-surface-container-low border border-outline-variant/20 p-4">
-      <h3 class="font-headline text-xl font-bold mb-2">Now</h3>
-      <ul class="list-disc pl-5 space-y-1 text-secondary">
-        <li>Rapid first draft, then tight refinement passes.</li>
-        <li>Automated checks run continuously during iteration.</li>
-        <li>Visual and functional verification baked into every step.</li>
-      </ul>
-    </div>
-  </div>
-  <p>
-    On this portfolio system, that meant shipping design consistency, SQLite-backed content, SEO/static generation,
-    and route-level QA in short cycles instead of spread-out phases.
-  </p>
-</section>
-
-<section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">03. Scope: From Feature Owner to System Owner</h2>
-  <p>
-    The biggest change is scope. I no longer think in isolated features; I think in product systems.
+    On this portfolio, for example, the work crosses page design, SQLite authoring, static generation,
+    search and filtering, metadata, RSS, sitemap output, publication boundaries, and browser QA.
+    Agents make it practical to inspect those surfaces in one task, but the system remains divided by
+    explicit ownership:
   </p>
   <ul class="list-disc pl-6 space-y-2">
-    <li><strong>UI system:</strong> design consistency across home, source, logs, about, contact, and post templates.</li>
-    <li><strong>Content system:</strong> SQLite as source of truth, static page generation for deployability.</li>
-    <li><strong>Discovery system:</strong> OG tags, sitemap, RSS, and canonical links.</li>
-    <li><strong>Quality system:</strong> automated route checks, link checks, and visual verification.</li>
-    <li><strong>Governance system:</strong> post visibility control through status in SQLite.</li>
+    <li><strong>Authoring:</strong> SQLite stores canonical post content and publication state.</li>
+    <li><strong>Build:</strong> scripts generate static pages and a public-only artifact.</li>
+    <li><strong>Discovery:</strong> canonical metadata, Open Graph cards, RSS, and sitemap stay synchronized.</li>
+    <li><strong>Experience:</strong> home, portfolio, about, résumé, contact, and blog routes remain coherent.</li>
+    <li><strong>Quality:</strong> deterministic checks and browser tests verify different layers.</li>
   </ul>
   <p>
-    In other words, AI acceleration increases my leverage across frontend, backend, tooling, content, and release quality.
+    Broader scope works because the boundaries are clearer, not because one prompt is allowed to
+    improvise across everything.
   </p>
 </section>
 
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">04. What Did Not Change</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">04. What the tools are good at</h2>
   <p>
-    The role title changed, but the engineering principles did not.
+    Agents are useful for repository inventory, repetitive transformations, comparison across similar
+    files, drafting alternatives, and running a verification loop. They are less trustworthy when a
+    task depends on unstated product intent, external account context, hidden server side effects, or
+    a visual judgment no assertion captures.
   </p>
-  <div class="bg-surface-container-high p-5 border border-outline-variant/20">
-    <ul class="list-disc pl-6 space-y-2">
-      <li>I still optimize for maintainability over novelty.</li>
-      <li>I still treat tests and verification as non-negotiable.</li>
-      <li>I still prefer clear architecture over clever hacks.</li>
-      <li>I still document assumptions and constraints explicitly.</li>
-    </ul>
-  </div>
+  <p>
+    That is where engineering experience still does the heavy lifting: knowing which assumption is
+    dangerous, which API call is actually a state transition, and which green check does not prove
+    the user-visible scenario.
+  </p>
 </section>
 
 <section class="space-y-5 mt-12">
-  <h2 class="font-headline text-4xl font-bold leading-tight">05. Bottom Line</h2>
+  <h2 class="font-headline text-4xl font-bold leading-tight">05. The label matters less than the operating model</h2>
   <p>
-    “AI Accelerated Engineer” for me is not a branding phrase. It is a concrete shift in workflow, iteration velocity,
-    and scope of ownership. The output is better when the human stays accountable for correctness, coherence, and judgment.
+    “AI-accelerated engineer” is useful to me only as a description of workflow. It does not mean the
+    tool owns the work or that speed is the primary outcome. The standard is still maintainable code,
+    explicit tradeoffs, safe delivery, and evidence another engineer can reproduce.
   </p>
   <p>
-    AI gives me more surface area. Engineering discipline keeps that surface area reliable.
+    AI gives me more reach. Mobile engineering experience tells me where that reach needs guardrails.
   </p>
 </section></div>
 </div>
 <div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
 <a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-prompt-patterns-for-production-ready-code.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Prompt Patterns That Consistently Produce Production-Ready Code</h5>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Prompt Patterns for Reviewable, Production-Ready Code</h5>
 <div class="mt-6 flex items-center gap-2 text-tertiary">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="font-label text-xs">read_entry</span>
@@ -384,7 +392,7 @@
 </a>
 <a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-03-26-editable-blog-system-on-github-pages.html">
 <span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Building an Editable Blog System That Still Works on GitHub Pages</h5>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Building an Editable Blog That Still Works on GitHub Pages</h5>
 <div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
 <span class="font-label text-xs">read_entry</span>
 <span class="material-symbols-outlined">arrow_forward</span>
@@ -428,7 +436,7 @@
 
     const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
     const CURRENT_POST_SLUG = "2026-03-26-from-mobile-developer-to-ai-accelerated-engineer";
-    const CURRENT_POST_TITLE = "From Mobile Developer to AI Accelerated Engineer";
+    const CURRENT_POST_TITLE = "From Mobile Developer to AI-Accelerated Engineer";
     const CURRENT_POST_URL = "/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html";
     const sharePostButton = document.getElementById("share-post-button");
     const bookmarkPostButton = document.getElementById("bookmark-post-button");
