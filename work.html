@@ -122,53 +122,64 @@
         </div>
       </div>
 
-      <div class="work-hero__art" role="img" aria-label="Delivery system: built, verified, shipped, and running. All checks complete.">
-        <svg class="work-flow" viewBox="0 0 560 520">
-          <defs>
-            <linearGradient id="work-flow-gradient" x1="70" y1="410" x2="490" y2="120" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#168C86"/>
-              <stop offset="0.52" stop-color="#1F5CBA"/>
-              <stop offset="1" stop-color="#AF98DA"/>
-            </linearGradient>
-          </defs>
-          <circle class="work-flow__halo" cx="286" cy="270" r="190"/>
-          <text class="work-flow__kicker" x="46" y="72">DELIVERY SYSTEM</text>
-          <g class="work-flow__status" transform="translate(358 45)">
-            <rect width="150" height="44" rx="22"/>
-            <circle class="work-flow__status-dot" cx="24" cy="22" r="5"/>
-            <text x="43" y="27">SHIPPED</text>
+      <div class="work-hero__art" role="img" aria-label="A product problem moves through a shared engineering core, branches across Android, iOS, and backend with AI assistance, then converges into a verified release.">
+        <svg class="work-pipeline" viewBox="0 0 560 520">
+          <circle class="work-pipeline__halo" cx="280" cy="264" r="204"/>
+          <text class="work-pipeline__kicker" x="52" y="58">DELIVERY PIPELINE</text>
+          <g class="work-pipeline__status" transform="translate(376 34)">
+            <rect width="132" height="38" rx="19"/>
+            <circle cx="21" cy="19" r="4"/>
+            <text x="37" y="24">ACTIVE</text>
           </g>
-          <path class="work-flow__rail" d="M82 390C145 390 147 320 210 320S288 250 350 250 417 160 478 160"/>
-          <path class="work-flow__track" d="M82 390C145 390 147 320 210 320S288 250 350 250 417 160 478 160"/>
-          <path class="work-flow__signal" d="M82 390C145 390 147 320 210 320S288 250 350 250 417 160 478 160"/>
-          <g class="work-flow__checkpoint work-flow__checkpoint--one" transform="translate(82 390)">
-            <circle class="work-flow__checkpoint-ring" r="24"/>
-            <circle class="work-flow__checkpoint-fill" r="17"/>
-            <path class="work-flow__check" d="m-7 0 5 5L9-7"/>
-            <text class="work-flow__label" x="0" y="50">BUILT</text>
+
+          <path class="work-pipeline__line" d="M280 105v56"/>
+          <path class="work-pipeline__line" d="M280 211c0 30-150 24-150 74"/>
+          <path class="work-pipeline__line" d="M280 211v74"/>
+          <path class="work-pipeline__line" d="M280 211c0 30 150 24 150 74"/>
+          <path class="work-pipeline__line" d="M130 335c0 45 150 21 150 70"/>
+          <path class="work-pipeline__line" d="M280 335v70"/>
+          <path class="work-pipeline__line" d="M430 335c0 45-150 21-150 70"/>
+          <path class="work-pipeline__line work-pipeline__line--ai" d="M414 210c-45 9-75 28-96 57"/>
+
+          <path class="work-pipeline__flow" d="M280 105v56"/>
+          <path class="work-pipeline__flow" d="M280 211c0 30-150 24-150 74"/>
+          <path class="work-pipeline__flow work-pipeline__flow--delay-one" d="M280 211v74"/>
+          <path class="work-pipeline__flow work-pipeline__flow--delay-two" d="M280 211c0 30 150 24 150 74"/>
+          <path class="work-pipeline__flow" d="M130 335c0 45 150 21 150 70"/>
+          <path class="work-pipeline__flow work-pipeline__flow--delay-one" d="M280 335v70"/>
+          <path class="work-pipeline__flow work-pipeline__flow--delay-two" d="M430 335c0 45-150 21-150 70"/>
+
+          <g class="work-pipeline__node" transform="translate(190 71)">
+            <rect width="180" height="42" rx="8"/>
+            <text x="90" y="26">PRODUCT PROBLEM</text>
           </g>
-          <g class="work-flow__checkpoint work-flow__checkpoint--two" transform="translate(210 320)">
-            <circle class="work-flow__checkpoint-ring" r="24"/>
-            <circle class="work-flow__checkpoint-fill" r="17"/>
-            <path class="work-flow__check" d="m-7 0 5 5L9-7"/>
-            <text class="work-flow__label" x="0" y="50">VERIFIED</text>
+          <g class="work-pipeline__node work-pipeline__node--core" transform="translate(178 161)">
+            <rect width="204" height="50" rx="8"/>
+            <text x="102" y="23">SHARED CORE</text>
+            <text class="work-pipeline__meta" x="102" y="39">ARCHITECT · BUILD · IMPROVE</text>
           </g>
-          <g class="work-flow__checkpoint work-flow__checkpoint--three" transform="translate(350 250)">
-            <circle class="work-flow__checkpoint-ring" r="24"/>
-            <circle class="work-flow__checkpoint-fill" r="17"/>
-            <path class="work-flow__check" d="m-7 0 5 5L9-7"/>
-            <text class="work-flow__label" x="0" y="50">SHIPPED</text>
+          <g class="work-pipeline__node" transform="translate(79 285)">
+            <rect width="102" height="50" rx="8"/>
+            <text x="51" y="30">ANDROID</text>
           </g>
-          <g class="work-flow__checkpoint work-flow__checkpoint--four" transform="translate(478 160)">
-            <circle class="work-flow__checkpoint-ring" r="27"/>
-            <circle class="work-flow__checkpoint-fill" r="19"/>
-            <path class="work-flow__check" d="m-8 0 6 6 12-14"/>
-            <text class="work-flow__label" x="0" y="53">RUNNING</text>
+          <g class="work-pipeline__node" transform="translate(229 285)">
+            <rect width="102" height="50" rx="8"/>
+            <text x="51" y="30">iOS</text>
           </g>
-          <g class="work-flow__complete" transform="translate(158 445)">
-            <rect width="244" height="46" rx="8"/>
-            <path d="m20 23 6 6 12-14"/>
-            <text x="52" y="28">ALL CHECKS COMPLETE</text>
+          <g class="work-pipeline__node" transform="translate(379 285)">
+            <rect width="102" height="50" rx="8"/>
+            <text x="51" y="30">BACKEND</text>
+          </g>
+          <g class="work-pipeline__ai" transform="translate(414 180)">
+            <circle r="31"/>
+            <text y="-2">AI</text>
+            <text class="work-pipeline__meta" y="13">ASSIST</text>
+          </g>
+          <g class="work-pipeline__node work-pipeline__node--release" transform="translate(174 405)">
+            <rect width="212" height="54" rx="8"/>
+            <path d="m23 27 7 7 13-16"/>
+            <text x="122" y="25">VERIFIED RELEASE</text>
+            <text class="work-pipeline__meta" x="122" y="41">QUALITY GATES PASSED</text>
           </g>
         </svg>
       </div>

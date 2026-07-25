@@ -639,11 +639,21 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && mempalaceCardText.includes('merged change'),
     'MemPalace card does not describe the merged nested .gitignore contribution'
   );
-  await assert((await page.locator('.work-flow__checkpoint').count()) === 4, 'Portfolio hero is missing its completed delivery checkpoints');
-  await assert((await page.locator('.work-flow__complete').textContent() || '').includes('ALL CHECKS COMPLETE'), 'Portfolio hero does not communicate completed verification');
+  await assert((await page.locator('.work-pipeline__node').count()) === 6, 'Portfolio hero is missing delivery pipeline stages');
+  const workPipelineText = ((await page.locator('.work-pipeline').textContent()) || '').replace(/\s+/g, ' ').trim();
   await assert(
-    (await page.locator('.work-hero__art[role="img"]').getAttribute('aria-label') || '').includes('All checks complete'),
-    'Portfolio hero completion message is missing from the accessibility tree'
+    workPipelineText.includes('PRODUCT PROBLEM')
+      && workPipelineText.includes('SHARED CORE')
+      && workPipelineText.includes('ANDROID')
+      && workPipelineText.includes('iOS')
+      && workPipelineText.includes('BACKEND')
+      && workPipelineText.includes('AI')
+      && workPipelineText.includes('VERIFIED RELEASE'),
+    'Portfolio hero does not communicate the complete branching delivery pipeline'
+  );
+  await assert(
+    (await page.locator('.work-hero__art[role="img"]').getAttribute('aria-label') || '').includes('verified release'),
+    'Portfolio hero delivery pipeline is missing from the accessibility tree'
   );
 
   const firstProductionCard = page.locator('.work-case-grid > .work-case').first();
