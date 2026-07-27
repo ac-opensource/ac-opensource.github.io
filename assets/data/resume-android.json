@@ -71,7 +71,7 @@
     {
       "dates": "Jun 2023 - Jun 2024",
       "title": "Senior Mobile Developer",
-      "company": "ITV",
+      "company": "Candyspace",
       "projects": [
         "ITVX — Streaming platform"
       ],
@@ -155,7 +155,7 @@
     },
     {
       "name": "ITVX",
-      "description": "Android media-player work for ITV's live and on-demand streaming platform, focused on playback behavior, reliability, and maintainable delivery."
+      "description": "Android media-player work on ITVX at Candyspace, focused on live and on-demand playback behavior, reliability, and maintainable delivery."
     },
     {
       "name": "OCBC",
