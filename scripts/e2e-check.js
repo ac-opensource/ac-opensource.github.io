@@ -244,7 +244,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(
     JSON.stringify(careerHeadings.slice(0, 4)) === JSON.stringify([
       'Senior Software Engineer — Bitcoin.com',
-      'Senior Mobile Developer — ITV',
+      'Senior Mobile Developer — Candyspace',
       'Senior Android Developer — Red Airship',
       'Lead Developer — InnovationTeam',
     ]),
@@ -273,7 +273,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const resumeText = ((await page.locator('main').textContent()) || '').replace(/\s+/g, ' ').trim();
   for (const expectedText of [
     'Senior Software Engineer Bitcoin.com Bitcoin.com Wallet — Self-custody crypto wallet Jun 2024 — Present',
-    'Senior Mobile Developer ITV ITVX — Streaming platform Jun 2023 — Jun 2024',
+    'Senior Mobile Developer Candyspace ITVX — Streaming platform Jun 2023 — Jun 2024',
     'Senior Android Developer Red Airship OCBC — Mobile banking OpenPay — Fintech Jun 2021 — Jun 2023',
     'Lead Developer InnovationTeam MySTC — Telecom project May 2020 — Jun 2021',
     'Team Lead iPARA Technologies and Solutions OWTO — Ride-hailing service Jun 2018 — May 2020',
@@ -621,6 +621,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   for (const projectName of ['Bitcoin.com Wallet', 'ITVX', 'MemPalace', 'Persons Finder', 'Orchestrum', 'Littlepay', 'NTU Pass', 'Solo', 'Aqua Expeditions']) {
     await assert(workPageText.includes(projectName), `Work page is missing the ${projectName} portfolio entry`);
   }
+  const itvxCardText = ((await page.locator('.work-case--itvx').textContent()) || '').replace(/\s+/g, ' ').trim();
+  await assert(
+    itvxCardText.includes('Candyspace') && itvxCardText.includes('ITVX'),
+    'ITVX work card does not identify Candyspace as the employer'
+  );
   await assert(!workPageText.includes('[N/A]'), 'Work page still exposes an [N/A] placeholder');
   await assert(!workPageText.includes('Portfolio App Sync'), 'Work page still exposes the obsolete Portfolio App Sync label');
   const publicWorkLayout = await page.evaluate(() => {
