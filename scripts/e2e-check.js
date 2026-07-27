@@ -268,6 +268,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await assert(careerSectionText.includes(expectedText), `About career timeline is missing: ${expectedText}`);
   }
   await assert(!careerSectionText.includes('Littlepay'), 'About career timeline still exposes Littlepay');
+  for (const itvxAchievement of ['recommendations panel', 'timeline scrubbing', 'Simple XML-to-Jackson']) {
+    await assert(careerSectionText.includes(itvxAchievement), `About career timeline is missing ITVX achievement: ${itvxAchievement}`);
+  }
 
   await page.goto(BASE_URL + '/resume.html', { waitUntil: 'domcontentloaded' });
   const resumeText = ((await page.locator('main').textContent()) || '').replace(/\s+/g, ' ').trim();
@@ -283,6 +286,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await assert(resumeText.includes(expectedText), `Resume is missing the experience sequence: ${expectedText}`);
   }
   await assert(!resumeText.includes('Littlepay'), 'Resume still exposes Littlepay');
+  for (const itvxAchievement of ['recommendations panel', 'timeline scrubbing', 'tablet support', 'Simple XML-to-Jackson']) {
+    await assert(resumeText.includes(itvxAchievement), `Resume is missing ITVX achievement: ${itvxAchievement}`);
+  }
   const resumeProjectsSection = page.getByRole('heading', { name: 'Projects', exact: true }).locator('xpath=ancestor::section[1]');
   const resumeProjectHeadings = await resumeProjectsSection.locator('article .font-headline').evaluateAll((headings) =>
     headings.map((heading) => (heading.textContent || '').replace(/\s+/g, ' ').trim())
@@ -623,8 +629,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   }
   const itvxCardText = ((await page.locator('.work-case--itvx').textContent()) || '').replace(/\s+/g, ' ').trim();
   await assert(
-    itvxCardText.includes('Candyspace') && itvxCardText.includes('ITVX'),
-    'ITVX work card does not identify Candyspace as the employer'
+    ['Candyspace', 'ITVX', 'recommendations panel', 'timeline scrubbing', 'phone and tablet', 'Simple XML-to-Jackson']
+      .every((expectedText) => itvxCardText.includes(expectedText)),
+    'ITVX work card does not show the employer and concrete playback accomplishments'
   );
   await assert(!workPageText.includes('[N/A]'), 'Work page still exposes an [N/A] placeholder');
   await assert(!workPageText.includes('Portfolio App Sync'), 'Work page still exposes the obsolete Portfolio App Sync label');

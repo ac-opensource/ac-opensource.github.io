@@ -76,9 +76,9 @@
         "ITVX — Streaming platform"
       ],
       "bullets": [
-        "Worked on the Android media player for ITVX live and on-demand streaming.",
-        "Shipped player behavior and reliability improvements inside a large production streaming platform.",
-        "Collaborated within the media player team to deliver maintainable Android changes across core playback experiences."
+        "Built a recommendations panel that appears during playback, coordinating its animations with player-control and button movement across phone and tablet layouts.",
+        "Independently delivered timeline scrubbing with a visual preview so viewers could see where playback would land before seeking.",
+        "Fixed long-standing player issues and improved reliability with stronger error tracking, security fixes, and a Simple XML-to-Jackson migration."
       ]
     },
     {
@@ -155,7 +155,7 @@
     },
     {
       "name": "ITVX",
-      "description": "Android media-player work on ITVX at Candyspace, focused on live and on-demand playback behavior, reliability, and maintainable delivery."
+      "description": "Playback feature work on ITVX at Candyspace: in-player recommendations, independently delivered preview timeline scrubbing, tablet support, stronger error tracking, security fixes, and a Simple XML-to-Jackson migration."
     },
     {
       "name": "OCBC",
