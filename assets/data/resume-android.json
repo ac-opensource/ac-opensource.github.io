@@ -1,6 +1,6 @@
 {
-  "name": "A-AR ANDREW V. CONCEPCION",
-  "headline": "AI-Accelerated Developer (with deep platform knowledge) | Kotlin | Jetpack Compose | Compose Multiplatform",
+  "name": "ANDREW V. CONCEPCION",
+  "headline": "AI-Native Software Engineer | Kotlin | Jetpack Compose | Compose Multiplatform",
   "contact": {
     "phone": "+64 290 431 2382",
     "philippinesPhone": "+63 917 815 4366",
@@ -9,7 +9,7 @@
     "github": "https://github.com/ac-opensource",
     "linkedin": "https://www.linkedin.com/in/aarconcepcion"
   },
-  "summary": "AI-accelerated developer with deep platform knowledge and 10+ years of experience shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce. Strong in Kotlin, Jetpack Compose, mobile architecture, performance tuning, release hardening, and third-party integrations. Known for high-output execution, strong engineering judgment, and moving effectively across Android, iOS, backend, product, and design to ship reliable user-facing systems.",
+  "summary": "AI-native software engineer with deep platform knowledge and 10+ years of experience shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce. Strong in Kotlin, Jetpack Compose, mobile architecture, performance tuning, release hardening, and third-party integrations. Known for agent-first execution, strong engineering judgment, and moving effectively across Android, iOS, backend, product, and design to ship reliable user-facing systems.",
   "skills": [
     {
       "label": "Android",
@@ -57,15 +57,15 @@
   "experience": [
     {
       "dates": "Jun 2024 - Present",
-      "title": "Senior Software Engineer",
+      "title": "AI-Native Software Engineer",
       "company": "Bitcoin.com",
       "projects": [
         "Bitcoin.com Wallet — Self-custody crypto wallet"
       ],
       "bullets": [
-        "Solve correctness and reliability problems across multichain transactions, Earn and rewards, routing, and deep links by tracing behavior end to end across UI, domain, APIs, and shared native layers.",
-        "Modernize a large Android wallet through API migrations, shared Rust and UniFFI integration, and design-system adoption while preserving established product behavior.",
-        "Carry changes through focused regression tests, emulator proof, CI and build hardening, code review, and release-candidate delivery."
+        "Led the foundation and first end-to-end Android implementation of a multichain rewards platform, then built reward-backed crypto market predictions and moved their service layer into shared Rust through UniFFI.",
+        "Co-built Bitcoin replace-by-fee with fee-aware UTXO validation, speed-up/cancel flows, reusable transaction preparation and signing, opt-out controls, and dust protection; led an in-app single-chain-to-multichain wallet migration.",
+        "Modernized staking and liquidity-reward pool reads from legacy RPC to typed REST, shipped provider-aware swap routing and recurring-buy reminders, and hardened startup, native builds, CI, and Android releases."
       ]
     },
     {
@@ -151,7 +151,7 @@
   "projects": [
     {
       "name": "Bitcoin.com Wallet",
-      "description": "Self-custody wallet delivery across multichain transactions, Earn and rewards, API migrations, shared Rust and UniFFI, reliability, and release hardening."
+      "description": "Self-custody systems across multichain rewards, market predictions, Bitcoin transaction replacement, staking and liquidity pools, swaps, recurring-buy reminders, wallet migration, and shared Rust through UniFFI."
     },
     {
       "name": "ITVX",

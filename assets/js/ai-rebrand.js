@@ -1,5 +1,5 @@
 (function (global) {
-  const DEFAULT_TARGET = "AI Accelerated Engineer";
+  const DEFAULT_TARGET = "AI-Native Software Engineer";
   const ROLE_PATTERN = /\b(mobile developer|mobile engineer|mobile engineering|mobile development|android developer|ios developer)\b/i;
 
   function shouldReduceMotion() {
