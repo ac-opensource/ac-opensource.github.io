@@ -1,6 +1,6 @@
 # Andrew Concepcion
 
-> Personal engineering portfolio and technical blog of Andrew Concepcion, an AI-accelerated developer with 10+ years of experience across Android, iOS, backend systems, architecture, and product delivery.
+> Personal engineering portfolio and technical blog of Andrew Concepcion, an AI-native software engineer with 10+ years of experience across Android, iOS, backend systems, architecture, and product delivery.
 
 Canonical site: https://ac-opensource.github.io/
 
@@ -9,7 +9,7 @@ Use the canonical static pages below for public professional and technical infor
 ## Primary sections
 
 - [Home](https://ac-opensource.github.io/): Overview, current engineering focus, and recent public work.
-- [Portfolio](https://ac-opensource.github.io/work.html): Selected mobile and public work across streaming, payments, banking, telecom, backend systems, technical leadership, and AI-accelerated delivery.
+- [Portfolio](https://ac-opensource.github.io/work.html): Selected mobile and public work across streaming, payments, banking, telecom, backend systems, technical leadership, and agent-first delivery.
 - [About](https://ac-opensource.github.io/about.html): Professional background, working style, interests, and career trajectory.
 - [Resume](https://ac-opensource.github.io/resume.html): Canonical public resume and skills summary.
 - [Blog](https://ac-opensource.github.io/blog/): Engineering logs, essays, case studies, and field notes.

@@ -1,12 +1,12 @@
-A-Ar Andrew V. Concepcion
-AI-Accelerated Software Engineer | Kotlin | Jetpack Compose | Mobile Architecture
+Andrew V. Concepcion
+AI-Native Software Engineer | Kotlin | Jetpack Compose | Mobile Architecture
 aarconcepcion@gmail.com | NZ +64 290 431 2382 | PH +63 917 815 4366 | https://ac-opensource.github.io
 
 Dear Hiring Team,
 
-I am writing to express interest in software engineering opportunities in New Zealand where strong product delivery, technical ownership, and mobile depth matter. I am an AI-accelerated developer with more than 10 years of experience shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce. My core expertise is in Kotlin, Jetpack Compose, and modern Android architecture, supported by hands-on experience across iOS, backend integrations, shared native layers, release engineering, and cross-functional delivery.
+I am writing to express interest in software engineering opportunities in New Zealand where strong product delivery, technical ownership, and mobile depth matter. I am an AI-native software engineer with more than 10 years of experience shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce. My core expertise is in Kotlin, Jetpack Compose, and modern Android architecture, supported by hands-on experience across iOS, backend integrations, shared native layers, release engineering, and cross-functional delivery.
 
-I currently work as a Senior Software Engineer at Bitcoin.com, where I solve correctness and reliability problems across multichain transactions, Earn and rewards, routing, and deep links by tracing behavior end to end across UI, domain, APIs, and shared native layers. I also help modernize a large Android wallet through API migrations, shared Rust and UniFFI integration, and design-system adoption, while preserving established product behavior and carrying changes through focused testing, build hardening, code review, and release-candidate delivery.
+I currently work as an AI-Native Software Engineer at Bitcoin.com. I led the first end-to-end Android implementation of a multichain rewards platform, built reward-backed crypto market predictions, co-built Bitcoin replace-by-fee, and led an in-app single-chain-to-multichain wallet migration. I also modernized staking and liquidity-reward pool reads, shipped provider-aware swaps and recurring-buy reminders, moved services into shared Rust through UniFFI, and hardened startup and Android releases with agent-first workflows.
 
 Before Bitcoin.com, I worked at Candyspace on the Android media player for ITVX, improving live and on-demand playback within a large production streaming platform. Earlier, at Red Airship, I built OCBC Business mobile banking flows across onboarding, account dashboards, transfers, and digital account opening, and improved OpenPay checkout and payment reliability. I also led five senior Android engineers on MySTC, serving more than 10 million installs across multilingual customer journeys.
 
@@ -20,4 +20,4 @@ Thank you for your time and consideration.
 
 Sincerely,
 
-A-Ar Andrew V. Concepcion
+Andrew V. Concepcion

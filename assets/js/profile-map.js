@@ -15,7 +15,7 @@
     "testing-qa": "Testing / QA",
     leadership: "Tech leadership",
     "cross-functional": "Cross-functional",
-    "ai-engineering": "AI-assisted delivery",
+    "ai-engineering": "Agent-first delivery",
     "agent-memory": "Agent orchestration"
   };
   const MOBILE_NODE_LABELS = {

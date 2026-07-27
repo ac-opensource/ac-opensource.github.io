@@ -243,7 +243,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await assert(
     JSON.stringify(careerHeadings.slice(0, 4)) === JSON.stringify([
-      'Senior Software Engineer — Bitcoin.com',
+      'AI-Native Software Engineer — Bitcoin.com',
       'Senior Mobile Developer — Candyspace',
       'Senior Android Developer — Red Airship',
       'Lead Developer — InnovationTeam',
@@ -272,7 +272,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await page.goto(BASE_URL + '/resume.html', { waitUntil: 'domcontentloaded' });
   const resumeText = ((await page.locator('main').textContent()) || '').replace(/\s+/g, ' ').trim();
   for (const expectedText of [
-    'Senior Software Engineer Bitcoin.com Bitcoin.com Wallet — Self-custody crypto wallet Jun 2024 — Present',
+    'AI-Native Software Engineer Bitcoin.com Bitcoin.com Wallet — Self-custody crypto wallet Jun 2024 — Present',
     'Senior Mobile Developer Candyspace ITVX — Streaming platform Jun 2023 — Jun 2024',
     'Senior Android Developer Red Airship OCBC — Mobile banking OpenPay — Fintech Jun 2021 — Jun 2023',
     'Lead Developer InnovationTeam MySTC — Telecom project May 2020 — Jun 2021',
@@ -693,7 +693,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     'Bitcoin.com Wallet card is not using the local official app-screen assets'
   );
   const bitcoinCardText = ((await page.locator('.work-case--bitcoin').textContent()) || '').replace(/\s+/g, ' ').trim();
-  for (const capability of ['Multichain Android', 'Rust + UniFFI', 'Reliability', 'Release engineering']) {
+  for (const capability of ['Staking + reward pools', 'Buy · Sell · Swap', 'Multichain transactions', 'Rust + UniFFI']) {
     await assert(bitcoinCardText.includes(capability), `Bitcoin.com Wallet card is missing the ${capability} capability`);
   }
 
@@ -735,9 +735,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   const heroIntro = ((await page.locator('.work-hero__intro').textContent()) || '').replace(/\s+/g, ' ').trim();
   await assert(heroIntro.includes('I’m a problem solver'), 'Portfolio hero does not lead with problem-solving positioning');
-  await assert(heroIntro.includes('I lead teams') && heroIntro.includes('use AI'), 'Portfolio hero is missing leadership or AI-accelerated delivery positioning');
+  await assert(heroIntro.includes('I lead teams') && heroIntro.includes('use AI'), 'Portfolio hero is missing leadership or agent-first delivery positioning');
   await assert((await page.locator('.work-signals > div').count()) === 4, 'Portfolio hero does not expose all four positioning signals');
-  await assert(workPageText.includes('AI-accelerated'), 'Portfolio hero is missing its AI-accelerated delivery signal');
+  await assert(workPageText.includes('Agent-first'), 'Portfolio hero is missing its agent-first delivery signal');
 
   const ocbcScreens = page.locator('.work-case--ocbc .work-ocbc-shot');
   await assert((await ocbcScreens.count()) === 3, 'OCBC Business card does not show all three official app screens');

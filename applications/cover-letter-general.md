@@ -1,12 +1,14 @@
-A-Ar Andrew V. Concepcion
-AI-Accelerated Developer | Deep and Extensive Platform Knowledge | High-Output Delivery
+Andrew V. Concepcion
+AI-Native Software Engineer | Mobile + Platform Systems | Agent-First Delivery
 aarconcepcion@gmail.com | NZ +64 290 431 2382 | PH +63 917 815 4366 | https://ac-opensource.github.io
 
 Dear Hiring Team,
 
-I am writing to express interest in software engineering opportunities where strong product delivery, technical ownership, and mobile depth matter. I am an AI-accelerated developer with deep and extensive platform knowledge and more than 10 years of experience shipping production systems across fintech, telecom, transport, rewards, safety, and e-commerce. My strongest background is in Kotlin, Android, and modern mobile architecture, while my delivery scope has consistently extended across iOS, backend coordination, release quality, and close collaboration with product and design.
+I am writing to express interest in software engineering opportunities where strong product delivery, technical ownership, and mobile depth matter. I am an AI-native software engineer with deep platform knowledge and more than 10 years of experience shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce. My strongest background is in Kotlin, Android, and modern mobile architecture, while my delivery scope has consistently extended across iOS, backend integrations, shared native layers, release quality, and close collaboration with product and design.
 
-Most recently, I served as Lead Android Developer at Littlepay, where I led Android delivery and technical direction, worked closely with product, design, and backend stakeholders, and pushed for maintainable, testable code with strong release confidence. Before that, at RedAirship, I helped build and launch a mobile banking app for a major Singaporean bank, delivering onboarding, account dashboards, transfers, and digital account opening with Android and iOS feature parity. I also led Android delivery on MySTC at telecom scale and contributed across Android, iOS, and backend systems on OWTO as the platform scaled to more than 500K downloads.
+I currently work as an AI-Native Software Engineer at Bitcoin.com. I led the first end-to-end Android implementation of a multichain rewards platform, built reward-backed crypto market predictions, co-built Bitcoin replace-by-fee, and led an in-app single-chain-to-multichain wallet migration. I also modernized staking and liquidity-reward pool reads, shipped provider-aware swaps and recurring-buy reminders, moved services into shared Rust through UniFFI, and hardened startup and Android releases.
+
+Earlier, I worked at Candyspace on the Android media player for ITVX and at Red Airship on OCBC Business mobile banking and OpenPay checkout reliability. I also led five senior Android engineers on MySTC and contributed across Android, iOS, and backend systems on OWTO as the platform grew to more than 500K downloads.
 
 What I bring is a mix of speed, ownership, and engineering discipline. I use AI tools productively, but I pair that speed with sound technical judgment, clean architecture, performance tuning, release hardening, and strong execution under production constraints. I am comfortable leading teams, mentoring engineers, driving architecture decisions, and moving across implementation and delivery responsibilities wherever the work needs momentum.
 
@@ -16,4 +18,4 @@ I would welcome the opportunity to discuss how my experience can support your te
 
 Sincerely,
 
-A-Ar Andrew V. Concepcion
+Andrew V. Concepcion
