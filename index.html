@@ -1,602 +1,242 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<meta name="google-site-verification" content="cG-TBeLi9kd77kCjn9ujeH_G6b-5r-Jv69vGJiROZnU">
-<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
-<title>Andrew Concepcion | AI-Native Software Engineer</title>
-<meta name="description" content="Andrew Concepcion is an AI-native software engineer with deep platform knowledge, specializing in agent-first product delivery across Android, iOS, backend, Compose Multiplatform, and SwiftUI.">
-<link rel="canonical" href="https://ac-opensource.github.io/">
-<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml">
-<meta name="robots" content="index,follow">
-<meta property="og:site_name" content="Andrew Concepcion">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://ac-opensource.github.io/">
-<meta property="og:title" content="Andrew Concepcion | AI-Native Software Engineer">
-<meta property="og:description" content="Andrew Concepcion is an AI-native software engineer with deep platform knowledge, specializing in agent-first product delivery across Android, iOS, backend, Compose Multiplatform, and SwiftUI.">
-<meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/home-profile-tree.png">
-<meta property="og:image:type" content="image/png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Andrew Concepcion's engineering profile tree connecting mobile, backend, architecture, reliability, and agent-first delivery">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Andrew Concepcion | AI-Native Software Engineer">
-<meta name="twitter:description" content="Andrew Concepcion is an AI-native software engineer with deep platform knowledge, specializing in agent-first product delivery across Android, iOS, backend, Compose Multiplatform, and SwiftUI.">
-<meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/home-profile-tree.png">
-<meta name="twitter:image:alt" content="Andrew Concepcion's engineering profile tree connecting mobile, backend, architecture, reliability, and agent-first delivery">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Person",
-      "@id": "https://ac-opensource.github.io/#person",
-      "name": "Andrew Concepcion",
-      "url": "https://ac-opensource.github.io/",
-      "jobTitle": "AI-Native Software Engineer",
-      "sameAs": [
-        "https://github.com/ac-opensource",
-        "https://www.linkedin.com/in/aarconcepcion"
-      ],
-      "knowsAbout": [
-        "Android engineering",
-        "iOS engineering",
-        "Backend APIs",
-        "Kotlin",
-        "Jetpack Compose",
-        "Software architecture",
-        "Reliability engineering",
-        "Agent-first software delivery"
-      ]
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://ac-opensource.github.io/#website",
-      "url": "https://ac-opensource.github.io/",
-      "name": "Andrew Concepcion",
-      "description": "Engineering portfolio, public project evidence, and technical writing.",
-      "publisher": { "@id": "https://ac-opensource.github.io/#person" }
-    }
-  ]
-}
-</script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&amp;family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="/assets/css/neural-background.css?v=20260722-flow5" rel="stylesheet">
-<link href="/assets/css/profile-map.css?v=20260723-worldtree17" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            "on-error": "#fff7f6",
-            "on-secondary": "#f6f9ff",
-            "background": "#faf9f4",
-            "tertiary": "#1f5cba",
-            "inverse-surface": "#0d0f0c",
-            "tertiary-fixed": "#6799fb",
-            "on-secondary-container": "#4a535c",
-            "tertiary-container": "#6799fb",
-            "tertiary-dim": "#024fad",
-            "surface-container-lowest": "#ffffff",
-            "surface": "#faf9f4",
-            "outline": "#787c73",
-            "inverse-primary": "#f0f4fb",
-            "error": "#9f403d",
-            "on-secondary-fixed": "#374049",
-            "surface-container-low": "#f4f4ee",
-            "on-primary-fixed": "#3b4045",
-            "secondary-container": "#dae3ef",
-            "secondary": "#57606a",
-            "primary-container": "#dee3e9",
-            "surface-tint": "#5a5f65",
-            "primary-fixed": "#dee3e9",
-            "on-surface-variant": "#5c6058",
-            "on-tertiary-container": "#001b46",
-            "on-background": "#2f342d",
-            "surface-dim": "#d7dcd0",
-            "on-tertiary": "#f9f8ff",
-            "on-surface": "#2f342d",
-            "on-error-container": "#752121",
-            "surface-container": "#edefe7",
-            "on-primary-fixed-variant": "#575c62",
-            "inverse-on-surface": "#9d9d99",
-            "secondary-dim": "#4b545d",
-            "outline-variant": "#afb3aa",
-            "primary": "#5a5f65",
-            "error-container": "#fe8983",
-            "surface-bright": "#faf9f4",
-            "primary-fixed-dim": "#d0d5db",
-            "tertiary-fixed-dim": "#598ced",
-            "surface-variant": "#e0e4d9",
-            "on-tertiary-fixed-variant": "#002559",
-            "secondary-fixed-dim": "#ccd5e1",
-            "primary-dim": "#4e5358",
-            "error-dim": "#4e0309",
-            "on-tertiary-fixed": "#000000",
-            "surface-container-highest": "#e0e4d9",
-            "on-primary": "#f4f8ff",
-            "on-secondary-fixed-variant": "#535c66",
-            "secondary-fixed": "#dae3ef",
-            "on-primary-container": "#4d5258",
-            "surface-container-high": "#e7e9e0"
-          },
-          fontFamily: {
-            "headline": ["Space Grotesk"],
-            "body": ["Manrope"],
-            "label": ["Space Grotesk"]
-          },
-          borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
-          animation: {
-            'float': 'float 6s ease-in-out infinite',
-            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'spin-slow': 'spin 12s linear infinite',
-            'orbit': 'orbit 15s linear infinite',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
-              '50%': { transform: 'translateY(-20px) rotate(2deg)' },
-            },
-            orbit: {
-              'from': { transform: 'rotate(0deg) translateX(40px) rotate(0deg)' },
-              'to': { transform: 'rotate(360deg) translateX(40px) rotate(-360deg)' }
-            },
-          }
-        },
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="google-site-verification" content="cG-TBeLi9kd77kCjn9ujeH_G6b-5r-Jv69vGJiROZnU">
+  <title>Andrew Concepcion | AI-Native Software Engineer</title>
+  <meta name="description" content="Andrew Concepcion is an AI-native software engineer with deep platform knowledge, specializing in agent-first product delivery across Android, iOS, backend, Compose Multiplatform, and SwiftUI.">
+  <link rel="canonical" href="https://ac-opensource.github.io/">
+  <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml">
+  <meta name="robots" content="index,follow">
+  <meta property="og:site_name" content="Andrew Concepcion">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ac-opensource.github.io/">
+  <meta property="og:title" content="Andrew Concepcion | AI-Native Software Engineer">
+  <meta property="og:description" content="Andrew Concepcion is an AI-native software engineer with deep platform knowledge, specializing in agent-first product delivery across Android, iOS, backend, Compose Multiplatform, and SwiftUI.">
+  <meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/home-profile-tree.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Andrew Concepcion's engineering profile tree connecting mobile, backend, architecture, reliability, and agent-first delivery">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Andrew Concepcion | AI-Native Software Engineer">
+  <meta name="twitter:description" content="Andrew Concepcion is an AI-native software engineer with deep platform knowledge, specializing in agent-first product delivery across Android, iOS, backend, Compose Multiplatform, and SwiftUI.">
+  <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/home-profile-tree.png">
+  <meta name="twitter:image:alt" content="Andrew Concepcion's engineering profile tree connecting mobile, backend, architecture, reliability, and agent-first delivery">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://ac-opensource.github.io/#person",
+        "name": "Andrew Concepcion",
+        "url": "https://ac-opensource.github.io/",
+        "jobTitle": "AI-Native Software Engineer",
+        "sameAs": [
+          "https://github.com/ac-opensource",
+          "https://www.linkedin.com/in/aarconcepcion"
+        ],
+        "knowsAbout": [
+          "Android engineering",
+          "iOS engineering",
+          "Backend APIs",
+          "Kotlin",
+          "Jetpack Compose",
+          "Software architecture",
+          "Reliability engineering",
+          "Agent-first software delivery"
+        ]
       },
-    }
-  </script>
-<style>
-    body {
-      background-color: #faf9f4;
-    }
-    .glass-nav {
-      background: rgba(250, 249, 244, 0.85);
-      backdrop-filter: blur(12px);
-    }
-    .hero-glow {
-      box-shadow: 0 0 50px -10px rgba(31, 92, 186, 0.15);
-    }
-    .grid-bg-overlay {
-      background-image: linear-gradient(to right, rgba(175, 179, 170, 0.06) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(175, 179, 170, 0.06) 1px, transparent 1px);
-      background-size: 20px 20px;
-    }
-    .kinetic-sculpture {
-      position: relative;
-      width: min(76vw, 20rem);
-      aspect-ratio: 1;
-      perspective: 900px;
-      filter: drop-shadow(0 24px 28px rgba(31, 92, 186, 0.12));
-    }
-    .kinetic-sculpture::before {
-      position: absolute;
-      inset: 18%;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(31, 92, 186, 0.12), transparent 68%);
-      content: "";
-      filter: blur(24px);
-      animation: kinetic-glow 5s ease-in-out infinite;
-    }
-    .kinetic-sculpture__assembly,
-    .kinetic-sculpture__cube,
-    .kinetic-sculpture__ring {
-      position: absolute;
-      inset: 0;
-      transform-style: preserve-3d;
-    }
-    .kinetic-sculpture__assembly {
-      animation: kinetic-assembly 18s ease-in-out infinite;
-    }
-    .kinetic-sculpture__ring {
-      inset: 17%;
-      border: 1px solid rgba(31, 92, 186, 0.34);
-      border-radius: 50%;
-      box-shadow: inset 0 0 14px rgba(31, 92, 186, 0.06);
-    }
-    .kinetic-sculpture__ring::after {
-      position: absolute;
-      top: 50%;
-      left: -4px;
-      width: 8px;
-      height: 8px;
-      border: 1px solid #1f5cba;
-      border-radius: 50%;
-      background: #faf9f4;
-      box-shadow: 0 0 10px rgba(31, 92, 186, 0.5);
-      content: "";
-      transform: translateY(-50%);
-    }
-    .kinetic-sculpture__ring--one {
-      transform: rotateX(68deg) rotateZ(18deg);
-      animation: kinetic-ring-one 9s linear infinite;
-    }
-    .kinetic-sculpture__ring--two {
-      border-style: dashed;
-      transform: rotateY(72deg) rotateZ(-24deg);
-      animation: kinetic-ring-two 12s linear infinite reverse;
-    }
-    .kinetic-sculpture__ring--three {
-      inset: 27%;
-      border-color: rgba(87, 96, 106, 0.3);
-      transform: rotateX(52deg) rotateY(48deg);
-      animation: kinetic-ring-three 14s linear infinite;
-    }
-    .kinetic-sculpture__cube {
-      inset: 50%;
-      width: 5.5rem;
-      height: 5.5rem;
-      margin: -2.75rem;
-      animation: kinetic-core 13s linear infinite;
-    }
-    .kinetic-sculpture__face {
-      position: absolute;
-      inset: 0;
-      border: 1px solid rgba(31, 92, 186, 0.48);
-      background: rgba(250, 249, 244, 0.34);
-      box-shadow: inset 0 0 20px rgba(31, 92, 186, 0.05);
-      backdrop-filter: blur(1px);
-    }
-    .kinetic-sculpture__face--front { transform: translateZ(2.75rem); }
-    .kinetic-sculpture__face--back { transform: rotateY(180deg) translateZ(2.75rem); }
-    .kinetic-sculpture__face--right { transform: rotateY(90deg) translateZ(2.75rem); }
-    .kinetic-sculpture__face--left { transform: rotateY(-90deg) translateZ(2.75rem); }
-    .kinetic-sculpture__face--top { transform: rotateX(90deg) translateZ(2.75rem); }
-    .kinetic-sculpture__face--bottom { transform: rotateX(-90deg) translateZ(2.75rem); }
-    .kinetic-sculpture__satellite {
-      position: absolute;
-      width: 1rem;
-      height: 1rem;
-      border: 1px solid rgba(31, 92, 186, 0.52);
-      background: rgba(250, 249, 244, 0.72);
-      box-shadow: 0 0 14px rgba(31, 92, 186, 0.18);
-      transform-style: preserve-3d;
-      animation: kinetic-satellite 6s ease-in-out infinite;
-    }
-    .kinetic-sculpture__satellite--one {
-      top: 18%;
-      left: 24%;
-      transform: translateZ(4rem) rotate(45deg);
-    }
-    .kinetic-sculpture__satellite--two {
-      right: 18%;
-      bottom: 26%;
-      width: 1.25rem;
-      height: 1.25rem;
-      border-radius: 50%;
-      animation-delay: -2.2s;
-    }
-    .kinetic-sculpture__tag {
-      position: absolute;
-      border-left: 1px solid rgba(31, 92, 186, 0.42);
-      padding-left: 0.45rem;
-      color: rgba(31, 92, 186, 0.72);
-      font-family: "Space Grotesk", ui-monospace, monospace;
-      font-size: clamp(0.42rem, 1.2vw, 0.56rem);
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      white-space: nowrap;
-      transform: translateZ(2rem);
-      animation: kinetic-tag 6s ease-in-out infinite;
-    }
-    .kinetic-sculpture__tag--one {
-      top: 14%;
-      left: 8%;
-    }
-    .kinetic-sculpture__tag--two {
-      right: 5%;
-      bottom: 19%;
-      animation-delay: -2.2s;
-    }
-    @keyframes kinetic-assembly {
-      0%, 100% { transform: rotateX(-10deg) rotateY(-14deg); }
-      50% { transform: rotateX(10deg) rotateY(16deg); }
-    }
-    @keyframes kinetic-ring-one {
-      to { transform: rotateX(68deg) rotateZ(378deg); }
-    }
-    @keyframes kinetic-ring-two {
-      to { transform: rotateY(72deg) rotateZ(336deg); }
-    }
-    @keyframes kinetic-ring-three {
-      to { transform: rotateX(52deg) rotateY(408deg); }
-    }
-    @keyframes kinetic-core {
-      to { transform: rotateX(360deg) rotateY(360deg); }
-    }
-    @keyframes kinetic-satellite {
-      0%, 100% { margin-top: -0.35rem; opacity: 0.65; }
-      50% { margin-top: 0.35rem; opacity: 1; }
-    }
-    @keyframes kinetic-tag {
-      0%, 100% { margin-top: -0.2rem; opacity: 0.55; }
-      50% { margin-top: 0.2rem; opacity: 0.9; }
-    }
-    @keyframes kinetic-glow {
-      0%, 100% { opacity: 0.55; transform: scale(0.9); }
-      50% { opacity: 1; transform: scale(1.12); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .kinetic-sculpture::before,
-      .kinetic-sculpture__assembly,
-      .kinetic-sculpture__ring,
-      .kinetic-sculpture__cube,
-      .kinetic-sculpture__satellite,
-      .kinetic-sculpture__tag {
-        animation: none;
+      {
+        "@type": "WebSite",
+        "@id": "https://ac-opensource.github.io/#website",
+        "url": "https://ac-opensource.github.io/",
+        "name": "Andrew Concepcion",
+        "description": "Engineering portfolio, public project evidence, and technical writing.",
+        "publisher": { "@id": "https://ac-opensource.github.io/#person" }
       }
-    }
-  </style>
+    ]
+  }
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&amp;family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
+  <link href="/assets/css/neural-background.css?v=20260722-flow5" rel="stylesheet">
+  <link href="/assets/css/orbital-option-8.css?v=20260806-16" rel="stylesheet">
+  <script src="/assets/js/orbital-option-8.js?v=20260806-16" defer></script>
 </head>
-<body class="font-body text-on-surface selection:bg-tertiary-container selection:text-on-tertiary-container overflow-x-hidden">
-<a class="skip-link" href="#main-content">Skip to content</a>
-<div class="neural-global-bg" aria-hidden="true">
-  <div class="neural-mesh-container">
-    <div class="neural-mesh"></div>
-    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
-    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
-    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
-    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
-    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
-    <div class="mesh-line w-[400px]" style="top: 20%; left: 30%; transform: rotate(45deg);"></div>
-    <div class="mesh-line w-[500px]" style="top: 50%; left: 70%; transform: rotate(200deg);"></div>
-    <div class="mesh-line w-[300px]" style="top: 80%; left: 40%; transform: rotate(-30deg);"></div>
-  </div>
-  <div class="bust-gradient"></div>
-  <div class="canvas-grid"></div>
-</div>
-<header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
-  <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-    <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
-    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
-      <a data-route="/" href="/" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
-      <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
-      <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
-      <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
-    </nav>
-    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
-  </div>
-  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
-    <a data-route="/" href="/" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
-    <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
-    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
-    <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
-  </nav>
-</header>
-<div class="pt-32 md:pt-24 min-h-screen">
-<!-- Main Content Canvas -->
-<main class="max-w-7xl mx-auto p-6 md:p-12" id="main-content">
-<!-- Animated Hero Section -->
-<section class="mb-24 grid lg:grid-cols-5 gap-12 items-center">
-<div class="lg:col-span-3">
-<div class="font-label text-xs uppercase text-tertiary mb-4 tracking-tighter flex items-center gap-2" style="">
-<span class="w-8 h-[1px] bg-tertiary"></span>
-          [IDENTITY: AI_NATIVE_SOFTWARE_ENGINEER]
-        </div>
-<h1 class="font-headline text-4xl md:text-6xl font-bold leading-tight tracking-tighter text-on-surface mt-8">
-          Hello, I'm <span class="text-tertiary">Andrew</span>.<br/>AI-native software engineer.
-        </h1>
-<p class="text-lg md:text-xl text-secondary max-w-xl leading-relaxed font-light">
-          I build and improve production engineering systems across Android, iOS, backend, shared native code, and agent-first delivery workflows.
-        </p>
-<div class="mt-10 flex flex-wrap gap-4">
-<a class="bg-primary text-on-primary px-8 py-4 font-label uppercase text-sm hover:bg-primary-dim hover:ring-1 hover:ring-tertiary transition-all inline-flex items-center gap-2 group" href="/work.html">
-            View My Work
-            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform" style="">arrow_forward</span>
-</a>
-<a class="border border-outline-variant px-8 py-4 font-label uppercase text-sm hover:bg-surface-variant transition-all inline-flex items-center" href="/resume.html">
-            View Resume
-          </a>
-</div>
-</div>
-<div class="lg:col-span-2 relative w-full max-w-[26rem] mx-auto lg:max-w-none aspect-square bg-surface-container-low hero-glow group overflow-hidden border border-outline-variant/10">
-<div class="absolute inset-0 z-10 flex items-center justify-center p-5 sm:p-7 pointer-events-none">
-<div class="kinetic-sculpture" role="img" aria-label="Abstract three-dimensional kinetic sculpture with rotating wireframe rings, a translucent cube, and orbiting forms.">
-<div class="kinetic-sculpture__assembly" aria-hidden="true">
-<div class="kinetic-sculpture__ring kinetic-sculpture__ring--one"></div>
-<div class="kinetic-sculpture__ring kinetic-sculpture__ring--two"></div>
-<div class="kinetic-sculpture__ring kinetic-sculpture__ring--three"></div>
-<div class="kinetic-sculpture__cube">
-<span class="kinetic-sculpture__face kinetic-sculpture__face--front"></span>
-<span class="kinetic-sculpture__face kinetic-sculpture__face--back"></span>
-<span class="kinetic-sculpture__face kinetic-sculpture__face--right"></span>
-<span class="kinetic-sculpture__face kinetic-sculpture__face--left"></span>
-<span class="kinetic-sculpture__face kinetic-sculpture__face--top"></span>
-<span class="kinetic-sculpture__face kinetic-sculpture__face--bottom"></span>
-</div>
-<span class="kinetic-sculpture__satellite kinetic-sculpture__satellite--one"></span>
-<span class="kinetic-sculpture__satellite kinetic-sculpture__satellite--two"></span>
-<span class="kinetic-sculpture__tag kinetic-sculpture__tag--one">[CURIOSITY]</span>
-<span class="kinetic-sculpture__tag kinetic-sculpture__tag--two">[CRAFT]</span>
-</div>
-</div>
-</div>
-<div class="absolute inset-0 bg-gradient-to-tr from-surface via-transparent to-transparent z-20"></div>
-<div class="absolute top-4 right-4 font-label text-[10px] text-tertiary z-30 flex items-center gap-2" style="">
-<span class="w-2 h-2 bg-tertiary animate-pulse-slow"></span>
-          [KINETIC_FIELD: ACTIVE]
-        </div>
-<div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-tertiary z-30"></div>
-<div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-tertiary z-30"></div>
-<div class="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-tertiary z-30"></div>
-<div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-tertiary z-30"></div>
-<div class="absolute inset-0 opacity-[0.03] grid-bg-overlay z-0"></div>
-</div>
-</section>
-<!-- About Snapshot -->
-<section class="mb-24" id="home-about-snapshot">
-<div class="mb-8">
-<h2 class="font-headline text-4xl md:text-5xl font-bold tracking-tight text-on-surface" id="home-about-heading">About</h2>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-<article class="p-6 md:p-8 bg-surface-container-low border border-outline-variant/20 border-t-2 border-t-tertiary">
-<h3 class="font-headline text-2xl md:text-3xl font-bold mb-4 tracking-tight text-on-surface" id="home-about-professional-title">Professional</h3>
-<p class="text-base md:text-lg leading-[1.6] font-light text-secondary" id="home-about-professional-body">
-            AI-native software engineer with deep platform knowledge and 10+ years of experience shipping production-grade Android, iOS, and backend systems across crypto, fintech, streaming, telecom, e-commerce, and transport. I pair agent-first execution with composable architectures, mentoring, and clean, testable code that scales.
-          </p>
-</article>
-<article class="p-6 md:p-8 bg-surface-container-highest border border-outline-variant/20">
-<h3 class="font-headline text-2xl md:text-3xl font-bold mb-4 tracking-tight text-on-surface" id="home-about-personal-title">Personal</h3>
-<p class="text-base md:text-lg leading-[1.6] font-light text-secondary" id="home-about-personal-body">
-            Husband, dad, and lifelong explorer. When I’m not building mobile experiences, you’ll find me observing Saturn through my Dobsonian, photographing a family adventure, or reading something that challenges how I think. I also run a small Airbnb and laundry business—hands-on ventures supporting my journey toward financial independence. Fitness keeps me grounded; curiosity keeps me moving forward.
-          </p>
-</article>
-</div>
-</section>
-<!-- Evidence Profile Map -->
-<section class="mb-24" id="profile-map">
-<div class="profile-map profile-map--compact" data-profile-map data-profile-map-mode="compact" data-profile-map-default="engineering">
-  <div class="profile-map__topline">
-    <span class="profile-map__eyebrow">[SKILLS + INTERESTS]</span>
-    <span class="profile-map__status" data-profile-map-status>[select a junction]</span>
-  </div>
-  <h2 class="profile-map__heading">What I build—and what keeps me curious.</h2>
-  <p class="profile-map__intro">Mobile is home turf. I follow the work outward into backend systems, architecture, reliability, and agent-first delivery—and inward into family, cameras, the night sky, philosophy, fitness, and small ventures.</p>
-  <div class="profile-map__tabs" role="tablist" aria-label="Profile tree dataset">
-    <button class="profile-map__tab" type="button" role="tab" aria-selected="true" aria-controls="home-profile-map-panel" data-profile-map-tab="engineering">Engineering</button>
-    <button class="profile-map__tab" type="button" role="tab" aria-selected="false" aria-controls="home-profile-map-panel" data-profile-map-tab="interests" tabindex="-1">Interests</button>
-  </div>
-  <div class="profile-map__stage" id="home-profile-map-panel" role="tabpanel">
-    <div class="profile-map__visual" data-profile-map-visual>
-      <div class="profile-map__popover" data-profile-map-readout role="dialog" aria-modal="false" aria-live="polite" hidden></div>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="neural-global-bg" aria-hidden="true">
+    <div class="neural-mesh-container">
+      <div class="neural-mesh"></div>
+      <div class="neural-node" style="top:18%;left:28%;animation-delay:0s"></div>
+      <div class="neural-node" style="top:48%;left:72%;animation-delay:1.2s"></div>
+      <div class="neural-node" style="top:82%;left:38%;animation-delay:.5s"></div>
+      <div class="neural-node" style="top:29%;left:84%;animation-delay:2s"></div>
+      <div class="neural-node" style="top:64%;left:18%;animation-delay:1.5s"></div>
+      <div class="neural-node" style="top:13%;left:61%;animation-delay:.8s"></div>
     </div>
-    <aside class="profile-map__side" aria-label="Profile tree context">
-      <h3 class="profile-map__dataset-title" data-profile-map-dataset-title>Engineering</h3>
-      <p class="profile-map__dataset-description" data-profile-map-dataset-description>I build across Android, iOS, backend systems, and shared code, with architecture, reliability, and delivery running through it all.</p>
-      <div class="profile-map__legend" aria-label="Junction evidence legend">
-        <span class="profile-map__legend-item"><span class="profile-map__legend-line" aria-hidden="true"></span><span>Solid junction · shipped work</span></span>
-        <span class="profile-map__legend-item"><span class="profile-map__legend-line profile-map__legend-line--dashed" aria-hidden="true"></span><span>Open junction · writing / profile</span></span>
-      </div>
-      <p class="profile-map__method">Choose a junction to see more. Related paths illuminate when selected. <a href="/about.html#profile-map-evidence">Full tree and sources</a>.</p>
-    </aside>
   </div>
-  <div class="profile-map__fallback">
-    <section class="profile-map__fallback-panel" id="home-profile-engineering" data-profile-map-fallback-panel="engineering">
-      <h3>Engineering</h3>
-      <div class="profile-map__fallback-grid">
-        <div class="profile-map__fallback-group"><strong>Surfaces</strong><ul><li>Android</li><li>iOS</li><li>Backend APIs</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Languages</strong><ul><li>Kotlin</li><li>Swift / Objective-C</li><li>Rust / UniFFI</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Craft</strong><ul><li>Jetpack Compose</li><li>Clean / modular architecture</li><li>Reliability / performance</li><li>CI/CD / release hardening</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Delivery</strong><ul><li>Technical leadership</li><li>Agent-first engineering</li></ul></div>
+
+  <header class="site-topbar" id="site-topbar">
+    <div class="site-topbar__inner">
+      <a class="site-brand" href="/">Andrew Concepcion</a>
+      <nav class="site-nav site-nav--desktop" id="site-nav" aria-label="Primary navigation">
+        <a class="site-nav-link" data-route="/" href="/" aria-current="page">[dashboard]</a>
+        <a class="site-nav-link" data-route="/work.html" href="/work.html">[portfolio]</a>
+        <a class="site-nav-link" data-route="/blog/" href="/blog/">[logs]</a>
+        <a class="site-nav-link" data-route="/about.html" href="/about.html">[about]</a>
+        <a class="site-nav-link" data-route="/contact.html" href="/contact.html">[contact]</a>
+      </nav>
+      <div class="site-status">[status: online]</div>
+    </div>
+    <nav class="site-nav site-nav--mobile" id="site-nav-mobile" aria-label="Mobile navigation">
+      <a class="site-nav-link" data-route="/" href="/" aria-current="page">[dashboard]</a>
+      <a class="site-nav-link" data-route="/work.html" href="/work.html">[portfolio]</a>
+      <a class="site-nav-link" data-route="/blog/" href="/blog/">[logs]</a>
+      <a class="site-nav-link" data-route="/about.html" href="/about.html">[about]</a>
+      <a class="site-nav-link" data-route="/contact.html" href="/contact.html">[contact]</a>
+    </nav>
+  </header>
+
+  <main class="orbital-landing" id="main-content" data-synthesis data-view="orbit" data-transition="overview">
+    <section class="overview-layer" data-overview aria-labelledby="identity-heading">
+      <div class="scene-scaffold" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+      <header class="scene-identity" data-identity-hero>
+        <p class="eyebrow">[IDENTITY: AI_NATIVE_SOFTWARE_ENGINEER]</p>
+        <h1 id="identity-heading">Hello, I’m <em>Andrew</em>.<br>AI-native software engineer.</h1>
+        <p>I build and improve production engineering systems across Android, iOS, backend, shared native code, and agent-first delivery workflows.</p>
+        <div class="identity-actions">
+          <a href="/work.html">View My Work <span aria-hidden="true">→</span></a>
+          <a href="/resume.html">View Resume</a>
+        </div>
+      </header>
+
+      <div class="scene-controls" aria-label="Orbital field controls">
+        <button class="view-toggle" type="button" data-view-toggle aria-pressed="false">
+          <span class="view-icon" aria-hidden="true"><i></i><i></i></span>
+          <span><small data-view-action>Rotate to top view</small><strong data-view-label>Orbit · 38°</strong></span>
+        </button>
+        <button type="button" data-motion-toggle aria-pressed="false">[pause]</button>
       </div>
+
+      <div class="camera-window" data-camera-window data-orbit-stage>
+        <div class="camera-rig" data-camera-rig>
+          <div class="orbit-plane" data-orbit-plane>
+            <span class="datum datum--x" aria-hidden="true"></span>
+            <span class="datum datum--y" aria-hidden="true"></span>
+            <span class="track track--about" data-track="about" aria-hidden="true"><i>01 / R–A</i></span>
+            <span class="track track--profile" data-track="profile" aria-hidden="true"><i>02 / R–B</i></span>
+            <span class="track track--work" data-track="work" aria-hidden="true"><i>03 / R–C</i></span>
+            <span class="track track--projects" data-track="projects" aria-hidden="true"><i>04 / R–D</i></span>
+            <span class="track track--threads" data-track="threads" aria-hidden="true"><i>05 / R–E</i></span>
+            <span class="track track--contact" data-track="contact" aria-hidden="true"><i>06 / R–F</i></span>
+            <span class="field-origin" aria-hidden="true"><b>AC</b><small>ORIGIN / 00</small></span>
+
+            <button class="orbit-node orbit-node--about" type="button" data-orbit-object="about" aria-label="Focus About">
+              <span class="sculpture sculpture--life" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b></span>
+              <span class="node-label"><small>01 / IDENTITY</small><strong>About</strong><span>Professional + personal</span></span>
+            </button>
+            <button class="orbit-node orbit-node--profile" type="button" data-orbit-object="profile" aria-label="Focus Skills and interests">
+              <span class="sculpture sculpture--range" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b><b></b></span>
+              <span class="node-label"><small>02 / CAPABILITY</small><strong>Skills + interests</strong><span>What I build · what keeps me curious</span></span>
+            </button>
+            <button class="orbit-node orbit-node--work" type="button" data-orbit-object="work" aria-label="Focus Work and portfolio">
+              <span class="sculpture sculpture--production" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b></span>
+              <span class="node-label"><small>03 / PORTFOLIO</small><strong>Work</strong><span>Production record · leadership · delivery</span></span>
+            </button>
+            <button class="orbit-node orbit-node--projects" type="button" data-orbit-object="projects" aria-label="Focus Highlighted projects">
+              <span class="sculpture sculpture--opensource" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b><b></b></span>
+              <span class="node-label"><small>04 / SELECTED SYSTEMS</small><strong>Highlighted projects</strong><span>Bitcoin.com Wallet · public builds</span></span>
+            </button>
+            <button class="orbit-node orbit-node--threads" type="button" data-orbit-object="threads" aria-label="Focus Current threads">
+              <span class="sculpture sculpture--questions" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b></span>
+              <span class="node-label"><small>05 / NOW</small><strong>Current threads</strong><span>Agents · privacy · observation</span></span>
+            </button>
+            <button class="orbit-node orbit-node--contact" type="button" data-orbit-object="contact" aria-label="Focus Contact">
+              <span class="sculpture sculpture--practice" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b></span>
+              <span class="node-label"><small>06 / CONNECT</small><strong>Contact</strong><span>Start a thoughtful collaboration</span></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <section class="dashboard-preview" data-dashboard-preview aria-live="polite" aria-label="Destination preview">
+        <p class="dashboard-preview__status"><span data-preview-code>[HOVER PREVIEW]</span><span data-preview-status>FIELD / READY</span></p>
+        <article data-preview="about"><small>01 / ABOUT</small><h2>Professional + personal.</h2><p>AI-native software engineer with 10+ years shipping across platforms. Husband, dad, explorer, photographer, amateur astronomer, reader, builder.</p></article>
+        <article data-preview="profile"><small>02 / SKILLS + INTERESTS</small><h2>What I build—and what keeps me curious.</h2><p>Mobile is home turf. The work extends into backend systems, architecture, reliability, agent-first delivery, family, cameras, the night sky, philosophy, and fitness.</p></article>
+        <article data-preview="work"><small>03 / WORK</small><h2>I build the parts people notice when they fail.</h2><p>Android, iOS, backend, and architecture—leading teams, staying close to the code, and moving from idea to verified release.</p></article>
+        <article data-preview="projects"><small>04 / HIGHLIGHTED PROJECTS</small><h2>I go where the product needs me.</h2><p>Android, iOS, backend, or architecture—leading teams, staying close to the code, and using AI to move from idea to verified release faster.</p></article>
+        <article data-preview="threads"><small>05 / CURRENT THREADS</small><h2>Questions I keep returning to.</h2><p>Agent systems that leave receipts, location tools without surveillance, and learning to look before moving on.</p></article>
+        <article data-preview="contact"><small>06 / CONTACT</small><h2>Let’s build something durable.</h2><p>The clearest route into engineering leadership, mobile and backend systems, reliability work, or thoughtful agent-assisted delivery.</p></article>
+      </section>
+
+      <p class="scene-readout" aria-live="polite"><span data-view-readout>PERSPECTIVE / 38°</span><span data-motion-readout>MOTION / ACTIVE</span></p>
     </section>
-    <section class="profile-map__fallback-panel" id="home-profile-interests" data-profile-map-fallback-panel="interests">
-      <h3>Interests</h3>
-      <div class="profile-map__fallback-grid">
-        <div class="profile-map__fallback-group"><strong>Place</strong><ul><li>Travel</li><li>Outdoors</li><li>Family time</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Observation</strong><ul><li>Photography</li><li>Astronomy</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Reflection</strong><ul><li>Philosophy</li><li>Fitness</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Building</strong><ul><li>Small ventures</li></ul></div>
-      </div>
+
+    <nav class="field-map" data-field-map aria-label="Landing destinations">
+      <svg viewBox="0 0 380 128" aria-hidden="true"><path d="M190 65 48 87M190 65 92 30M190 65 166 19M190 65 276 33M190 65 334 84M190 65 218 112M48 87 92 30 166 19 276 33 334 84 218 112 48 87" /></svg>
+      <svg class="field-map__compact-lines" viewBox="0 0 700 60" preserveAspectRatio="none" aria-hidden="true"><path d="M50 19 150 11 250 21 350 11 450 21 550 13 650 19M50 19 250 21 450 21 650 19M150 11 350 11 550 13" /></svg>
+      <button class="map-home" type="button" data-map-home style="--mx:50%;--my:51%" aria-label="Return home to orbital overview"><span>00</span><strong>Home</strong></button>
+      <button type="button" data-map-target="about" style="--mx:12%;--my:68%" aria-label="Focus About"><span>01</span><strong>About</strong></button>
+      <button type="button" data-map-target="profile" style="--mx:24%;--my:24%" aria-label="Focus Skills and interests"><span>02</span><strong>Skills</strong></button>
+      <button type="button" data-map-target="work" style="--mx:43%;--my:15%" aria-label="Focus Work"><span>03</span><strong>Work</strong></button>
+      <button type="button" data-map-target="projects" style="--mx:71%;--my:26%" aria-label="Focus Highlighted projects"><span>04</span><strong>Projects</strong></button>
+      <button type="button" data-map-target="threads" style="--mx:86%;--my:66%" aria-label="Focus Current threads"><span>05</span><strong>Threads</strong></button>
+      <button type="button" data-map-target="contact" style="--mx:56%;--my:86%" aria-label="Focus Contact"><span>06</span><strong>Contact</strong></button>
+    </nav>
+
+    <section class="spatial-detail" data-detail-layer role="region" aria-label="Selected destination" hidden>
+      <button class="detail-backdrop" type="button" data-detail-backdrop aria-label="Return to orbital overview"></button>
+      <button class="detail-close" type="button" data-detail-close aria-label="Return to orbital overview"><span aria-hidden="true">×</span><small>home</small></button>
+
+      <article class="facet-detail" data-facet-detail="about" aria-labelledby="facet-about-title">
+        <figure class="landing-object"><span class="landing-code">OBJECT 01 / WHOLE-PERSON SPHERE</span><span class="sculpture sculpture--life" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b></span><figcaption>One person; professional depth and a life beyond the screen.</figcaption></figure>
+        <div class="landing-copy"><p class="eyebrow">[ABOUT]</p><h2 id="facet-about-title">Professional + personal.</h2><p>AI-native software engineer with deep platform knowledge and 10+ years of production experience. Husband, dad, and lifelong explorer—grounded by family, photography, astronomy, reading, fitness, and hands-on ventures.</p><a href="/about.html">Open About from the top <span aria-hidden="true">→</span></a></div>
+        <div class="focus-satellites" aria-label="About Andrew focus points"><span style="--sx:5%;--sy:14%"><small>01.A / PROFESSIONAL</small><strong>Platforms + production</strong><em>Android, iOS, backend systems, architecture, and delivery.</em></span><span style="--sx:78%;--sy:12%"><small>01.B / PERSONAL</small><strong>Husband + dad</strong><em>Family adventures, small ventures, and financial independence.</em></span><span style="--sx:81%;--sy:72%"><small>01.C / CURIOSITY</small><strong>Cameras + night sky</strong><em>Photography, astronomy, reading, fitness, and the outdoors.</em></span></div>
+      </article>
+
+      <article class="facet-detail" data-facet-detail="profile" aria-labelledby="facet-profile-title">
+        <figure class="landing-object"><span class="landing-code">OBJECT 02 / CAPABILITY LATTICE</span><span class="sculpture sculpture--range" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b><b></b></span><figcaption>Engineering and human interests sharing one connected framework.</figcaption></figure>
+        <div class="landing-copy"><p class="eyebrow">[SKILLS + INTERESTS]</p><h2 id="facet-profile-title">What I build—and what keeps me curious.</h2><p>Mobile is home turf. I follow the work outward into backend systems, architecture, reliability, and agent-first delivery—and inward into family, cameras, the night sky, philosophy, fitness, and small ventures.</p><a href="/about.html">Explore the complete About page <span aria-hidden="true">→</span></a></div>
+        <div class="focus-satellites" aria-label="Skills and interests focus points"><span style="--sx:5%;--sy:14%"><small>02.A / SURFACES</small><strong>Android + iOS + backend</strong><em>Kotlin, Swift, Objective-C, Rust, APIs, and shared native code.</em></span><span style="--sx:78%;--sy:12%"><small>02.B / CRAFT</small><strong>Architecture + reliability</strong><em>Composable systems, performance, CI/CD, and release hardening.</em></span><span style="--sx:81%;--sy:72%"><small>02.C / INTERESTS</small><strong>Place + observation</strong><em>Family, travel, cameras, astronomy, philosophy, fitness, and ventures.</em></span></div>
+      </article>
+
+      <article class="facet-detail" data-facet-detail="work" aria-labelledby="facet-work-title">
+        <figure class="landing-object"><span class="landing-code">OBJECT 03 / PRODUCTION GYROSCOPE</span><span class="sculpture sculpture--production" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b></span><figcaption>A full record of work balanced around production outcomes.</figcaption></figure>
+        <div class="landing-copy"><p class="eyebrow">[WORK / PORTFOLIO]</p><h2 id="facet-work-title">I build the parts people notice when they fail.</h2><p>I work wherever the product needs me—Android, iOS, backend, or architecture. I lead teams, stay close to the code, and use AI to move from idea to verified release faster.</p><a href="/work.html">Open the full portfolio <span aria-hidden="true">→</span></a></div>
+        <div class="focus-satellites" aria-label="Work focus points"><span style="--sx:5%;--sy:14%"><small>03.A / RANGE</small><strong>10+ years in production</strong><em>Crypto, banking, streaming, telecom, payments, transport, safety, and commerce.</em></span><span style="--sx:78%;--sy:12%"><small>03.B / ROLE</small><strong>Lead + build</strong><em>Direction, mentoring, architecture, implementation, and release.</em></span><span style="--sx:81%;--sy:72%"><small>03.C / EVIDENCE</small><strong>Systems + outcomes</strong><em>Case notes, public builds, product context, and operating constraints.</em></span></div>
+      </article>
+
+      <article class="facet-detail" data-facet-detail="projects" aria-labelledby="facet-projects-title">
+        <figure class="landing-object"><span class="landing-code">OBJECT 04 / PROJECT ARMATURE</span><span class="sculpture sculpture--opensource" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b><b></b></span><figcaption>Selected systems joined by the decisions and constraints behind them.</figcaption></figure>
+        <div class="landing-copy"><p class="eyebrow">[HIGHLIGHTED PROJECTS]</p><h2 id="facet-projects-title">I go where the product needs me.</h2><p>I’m a problem solver who works wherever the product needs me—Android, iOS, backend, or architecture. I lead teams, stay close to the code, and use AI to get from idea to verified release faster.</p><a href="/work.html">Browse the complete portfolio <span aria-hidden="true">→</span></a></div>
+        <div class="focus-satellites focus-satellites--projects" aria-label="Highlighted projects"><a class="project-satellite--primary" style="--sx:3%;--sy:11%" href="/work.html#production-work"><small>LEAD PROJECT / ANDROID</small><strong>Bitcoin.com Wallet</strong><em>Multichain rewards, market predictions, Bitcoin transaction replacement, wallet migration, shared Rust, and release hardening.</em></a><a style="--sx:77%;--sy:10%" href="https://github.com/ac-opensource/persons-finder" target="_blank" rel="noreferrer"><small>KOTLIN / POSTGIS</small><strong>Persons Finder</strong><em>Location history, nearby search, and a guarded AI bio boundary.</em></a><a style="--sx:80%;--sy:72%" href="https://github.com/ac-opensource/Orchestrum" target="_blank" rel="noreferrer"><small>ELIXIR / AGENTS</small><strong>Orchestrum</strong><em>Isolated runs, proof-of-work, and operator-facing state.</em></a></div>
+      </article>
+
+      <article class="facet-detail" data-facet-detail="threads" aria-labelledby="facet-threads-title">
+        <figure class="landing-object"><span class="landing-code">OBJECT 05 / THOUGHT LOOM</span><span class="sculpture sculpture--questions" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b></span><figcaption>Three live threads moving through one field of judgment.</figcaption></figure>
+        <div class="landing-copy"><p class="eyebrow">[CURRENT THREADS]</p><h2 id="facet-threads-title">Questions I keep returning to.</h2><p>In code, in writing, and away from a screen: credible evidence, useful privacy, and the discipline to look before moving on.</p><a href="/blog/">Open all logs <span aria-hidden="true">→</span></a></div>
+        <div class="focus-satellites focus-satellites--threads" aria-label="Current threads">
+          <a style="--sx:3%;--sy:11%" href="/blog/2026-04-30-agents-that-leave-receipts.html"><small>APR 30 2026 · AGENT SYSTEMS</small><strong>Agents should leave receipts.</strong><em>The next run should know what changed, what passed, and what still needs proof.</em></a>
+          <a style="--sx:71%;--sy:8%" href="/blog/2026-07-21-what-building-persons-finder-taught-me.html"><small>JUL 21 2026 · LOCATION + PRIVACY</small><strong>Useful location systems shouldn’t become surveillance.</strong><em>How much history, precision, and AI context does a useful product actually need?</em></a>
+          <a style="--sx:77%;--sy:70%" href="/blog/2024-09-14-film-photography-gallery.html"><small>SEP 14 2024 · PHOTOGRAPHY</small><strong>Learning to look before I move on.</strong><em>Code invites a patch. A photograph makes me stop and look again.</em></a>
+        </div>
+      </article>
+
+      <article class="facet-detail" data-facet-detail="contact" aria-labelledby="facet-contact-title">
+        <figure class="landing-object"><span class="landing-code">OBJECT 06 / CONNECTION PRISM</span><span class="sculpture sculpture--practice" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b></span><figcaption>A direct route from shared context to a useful next conversation.</figcaption></figure>
+        <div class="landing-copy"><p class="eyebrow">[CONTACT]</p><h2 id="facet-contact-title">Let’s build something durable.</h2><p>For engineering leadership, mobile and backend systems, reliability work, or thoughtful agent-assisted delivery, the contact page is the clearest starting point.</p><a href="/contact.html">Contact Andrew <span aria-hidden="true">→</span></a></div>
+        <div class="focus-satellites" aria-label="Contact focus points"><span style="--sx:5%;--sy:14%"><small>06.A / WORK</small><strong>Complex product systems</strong><em>Mobile, backend, architecture, reliability, and delivery.</em></span><a style="--sx:78%;--sy:12%" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer"><small>06.B / SOURCE</small><strong>GitHub</strong><em>Public repositories, contributions, and inspectable engineering work.</em></a><span style="--sx:81%;--sy:72%"><small>06.C / MODE</small><strong>Thoughtful collaboration</strong><em>Clear context, concrete constraints, and durable outcomes.</em></span></div>
+      </article>
     </section>
-  </div>
-</div>
-</section>
-<!-- Bento Grid Layout for Dashboard -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-<!-- Recently Pushed: Engineering Projects (Left Column) -->
-<div class="lg:col-span-8 space-y-8">
-<div class="flex justify-between items-end border-b border-outline-variant/20 pb-4">
-<h2 class="font-headline text-2xl font-bold uppercase flex items-center gap-2">
-<span class="material-symbols-outlined" aria-hidden="true">deployed_code</span> Selected Public Repositories
-          </h2>
-<a class="font-label text-xs text-tertiary hover:text-tertiary-dim" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[VIEW: GITHUB_PROFILE]</a>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="recently-pushed-grid">
-<article class="bg-surface-container-low p-6 transition-all hover:bg-surface-container-highest group border border-transparent hover:border-outline-variant/30">
-<div class="flex justify-between items-start mb-6">
-<span class="material-symbols-outlined text-tertiary text-3xl" aria-hidden="true">travel_explore</span>
-<span class="font-label text-[10px] text-outline">[PUBLIC_REPO]</span>
-</div>
-<h3 class="font-headline text-xl font-bold mb-2"><a class="hover:text-tertiary" href="https://github.com/ac-opensource/persons-finder" target="_blank" rel="noreferrer">persons-finder</a></h3>
-<p class="text-sm text-secondary mb-6 font-light">A reference backend for location history, nearby search, and a guarded AI-generated bio boundary.</p>
-<div class="space-y-2">
-<div class="flex justify-between font-label text-[10px] uppercase">
-<span>[SOURCE: GITHUB]</span>
-<span>[STACK: KOTLIN/POSTGIS]</span>
-</div>
-<div class="w-full h-[2px] bg-outline-variant/20 overflow-hidden">
-<div class="w-full h-full bg-primary group-hover:bg-tertiary transition-all duration-500"></div>
-</div>
-</div>
-</article>
-<article class="bg-surface-container-low p-6 transition-all hover:bg-surface-container-highest group border border-transparent hover:border-outline-variant/30">
-<div class="flex justify-between items-start mb-6">
-<span class="material-symbols-outlined text-tertiary text-3xl" aria-hidden="true">account_tree</span>
-<span class="font-label text-[10px] text-outline">[ENGINEERING_PREVIEW]</span>
-</div>
-<h3 class="font-headline text-xl font-bold mb-2"><a class="hover:text-tertiary" href="https://github.com/ac-opensource/Orchestrum" target="_blank" rel="noreferrer">Orchestrum</a></h3>
-<p class="text-sm text-secondary mb-6 font-light">An engineering preview that routes project work into isolated agent runs and exposes proof-of-work and operator-facing runtime state.</p>
-<div class="space-y-2">
-<div class="flex justify-between font-label text-[10px] uppercase">
-<span>[SOURCE: GITHUB]</span>
-<span>[STACK: ELIXIR]</span>
-</div>
-<div class="w-full h-[2px] bg-outline-variant/20 overflow-hidden">
-<div class="w-1/3 h-full bg-primary group-hover:bg-tertiary transition-all duration-500"></div>
-</div>
-</div>
-</article>
-</div>
-</div>
-<!-- Current Threads Sidebar -->
-<aside class="lg:col-span-4 bg-surface-container-low p-8 border border-outline-variant/10" aria-labelledby="current-threads-heading">
-<div class="mb-8 flex items-start justify-between gap-5">
-  <div>
-    <div class="font-label text-[10px] uppercase tracking-[0.18em] text-tertiary mb-2">[NOW]</div>
-    <h2 class="font-headline text-xl font-bold" id="current-threads-heading">Current threads</h2>
-  </div>
-  <time class="font-label text-[9px] uppercase tracking-wider text-outline" datetime="2026-07-22">Updated Jul 2026</time>
-</div>
-<p class="text-sm text-secondary mb-8 leading-relaxed">Questions I keep returning to—in code, in writing, and away from a screen.</p>
-<div class="space-y-8">
-  <article class="relative pl-6 border-l border-tertiary group">
-    <span class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-tertiary motion-safe:animate-pulse" aria-hidden="true"></span>
-    <div class="font-label text-[10px] text-tertiary uppercase mb-2">Building · agent systems</div>
-    <h3 class="font-bold text-sm mb-2 leading-snug"><a class="hover:text-tertiary transition-colors" href="/blog/2026-04-30-agents-that-leave-receipts.html">Agents should leave receipts.</a></h3>
-    <p class="text-xs text-secondary leading-relaxed">The next run should know what changed, what passed, and what still needs proof.</p>
-  </article>
-  <article class="relative pl-6 border-l border-outline-variant hover:border-tertiary transition-colors group">
-    <span class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-outline-variant group-hover:bg-tertiary" aria-hidden="true"></span>
-    <div class="font-label text-[10px] text-outline uppercase mb-2">Testing · location + privacy</div>
-    <h3 class="font-bold text-sm mb-2 leading-snug"><a class="hover:text-tertiary transition-colors" href="/blog/2026-07-21-what-building-persons-finder-taught-me.html">Useful location systems shouldn’t become surveillance.</a></h3>
-    <p class="text-xs text-secondary leading-relaxed">I’m working through how much history, precision, and AI context a useful product actually needs.</p>
-  </article>
-  <article class="relative pl-6 border-l border-outline-variant hover:border-tertiary transition-colors group">
-    <span class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-outline-variant group-hover:bg-tertiary" aria-hidden="true"></span>
-    <div class="font-label text-[10px] text-outline uppercase mb-2">Observing · photography</div>
-    <h3 class="font-bold text-sm mb-2 leading-snug"><a class="hover:text-tertiary transition-colors" href="/blog/2024-09-14-film-photography-gallery.html">Learning to look before I move on.</a></h3>
-    <p class="text-xs text-secondary leading-relaxed">Code invites an immediate patch. A photograph makes me stop and look again.</p>
-  </article>
-</div>
-<div class="mt-10 pt-6 border-t border-outline-variant/20">
-  <div class="font-label text-[10px] uppercase text-outline mb-3">Also on my mind</div>
-  <div class="flex flex-wrap gap-2 text-[10px] font-label uppercase tracking-wide text-secondary">
-    <span class="border border-outline-variant/30 px-2.5 py-1.5">civic tech</span>
-    <span class="border border-outline-variant/30 px-2.5 py-1.5">native edges</span>
-    <span class="border border-outline-variant/30 px-2.5 py-1.5">technical leadership</span>
-    <span class="border border-outline-variant/30 px-2.5 py-1.5">small ventures</span>
-  </div>
-</div>
-</aside>
-</div>
-</main>
-</div>
-<footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
-  <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
-    <span>© 2026 Andrew Concepcion</span>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
-  </div>
-</footer>
-<script src="/assets/js/profile-map.js?v=20260723-worldtree17"></script>
-</body></html>
+  </main>
+
+  <noscript><p class="noscript-note">The orbital motion needs JavaScript, so the six complete destinations are shown below in a readable order.</p></noscript>
+</body>
+</html>
