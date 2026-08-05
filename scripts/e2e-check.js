@@ -147,6 +147,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   for (const route of routes) {
     const url = BASE_URL + route.path;
+    const isSpatialHome = route.path === '/';
     const resp = await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(200);
     await assert(resp && resp.status() >= 200 && resp.status() < 400, `Route ${route.path} did not load successfully`);
@@ -154,12 +155,12 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const hasTopbar = await page.locator('#site-topbar').count();
     const hasFooter = await page.locator('#site-footer').count();
     await assert(hasTopbar > 0, `${route.path}: missing #site-topbar`);
-    await assert(hasFooter > 0, `${route.path}: missing #site-footer`);
+    await assert(isSpatialHome ? hasFooter === 0 : hasFooter > 0, `${route.path}: unexpected footer state`);
     const desktopPortfolioLabels = await page.locator(
       '#site-nav a[href="/work.html"], #site-footer a[href="/work.html"]'
     ).allTextContents();
     await assert(
-      desktopPortfolioLabels.length === 2
+      desktopPortfolioLabels.length === (isSpatialHome ? 1 : 2)
         && desktopPortfolioLabels.every((label) => label.trim() === '[portfolio]'),
       `${route.path}: desktop navigation must label /work.html as [portfolio]`
     );
@@ -187,7 +188,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       '#site-nav-mobile a[href="/work.html"], #site-footer a[href="/work.html"]'
     ).allTextContents();
     await assert(
-      mobilePortfolioLabels.length === 2
+      mobilePortfolioLabels.length === (isSpatialHome ? 1 : 2)
         && mobilePortfolioLabels.every((label) => label.trim() === '[portfolio]'),
       `${route.path}: mobile navigation must label /work.html as [portfolio]`
     );
@@ -195,8 +196,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       const selectors = {
         brand: '#site-topbar > div > a:first-child',
         status: '#site-topbar > div > div:last-child',
-        navigation: '#site-nav-mobile',
-        footer: '#site-footer > div'
+        navigation: '#site-nav-mobile'
       };
       return Object.fromEntries(
         Object.entries(selectors).map(([name, selector]) => {
@@ -229,14 +229,182 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       const titleText = await mobilePage.locator('#post-title').textContent();
       await assert(Boolean((titleText || '').trim()), `${route.path} mobile: #post-title is empty`);
     }
+    if (route.path === '/about.html') {
+      const aboutHeroClearance = await mobilePage.evaluate(() => {
+        const header = document.querySelector('#site-topbar').getBoundingClientRect();
+        const label = document.querySelector('#main-content .bracket-label').getBoundingClientRect();
+        return label.top - header.bottom;
+      });
+      await assert(aboutHeroClearance >= 0, 'About mobile hero is obscured by the fixed header');
+    }
     if (route.screenshot !== false) {
       await prepareForScreenshot(mobilePage);
       await mobilePage.screenshot({ path: path.join(mobileDir, `${route.name}.png`), fullPage: true });
     }
   }
 
+  // The homepage deliberately changes from a free orbital field to a stable,
+  // swipeable segment on compact screens. Guard the real production route at
+  // the device shapes where text, map, and focused content are most constrained.
+  for (const viewport of [
+    { width: 320, height: 540 },
+    { width: 390, height: 844 },
+    { width: 568, height: 320 },
+    { width: 768, height: 1024 },
+    { width: 1024, height: 768 },
+  ]) {
+    const spatialContext = await browser.newContext({
+      hasTouch: true,
+      isMobile: viewport.width < 768,
+      viewport,
+    });
+    const spatialPage = await spatialContext.newPage();
+    spatialPage.on('pageerror', (error) => failures.push(`Homepage ${viewport.width}x${viewport.height} pageerror: ${error.message}`));
+    await spatialPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
+    await spatialPage.locator('[data-synthesis]').waitFor();
+
+    const overview = await spatialPage.evaluate(() => {
+      const rect = (element) => {
+        const bounds = element.getBoundingClientRect();
+        return { bottom: bounds.bottom, left: bounds.left, right: bounds.right, top: bounds.top };
+      };
+      const intersection = (first, second) => (
+        Math.max(0, Math.min(first.right, second.right) - Math.max(first.left, second.left))
+        * Math.max(0, Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top))
+      );
+      const labels = [...document.querySelectorAll('.node-label')].map(rect);
+      const hero = rect(document.querySelector('[data-identity-hero]'));
+      const map = rect(document.querySelector('[data-field-map]'));
+      const stage = document.querySelector('.camera-window');
+      const geometry = getComputedStyle(document.querySelector('.sculpture--range i:first-child'));
+      return {
+        compactMapVisible: getComputedStyle(document.querySelector('.field-map__compact-lines')).display !== 'none',
+        documentOverflow: [
+          document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          document.documentElement.scrollHeight - document.documentElement.clientHeight,
+        ],
+        geometry: {
+          animationName: geometry.animationName,
+          animationPlayState: geometry.animationPlayState,
+        },
+        heroOverlaps: labels.map((label) => intersection(label, hero)).filter((area) => area > 1),
+        mapOverlaps: labels.map((label) => intersection(label, map)).filter((area) => area > 1),
+        mapTargets: [...document.querySelectorAll('[data-field-map] button')].map((element) => {
+          const bounds = element.getBoundingClientRect();
+          const hit = document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+          return {
+            height: bounds.height,
+            topmost: hit === element || hit?.closest('button') === element,
+            width: bounds.width,
+          };
+        }),
+        motion: document.querySelector('[data-synthesis]').dataset.motion,
+        nodeTargets: [...document.querySelectorAll('[data-orbit-object]')].map((element) => {
+          const bounds = element.getBoundingClientRect();
+          return { height: bounds.height, width: bounds.width };
+        }),
+        stage: { clientWidth: stage.clientWidth, scrollWidth: stage.scrollWidth },
+      };
+    });
+
+    await assert(
+      overview.documentOverflow.every((amount) => Math.abs(amount) <= 1),
+      `Homepage overflows ${viewport.width}x${viewport.height}: ${JSON.stringify(overview.documentOverflow)}`
+    );
+    await assert(overview.heroOverlaps.length === 0, `Homepage nodes overlap hero copy at ${viewport.width}x${viewport.height}`);
+    await assert(overview.mapOverlaps.length === 0, `Homepage nodes overlap the field map at ${viewport.width}x${viewport.height}`);
+    await assert(
+      overview.mapTargets.every(({ height, topmost, width }) => Math.min(height, width) >= 44 && topmost),
+      `Homepage map targets are obscured or too small at ${viewport.width}x${viewport.height}`
+    );
+    await assert(
+      overview.nodeTargets.every(({ height, width }) => Math.min(height, width) >= 44),
+      `Homepage orbit objects are too small at ${viewport.width}x${viewport.height}`
+    );
+    await assert(overview.motion === 'static', `Homepage compact field is not stable at ${viewport.width}x${viewport.height}`);
+    await assert(overview.stage.scrollWidth > overview.stage.clientWidth, `Homepage orbit is not swipeable at ${viewport.width}x${viewport.height}`);
+    await assert(
+      overview.geometry.animationName === 'range-shift' && overview.geometry.animationPlayState === 'running',
+      `Homepage internal geometry is not animated at ${viewport.width}x${viewport.height}`
+    );
+    if (viewport.width < 768 || viewport.height <= 560) {
+      await assert(overview.compactMapVisible, `Homepage compact star map is hidden at ${viewport.width}x${viewport.height}`);
+    }
+
+    const stage = spatialPage.locator('.camera-window');
+    await stage.evaluate((element) => { element.scrollLeft = element.scrollWidth - element.clientWidth; });
+    await spatialPage.waitForTimeout(80);
+    await assert(await stage.evaluate((element) => element.scrollLeft > 0), `Homepage orbit did not move at ${viewport.width}x${viewport.height}`);
+
+    await spatialPage.locator('[data-map-target="projects"]').click();
+    await spatialPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'focused');
+    const focused = await spatialPage.evaluate(() => {
+      const layer = document.querySelector('[data-detail-layer]').getBoundingClientRect();
+      const map = document.querySelector('[data-field-map]').getBoundingClientRect();
+      return {
+        detailMapOverlap: Math.max(0, Math.min(layer.bottom, map.bottom) - Math.max(layer.top, map.top)),
+        horizontalOverflow: document.querySelector('[data-detail-layer]').scrollWidth - document.querySelector('[data-detail-layer]').clientWidth,
+      };
+    });
+    await assert(Math.abs(focused.horizontalOverflow) <= 1, `Homepage detail overflows horizontally at ${viewport.width}x${viewport.height}`);
+    const usesInFlowFocus = viewport.width < 768 || viewport.height <= 560;
+    if (usesInFlowFocus) {
+      await assert(focused.detailMapOverlap === 0, `Homepage detail covers the map at ${viewport.width}x${viewport.height}`);
+    }
+
+    const lastSatellite = spatialPage.locator('[data-facet-detail="projects"] .focus-satellites > *').last();
+    if (usesInFlowFocus) {
+      await lastSatellite.scrollIntoViewIfNeeded();
+      const finalCard = await lastSatellite.boundingBox();
+      const detailLayer = await spatialPage.locator('[data-detail-layer]').boundingBox();
+      await assert(
+        finalCard && detailLayer
+          && finalCard.y >= detailLayer.y - 1
+          && finalCard.y + finalCard.height <= detailLayer.y + detailLayer.height + 1,
+        `Homepage final project card is obscured at ${viewport.width}x${viewport.height}`
+      );
+    } else {
+      await spatialPage.waitForTimeout(600);
+      const orbitalSafety = await spatialPage.evaluate(() => {
+        const active = document.querySelector('[data-facet-detail="projects"]');
+        const root = document.querySelector('[data-synthesis]').getBoundingClientRect();
+        const copy = active.querySelector('.landing-copy').getBoundingClientRect();
+        const map = document.querySelector('[data-field-map]').getBoundingClientRect();
+        const intersectionArea = (first, second) => (
+          Math.max(0, Math.min(first.right, second.right) - Math.max(first.left, second.left))
+          * Math.max(0, Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top))
+        );
+        return [...active.querySelectorAll('.focus-satellites > *')].map((element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            outside: rect.left < root.left - 1
+              || rect.right > root.right + 1
+              || rect.top < root.top - 1
+              || rect.bottom > root.bottom + 1,
+            copyOverlap: Math.round(intersectionArea(rect, copy)),
+            mapOverlap: Math.round(intersectionArea(rect, map)),
+          };
+        });
+      });
+      await assert(
+        orbitalSafety.every((card) => !card.outside && card.copyOverlap === 0 && card.mapOverlap === 0),
+        `Homepage orbiting project cards collide or leave the stage at ${viewport.width}x${viewport.height}`
+      );
+    }
+    await spatialPage.locator('[data-detail-backdrop]').click({ position: { x: 4, y: 4 } });
+    await spatialPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'overview');
+    await spatialContext.close();
+  }
+
   // Career timeline and resume stay aligned on the current employer sequence.
   await page.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
+  const personalIntro = ((await page.locator('#about-personal-intro').textContent()) || '').replace(/\s+/g, ' ').trim();
+  await assert(
+    personalIntro.includes('husband, dad')
+      && personalIntro.includes('photography')
+      && personalIntro.includes('astronomy'),
+    'About hero does not expose the requested personal dimension'
+  );
   const careerSection = page.getByRole('heading', { name: 'Career Trajectory', exact: true }).locator('xpath=ancestor::section[1]');
   const careerHeadings = await careerSection.locator('h3').evaluateAll((headings) =>
     headings.map((heading) => (heading.textContent || '').replace(/\s+/g, ' ').trim())
@@ -619,6 +787,12 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   // Work page portfolio content and progressive-enhancement checks
   await page.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  const portfolioHeroOffset = await page.evaluate(() => {
+    const header = document.querySelector('#site-topbar').getBoundingClientRect();
+    const eyebrow = document.querySelector('.work-hero .work-eyebrow').getBoundingClientRect();
+    return eyebrow.top - header.bottom;
+  });
+  await assert(portfolioHeroOffset < 100, `Portfolio hero starts ${portfolioHeroOffset}px below the header; expected less than 100px`);
   const portfolioEntries = page.locator('[data-portfolio-entry]');
   const portfolioEntryCount = await portfolioEntries.count();
   await assert(portfolioEntryCount >= 16, `Work page rendered ${portfolioEntryCount} portfolio entries; expected at least 16`);

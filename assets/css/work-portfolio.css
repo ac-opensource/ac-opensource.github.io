@@ -24,7 +24,7 @@ body {
 .work-page {
   width: min(100%, 86rem);
   margin: 0 auto;
-  padding: 8.2rem clamp(1.25rem, 4vw, 3rem) 3rem;
+  padding: 4.75rem clamp(1.25rem, 4vw, 3rem) 3rem;
 }
 
 .work-eyebrow {
@@ -72,7 +72,7 @@ body {
   overflow: hidden;
   border: 0;
   border-radius: 0;
-  padding: clamp(2rem, 5vw, 4.5rem) clamp(0rem, 3vw, 2rem);
+  padding: clamp(1.5rem, 3vw, 2.75rem) clamp(0rem, 3vw, 2rem);
   background: transparent;
   box-shadow: none;
 }
@@ -1589,6 +1589,12 @@ body {
 
   .work-cta__actions {
     margin-top: 0;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 767px) {
+  .work-page {
+    padding-top: 7.125rem;
   }
 }
 
