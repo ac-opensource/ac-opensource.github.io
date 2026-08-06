@@ -1,0 +1,632 @@
+<!-- generated: scripts/build-static-blog-pages.js -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
+<title>Rebuilding My Homepage as an Interactive Orbital System | Andrew Concepcion</title>
+<meta name="description" content="I’m not a web developer, but with Codex I turned a static portfolio into a working orbital interface—and spent more time shaping the product than wrestling with syntax."/>
+<link rel="canonical" href="https://ac-opensource.github.io/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html"/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:site_name" content="Andrew Concepcion"/>
+<meta property="og:type" content="article"/>
+<meta property="og:url" content="https://ac-opensource.github.io/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html"/>
+<meta property="og:title" content="Rebuilding My Homepage as an Interactive Orbital System | Andrew Concepcion"/>
+<meta property="og:description" content="I’m not a web developer, but with Codex I turned a static portfolio into a working orbital interface—and spent more time shaping the product than wrestling with syntax."/>
+<meta property="og:image" content="https://ac-opensource.github.io/blog/images/orbital-homepage-value-chain-hero.svg"/>
+<meta property="og:image:alt" content="Diagram of product direction becoming an orbital homepage while the engineer moves upward from implementation mechanics to verified delivery."/>
+<meta property="article:published_time" content="2026-08-06"/>
+<meta property="article:author" content="Andrew Concepcion"/>
+<meta property="article:tag" content="ai-workflow">
+<meta property="article:tag" content="product-engineering">
+<meta property="article:tag" content="web-animation">
+<meta property="article:tag" content="ux">
+<meta property="article:tag" content="accessibility">
+<meta property="article:tag" content="quality-engineering">
+<meta property="article:tag" content="cross-disciplinary-engineering">
+<meta property="article:tag" content="technical">
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Rebuilding My Homepage as an Interactive Orbital System | Andrew Concepcion"/>
+<meta name="twitter:description" content="I’m not a web developer, but with Codex I turned a static portfolio into a working orbital interface—and spent more time shaping the product than wrestling with syntax."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/orbital-homepage-value-chain-hero.svg"/>
+<meta name="twitter:image:alt" content="Diagram of product direction becoming an orbital homepage while the engineer moves upward from implementation mechanics to verified delivery."/>
+<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#faf9f4",
+          "tertiary": "#1f5cba",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f4f4ee",
+          "surface-container": "#edefe7",
+          "surface-container-highest": "#e0e4d9",
+          "secondary": "#57606a",
+          "on-surface": "#2f342d",
+          "outline": "#787c73",
+          "outline-variant": "#afb3aa",
+          "primary": "#5a5f65",
+          "on-primary": "#f4f8ff"
+        },
+        fontFamily: {
+          "headline": ["Space Grotesk"],
+          "body": ["Manrope"],
+          "label": ["Space Grotesk"]
+        },
+        borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"}
+      }
+    }
+  }
+</script>
+<style>
+  body {
+    background-color: #faf9f4;
+  }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .code-block {
+    background: #1A1C1E;
+    color: #DEE3E9;
+    font-family: 'Space Grotesk', monospace;
+    padding: 1.5rem;
+    border-left: 4px solid #1F5CBA;
+  }
+  .code-keyword { color: #6799FB; }
+  .code-type { color: #FE8983; }
+  .code-func { color: #E0E4D9; }
+  .hero-overlay-alpha {
+    opacity: 0;
+    animation: overlayAlphaPulse 4.8s ease-in-out infinite;
+    will-change: opacity;
+  }
+  .work-post-hero {
+    position: relative;
+    display: grid;
+    aspect-ratio: 1;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(175, 179, 170, 0.28);
+    background: #edefe7;
+  }
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
+  }
+  .work-post-hero__screen {
+    display: block;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
+    overflow: hidden;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
+  }
+  .work-post-hero__screen img,
+  .work-post-hero--cover > img,
+  .work-post-hero--contain > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .work-post-hero__screen img,
+  .work-post-hero--cover > img {
+    object-fit: cover;
+  }
+  .work-post-hero--cover > img {
+    object-position: 62% center;
+  }
+  .work-post-hero--contain {
+    aspect-ratio: 4 / 5;
+  }
+  .work-post-hero--contain > img {
+    object-fit: contain;
+    background: #fff;
+  }
+  @keyframes overlayAlphaPulse {
+    0% { opacity: 0; }
+    15% { opacity: 0; }
+    35% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-overlay-alpha {
+      animation: none;
+      opacity: 1;
+    }
+  }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
+</style>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Rebuilding My Homepage as an Interactive Orbital System",
+  "description": "I’m not a web developer, but with Codex I turned a static portfolio into a working orbital interface—and spent more time shaping the product than wrestling with syntax.",
+  "author": {
+    "@type": "Person",
+    "name": "Andrew Concepcion"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Andrew Concepcion",
+    "url": "https://ac-opensource.github.io"
+  },
+  "datePublished": "2026-08-06",
+  "dateModified": "2026-08-06T05:43:54.000Z",
+  "image": "https://ac-opensource.github.io/blog/images/orbital-homepage-value-chain-hero.svg",
+  "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html"
+}</script>
+</head>
+<body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
+<a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
+<div class="neural-global-bg" aria-hidden="true">
+  <div class="neural-mesh-container">
+    <div class="neural-mesh"></div>
+    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
+    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
+    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
+    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
+    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
+    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
+    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
+    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
+    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
+  </div>
+  <div class="bust-gradient"></div>
+  <div class="canvas-grid"></div>
+</div>
+<header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
+  <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
+    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+      <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+      <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+      <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+      <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+    </nav>
+    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
+  </div>
+  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+    <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+    <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+  </nav>
+</header>
+<main id="main-content" class="pt-32 md:pt-24 pb-32">
+<article class="max-w-screen-xl mx-auto px-6">
+<div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
+<span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
+<span id="post-date" class="bg-surface-container-low px-2 py-1">2026-08-06</span>
+<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[7 min read]</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
+<div class="lg:col-span-7">
+<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">Rebuilding My Homepage as an Interactive Orbital System</h1>
+<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">I’m not a web developer, but with Codex I turned a static portfolio into a working orbital interface—and spent more time shaping the product than wrestling with syntax.</p>
+<div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
+<button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
+<button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
+<a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[RSS]</a>
+</div>
+</div>
+
+<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
+<div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
+<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="/blog/images/orbital-homepage-value-chain-hero.svg" alt="Diagram of product direction becoming an orbital homepage while the engineer moves upward from implementation mechanics to verified delivery." loading="eager" decoding="async"/>
+</div>
+<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
+<div class="flex justify-between items-start">
+<span class="font-label text-xs">[state_machine_v4.svg]</span>
+<span class="material-symbols-outlined text-tertiary">schema</span>
+</div>
+<div class="space-y-4">
+<div class="h-1 w-2/3 bg-tertiary/20"></div>
+<div class="flex gap-2">
+<div class="w-4 h-4 border border-tertiary"></div>
+<div class="w-4 h-4 bg-tertiary"></div>
+<div class="w-4 h-4 border border-tertiary"></div>
+</div>
+<div class="h-px w-full bg-outline-variant/50"></div>
+<div class="flex justify-end">
+<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<aside class="lg:col-span-3 hidden lg:block space-y-12">
+<div class="pt-4 border-t border-outline-variant/20">
+<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[author_identity]</h4>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">account_tree</span>
+</div>
+<div>
+<p id="post-author-name" class="text-sm font-bold">Andrew Concepcion</p>
+<p id="post-author-role" class="text-xs text-secondary">[technical]</p>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/20">
+<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
+<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ai-workflow</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#product-engineering</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#web-animation</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ux</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#accessibility</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#quality-engineering</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#cross-disciplinary-engineering</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#technical</span></div>
+</div>
+<section class="p-6 bg-surface-container-low space-y-4">
+<h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
+<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">I’m not a web developer, but with Codex I turned a static portfolio into a working orbital interface—and spent more time shaping the product than wrestling with syntax.</p>
+</section>
+</aside>
+<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><section class="space-y-6">
+  <p>
+    I had been looking at my homepage for a while knowing that it said the right things but did not
+    really feel like me. It was clear, tidy, and familiar: introduction at the top, sections below,
+    links to the rest of the site. Nothing was wrong with it. It just felt more like a document than
+    a system.
+  </p>
+  <p>
+    I wanted movement, depth, and a sense that the different parts of my work were connected. The idea
+    in my head was an orbital interface, but not a space-themed website. More like an engineering
+    model that happened to be alive.
+  </p>
+  <p>
+    There was an obvious problem: I am not a web developer. I work mainly in mobile engineering and
+    production systems. I can read web code and reason about the behaviour, but complex CSS animation
+    is not where I spend my day. In the past, that gap would probably have kept this as a sketch. This
+    time I used Codex to close it.
+  </p>
+</section>
+
+<!-- orbital-value-chain-figure -->
+<figure class="mt-12 space-y-3">
+  <img class="w-full border border-outline-variant/20 bg-surface-container-lowest" src="/blog/images/orbital-homepage-value-chain-hero.svg" alt="Diagram of product direction becoming an orbital homepage while the engineer moves upward from implementation mechanics to verified delivery." loading="eager" decoding="async" />
+  <figcaption class="text-sm text-secondary leading-relaxed">
+    Codex covered more of the implementation. I spent more time shaping the experience and deciding
+    what was actually good enough to ship.
+  </figcaption>
+</figure>
+
+<aside class="mt-12 bg-surface-container-low border-l-4 border-tertiary p-6 md:p-8 space-y-4">
+  <p class="font-label text-xs uppercase tracking-widest text-tertiary">Where the leverage came from</p>
+  <h2 class="font-headline text-3xl font-bold leading-tight">The loop became much faster.</h2>
+  <p>
+    I could move from an idea to something I could click, reject, combine, and test in hours. Codex
+    handled much of the unfamiliar web work. I stayed responsible for the direction, the tradeoffs,
+    and whether the result held together as a product.
+  </p>
+  <p>
+    That let me spend less time translating an idea into syntax and more time deciding what the idea
+    should become. That is what moving up the value chain looked like in practice.
+  </p>
+</aside>
+
+<section class="space-y-5 mt-14">
+  <h2 class="font-headline text-4xl font-bold leading-tight">Starting wider than one design</h2>
+  <p>
+    We began by looking at the existing site rather than starting with a blank canvas. The type,
+    colours, thin structural lines, and generous empty space already had an identity. I wanted to keep
+    that and change the way the homepage behaved.
+  </p>
+  <p>
+    Instead of asking for one polished answer, I had Codex build seven working directions. They ranged
+    from a mechanical instrument to a spatial map, a kinetic sculpture display, and a knowledge graph.
+    The point was not to choose a theme from a mood board. I wanted to use each version and see what
+    felt natural.
+  </p>
+  <p>
+    The early set still played things too safely. Several versions looked different at first glance
+    but had almost the same interaction underneath. I pushed the experiments further apart. Once each
+    one behaved differently, comparing them became useful. I could tell which ideas were interesting
+    only in a screenshot and which ones remained interesting after a minute of use.
+  </p>
+</section>
+
+<section class="space-y-5 mt-14">
+  <h2 class="font-headline text-4xl font-bold leading-tight">The final homepage did not come from a single winner</h2>
+  <p>
+    I ended up liking fragments from several versions. One had the loose elliptical movement I was
+    after. Another could rotate from an angled orbit into a top view. The spatial-map version handled
+    selection well and kept a small map of the whole system visible. A sculpture experiment gave each
+    destination its own geometric character.
+  </p>
+  <p>
+    We combined those pieces into a new version rather than forcing one experiment to carry everything.
+    I also brought back parts of the old homepage that should never have disappeared: the direct
+    introduction, the subtle moving background, and the small amount of blue that gave the page some
+    life.
+  </p>
+  <p>
+    Keeping the introduction outside the orbit was especially important. Some prototypes made the
+    centre another object that had to be opened. It looked clever, but it hid the most basic answer a
+    homepage needs to give: who is this person and what do they do? The orbit became a way to explore,
+    not an obstacle before the content.
+  </p>
+</section>
+
+<section class="space-y-5 mt-14">
+  <h2 class="font-headline text-4xl font-bold leading-tight">Most of my feedback was not about code</h2>
+  <p>
+    I reviewed the prototypes the same way I would review a product. I sent screenshots. I pointed out
+    when a panel felt too much like a table, when an animation drew attention to itself, or when a
+    preview appeared too far from the thing it described. I noticed when there was no clear route back
+    home and when too many borders made the page feel boxed in.
+  </p>
+  <p>
+    The words needed work too. Some labels overlapped with the site's main navigation while meaning
+    something slightly different. Work history and highlighted projects felt like the same
+    destination. Several links led to About without making the difference clear. Fixing that
+    information structure did more for the homepage than adding another visual effect would have.
+  </p>
+  <p>
+    This was the part of the process that surprised me least. I did not need to know the CSS behind a
+    problem to know that the experience was wrong. I could describe the behaviour I expected, review
+    the next version, and keep narrowing the gap.
+  </p>
+</section>
+
+<section class="space-y-5 mt-14">
+  <h2 class="font-headline text-4xl font-bold leading-tight">When the motion felt wrong, it usually was</h2>
+  <p>
+    One orbiting object kept making tiny jumps and sometimes looked as if it became stuck near the edge.
+    It was easy to see and hard to ignore. Codex traced it to a collision system that was adjusting the
+    position of the nodes on every frame. The code was trying to keep everything tidy, but those
+    corrections were fighting the orbit itself.
+  </p>
+  <p>
+    We removed the collision adjustments and let each object follow its own continuous path. That
+    meant accepting that an object might briefly overlap another one or move partly off-screen. I
+    preferred that to motion that looked nervous and artificial.
+  </p>
+  <p>
+    A smaller vertical hop remained. This time the problem was depth. The animation used a handful of
+    rounded depth levels for both perspective and stacking order, so moving between levels caused a
+    visible step. Using smooth depth for the transform and rounded values only for front-to-back order
+    fixed it.
+  </p>
+  <p>
+    Later we turned one of the nodes into a comet. It speeds up as it approaches the centre, slows down
+    as it moves away, and carries a fading trail. Even that took a few passes. A comet tail should
+    point away from the centre of the system, not simply follow behind the direction of travel. Once
+    that was corrected, the movement finally made sense.
+  </p>
+</section>
+
+<section class="space-y-5 mt-14">
+  <h2 class="font-headline text-4xl font-bold leading-tight">Mobile exposed every shortcut</h2>
+  <p>
+    The first compact layout simplified the idea too far. The orbits collapsed into one path, the
+    centre disappeared, some nodes spent too long out of view, and the map competed with the content.
+    It technically fit on a phone, but it no longer felt like the same homepage.
+  </p>
+  <p>
+    We gave the mobile version more vertical room instead. The page became scrollable, with separate
+    space for the introduction, the moving system, and the map. It kept multiple paths, a visible
+    centre, animated geometry, focused details, and a reliable way to dismiss them. We tested short
+    phones, portrait and landscape layouts, tablets, touch targets, and reduced motion rather than
+    trusting one responsive preview.
+  </p>
+  <p>
+    Sound produced another small lesson. At one point it seemed broken even though the code was there.
+    The local server was not the problem; the browser was waiting for the first deliberate interaction
+    before allowing audio. Once that behaviour was handled properly, the cues worked without adding a
+    fake autoplay workaround.
+  </p>
+</section>
+
+<section class="space-y-5 mt-14">
+  <h2 class="font-headline text-4xl font-bold leading-tight">The part Codex could not own</h2>
+  <p>
+    None of this worked because the first output was excellent. It was useful because it gave me
+    something real to react to. I still had to decide which ideas belonged together, which labels were
+    misleading, when an animation had crossed from calm into distracting, and which imperfections I
+    was willing to accept.
+  </p>
+  <p>
+    My mobile background helped more than I expected. State, navigation, touch behaviour, lifecycle,
+    accessibility, and release discipline transfer across stacks. I did not suddenly become a
+    front-end specialist, but I could bring engineering judgment to a front-end problem while Codex
+    handled much of the stack-specific implementation.
+  </p>
+  <p>
+    There is a version of AI-assisted development that produces more code and calls that progress. I
+    am not interested in that. The useful version gives me more chances to compare, test, and improve
+    an idea before the cost of iteration becomes too high.
+  </p>
+</section>
+
+<section class="space-y-5 mt-14">
+  <h2 class="font-headline text-4xl font-bold leading-tight">Finishing still meant proving it worked</h2>
+  <p>
+    The homepage eventually passed its focused desktop and mobile checks, the full production build,
+    and the site's browser suite across 32 routes. We checked keyboard and touch interaction, focus,
+    browser history, reduced motion, small screens, overflow, readable content without JavaScript,
+    and the live page after deployment.
+  </p>
+  <p>
+    That last part matters. A local demo, a successful build, and a working public page are three
+    different things. The speed of the iteration did not change the need to separate them.
+  </p>
+  <p>
+    What changed was the size of the surface I could responsibly own. I was able to take an idea in an
+    unfamiliar stack, shape it through many working versions, follow the technical problems when the
+    behaviour felt wrong, and carry it through verification. I spent less time asking how to express
+    every detail in web code and more time deciding whether the result was clear, coherent, and worth
+    shipping.
+  </p>
+  <p>
+    That is the real gain for me. Not skipping the work—working at a higher level, with a much faster
+    path from judgment to result.
+  </p>
+  <p>
+    <a class="inline-flex items-center gap-2 bg-primary text-on-primary px-5 py-3 font-label text-xs uppercase tracking-widest no-underline hover:bg-tertiary" href="/">
+      Explore the orbital homepage <span aria-hidden="true">→</span>
+    </a>
+  </p>
+</section></div>
+</div>
+<div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
+<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-07-22-its-not-okay-to-stay-not-okay.html">
+<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
+<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">It’s Not Okay to Not Be Okay</h5>
+<div class="mt-6 flex items-center gap-2 text-tertiary">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="font-label text-xs">read_entry</span>
+</div>
+</a>
+<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/">
+<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
+<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">No next post</h5>
+<div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
+<span class="font-label text-xs">read_entry</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</a>
+</div>
+</article>
+</main>
+<footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
+    <span>© 2026 Andrew Concepcion</span>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
+  </div>
+</footer>
+<script>
+  (() => {
+    const FORCE_ACTIVE_ROUTE = "/blog/";
+    const path = window.location.pathname.replace(/\/index\.html$/, "/");
+    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
+      const route = link.dataset.route;
+      let active = false;
+      if (route === FORCE_ACTIVE_ROUTE) {
+        active = true;
+      } else if (FORCE_ACTIVE_ROUTE === "/work.html" && route === "/blog/") {
+        active = false;
+      } else {
+        active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      }
+      if (active) {
+        link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+
+    const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
+    const CURRENT_POST_SLUG = "2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system";
+    const CURRENT_POST_TITLE = "Rebuilding My Homepage as an Interactive Orbital System";
+    const CURRENT_POST_URL = "/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html";
+    const sharePostButton = document.getElementById("share-post-button");
+    const bookmarkPostButton = document.getElementById("bookmark-post-button");
+
+    function loadBookmarks() {
+      try {
+        const raw = localStorage.getItem(BOOKMARKS_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(parsed)) return new Set();
+        return new Set(parsed.map((value) => String(value || "").trim()).filter(Boolean));
+      } catch (_error) {
+        return new Set();
+      }
+    }
+
+    function saveBookmarks(set) {
+      try {
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(set)));
+      } catch (_error) {
+        // Ignore write failures.
+      }
+    }
+
+    function setBookmarkButtonState(active) {
+      if (!bookmarkPostButton) return;
+      bookmarkPostButton.textContent = active ? "[BOOKMARKED]" : "[BOOKMARK]";
+      bookmarkPostButton.classList.toggle("border-tertiary/40", active);
+      bookmarkPostButton.classList.toggle("text-tertiary", active);
+      bookmarkPostButton.classList.toggle("bg-surface-container-highest", active);
+      bookmarkPostButton.classList.toggle("border-outline-variant/20", !active);
+      bookmarkPostButton.classList.toggle("text-secondary", !active);
+    }
+
+    async function shareCurrentPost() {
+      const absoluteUrl = new URL(CURRENT_POST_URL, window.location.origin).href;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: CURRENT_POST_TITLE || "Blog post",
+            url: absoluteUrl
+          });
+          return;
+        } catch (_error) {
+          // Continue to fallback.
+        }
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(absoluteUrl);
+          return;
+        } catch (_error) {
+          // Continue to prompt fallback.
+        }
+      }
+      window.prompt("Copy post URL:", absoluteUrl);
+    }
+
+    if (sharePostButton) {
+      sharePostButton.addEventListener("click", () => {
+        shareCurrentPost();
+      });
+    }
+
+    if (bookmarkPostButton && CURRENT_POST_SLUG) {
+      const bookmarks = loadBookmarks();
+      setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      bookmarkPostButton.addEventListener("click", () => {
+        if (bookmarks.has(CURRENT_POST_SLUG)) {
+          bookmarks.delete(CURRENT_POST_SLUG);
+        } else {
+          bookmarks.add(CURRENT_POST_SLUG);
+        }
+        saveBookmarks(bookmarks);
+        setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      });
+    }
+  })();
+</script>
+</body></html>

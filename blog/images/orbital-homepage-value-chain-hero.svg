@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" role="img" aria-labelledby="title desc">
+  <title id="title">From prompts to an orbital homepage</title>
+  <desc id="desc">A technical diagram showing a stack of product prompts feeding an interactive orbital system while an adjacent ladder rises from implementation to product outcomes and verified delivery.</desc>
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#afb3aa" stroke-opacity=".2"/>
+    </pattern>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0L10 5 0 10Z" fill="#1f5cba"/>
+    </marker>
+    <style>
+      .label { font: 600 18px 'Space Grotesk', ui-monospace, monospace; letter-spacing: .12em; fill: #57606a; }
+      .small { font: 500 15px 'Manrope', system-ui, sans-serif; fill: #57606a; }
+      .strong { font: 700 22px 'Space Grotesk', ui-monospace, monospace; fill: #2f342d; }
+      .micro { font: 600 12px 'Space Grotesk', ui-monospace, monospace; letter-spacing: .09em; fill: #1f5cba; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="1200" fill="#faf9f4"/>
+  <rect x="40" y="40" width="1120" height="1120" fill="url(#grid)" stroke="#afb3aa" stroke-opacity=".45"/>
+  <circle cx="700" cy="570" r="230" fill="#1f5cba" fill-opacity=".05" filter="url(#soft)"/>
+
+  <text x="86" y="102" class="label">PROMPT → PROTOTYPE → REVIEW → PROOF</text>
+  <path d="M86 126H1114" stroke="#afb3aa" stroke-opacity=".65"/>
+
+  <g transform="translate(86 210)">
+    <text class="micro" y="-26">PRODUCT DIRECTION</text>
+    <rect width="310" height="104" fill="#fff" fill-opacity=".8" stroke="#afb3aa"/>
+    <circle cx="26" cy="28" r="5" fill="#1f5cba"/>
+    <path d="M45 27H274M26 52H285M26 74H238" stroke="#57606a" stroke-opacity=".55"/>
+
+    <rect y="134" width="310" height="104" fill="#fff" fill-opacity=".8" stroke="#afb3aa"/>
+    <circle cx="26" cy="162" r="5" fill="#1f5cba"/>
+    <path d="M45 161H254M26 186H280M26 208H218" stroke="#57606a" stroke-opacity=".55"/>
+
+    <rect y="268" width="310" height="104" fill="#fff" fill-opacity=".8" stroke="#afb3aa"/>
+    <circle cx="26" cy="296" r="5" fill="#1f5cba"/>
+    <path d="M45 295H282M26 320H268M26 342H226" stroke="#57606a" stroke-opacity=".55"/>
+
+    <text x="0" y="422" class="small">Runnable alternatives, not one-shot output.</text>
+    <path d="M326 186H430" stroke="#1f5cba" stroke-width="2" marker-end="url(#arrow)"/>
+  </g>
+
+  <g transform="translate(696 560)">
+    <ellipse rx="240" ry="132" fill="none" stroke="#afb3aa" stroke-width="2" transform="rotate(-12)"/>
+    <ellipse rx="190" ry="94" fill="none" stroke="#1f5cba" stroke-opacity=".72" stroke-dasharray="8 9" transform="rotate(15)"/>
+    <ellipse rx="130" ry="66" fill="none" stroke="#afb3aa" stroke-width="2" transform="rotate(-28)"/>
+    <circle r="56" fill="#fff" stroke="#1f5cba" stroke-width="2"/>
+    <circle r="38" fill="none" stroke="#afb3aa" stroke-dasharray="5 5"/>
+    <text text-anchor="middle" y="-2" class="strong" fill="#1f5cba">AC</text>
+    <text text-anchor="middle" y="20" class="micro">HOME</text>
+
+    <g transform="translate(-194 -88)">
+      <rect x="-28" y="-28" width="56" height="56" fill="#faf9f4" stroke="#2f342d" transform="rotate(38)"/>
+      <text x="42" y="4" class="micro">ABOUT</text>
+    </g>
+    <g transform="translate(168 -104)">
+      <circle r="30" fill="#faf9f4" stroke="#2f342d"/>
+      <circle r="18" fill="none" stroke="#1f5cba"/>
+      <text x="42" y="4" class="micro">WORK</text>
+    </g>
+    <g transform="translate(222 68)">
+      <path d="M-30 22L0-28 30 22Z" fill="#faf9f4" stroke="#2f342d"/>
+      <text x="44" y="5" class="micro">PROJECTS</text>
+    </g>
+    <g transform="translate(-154 112)">
+      <path d="M-28-28H28V28H-28Z M-16-16H16V16H-16Z" fill="#faf9f4" stroke="#2f342d"/>
+      <text x="42" y="5" class="micro">LOGS</text>
+    </g>
+  </g>
+
+  <g transform="translate(86 760)">
+    <text class="micro" y="-24">MOVING UP THE VALUE CHAIN</text>
+    <path d="M0 340V20" stroke="#1f5cba" stroke-width="3" marker-end="url(#arrow)"/>
+    <g transform="translate(28 292)">
+      <rect width="258" height="58" fill="#edefe7"/>
+      <text x="18" y="35" class="small">Implementation mechanics</text>
+    </g>
+    <g transform="translate(94 214)">
+      <rect width="276" height="58" fill="#edefe7"/>
+      <text x="18" y="35" class="small">Interaction decisions</text>
+    </g>
+    <g transform="translate(166 136)">
+      <rect width="286" height="58" fill="#edefe7"/>
+      <text x="18" y="35" class="small">Product direction</text>
+    </g>
+    <g transform="translate(238 58)">
+      <rect width="314" height="58" fill="#1f5cba" fill-opacity=".12" stroke="#1f5cba"/>
+      <text x="18" y="35" class="strong">Verified delivery</text>
+    </g>
+  </g>
+
+  <g transform="translate(730 905)">
+    <rect width="382" height="166" fill="#fff" fill-opacity=".76" stroke="#afb3aa"/>
+    <text x="28" y="40" class="micro">THE LEVERAGE</text>
+    <text x="28" y="78" class="strong">More judgment per hour.</text>
+    <text x="28" y="112" class="small">Direction, critique, behavior, evidence.</text>
+    <text x="28" y="138" class="small">The loop got faster; the bar stayed high.</text>
+  </g>
+</svg>

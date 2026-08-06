@@ -1,5 +1,28 @@
 [
   {
+    "slug": "2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system",
+    "title": "Rebuilding My Homepage as an Interactive Orbital System",
+    "author": "Andrew Concepcion",
+    "summary": "I’m not a web developer, but with Codex I turned a static portfolio into a working orbital interface—and spent more time shaping the product than wrestling with syntax.",
+    "date": "2026-08-06",
+    "readingTime": "7 min read",
+    "topics": [
+      "ai-workflow",
+      "product-engineering",
+      "web-animation",
+      "ux",
+      "accessibility",
+      "quality-engineering",
+      "cross-disciplinary-engineering"
+    ],
+    "category": "technical",
+    "heroImage": "/blog/images/orbital-homepage-value-chain-hero.svg",
+    "heroAlt": "Diagram of product direction becoming an orbital homepage while the engineer moves upward from implementation mechanics to verified delivery.",
+    "heroCaption": "Codex covered more of the implementation. I spent more time shaping the experience and deciding what was actually good enough to ship.",
+    "updatedAt": "2026-08-06 05:43:54",
+    "createdAt": "2026-08-06 05:14:13"
+  },
+  {
     "slug": "2026-07-22-its-not-okay-to-stay-not-okay",
     "title": "It’s Not Okay to Not Be Okay",
     "author": "Andrew Concepcion",
