@@ -837,10 +837,27 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await flingPage.waitForTimeout(320);
     const apoAfter = await readOrbitCoordinates(flingPage);
     const apoDistance = displacement(apoBefore, apoAfter, flingTarget.key);
-    const accelerationWait = Math.max(0, flung.fling.period * 420 - 1140);
-    await flingPage.waitForTimeout(accelerationWait);
+    const apoRadius = await flingPage.evaluate((key) => {
+      const plane = document.querySelector('[data-orbit-plane]');
+      const node = document.querySelector(`[data-orbit-object="${key}"]`);
+      const focusX = plane.clientWidth * .04;
+      const focusY = plane.clientHeight * .02;
+      const x = Number.parseFloat(getComputedStyle(node).getPropertyValue('--x'));
+      const y = Number.parseFloat(getComputedStyle(node).getPropertyValue('--y'));
+      return Math.hypot(x - focusX, y - focusY);
+    }, flingTarget.key);
+    await flingPage.waitForFunction(({ key, threshold }) => {
+      const plane = document.querySelector('[data-orbit-plane]');
+      const node = document.querySelector(`[data-orbit-object="${key}"]`);
+      if (!plane || !node) return false;
+      const focusX = plane.clientWidth * .04;
+      const focusY = plane.clientHeight * .02;
+      const x = Number.parseFloat(getComputedStyle(node).getPropertyValue('--x'));
+      const y = Number.parseFloat(getComputedStyle(node).getPropertyValue('--y'));
+      return Math.hypot(x - focusX, y - focusY) <= threshold;
+    }, { key: flingTarget.key, threshold: apoRadius * .58 }, { timeout: 30000, polling: 100 });
     const inboundBefore = await readOrbitCoordinates(flingPage);
-    await flingPage.waitForTimeout(320);
+    await flingPage.waitForTimeout(420);
     const inboundAfter = await readOrbitCoordinates(flingPage);
     const inboundDistance = displacement(inboundBefore, inboundAfter, flingTarget.key);
     const regularDistances = inboundBefore
