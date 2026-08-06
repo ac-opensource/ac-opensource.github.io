@@ -622,16 +622,6 @@ a { color: inherit; text-underline-offset: 0.22em; }
     top:calc(12px + env(safe-area-inset-top));
     right:calc(12px + env(safe-area-inset-right));
   }
-  .focus-satellites > *,
-  [data-phase="focused"] .focus-satellites > *,
-  [data-phase="focused"] .focus-satellites > *:nth-child(2),
-  [data-phase="focused"] .focus-satellites > *:nth-child(3) {
-    left:auto;
-    width:auto;
-    max-width:100%;
-    animation:none !important;
-    transform:none !important;
-  }
 }
 
 @media (max-width: 767px) and (min-height: 561px) {
@@ -733,6 +723,719 @@ a { color: inherit; text-underline-offset: 0.22em; }
   .landing-copy > a { margin-top:8px; }
 }
 
+/* Compact screens keep the same spatial model as desktop. The field is
+   scaled and clipped to a protected stage, but nodes remain absolute,
+   parametric, animated, and responsive to the orbit/top-view controls. */
+@media (max-width: 767px) {
+  .site-topbar__inner {
+    padding-right:calc(24px + env(safe-area-inset-right));
+    padding-left:calc(24px + env(safe-area-inset-left));
+  }
+  .site-nav--mobile {
+    padding-right:calc(24px + env(safe-area-inset-right));
+    padding-left:calc(24px + env(safe-area-inset-left));
+  }
+  .orbital-landing { --map-rail-size:94px; }
+  .scene-identity {
+    top:calc(22px + env(safe-area-inset-top));
+    left:calc(18px + env(safe-area-inset-left));
+    width:calc(100% - 36px - env(safe-area-inset-left) - env(safe-area-inset-right));
+  }
+  .scene-controls {
+    top:clamp(268px,40%,310px);
+    right:calc(12px + env(safe-area-inset-right));
+    left:auto;
+    display:flex;
+    background:rgba(250,249,244,.7);
+    -webkit-backdrop-filter:blur(6px);
+    backdrop-filter:blur(6px);
+  }
+  .scene-controls button { min-width:58px; min-height:44px; padding-inline:7px; }
+  .scene-controls .view-toggle { min-width:112px; }
+  .scene-controls .view-toggle small { font-size:6px; }
+  .scene-controls .view-toggle strong { font-size:8px; }
+  .camera-window {
+    top:clamp(300px,46%,350px);
+    right:env(safe-area-inset-right);
+    bottom:calc(var(--map-rail-size) + env(safe-area-inset-bottom));
+    left:env(safe-area-inset-left);
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    pointer-events:none;
+    touch-action:manipulation;
+  }
+  .camera-rig,
+  [data-view="top"] .camera-rig {
+    width:min(104vw,440px);
+    min-width:0;
+    height:auto;
+    aspect-ratio:1.18;
+  }
+  .camera-rig { transform:rotateX(38deg) rotateZ(-7deg) translateZ(-18px); }
+  [data-view="top"] .camera-rig { transform:rotateX(0) rotateZ(0) translateZ(0); }
+  .orbit-plane {
+    position:relative;
+    width:100%;
+    min-width:0;
+    height:100%;
+    display:block;
+    padding:0;
+  }
+  .track--about { --tw:64%; --th:72%; }
+  .track--profile { --tw:68%; --th:75%; }
+  .track--work { --tw:72%; --th:78%; }
+  .track--projects { --tw:74%; --th:81%; }
+  .track--threads { --tw:68%; --th:84%; }
+  .track--contact { --tw:76%; --th:87%; }
+  .track i { display:none; }
+  .orbit-node,
+  [data-phase="focusing"] .orbit-node.is-selected,
+  [data-phase="focused"] .orbit-node.is-selected {
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:104px;
+    min-height:60px;
+    display:grid;
+    grid-template-columns:38px minmax(0,1fr);
+    gap:5px;
+    padding:0;
+    touch-action:manipulation;
+    transform:translate(-50%,-50%) translate3d(var(--x),var(--y),calc(var(--depth) * 7px)) !important;
+  }
+  .orbit-node--work,
+  .orbit-node--threads,
+  .orbit-node--contact { grid-template-columns:minmax(0,1fr) 38px; }
+  .orbit-node .sculpture { width:36px; height:36px; }
+  .orbit-node > * { transform:rotateZ(7deg) rotateX(-38deg) !important; }
+  [data-view="top"] .orbit-node > * { transform:none !important; }
+  .node-label { padding:5px 4px 6px 6px; }
+  .node-label small { font-size:6px; }
+  .node-label strong { margin-top:4px; font-size:8.5px; line-height:1.05; }
+  .node-label span { display:none; }
+  [data-phase="focusing"] .orbit-node.is-selected {
+    transform:translate(-50%,-50%) translate3d(var(--x),var(--y),30px) scale(1.12) !important;
+  }
+  [data-phase="focused"] .orbit-node.is-selected {
+    opacity:0;
+    transform:translate(-50%,-50%) translate3d(var(--x),var(--y),60px) scale(2) !important;
+  }
+  .field-origin { width:42px; height:42px; }
+  .field-origin b { font-size:13px; }
+  .field-origin small { font-size:4px; }
+  .field-map {
+    right:env(safe-area-inset-right);
+    bottom:0;
+    left:env(safe-area-inset-left);
+    width:auto;
+    height:calc(var(--map-rail-size) + env(safe-area-inset-bottom));
+    display:block;
+    padding:0 0 env(safe-area-inset-bottom);
+    background:linear-gradient(180deg,rgba(250,249,244,0),rgba(250,249,244,.9) 24%,rgba(250,249,244,.97));
+    -webkit-backdrop-filter:blur(7px);
+    backdrop-filter:blur(7px);
+  }
+  .field-map svg:not(.field-map__compact-lines) {
+    inset:0 10px calc(3px + env(safe-area-inset-bottom));
+    width:calc(100% - 20px);
+    height:calc(100% - 3px - env(safe-area-inset-bottom));
+    display:block;
+  }
+  .field-map .field-map__compact-lines { display:none; }
+  .field-map button {
+    position:absolute;
+    top:var(--mobile-my,var(--my));
+    left:var(--mobile-mx,var(--mx));
+    width:54px;
+    min-width:44px;
+    min-height:44px;
+    transform:translate(-50%,-50%);
+  }
+  .field-map button:nth-of-type(1) { --mobile-mx:50%; --mobile-my:62%; }
+  .field-map button:nth-of-type(2) { --mobile-mx:8%; --mobile-my:62%; }
+  .field-map button:nth-of-type(3) { --mobile-mx:24%; --mobile-my:24%; }
+  .field-map button:nth-of-type(4) { --mobile-mx:42%; --mobile-my:18%; }
+  .field-map button:nth-of-type(5) { --mobile-mx:69%; --mobile-my:24%; }
+  .field-map button:nth-of-type(6) { --mobile-mx:88%; --mobile-my:62%; }
+  .field-map button:nth-of-type(7) { --mobile-mx:55%; --mobile-my:88%; }
+  .field-map button::before { top:0; width:24px; height:24px; }
+  .field-map button span { height:28px; padding-top:8px; font-size:6px; }
+  .field-map button strong { font-size:6px; }
+  .spatial-detail { bottom:calc(var(--map-rail-size) + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 767px) and (min-height: 650px) {
+  .spatial-detail { overflow:hidden; background:linear-gradient(180deg,rgba(250,249,244,.92),rgba(250,249,244,.44)); }
+  .facet-detail.is-active,
+  [data-active="true"].facet-detail {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    min-height:0;
+    display:block;
+    padding:0;
+    overflow:hidden;
+  }
+  .landing-copy,
+  [data-phase="focused"] .landing-copy {
+    position:absolute;
+    z-index:12;
+    top:34px;
+    left:18px;
+    width:calc(100% - 36px);
+    padding-right:64px;
+    opacity:1;
+    transform:none;
+  }
+  .landing-copy .eyebrow { margin-bottom:9px; font-size:7px; }
+  .landing-copy h2 { max-width:100%; font-size:clamp(31px,9.3vw,40px); line-height:.92; }
+  .landing-copy > p:not(.eyebrow) { max-width:100%; margin-top:11px; font-size:10px; line-height:1.42; }
+  .landing-copy > a { min-height:44px; margin-top:12px; padding-inline:11px; font-size:7px; }
+  .landing-object,
+  [data-phase="focused"] .landing-object {
+    position:absolute;
+    z-index:5;
+    top:72%;
+    left:50%;
+    width:min(62vw,240px);
+    margin:0;
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1);
+  }
+  .landing-object .sculpture { width:min(31vw,126px); height:min(31vw,126px); }
+  .landing-code { top:5%; font-size:6px; }
+  .landing-object figcaption { display:none; }
+  .focus-satellites {
+    --sat-rx:clamp(92px,31vw,124px);
+    --sat-hx:clamp(46px,15.5vw,62px);
+    --sat-ry:clamp(78px,12vh,104px);
+    --sat-hy:clamp(39px,6vh,52px);
+    position:absolute;
+    z-index:10;
+    top:72%;
+    left:50%;
+    width:0;
+    height:0;
+    display:block;
+    margin:0;
+    pointer-events:none;
+  }
+  .focus-satellites::before { display:block; }
+  .focus-satellites > *,
+  [data-phase="focused"] .focus-satellites > * {
+    position:absolute;
+    top:0;
+    left:0;
+    width:clamp(96px,29vw,116px);
+    max-width:none;
+    min-height:62px;
+    padding:8px 9px;
+    opacity:0;
+    transform:translate(-50%,-50%) translate3d(calc(-1 * var(--sat-rx)),calc(-1 * var(--sat-hy)),0);
+  }
+  [data-phase="focused"] .focus-satellites > * {
+    animation:satellite-arrive 520ms cubic-bezier(.17,.84,.2,1) 240ms both,satellite-orbit 88s linear 0s infinite;
+  }
+  [data-phase="focused"] .focus-satellites > *:nth-child(2) {
+    animation:satellite-arrive 520ms cubic-bezier(.17,.84,.2,1) 340ms both,satellite-orbit 88s linear -29.33s infinite;
+  }
+  [data-phase="focused"] .focus-satellites > *:nth-child(3) {
+    animation:satellite-arrive 520ms cubic-bezier(.17,.84,.2,1) 440ms both,satellite-orbit 88s linear -58.66s infinite;
+  }
+  .focus-satellites .project-satellite--primary { width:clamp(108px,32vw,128px); min-height:74px; }
+  .focus-satellites small { font-size:5.5px; }
+  .focus-satellites strong { margin-top:5px; font-size:8px; }
+  .focus-satellites em { margin-top:5px; font-size:6px; line-height:1.3; }
+  .focus-satellites .project-satellite--primary strong { font-size:9px; }
+}
+
+@media (max-width: 767px) and (max-height: 649px) and (orientation:portrait) {
+  .scene-identity { top:14px; }
+  .scene-identity .eyebrow { margin-bottom:7px; }
+  .scene-identity h1 { font-size:clamp(27px,9.2vw,34px); }
+  .scene-identity > p:not(.eyebrow) {
+    display:-webkit-box;
+    margin-top:8px;
+    overflow:hidden;
+    font-size:9px;
+    line-height:1.35;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+  }
+  .identity-actions { margin-top:8px; }
+  .scene-controls { top:190px; }
+  .camera-window { top:228px; bottom:78px; }
+  .orbital-landing { --map-rail-size:78px; }
+}
+
+@media (orientation:landscape) and (max-height: 560px) and (max-width: 1000px) {
+  .orbital-landing { --map-rail-size:60px; }
+  .scene-identity {
+    top:8px;
+    left:calc(12px + env(safe-area-inset-left));
+    width:38%;
+  }
+  .scene-identity h1 { font-size:clamp(20px,3.5vw,28px); }
+  .scene-identity > p:not(.eyebrow) { display:none; }
+  .identity-actions { margin-top:5px; }
+  .identity-actions a { min-height:44px; padding-inline:8px; font-size:7px; }
+  .scene-controls {
+    top:2px;
+    right:calc(6px + env(safe-area-inset-right));
+    display:flex;
+  }
+  .scene-controls .view-toggle { min-width:96px; }
+  .scene-controls button { min-width:48px; }
+  .camera-window {
+    top:0;
+    right:env(safe-area-inset-right);
+    bottom:0;
+    left:40%;
+    overflow:hidden;
+    overscroll-behavior-inline:auto;
+    pointer-events:none;
+    scroll-snap-type:none;
+    touch-action:manipulation;
+  }
+  .camera-rig,
+  [data-view="top"] .camera-rig {
+    width:min(64vw,360px);
+    min-width:0;
+    height:auto;
+    aspect-ratio:1.18;
+  }
+  .camera-rig { transform:rotateX(38deg) rotateZ(-7deg) translateZ(-18px); }
+  [data-view="top"] .camera-rig { transform:rotateX(0) rotateZ(0) translateZ(0); }
+  .orbit-plane {
+    position:relative;
+    width:100%;
+    min-width:0;
+    height:100%;
+    display:block;
+    padding:0;
+  }
+  .orbit-node,
+  [data-phase="focusing"] .orbit-node.is-selected,
+  [data-phase="focused"] .orbit-node.is-selected {
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:92px;
+    min-height:52px;
+    display:grid;
+    flex:none;
+    grid-template-columns:32px minmax(0,1fr);
+    scroll-snap-align:none;
+    transform:translate(-50%,-50%) translate3d(var(--x),var(--y),calc(var(--depth) * 7px)) !important;
+  }
+  .orbit-node--work,
+  .orbit-node--threads,
+  .orbit-node--contact { grid-template-columns:minmax(0,1fr) 32px; }
+  .orbit-node .sculpture { width:30px; height:30px; }
+  .orbit-node > * { transform:rotateZ(7deg) rotateX(-38deg) !important; }
+  [data-view="top"] .orbit-node > * { transform:none !important; }
+  [data-phase="focusing"] .orbit-node.is-selected {
+    transform:translate(-50%,-50%) translate3d(var(--x),var(--y),30px) scale(1.1) !important;
+  }
+  [data-phase="focused"] .orbit-node.is-selected {
+    opacity:0;
+    transform:translate(-50%,-50%) translate3d(var(--x),var(--y),60px) scale(2) !important;
+  }
+  .node-label small { font-size:5px; }
+  .node-label strong { font-size:7px; }
+  .field-map {
+    right:auto;
+    bottom:8px;
+    left:calc(12px + env(safe-area-inset-left));
+    width:min(240px,36vw);
+    height:104px;
+    display:block;
+    padding:0;
+    background:transparent;
+    transform:none;
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+  .field-map svg:not(.field-map__compact-lines) {
+    inset:4px 10px 6px;
+    width:calc(100% - 20px);
+    height:calc(100% - 10px);
+    display:block;
+  }
+  .field-map .field-map__compact-lines { display:none; }
+  .field-map button {
+    position:absolute;
+    top:var(--my);
+    left:var(--mx);
+    width:54px;
+    min-width:44px;
+    min-height:44px;
+    transform:translate(-50%,-50%);
+  }
+  .field-map button::before { top:0; width:24px; height:24px; }
+  .field-map button span { height:28px; padding-top:8px; font-size:6px; }
+  .field-map button strong { font-size:6px; }
+}
+
+@media (min-width: 768px) and (max-width: 1100px) and (min-height: 561px) {
+  .scene-controls { display:flex; }
+  .camera-window {
+    top:2%;
+    right:-2%;
+    bottom:0;
+    left:36%;
+    overflow:hidden;
+    overscroll-behavior-inline:auto;
+    pointer-events:none;
+    scroll-snap-type:none;
+    touch-action:manipulation;
+  }
+  .camera-rig,
+  [data-view="top"] .camera-rig {
+    width:min(72vw,790px);
+    min-width:0;
+    height:auto;
+    aspect-ratio:1.18;
+  }
+  .camera-rig { transform:rotateX(45deg) rotateZ(-7deg) translateZ(-24px); }
+  [data-view="top"] .camera-rig { transform:rotateX(0) rotateZ(0) translateZ(0); }
+  .orbit-plane { position:relative; width:100%; min-width:0; height:100%; display:block; padding:0; }
+  .orbit-node,
+  [data-phase="focusing"] .orbit-node.is-selected,
+  [data-phase="focused"] .orbit-node.is-selected {
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:150px;
+    min-height:76px;
+    grid-template-columns:52px minmax(0,1fr);
+    transform:translate(-50%,-50%) translate3d(var(--x),var(--y),calc(var(--depth) * 7px)) !important;
+  }
+  .orbit-node--work,
+  .orbit-node--threads,
+  .orbit-node--contact { grid-template-columns:minmax(0,1fr) 52px; }
+  .orbit-node .sculpture { width:50px; height:50px; }
+  .orbit-node > * { transform:rotateZ(7deg) rotateX(-45deg) !important; }
+  [data-view="top"] .orbit-node > * { transform:none !important; }
+  [data-phase="focusing"] .orbit-node.is-selected {
+    transform:translate(-50%,-50%) translate3d(var(--x),var(--y),36px) scale(1.1) !important;
+  }
+  [data-phase="focused"] .orbit-node.is-selected {
+    opacity:0;
+    transform:translate(-50%,-50%) translate3d(var(--x),var(--y),60px) scale(2.2) !important;
+  }
+  .field-map svg:not(.field-map__compact-lines) { display:block; }
+  .field-map .field-map__compact-lines { display:none; }
+}
+
+/* The mobile landing is a taller spatial canvas. Scrolling creates the room;
+   the orbit and constellation keep their desktop interaction and proportions. */
+@media (max-width: 767px) {
+  body {
+    min-height:100%;
+    display:block;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .site-topbar__inner {
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:12px;
+    padding-right:calc(18px + env(safe-area-inset-right));
+    padding-left:calc(18px + env(safe-area-inset-left));
+  }
+  .site-brand {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .site-status { white-space:nowrap; }
+  .orbital-landing {
+    --map-clearance:172px;
+    height:1100px;
+    min-height:1100px;
+    flex:0 0 auto;
+    overflow:hidden;
+  }
+  .overview-layer { position:absolute; inset:0; overflow:hidden; }
+  .scene-identity { top:22px; }
+  .scene-controls {
+    top:300px;
+    right:calc(14px + env(safe-area-inset-right));
+    left:calc(14px + env(safe-area-inset-left));
+  }
+  .camera-window {
+    top:360px;
+    right:env(safe-area-inset-right);
+    bottom:auto;
+    left:env(safe-area-inset-left);
+    height:520px;
+    overflow:hidden;
+    overscroll-behavior-inline:auto;
+    scroll-snap-type:none;
+    touch-action:manipulation;
+  }
+  .camera-rig,
+  [data-view="top"] .camera-rig {
+    width:min(100%,440px);
+    height:clamp(470px,122vw,520px);
+    aspect-ratio:auto;
+  }
+  .orbit-node,
+  [data-phase="focusing"] .orbit-node.is-selected,
+  [data-phase="focused"] .orbit-node.is-selected { min-height:64px; }
+  .field-map {
+    right:auto;
+    bottom:12px;
+    left:50%;
+    width:min(calc(100% - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)),360px);
+    height:160px;
+    display:block;
+    padding:0;
+    overflow:visible;
+    background:transparent;
+    transform:translateX(-50%);
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+  .field-map svg:not(.field-map__compact-lines) {
+    inset:4px 10px 6px;
+    width:calc(100% - 20px);
+    height:calc(100% - 10px);
+    display:block;
+  }
+  .field-map .field-map__compact-lines { display:none; }
+  .field-map button:nth-of-type(1) { --mobile-mx:50%; --mobile-my:54%; }
+  .field-map button:nth-of-type(2) { --mobile-mx:13%; --mobile-my:68%; }
+  .field-map button:nth-of-type(3) { --mobile-mx:27%; --mobile-my:25%; }
+  .field-map button:nth-of-type(4) { --mobile-mx:44%; --mobile-my:17%; }
+  .field-map button:nth-of-type(5) { --mobile-mx:70%; --mobile-my:27%; }
+  .field-map button:nth-of-type(6) { --mobile-mx:87%; --mobile-my:68%; }
+  .field-map button:nth-of-type(7) { --mobile-mx:58%; --mobile-my:87%; }
+  .spatial-detail { inset:0; bottom:var(--map-clearance); }
+}
+
+@media (max-width: 340px) and (max-height: 649px) and (orientation: portrait) {
+  .orbital-landing { --map-clearance:158px; height:900px; min-height:900px; }
+  .scene-controls { top:212px; }
+  .camera-window { top:278px; height:420px; }
+  .camera-rig,
+  [data-view="top"] .camera-rig {
+    width:min(100%,400px);
+    height:410px;
+  }
+  .field-map { bottom:8px; height:150px; }
+  .orbit-node,
+  [data-phase="focusing"] .orbit-node.is-selected,
+  [data-phase="focused"] .orbit-node.is-selected {
+    width:100px;
+    grid-template-columns:36px minmax(0,1fr);
+  }
+  .orbit-node--work,
+  .orbit-node--threads,
+  .orbit-node--contact { grid-template-columns:minmax(0,1fr) 36px; }
+  .orbit-node .sculpture { width:34px; height:34px; }
+}
+
+@media (orientation: landscape) and (max-height: 560px) and (max-width: 767px) {
+  .orbital-landing { --map-clearance:126px; height:650px; min-height:650px; }
+  .scene-identity {
+    top:8px;
+    left:calc(12px + env(safe-area-inset-left));
+    width:38%;
+  }
+  .scene-controls { top:8px; right:calc(8px + env(safe-area-inset-right)); left:auto; }
+  .camera-window {
+    top:110px;
+    right:env(safe-area-inset-right);
+    bottom:auto;
+    left:39%;
+    height:410px;
+  }
+  .camera-rig,
+  [data-view="top"] .camera-rig {
+    width:min(61vw,370px);
+    height:390px;
+  }
+  .field-map {
+    right:auto;
+    bottom:18px;
+    left:calc(12px + env(safe-area-inset-left));
+    width:min(240px,44vw);
+    height:108px;
+    transform:none;
+  }
+  .spatial-detail { bottom:var(--map-clearance); }
+  .orbit-node,
+  [data-phase="focusing"] .orbit-node.is-selected,
+  [data-phase="focused"] .orbit-node.is-selected { min-height:60px; }
+}
+
+@media (max-width: 767px) and (orientation: portrait) {
+  .spatial-detail { overflow:hidden; }
+  .facet-detail.is-active,
+  [data-active="true"].facet-detail {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    min-height:0;
+    display:block;
+    padding:0;
+    overflow:hidden;
+  }
+  .landing-copy,
+  [data-phase="focused"] .landing-copy {
+    position:absolute;
+    z-index:12;
+    top:30px;
+    left:18px;
+    width:calc(100% - 36px);
+    padding-right:58px;
+  }
+  .landing-object,
+  [data-phase="focused"] .landing-object {
+    position:absolute;
+    top:55%;
+    left:50%;
+    width:min(58vw,220px);
+    margin:0;
+    transform:translate(-50%,-50%) scale(1);
+  }
+  .landing-object .sculpture { width:min(30vw,118px); height:min(30vw,118px); }
+  .focus-satellites {
+    --sat-rx:clamp(88px,29vw,116px);
+    --sat-hx:clamp(44px,14.5vw,58px);
+    --sat-ry:clamp(72px,10vh,92px);
+    --sat-hy:clamp(36px,5vh,46px);
+    position:absolute;
+    z-index:10;
+    top:55%;
+    left:50%;
+    width:0;
+    height:0;
+    display:block;
+    margin:0;
+    pointer-events:none;
+  }
+  .focus-satellites::before { display:block; }
+  .focus-satellites > *,
+  [data-phase="focused"] .focus-satellites > *,
+  [data-phase="focused"] .focus-satellites > *:nth-child(2),
+  [data-phase="focused"] .focus-satellites > *:nth-child(3) {
+    position:absolute;
+    top:0;
+    left:0;
+    width:clamp(96px,29vw,116px);
+    max-width:none;
+    min-height:62px;
+    opacity:0;
+    transform:translate(-50%,-50%) translate3d(calc(-1 * var(--sat-rx)),calc(-1 * var(--sat-hy)),0);
+  }
+  [data-phase="focused"] .focus-satellites > * {
+    animation:satellite-arrive 520ms cubic-bezier(.17,.84,.2,1) 240ms both,satellite-orbit 88s linear 0s infinite;
+  }
+  [data-phase="focused"] .focus-satellites > *:nth-child(2) {
+    animation:satellite-arrive 520ms cubic-bezier(.17,.84,.2,1) 340ms both,satellite-orbit 88s linear -29.33s infinite;
+  }
+  [data-phase="focused"] .focus-satellites > *:nth-child(3) {
+    animation:satellite-arrive 520ms cubic-bezier(.17,.84,.2,1) 440ms both,satellite-orbit 88s linear -58.66s infinite;
+  }
+  .focus-satellites .project-satellite--primary { width:clamp(108px,32vw,128px); }
+}
+
+@media (orientation: landscape) and (max-height: 560px) and (max-width: 1000px) {
+  .facet-detail.is-active,
+  [data-active="true"].facet-detail {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    min-height:0;
+    display:block;
+    padding:0;
+    overflow:hidden;
+  }
+  .landing-copy,
+  [data-phase="focused"] .landing-copy {
+    position:absolute;
+    z-index:12;
+    top:28px;
+    left:calc(14px + env(safe-area-inset-left));
+    width:38%;
+    padding:0;
+  }
+  .landing-object,
+  [data-phase="focused"] .landing-object {
+    position:absolute;
+    top:52%;
+    left:69%;
+    width:min(30vw,170px);
+    margin:0;
+    transform:translate(-50%,-50%) scale(1);
+  }
+  .landing-object .sculpture { width:min(16vw,92px); height:min(16vw,92px); }
+  .focus-satellites {
+    --sat-rx:clamp(76px,14vw,92px);
+    --sat-hx:clamp(38px,7vw,46px);
+    --sat-ry:clamp(58px,18vh,76px);
+    --sat-hy:clamp(29px,9vh,38px);
+    position:absolute;
+    z-index:10;
+    top:52%;
+    left:69%;
+    width:0;
+    height:0;
+    display:block;
+    margin:0;
+    pointer-events:none;
+  }
+  .focus-satellites::before { display:block; }
+  .focus-satellites > *,
+  [data-phase="focused"] .focus-satellites > *,
+  [data-phase="focused"] .focus-satellites > *:nth-child(2),
+  [data-phase="focused"] .focus-satellites > *:nth-child(3) {
+    position:absolute;
+    top:0;
+    left:0;
+    width:clamp(84px,17vw,98px);
+    max-width:none;
+    min-height:54px;
+    opacity:0;
+    transform:translate(-50%,-50%) translate3d(calc(-1 * var(--sat-rx)),calc(-1 * var(--sat-hy)),0);
+  }
+  [data-phase="focused"] .focus-satellites > * {
+    animation:satellite-arrive 520ms cubic-bezier(.17,.84,.2,1) 240ms both,satellite-orbit 96s linear 0s infinite;
+  }
+  [data-phase="focused"] .focus-satellites > *:nth-child(2) {
+    animation:satellite-arrive 520ms cubic-bezier(.17,.84,.2,1) 340ms both,satellite-orbit 96s linear -32s infinite;
+  }
+  [data-phase="focused"] .focus-satellites > *:nth-child(3) {
+    animation:satellite-arrive 520ms cubic-bezier(.17,.84,.2,1) 440ms both,satellite-orbit 96s linear -64s infinite;
+  }
+  .focus-satellites .project-satellite--primary { width:clamp(92px,19vw,108px); }
+}
+
+@media (min-width: 768px) and (max-width: 1100px) and (min-height: 561px) {
+  .camera-window { left:44%; }
+}
+
+/* Social-card and short-laptop heights need the same compact constellation,
+   but with enough clearance below the hero actions. */
+@media (min-width: 1101px) and (max-height: 700px) {
+  .camera-window { right:18%; }
+  .camera-rig { width:min(70vw,840px); }
+  .field-map {
+    bottom:8px;
+    left:36px;
+    width:340px;
+    height:120px;
+  }
+  .field-map button { width:56px; }
+}
+
 .no-js body, .no-js { overflow:auto; }
 .no-js .orbital-landing { height:auto; min-height:0; overflow:visible; }
 .no-js .overview-layer { position:relative; min-height:720px; }
@@ -758,4 +1461,11 @@ a { color: inherit; text-underline-offset: 0.22em; }
   .focus-satellites > *:nth-child(1) { transform:translate(-50%,-50%) translate3d(calc(-1 * var(--sat-rx)),calc(-1 * var(--sat-hy)),0); }
   .focus-satellites > *:nth-child(2) { transform:translate(-50%,-50%) translate3d(var(--sat-rx),calc(-1 * var(--sat-hy)),0); }
   .focus-satellites > *:nth-child(3) { transform:translate(-50%,-50%) translate3d(var(--sat-hx),var(--sat-ry),0); }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width:766px) {
+  [data-phase="focused"] .focus-satellites > * { opacity:1; animation:none !important; }
+  [data-phase="focused"] .focus-satellites > *:nth-child(1) { opacity:1; transform:translate(-50%,-50%) translate3d(calc(-1 * var(--sat-rx)),calc(-1 * var(--sat-hy)),0) !important; }
+  [data-phase="focused"] .focus-satellites > *:nth-child(2) { opacity:1; transform:translate(-50%,-50%) translate3d(var(--sat-rx),calc(-1 * var(--sat-hy)),0) !important; }
+  [data-phase="focused"] .focus-satellites > *:nth-child(3) { opacity:1; transform:translate(-50%,-50%) translate3d(var(--sat-hx),var(--sat-ry),0) !important; }
 }

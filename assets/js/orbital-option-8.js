@@ -42,8 +42,9 @@
   ]);
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const shortQuery = window.matchMedia("(orientation: landscape) and (max-height: 560px) and (max-width: 1000px)");
-  // Layout mode follows available geometry, not input type. Pointer-based
-  // compacting froze iPad-sized canvases without applying the matching CSS.
+  const phoneQuery = window.matchMedia("(max-width: 767px)");
+  // Compact describes the available geometry only. It scales the same orbital
+  // model; it never freezes motion or replaces the ellipses with a carousel.
   const compactQuery = window.matchMedia("(max-width: 1100px)");
   const nodeByKey = new Map(nodes.map((node) => [node.dataset.orbitObject, node]));
   const detailByKey = new Map(details.map((detail) => [detail.dataset.facetDetail, detail]));
@@ -59,12 +60,14 @@
     { key: "contact", angle: 292, rx: .47, ry: .325, cx: .065, cy: .035, tilt: -11, period: 314 },
   ];
 
-  const compactPositions = [
-    [-.26, -.18], [0, -.25], [.26, -.16], [-.26, .17], [0, .27], [.26, .16],
-  ];
-  const shortPositions = [
-    [-.27, -.34], [.27, -.34], [-.27, -.1], [.27, -.1], [-.27, .02], [.27, .02],
-  ];
+  const phoneProfiles = new Map([
+    ["about", { angleOffset: -88, rx: .37, ry: .41, cx: 0, cy: 0, tilt: 0 }],
+    ["profile", { angleOffset: -102, rx: .37, ry: .41, cx: 0, cy: 0, tilt: 0 }],
+    ["work", { angleOffset: -112, rx: .37, ry: .41, cx: 0, cy: 0, tilt: 0 }],
+    ["projects", { angleOffset: -107, rx: .37, ry: .41, cx: 0, cy: 0, tilt: 0 }],
+    ["threads", { angleOffset: -121, rx: .37, ry: .41, cx: 0, cy: 0, tilt: 0 }],
+    ["contact", { angleOffset: -142, rx: .37, ry: .41, cx: 0, cy: 0, tilt: 0 }],
+  ]);
 
   const state = {
     width: 0,
@@ -84,7 +87,9 @@
     opener: null,
     paused: false,
     cameraHeld: false,
+    overviewScrollY: 0,
     reduced: reducedMotionQuery.matches,
+    phone: phoneQuery.matches,
     compact: compactQuery.matches,
     short: shortQuery.matches,
     audioContext: null,
@@ -191,14 +196,39 @@
   };
 
   const pointOnEllipse = (profile) => {
-    const angle = profile.angle * Math.PI / 180;
-    const tilt = profile.tilt * Math.PI / 180;
-    const localX = Math.cos(angle) * state.width * profile.rx;
-    const localY = Math.sin(angle) * state.height * profile.ry;
+    let layout = profile;
+    if (state.phone) {
+      const phone = phoneProfiles.get(profile.key);
+      const verticalScale = state.short ? .86 : 1;
+      layout = {
+        ...profile,
+        angleOffset: phone.angleOffset,
+        rx: phone.rx,
+        ry: phone.ry * verticalScale,
+        cx: phone.cx,
+        cy: phone.cy * verticalScale,
+        tilt: phone.tilt,
+      };
+    } else if (state.compact) {
+      const compact = phoneProfiles.get(profile.key);
+      layout = {
+        ...profile,
+        angleOffset: compact.angleOffset,
+        rx: .34,
+        ry: .42,
+        cx: 0,
+        cy: 0,
+        tilt: 0,
+      };
+    }
+    const angle = (profile.angle + (layout.angleOffset || 0)) * Math.PI / 180;
+    const tilt = layout.tilt * Math.PI / 180;
+    const localX = Math.cos(angle) * state.width * layout.rx;
+    const localY = Math.sin(angle) * state.height * layout.ry;
     const depth = ((Math.sin(angle) + 1) / 2) * 5;
     return {
-      x: state.width * profile.cx + localX * Math.cos(tilt) - localY * Math.sin(tilt),
-      y: state.height * profile.cy + localX * Math.sin(tilt) + localY * Math.cos(tilt),
+      x: state.width * layout.cx + localX * Math.cos(tilt) - localY * Math.sin(tilt),
+      y: state.height * layout.cy + localX * Math.sin(tilt) + localY * Math.cos(tilt),
       depth,
       layer: Math.round(depth),
     };
@@ -206,10 +236,7 @@
 
   const render = () => {
     if (!state.width || !state.height) measure();
-    const positions = state.short ? shortPositions : compactPositions;
-    const points = state.compact
-      ? positions.map(([x, y], index) => ({ x: x * state.width, y: y * state.height, depth: index % 3, layer: index % 3 }))
-      : profiles.map(pointOnEllipse);
+    const points = profiles.map(pointOnEllipse);
 
     profiles.forEach((profile, index) => {
       const node = nodeByKey.get(profile.key);
@@ -228,7 +255,7 @@
   };
 
   const shouldAnimate = () => (
-    !state.reduced && !state.compact && !state.paused && !state.cameraHeld &&
+    !state.reduced && !state.paused && !state.cameraHeld &&
     state.phase !== "dismissing" && !document.hidden
   );
 
@@ -237,7 +264,8 @@
     state.lastFrame = timestamp;
     profiles.forEach((profile) => {
       if (state.held.has(profile.key)) return;
-      profile.angle += (360 / profile.period) * (delta / 1000);
+      const period = state.phone ? 360 : (state.compact ? 330 : profile.period);
+      profile.angle += (360 / period) * (delta / 1000);
     });
     render();
     state.frameRequest = shouldAnimate() ? window.requestAnimationFrame(frame) : 0;
@@ -251,11 +279,10 @@
   };
 
   const syncMotion = () => {
-    const staticMode = state.reduced || state.compact;
-    root.dataset.motion = state.reduced ? "reduced" : (state.compact ? "static" : (state.paused ? "paused" : "active"));
-    motionToggle.setAttribute("aria-disabled", String(staticMode));
+    root.dataset.motion = state.reduced ? "reduced" : (state.paused ? "paused" : "active");
+    motionToggle.setAttribute("aria-disabled", String(state.reduced));
     motionToggle.setAttribute("aria-pressed", String(state.paused));
-    motionToggle.textContent = state.reduced ? "[reduced]" : (state.compact ? "[static]" : (state.paused ? "[resume]" : "[pause]"));
+    motionToggle.textContent = state.reduced ? "[reduced]" : (state.paused ? "[resume]" : "[pause]");
     if (motionReadout) motionReadout.textContent = `MOTION / ${root.dataset.motion.toUpperCase()}`;
     startFrame();
   };
@@ -278,7 +305,7 @@
   };
 
   const placePreview = (anchor) => {
-    if (!anchor || state.compact) return;
+    if (!anchor || previewPanel.offsetParent === null) return;
     const rootRect = root.getBoundingClientRect();
     const anchorRect = anchor.getBoundingClientRect();
     const panelRect = previewPanel.getBoundingClientRect();
@@ -395,6 +422,8 @@
     const { historyMode = "push", sound = true, immediate = false, opener = null } = options;
     if (state.selected === key && state.phase === "focused") return;
     clearTransitionTimers();
+    const enteringFromOverview = !state.selected;
+    if (state.phone && enteringFromOverview) state.overviewScrollY = window.scrollY;
     if (state.selected) state.held.delete(state.selected);
     state.selected = key;
     state.held.add(key);
@@ -413,6 +442,12 @@
     setPhase(immediate || state.reduced ? "focused" : "focusing");
     if (sound) playCue("select");
     startFrame();
+    if (state.phone) {
+      window.scrollTo({
+        top: root.offsetTop,
+        behavior: immediate || state.reduced ? "auto" : "smooth",
+      });
+    }
 
     if (immediate || state.reduced) {
       window.requestAnimationFrame(() => closeButton.focus({ preventScroll: true }));
@@ -435,6 +470,12 @@
     syncSelection();
     startFrame();
     if (restoreFocus && opener?.isConnected) opener.focus({ preventScroll: true });
+    if (state.phone) {
+      window.scrollTo({
+        top: state.overviewScrollY,
+        behavior: state.reduced ? "auto" : "smooth",
+      });
+    }
   };
 
   const dismiss = (options = {}) => {
@@ -521,7 +562,7 @@
   });
 
   motionToggle.addEventListener("click", () => {
-    if (state.reduced || state.compact) return;
+    if (state.reduced) return;
     state.paused = !state.paused;
     playCue("motion");
     syncMotion();
@@ -553,6 +594,7 @@
   window.addEventListener("popstate", restoreFromLocation);
   window.addEventListener("resize", () => {
     state.compact = compactQuery.matches;
+    state.phone = phoneQuery.matches;
     state.short = shortQuery.matches;
     measure();
     if (state.preview) placePreview(state.previewAnchor || nodeByKey.get(state.preview));
@@ -565,6 +607,13 @@
   });
   compactQuery.addEventListener?.("change", (event) => {
     state.compact = event.matches;
+    state.phone = phoneQuery.matches;
+    state.short = shortQuery.matches;
+    measure();
+    syncMotion();
+  });
+  phoneQuery.addEventListener?.("change", (event) => {
+    state.phone = event.matches;
     state.short = shortQuery.matches;
     measure();
     syncMotion();

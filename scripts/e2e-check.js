@@ -6,6 +6,8 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:4173';
 const CHECK_EXTERNAL_LINKS = process.env.CHECK_EXTERNAL_LINKS === '1';
 const siteRoot = path.resolve(__dirname, '..', process.env.SITE_ROOT || '.');
 const postsManifestPath = path.join(siteRoot, 'blog', 'posts.json');
+const homepageSocialImagePath = path.join(siteRoot, 'assets', 'images', 'og', 'home-orbital-dashboard.png');
+const homepageSocialImageUrl = 'https://ac-opensource.github.io/assets/images/og/home-orbital-dashboard.png';
 let STATIC_BLOG_POST_PATH = '/blog/post.html';
 let GENERATED_BLOG_POST_PATHS = [];
 
@@ -80,6 +82,23 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   async function assert(condition, message) {
     if (!condition) failures.push(message);
+  }
+
+  if (!fs.existsSync(homepageSocialImagePath)) {
+    failures.push('Homepage social preview image is missing');
+  } else {
+    const socialImage = fs.readFileSync(homepageSocialImagePath);
+    const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+    await assert(
+      socialImage.subarray(0, pngSignature.length).equals(pngSignature),
+      'Homepage social preview must be a true PNG image'
+    );
+    await assert(
+      socialImage.length >= 24
+        && socialImage.readUInt32BE(16) === 1200
+        && socialImage.readUInt32BE(20) === 630,
+      'Homepage social preview must be exactly 1200x630'
+    );
   }
 
   async function prepareForScreenshot(targetPage) {
@@ -164,6 +183,24 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         && desktopPortfolioLabels.every((label) => label.trim() === '[portfolio]'),
       `${route.path}: desktop navigation must label /work.html as [portfolio]`
     );
+    if (isSpatialHome) {
+      const socialMetadata = await page.evaluate(() => ({
+        openGraphAlt: document.querySelector('meta[property="og:image:alt"]')?.content,
+        openGraphImage: document.querySelector('meta[property="og:image"]')?.content,
+        twitterAlt: document.querySelector('meta[name="twitter:image:alt"]')?.content,
+        twitterImage: document.querySelector('meta[name="twitter:image"]')?.content,
+      }));
+      await assert(
+        socialMetadata.openGraphImage === homepageSocialImageUrl
+          && socialMetadata.twitterImage === homepageSocialImageUrl,
+        'Homepage social metadata does not reference the current orbital dashboard preview'
+      );
+      await assert(
+        Boolean(socialMetadata.openGraphAlt)
+          && socialMetadata.openGraphAlt === socialMetadata.twitterAlt,
+        'Homepage social preview alt text is missing or inconsistent'
+      );
+    }
 
     if (route.path === '/blog/') {
       await page.waitForSelector('#blog-feed article', { timeout: 15000 });
@@ -243,13 +280,47 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     }
   }
 
-  // The homepage deliberately changes from a free orbital field to a stable,
-  // swipeable segment on compact screens. Guard the real production route at
-  // the device shapes where text, map, and focused content are most constrained.
+  const readOrbitCoordinates = (targetPage) => targetPage.evaluate(() => (
+    [...document.querySelectorAll('[data-orbit-object]')].map((element) => ({
+      key: element.dataset.orbitObject,
+      x: Number.parseFloat(getComputedStyle(element).getPropertyValue('--x')),
+      y: Number.parseFloat(getComputedStyle(element).getPropertyValue('--y')),
+    }))
+  ));
+
+  const findVisibleBackdropPoint = (targetPage) => targetPage.evaluate(() => {
+    const layer = document.querySelector('[data-detail-layer]');
+    const backdrop = document.querySelector('[data-detail-backdrop]');
+    const bounds = layer.getBoundingClientRect();
+    const left = Math.max(2, bounds.left + 2);
+    const right = Math.min(window.innerWidth - 2, bounds.right - 2);
+    const top = Math.max(2, bounds.top + 2);
+    const bottom = Math.min(window.innerHeight - 2, bounds.bottom - 2);
+    const candidates = [];
+
+    for (let y = top; y <= bottom; y += 24) {
+      candidates.push({ x: left, y }, { x: right, y });
+    }
+    for (let x = left; x <= right; x += 24) {
+      candidates.push({ x, y: top }, { x, y: bottom });
+    }
+
+    return candidates.find(({ x, y }) => {
+      const hit = document.elementFromPoint(x, y);
+      return hit === backdrop || hit?.closest('[data-detail-backdrop]') === backdrop;
+    }) || null;
+  });
+
+  // Phones retain the desktop interaction model: a vertically scrollable
+  // landing scene, moving parametric ellipses, camera controls, field map and
+  // spatial focus. Short screens may simplify satellite placement, but never
+  // replace the primary field with a static horizontal carousel.
   for (const viewport of [
-    { width: 320, height: 540 },
+    { width: 320, height: 640 },
     { width: 390, height: 844 },
+    { width: 430, height: 932 },
     { width: 568, height: 320 },
+    { width: 844, height: 390 },
     { width: 768, height: 1024 },
     { width: 1024, height: 768 },
   ]) {
@@ -262,139 +333,309 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     spatialPage.on('pageerror', (error) => failures.push(`Homepage ${viewport.width}x${viewport.height} pageerror: ${error.message}`));
     await spatialPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
     await spatialPage.locator('[data-synthesis]').waitFor();
+    await spatialPage.evaluate(() => document.fonts?.ready);
 
     const overview = await spatialPage.evaluate(() => {
       const rect = (element) => {
         const bounds = element.getBoundingClientRect();
-        return { bottom: bounds.bottom, left: bounds.left, right: bounds.right, top: bounds.top };
+        return {
+          bottom: bounds.bottom + window.scrollY,
+          left: bounds.left + window.scrollX,
+          right: bounds.right + window.scrollX,
+          top: bounds.top + window.scrollY,
+        };
       };
       const intersection = (first, second) => (
         Math.max(0, Math.min(first.right, second.right) - Math.max(first.left, second.left))
         * Math.max(0, Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top))
       );
-      const labels = [...document.querySelectorAll('.node-label')].map(rect);
-      const hero = rect(document.querySelector('[data-identity-hero]'));
+      const ctas = [...document.querySelectorAll('.identity-actions a')].map(rect);
       const map = rect(document.querySelector('[data-field-map]'));
+      const nodes = [...document.querySelectorAll('[data-orbit-object]')];
+      const nodeRects = nodes.map(rect);
       const stage = document.querySelector('.camera-window');
+      const controls = [...document.querySelectorAll('.scene-controls button')];
+      const visibleMapSvg = [...document.querySelectorAll('[data-field-map] svg')].some((element) => {
+        const bounds = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return style.display !== 'none' && style.visibility !== 'hidden' && bounds.width > 0 && bounds.height > 0;
+      });
       const geometry = getComputedStyle(document.querySelector('.sculpture--range i:first-child'));
       return {
-        compactMapVisible: getComputedStyle(document.querySelector('.field-map__compact-lines')).display !== 'none',
-        documentOverflow: [
-          document.documentElement.scrollWidth - document.documentElement.clientWidth,
-          document.documentElement.scrollHeight - document.documentElement.clientHeight,
-        ],
+        controlsVisible: controls.every((element) => {
+          const bounds = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return style.display !== 'none' && style.visibility !== 'hidden' && bounds.width > 0 && bounds.height > 0;
+        }),
+        controlTargets: controls.map((element) => {
+          const bounds = element.getBoundingClientRect();
+          return { height: bounds.height, width: bounds.width };
+        }),
+        ctaMapOverlaps: ctas.map((cta) => intersection(cta, map)).filter((area) => area > 1),
+        ctaNodeOverlaps: ctas.flatMap((cta) => nodeRects.map((node) => intersection(cta, node))).filter((area) => area > 1),
+        documentOverflowX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        documentScrollRange: Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - window.innerHeight,
         geometry: {
           animationName: geometry.animationName,
           animationPlayState: geometry.animationPlayState,
         },
-        heroOverlaps: labels.map((label) => intersection(label, hero)).filter((area) => area > 1),
-        mapOverlaps: labels.map((label) => intersection(label, map)).filter((area) => area > 1),
-        mapTargets: [...document.querySelectorAll('[data-field-map] button')].map((element) => {
-          const bounds = element.getBoundingClientRect();
-          const hit = document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
-          return {
-            height: bounds.height,
-            topmost: hit === element || hit?.closest('button') === element,
-            width: bounds.width,
-          };
-        }),
+        mapNodeOverlaps: nodeRects.map((node) => intersection(node, map)).filter((area) => area > 1),
+        mapVisible: visibleMapSvg,
         motion: document.querySelector('[data-synthesis]').dataset.motion,
-        nodeTargets: [...document.querySelectorAll('[data-orbit-object]')].map((element) => {
+        nodePairOverlaps: nodeRects.flatMap((first, index) => (
+          nodeRects.slice(index + 1).map((second) => intersection(first, second))
+        )).filter((area) => area > 1),
+        nodeStyles: nodes.map((element) => {
           const bounds = element.getBoundingClientRect();
-          return { height: bounds.height, width: bounds.width };
+          return { height: bounds.height, position: getComputedStyle(element).position, width: bounds.width };
         }),
-        stage: { clientWidth: stage.clientWidth, scrollWidth: stage.scrollWidth },
+        stageOverflowX: stage.scrollWidth - stage.clientWidth,
+        stageOverflowStyle: getComputedStyle(stage).overflowX,
+        stageScrollSnap: getComputedStyle(stage).scrollSnapType,
       };
     });
 
     await assert(
-      overview.documentOverflow.every((amount) => Math.abs(amount) <= 1),
-      `Homepage overflows ${viewport.width}x${viewport.height}: ${JSON.stringify(overview.documentOverflow)}`
+      Math.abs(overview.documentOverflowX) <= 1,
+      `Homepage overflows horizontally at ${viewport.width}x${viewport.height}: ${overview.documentOverflowX}`
     );
-    await assert(overview.heroOverlaps.length === 0, `Homepage nodes overlap hero copy at ${viewport.width}x${viewport.height}`);
-    await assert(overview.mapOverlaps.length === 0, `Homepage nodes overlap the field map at ${viewport.width}x${viewport.height}`);
+    if (viewport.width < 768 && viewport.height > viewport.width) {
+      await assert(
+        overview.documentScrollRange > 1,
+        `Homepage phone scene is not vertically scrollable at ${viewport.width}x${viewport.height}`
+      );
+      await spatialPage.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await spatialPage.waitForTimeout(80);
+      await assert(await spatialPage.evaluate(() => window.scrollY > 0), `Homepage phone scene did not scroll at ${viewport.width}x${viewport.height}`);
+      await spatialPage.evaluate(() => window.scrollTo(0, 0));
+    }
+    await assert(overview.controlsVisible, `Homepage camera controls are hidden at ${viewport.width}x${viewport.height}`);
     await assert(
-      overview.mapTargets.every(({ height, topmost, width }) => Math.min(height, width) >= 44 && topmost),
-      `Homepage map targets are obscured or too small at ${viewport.width}x${viewport.height}`
+      overview.controlTargets.every(({ height, width }) => Math.min(height, width) >= 44),
+      `Homepage camera controls are too small at ${viewport.width}x${viewport.height}`
     );
+    await assert(overview.mapVisible, `Homepage field map is hidden at ${viewport.width}x${viewport.height}`);
+    await assert(overview.ctaMapOverlaps.length === 0, `Homepage CTA overlaps the field map at ${viewport.width}x${viewport.height}`);
+    await assert(overview.ctaNodeOverlaps.length === 0, `Homepage CTA overlaps an orbit node at ${viewport.width}x${viewport.height}`);
+    await assert(overview.mapNodeOverlaps.length === 0, `Homepage orbit node overlaps the field map at ${viewport.width}x${viewport.height}`);
+    await assert(overview.nodePairOverlaps.length === 0, `Homepage orbit nodes overlap each other at ${viewport.width}x${viewport.height}`);
     await assert(
-      overview.nodeTargets.every(({ height, width }) => Math.min(height, width) >= 44),
+      overview.nodeStyles.every(({ height, position, width }) => Math.min(height, width) >= 44 && position === 'absolute'),
       `Homepage orbit objects are too small at ${viewport.width}x${viewport.height}`
     );
-    await assert(overview.motion === 'static', `Homepage compact field is not stable at ${viewport.width}x${viewport.height}`);
-    await assert(overview.stage.scrollWidth > overview.stage.clientWidth, `Homepage orbit is not swipeable at ${viewport.width}x${viewport.height}`);
+    await assert(overview.motion === 'active', `Homepage orbital motion is inactive at ${viewport.width}x${viewport.height}`);
+    await assert(
+      overview.stageOverflowStyle === 'hidden' && overview.stageScrollSnap === 'none',
+      `Homepage still uses a horizontal orbit carousel at ${viewport.width}x${viewport.height}`
+    );
     await assert(
       overview.geometry.animationName === 'range-shift' && overview.geometry.animationPlayState === 'running',
       `Homepage internal geometry is not animated at ${viewport.width}x${viewport.height}`
     );
-    if (viewport.width < 768 || viewport.height <= 560) {
-      await assert(overview.compactMapVisible, `Homepage compact star map is hidden at ${viewport.width}x${viewport.height}`);
+
+    const beforeOrbit = await readOrbitCoordinates(spatialPage);
+    await spatialPage.waitForTimeout(900);
+    const afterOrbit = await readOrbitCoordinates(spatialPage);
+    const movingNodes = beforeOrbit.filter((before, index) => {
+      const after = afterOrbit[index];
+      return after?.key === before.key && Math.hypot(after.x - before.x, after.y - before.y) > 0.4;
+    });
+    await assert(movingNodes.length >= 4, `Homepage nodes do not follow moving parametric orbits at ${viewport.width}x${viewport.height}`);
+
+    const controls = spatialPage.locator('.scene-controls');
+    await controls.scrollIntoViewIfNeeded();
+    const viewToggle = spatialPage.locator('[data-view-toggle]');
+    const orbitTransform = await spatialPage.locator('[data-camera-rig]').evaluate((element) => getComputedStyle(element).transform);
+    await viewToggle.click();
+    await spatialPage.waitForFunction((initialTransform) => (
+      getComputedStyle(document.querySelector('[data-camera-rig]')).transform !== initialTransform
+    ), orbitTransform, { timeout: 2000 });
+    const transitionTransform = await spatialPage.locator('[data-camera-rig]').evaluate((element) => getComputedStyle(element).transform);
+    await spatialPage.waitForTimeout(1160);
+    const topTransform = await spatialPage.locator('[data-camera-rig]').evaluate((element) => getComputedStyle(element).transform);
+    await assert(await spatialPage.locator('[data-synthesis]').getAttribute('data-view') === 'top', `Homepage did not enter top view at ${viewport.width}x${viewport.height}`);
+    await assert(await viewToggle.getAttribute('aria-pressed') === 'true', `Homepage top-view control has stale state at ${viewport.width}x${viewport.height}`);
+    await assert(
+      transitionTransform !== orbitTransform && topTransform !== orbitTransform,
+      `Homepage top-view camera does not animate at ${viewport.width}x${viewport.height}`
+    );
+    await viewToggle.click();
+    await spatialPage.waitForTimeout(1160);
+
+    const fieldMap = spatialPage.locator('[data-field-map]');
+    await fieldMap.scrollIntoViewIfNeeded();
+    const mapTargets = await spatialPage.locator('[data-field-map] button').evaluateAll((elements) => elements.map((element) => {
+      const bounds = element.getBoundingClientRect();
+      const hit = document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+      return {
+        height: bounds.height,
+        topmost: hit === element || hit?.closest('button') === element,
+        width: bounds.width,
+      };
+    }));
+    await assert(
+      mapTargets.every(({ height, topmost, width }) => Math.min(height, width) >= 44 && topmost),
+      `Homepage field-map targets are obscured or too small at ${viewport.width}x${viewport.height}`
+    );
+
+    const orbitStage = spatialPage.locator('[data-orbit-stage]');
+    await orbitStage.scrollIntoViewIfNeeded();
+    const tappableNode = await spatialPage.evaluate(() => {
+      for (const element of document.querySelectorAll('[data-orbit-object]')) {
+        const bounds = element.getBoundingClientRect();
+        const x = bounds.left + bounds.width / 2;
+        const y = bounds.top + bounds.height / 2;
+        if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) continue;
+        const hit = document.elementFromPoint(x, y);
+        if (hit === element || hit?.closest('[data-orbit-object]') === element) {
+          return { key: element.dataset.orbitObject, x, y };
+        }
+      }
+      return null;
+    });
+    await assert(Boolean(tappableNode), `Homepage has no directly tappable orbit node at ${viewport.width}x${viewport.height}`);
+    if (tappableNode) {
+      await spatialPage.touchscreen.tap(tappableNode.x, tappableNode.y);
+    } else {
+      await spatialPage.locator('[data-map-target="projects"]').click();
     }
 
-    const stage = spatialPage.locator('.camera-window');
-    await stage.evaluate((element) => { element.scrollLeft = element.scrollWidth - element.clientWidth; });
-    await spatialPage.waitForTimeout(80);
-    await assert(await stage.evaluate((element) => element.scrollLeft > 0), `Homepage orbit did not move at ${viewport.width}x${viewport.height}`);
-
-    await spatialPage.locator('[data-map-target="projects"]').click();
     await spatialPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'focused');
+    await spatialPage.waitForFunction(() => {
+      const satellites = [...document.querySelectorAll('.facet-detail.is-active .focus-satellites > *')];
+      return satellites.length === 3
+        && satellites.every((element) => Number.parseFloat(getComputedStyle(element).opacity) >= 0.99);
+    }, null, { timeout: 2200 });
     const focused = await spatialPage.evaluate(() => {
       const layer = document.querySelector('[data-detail-layer]').getBoundingClientRect();
       const map = document.querySelector('[data-field-map]').getBoundingClientRect();
+      const active = document.querySelector('.facet-detail.is-active');
+      const copy = active.querySelector('.landing-copy').getBoundingClientRect();
+      const object = active.querySelector('.landing-object').getBoundingClientRect();
+      const intersection = (first, second) => (
+        Math.max(0, Math.min(first.right, second.right) - Math.max(first.left, second.left))
+        * Math.max(0, Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top))
+      );
+      const satellites = [...active.querySelectorAll('.focus-satellites > *')].map((element) => {
+        const bounds = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return {
+          animationName: style.animationName,
+          copyOverlap: intersection(bounds, copy),
+          height: bounds.height,
+          mapOverlap: intersection(bounds, map),
+          opacity: Number.parseFloat(style.opacity),
+          outside: bounds.left < layer.left - 1
+            || bounds.right > layer.right + 1
+            || bounds.top < layer.top - 1
+            || bounds.bottom > layer.bottom + 1,
+          width: bounds.width,
+        };
+      });
       return {
-        detailMapOverlap: Math.max(0, Math.min(layer.bottom, map.bottom) - Math.max(layer.top, map.top)),
+        activeKey: active?.dataset.facetDetail,
+        copyMapOverlap: intersection(copy, map),
         horizontalOverflow: document.querySelector('[data-detail-layer]').scrollWidth - document.querySelector('[data-detail-layer]').clientWidth,
+        objectMapOverlap: intersection(object, map),
+        satellites,
       };
     });
     await assert(Math.abs(focused.horizontalOverflow) <= 1, `Homepage detail overflows horizontally at ${viewport.width}x${viewport.height}`);
-    const usesInFlowFocus = viewport.width < 768 || viewport.height <= 560;
-    if (usesInFlowFocus) {
-      await assert(focused.detailMapOverlap === 0, `Homepage detail covers the map at ${viewport.width}x${viewport.height}`);
-    }
+    await assert(
+      focused.copyMapOverlap === 0 && focused.objectMapOverlap === 0,
+      `Homepage focus content covers the field map at ${viewport.width}x${viewport.height}`
+    );
+    await assert(focused.satellites.length === 3, `Homepage focus satellites are incomplete at ${viewport.width}x${viewport.height}`);
+    await assert(
+      focused.satellites.every(({ height, mapOverlap, opacity, width }) => (
+        height > 0 && width > 0 && opacity > 0 && mapOverlap === 0
+      )),
+      `Homepage focus satellites are obscured at ${viewport.width}x${viewport.height}`
+    );
 
-    const lastSatellite = spatialPage.locator('[data-facet-detail="projects"] .focus-satellites > *').last();
-    if (usesInFlowFocus) {
-      await lastSatellite.scrollIntoViewIfNeeded();
-      const finalCard = await lastSatellite.boundingBox();
-      const detailLayer = await spatialPage.locator('[data-detail-layer]').boundingBox();
-      await assert(
-        finalCard && detailLayer
-          && finalCard.y >= detailLayer.y - 1
-          && finalCard.y + finalCard.height <= detailLayer.y + detailLayer.height + 1,
-        `Homepage final project card is obscured at ${viewport.width}x${viewport.height}`
-      );
-    } else {
-      await spatialPage.waitForTimeout(600);
-      const orbitalSafety = await spatialPage.evaluate(() => {
-        const active = document.querySelector('[data-facet-detail="projects"]');
-        const root = document.querySelector('[data-synthesis]').getBoundingClientRect();
-        const copy = active.querySelector('.landing-copy').getBoundingClientRect();
-        const map = document.querySelector('[data-field-map]').getBoundingClientRect();
-        const intersectionArea = (first, second) => (
-          Math.max(0, Math.min(first.right, second.right) - Math.max(first.left, second.left))
-          * Math.max(0, Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top))
-        );
-        return [...active.querySelectorAll('.focus-satellites > *')].map((element) => {
-          const rect = element.getBoundingClientRect();
-          return {
-            outside: rect.left < root.left - 1
-              || rect.right > root.right + 1
-              || rect.top < root.top - 1
-              || rect.bottom > root.bottom + 1,
-            copyOverlap: Math.round(intersectionArea(rect, copy)),
-            mapOverlap: Math.round(intersectionArea(rect, map)),
-          };
-        });
-      });
-      await assert(
-        orbitalSafety.every((card) => !card.outside && card.copyOverlap === 0 && card.mapOverlap === 0),
-        `Homepage orbiting project cards collide or leave the stage at ${viewport.width}x${viewport.height}`
-      );
-    }
-    await spatialPage.locator('[data-detail-backdrop]').click({ position: { x: 4, y: 4 } });
+    await assert(
+      focused.satellites.every(({ animationName, copyOverlap, outside }) => (
+        animationName.includes('satellite-orbit') && copyOverlap === 0 && !outside
+      )),
+      `Homepage focus satellites do not orbit clear of the copy at ${viewport.width}x${viewport.height}`
+    );
+    const satelliteBefore = await spatialPage.locator('.facet-detail.is-active .focus-satellites > *').evaluateAll((elements) => (
+      elements.map((element) => getComputedStyle(element).transform)
+    ));
+    await spatialPage.waitForTimeout(850);
+    const satelliteAfter = await spatialPage.locator('.facet-detail.is-active .focus-satellites > *').evaluateAll((elements) => (
+      elements.map((element) => getComputedStyle(element).transform)
+    ));
+    await assert(
+      satelliteBefore.filter((transform, index) => transform !== satelliteAfter[index]).length >= 2,
+      `Homepage focus satellites do not move at ${viewport.width}x${viewport.height}`
+    );
+
+    const backdropPoint = await findVisibleBackdropPoint(spatialPage);
+    await assert(Boolean(backdropPoint), `Homepage has no unobscured outside-dismiss target at ${viewport.width}x${viewport.height}`);
+    if (backdropPoint) await spatialPage.touchscreen.tap(backdropPoint.x, backdropPoint.y);
+    else await spatialPage.locator('[data-detail-close]').click();
     await spatialPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'overview');
+    await assert(new URL(spatialPage.url()).hash === '', `Homepage outside dismiss leaves a stale hash at ${viewport.width}x${viewport.height}`);
     await spatialContext.close();
   }
+
+  // Reduced motion keeps the complete mobile interaction model but freezes all
+  // continuous motion and makes camera/focus transitions effectively immediate.
+  const reducedHomeContext = await browser.newContext({
+    hasTouch: true,
+    isMobile: true,
+    reducedMotion: 'reduce',
+    viewport: { width: 390, height: 844 },
+  });
+  const reducedHomePage = await reducedHomeContext.newPage();
+  reducedHomePage.on('pageerror', (error) => failures.push(`Reduced-motion homepage pageerror: ${error.message}`));
+  await reducedHomePage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
+  await reducedHomePage.locator('[data-synthesis]').waitFor();
+  await reducedHomePage.evaluate(() => document.fonts?.ready);
+  await assert(
+    await reducedHomePage.locator('[data-synthesis]').getAttribute('data-motion') === 'reduced',
+    'Reduced-motion homepage does not expose its reduced state'
+  );
+  await assert(
+    await reducedHomePage.locator('[data-motion-toggle]').getAttribute('aria-disabled') === 'true',
+    'Reduced-motion homepage leaves the motion control enabled'
+  );
+  const reducedBefore = await readOrbitCoordinates(reducedHomePage);
+  await reducedHomePage.waitForTimeout(650);
+  const reducedAfter = await readOrbitCoordinates(reducedHomePage);
+  await assert(
+    JSON.stringify(reducedBefore) === JSON.stringify(reducedAfter),
+    'Reduced-motion homepage still moves orbit nodes'
+  );
+  await reducedHomePage.locator('.scene-controls').scrollIntoViewIfNeeded();
+  await reducedHomePage.locator('[data-view-toggle]').click();
+  await assert(
+    await reducedHomePage.locator('[data-synthesis]').getAttribute('data-view') === 'top',
+    'Reduced-motion homepage top-view control no longer works'
+  );
+  await reducedHomePage.locator('[data-field-map]').scrollIntoViewIfNeeded();
+  await reducedHomePage.locator('[data-map-target="projects"]').click();
+  await reducedHomePage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'focused');
+  const reducedSatellitesBefore = await reducedHomePage.locator('[data-facet-detail="projects"] .focus-satellites > *').evaluateAll((elements) => (
+    elements.map((element) => ({ opacity: getComputedStyle(element).opacity, transform: getComputedStyle(element).transform }))
+  ));
+  await reducedHomePage.waitForTimeout(500);
+  const reducedSatellitesAfter = await reducedHomePage.locator('[data-facet-detail="projects"] .focus-satellites > *').evaluateAll((elements) => (
+    elements.map((element) => ({ opacity: getComputedStyle(element).opacity, transform: getComputedStyle(element).transform }))
+  ));
+  await assert(
+    reducedSatellitesBefore.length === 3
+      && reducedSatellitesBefore.every(({ opacity }) => Number.parseFloat(opacity) > 0)
+      && JSON.stringify(reducedSatellitesBefore) === JSON.stringify(reducedSatellitesAfter),
+    'Reduced-motion homepage satellites are hidden or still moving'
+  );
+  const reducedBackdropPoint = await findVisibleBackdropPoint(reducedHomePage);
+  await assert(Boolean(reducedBackdropPoint), 'Reduced-motion homepage has no outside-dismiss target');
+  if (reducedBackdropPoint) await reducedHomePage.touchscreen.tap(reducedBackdropPoint.x, reducedBackdropPoint.y);
+  else await reducedHomePage.locator('[data-detail-close]').click();
+  await reducedHomePage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'overview');
+  await reducedHomeContext.close();
 
   // Career timeline and resume stay aligned on the current employer sequence.
   await page.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
