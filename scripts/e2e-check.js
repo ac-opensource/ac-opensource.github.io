@@ -6,8 +6,8 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:4173';
 const CHECK_EXTERNAL_LINKS = process.env.CHECK_EXTERNAL_LINKS === '1';
 const siteRoot = path.resolve(__dirname, '..', process.env.SITE_ROOT || '.');
 const postsManifestPath = path.join(siteRoot, 'blog', 'posts.json');
-const homepageSocialImagePath = path.join(siteRoot, 'assets', 'images', 'og', 'home-orbital-dashboard.png');
-const homepageSocialImageUrl = 'https://ac-opensource.github.io/assets/images/og/home-orbital-dashboard.png';
+const homepageSocialImagePath = path.join(siteRoot, 'assets', 'images', 'og', 'home-orbital-dashboard-hero.png');
+const homepageSocialImageUrl = 'https://ac-opensource.github.io/assets/images/og/home-orbital-dashboard-hero.png';
 let STATIC_BLOG_POST_PATH = '/blog/post.html';
 let GENERATED_BLOG_POST_PATHS = [];
 
