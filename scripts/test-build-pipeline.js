@@ -24,6 +24,14 @@ function main() {
       throw new Error("The no-JavaScript blog fallback was not rebuilt from published posts.");
     }
 
+    const firstPostPage = fs.readFileSync(
+      path.join(outputRoot, "blog", `${initial.posts[0].slug}.html`),
+      "utf8"
+    );
+    if (firstPostPage.includes("hero-overlay-alpha") || firstPostPage.includes("overlayAlphaPulse")) {
+      throw new Error("Article hero images must render without a show/hide animation.");
+    }
+
     const ocbcPage = fs.readFileSync(
       path.join(outputRoot, "blog", "case-study-ocbc-banking-experience.html"),
       "utf8"

@@ -77,11 +77,6 @@
   .code-keyword { color: #6799FB; }
   .code-type { color: #FE8983; }
   .code-func { color: #E0E4D9; }
-  .hero-overlay-alpha {
-    opacity: 0;
-    animation: overlayAlphaPulse 4.8s ease-in-out infinite;
-    will-change: opacity;
-  }
   .work-post-hero {
     position: relative;
     display: grid;
@@ -131,19 +126,6 @@
   .work-post-hero--contain > img {
     object-fit: contain;
     background: #fff;
-  }
-  @keyframes overlayAlphaPulse {
-    0% { opacity: 0; }
-    15% { opacity: 0; }
-    35% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hero-overlay-alpha {
-      animation: none;
-      opacity: 1;
-    }
   }
   @media (max-width: 700px) {
     .work-post-hero--gallery {
@@ -237,7 +219,7 @@
 </div>
 
 <div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
-<div class="absolute inset-0 pointer-events-none hero-overlay-alpha">
+<div class="absolute inset-0 pointer-events-none">
 <img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&amp;fit=crop&amp;w=1600&amp;q=80" alt="A hand holds a smartphone against blurred colored lights." loading="eager" decoding="async"/>
 </div>
 <div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
