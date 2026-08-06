@@ -353,7 +353,48 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       const map = rect(document.querySelector('[data-field-map]'));
       const nodes = [...document.querySelectorAll('[data-orbit-object]')];
       const nodeRects = nodes.map(rect);
+      const plane = document.querySelector('[data-orbit-plane]');
+      const orbitAnchorErrors = nodes.map((node) => {
+        const marker = document.createElement('span');
+        marker.style.cssText = [
+          'position:absolute',
+          'top:50%',
+          'left:50%',
+          'width:0',
+          'height:0',
+          'pointer-events:none',
+          `transform:translate3d(${node.style.getPropertyValue('--x')},${node.style.getPropertyValue('--y')},0)`,
+        ].join(';');
+        plane.append(marker);
+        const markerBounds = marker.getBoundingClientRect();
+        const sculptureBounds = node.querySelector('.sculpture').getBoundingClientRect();
+        marker.remove();
+        return Math.hypot(
+          sculptureBounds.left + sculptureBounds.width / 2 - markerBounds.left,
+          sculptureBounds.top + sculptureBounds.height / 2 - markerBounds.top,
+        );
+      });
+      const orbitTrackErrors = nodes.map((node) => {
+        const key = node.dataset.orbitObject;
+        const track = document.querySelector(`[data-track="${key}"]`);
+        const style = getComputedStyle(track);
+        const percentage = (property, size) => Number.parseFloat(style.getPropertyValue(property)) * size / 100;
+        const centerX = percentage('--ox', plane.clientWidth);
+        const centerY = percentage('--oy', plane.clientHeight);
+        const radiusX = percentage('--tw', plane.clientWidth) / 2;
+        const radiusY = percentage('--th', plane.clientHeight) / 2;
+        const tilt = Number.parseFloat(style.getPropertyValue('--tr')) * Math.PI / 180;
+        const deltaX = Number.parseFloat(node.style.getPropertyValue('--x')) - centerX;
+        const deltaY = Number.parseFloat(node.style.getPropertyValue('--y')) - centerY;
+        const localX = deltaX * Math.cos(tilt) + deltaY * Math.sin(tilt);
+        const localY = -deltaX * Math.sin(tilt) + deltaY * Math.cos(tilt);
+        const normalizedRadius = Math.hypot(localX / radiusX, localY / radiusY);
+        return Math.abs(normalizedRadius - 1) * Math.min(radiusX, radiusY);
+      });
       const stage = document.querySelector('.camera-window');
+      const identity = document.querySelector('.scene-identity');
+      const fieldOrigin = document.querySelector('.field-origin');
+      const fieldOriginBounds = fieldOrigin.getBoundingClientRect();
       const controls = [...document.querySelectorAll('.scene-controls button')];
       const visibleMapSvg = [...document.querySelectorAll('[data-field-map] svg')].some((element) => {
         const bounds = element.getBoundingClientRect();
@@ -361,12 +402,40 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         return style.display !== 'none' && style.visibility !== 'hidden' && bounds.width > 0 && bounds.height > 0;
       });
       const geometry = getComputedStyle(document.querySelector('.sculpture--range i:first-child'));
+      const planeSize = document.querySelector('[data-orbit-plane]');
+      const focusPoint = { x: planeSize.clientWidth * .04, y: planeSize.clientHeight * .02 };
+      const orbitPoints = nodes.map((node) => ({
+        key: node.dataset.orbitObject,
+        x: Number.parseFloat(node.style.getPropertyValue('--x')),
+        y: Number.parseFloat(node.style.getPropertyValue('--y')),
+      }));
+      const projectsPoint = orbitPoints.find(({ key }) => key === 'projects');
+      const radialDistance = (point) => Math.hypot(point.x - focusPoint.x, point.y - focusPoint.y);
+      const regularTrackPathCount = new Set(
+        [...document.querySelectorAll('.track:not(.is-comet-track)')].map((track) => {
+          const style = getComputedStyle(track);
+          return ['--tw', '--th', '--ox', '--oy', '--tr']
+            .map((property) => style.getPropertyValue(property).trim())
+            .join('/');
+        })
+      ).size;
       return {
+        defaultComet: {
+          key: document.querySelector('[data-synthesis]').dataset.comet || null,
+          nodeCount: document.querySelectorAll('.orbit-node.is-comet').length,
+          period: Number.parseFloat(document.querySelector('.track.is-comet-track i')?.dataset.period),
+          resetDisabled: document.querySelector('[data-orbit-reset]')?.disabled,
+          trackCount: document.querySelectorAll('.track.is-comet-track').length,
+          upperLeftAndOutermost: projectsPoint.x < 0 && projectsPoint.y < 0
+            && radialDistance(projectsPoint) > Math.max(...orbitPoints.filter(({ key }) => key !== 'projects').map(radialDistance)),
+        },
         controlsVisible: controls.every((element) => {
           const bounds = element.getBoundingClientRect();
           const style = getComputedStyle(element);
           return style.display !== 'none' && style.visibility !== 'hidden' && bounds.width > 0 && bounds.height > 0;
         }),
+        cameraAboveHero: Number.parseInt(getComputedStyle(stage).zIndex, 10)
+          > Number.parseInt(getComputedStyle(identity).zIndex, 10),
         controlTargets: controls.map((element) => {
           const bounds = element.getBoundingClientRect();
           return { height: bounds.height, width: bounds.width };
@@ -382,9 +451,17 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         mapNodeOverlaps: nodeRects.map((node) => intersection(node, map)).filter((area) => area > 1),
         mapVisible: visibleMapSvg,
         motion: document.querySelector('[data-synthesis]').dataset.motion,
+        originVisible: getComputedStyle(fieldOrigin).display !== 'none'
+          && getComputedStyle(fieldOrigin).visibility !== 'hidden'
+          && fieldOriginBounds.width > 0
+          && fieldOriginBounds.height > 0,
+        orbitAnchorErrors,
+        orbitTrackErrors,
+        regularTrackPathCount,
         nodePairOverlaps: nodeRects.flatMap((first, index) => (
           nodeRects.slice(index + 1).map((second) => intersection(first, second))
         )).filter((area) => area > 1),
+        nodeOpacities: nodes.map((element) => Number.parseFloat(getComputedStyle(element).opacity)),
         nodeStyles: nodes.map((element) => {
           const bounds = element.getBoundingClientRect();
           return { height: bounds.height, position: getComputedStyle(element).position, width: bounds.width };
@@ -415,15 +492,43 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       `Homepage camera controls are too small at ${viewport.width}x${viewport.height}`
     );
     await assert(overview.mapVisible, `Homepage field map is hidden at ${viewport.width}x${viewport.height}`);
+    await assert(
+      overview.nodeOpacities.every((opacity) => opacity >= .99),
+      `Homepage orbit node is unexpectedly transparent at ${viewport.width}x${viewport.height}: ${JSON.stringify(overview.nodeOpacities)}`
+    );
+    await assert(overview.cameraAboveHero, `Homepage orbital system is layered below the hero at ${viewport.width}x${viewport.height}`);
+    await assert(overview.originVisible, `Homepage AC origin is hidden at ${viewport.width}x${viewport.height}`);
     await assert(overview.ctaMapOverlaps.length === 0, `Homepage CTA overlaps the field map at ${viewport.width}x${viewport.height}`);
     await assert(overview.ctaNodeOverlaps.length === 0, `Homepage CTA overlaps an orbit node at ${viewport.width}x${viewport.height}`);
     await assert(overview.mapNodeOverlaps.length === 0, `Homepage orbit node overlaps the field map at ${viewport.width}x${viewport.height}`);
     await assert(overview.nodePairOverlaps.length === 0, `Homepage orbit nodes overlap each other at ${viewport.width}x${viewport.height}`);
     await assert(
+      Math.max(...overview.orbitAnchorErrors) <= 3,
+      `Homepage orbital path is not centered on the geometric icons at ${viewport.width}x${viewport.height}: ${JSON.stringify(overview.orbitAnchorErrors)}`
+    );
+    await assert(
+      Math.max(...overview.orbitTrackErrors) <= .5,
+      `Homepage geometric icons do not sit on their rendered orbit guides at ${viewport.width}x${viewport.height}: ${JSON.stringify(overview.orbitTrackErrors)}`
+    );
+    await assert(
+      overview.regularTrackPathCount === 5,
+      `Homepage regular nodes collapse onto shared orbit paths at ${viewport.width}x${viewport.height}`
+    );
+    await assert(
       overview.nodeStyles.every(({ height, position, width }) => Math.min(height, width) >= 44 && position === 'absolute'),
       `Homepage orbit objects are too small at ${viewport.width}x${viewport.height}`
     );
     await assert(overview.motion === 'active', `Homepage orbital motion is inactive at ${viewport.width}x${viewport.height}`);
+    await assert(
+      overview.defaultComet.key === 'projects'
+        && overview.defaultComet.nodeCount === 1
+        && overview.defaultComet.trackCount === 1
+        && overview.defaultComet.period >= 18
+        && overview.defaultComet.period <= 34
+        && overview.defaultComet.resetDisabled === false
+        && overview.defaultComet.upperLeftAndOutermost,
+      `Homepage does not seed 04 / Highlighted Projects as the single default comet at ${viewport.width}x${viewport.height}`
+    );
     await assert(
       overview.stageOverflowStyle === 'hidden' && overview.stageScrollSnap === 'none',
       `Homepage still uses a horizontal orbit carousel at ${viewport.width}x${viewport.height}`
@@ -577,8 +682,284 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     else await spatialPage.locator('[data-detail-close]').click();
     await spatialPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'overview');
     await assert(new URL(spatialPage.url()).hash === '', `Homepage outside dismiss leaves a stale hash at ${viewport.width}x${viewport.height}`);
+
+    await spatialPage.locator('[data-field-map]').scrollIntoViewIfNeeded();
+    await spatialPage.locator('[data-map-target="projects"]').click();
+    await spatialPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'focused');
+    await spatialPage.waitForFunction(() => {
+      const logos = Array.from(document.querySelectorAll('[data-facet-detail="projects"] .project-app-logo img'));
+      return logos.length === 12 && logos.every((image) => image.complete && image.naturalWidth > 0);
+    });
+    const projectLogoGeometry = await spatialPage.evaluate(() => {
+      const disc = (element) => {
+        const bounds = element.getBoundingClientRect();
+        return {
+          radius: Math.min(bounds.width, bounds.height) / 2,
+          x: bounds.left + bounds.width / 2,
+          y: bounds.top + bounds.height / 2,
+        };
+      };
+      const distance = (first, second) => Math.hypot(first.x - second.x, first.y - second.y);
+      const clearance = (first, second) => distance(first, second) - first.radius - second.radius;
+      const core = disc(document.querySelector('[data-facet-detail="projects"] .project-app-core'));
+      const outer = Array.from(document.querySelectorAll('[data-facet-detail="projects"] .project-app-ring--outer .project-app-logo')).map(disc);
+      const inner = Array.from(document.querySelectorAll('[data-facet-detail="projects"] .project-app-ring--inner .project-app-logo')).map(disc);
+      const pairClearances = (discs) => discs.flatMap((first, index) => (
+        discs.slice(index + 1).map((second) => clearance(first, second))
+      ));
+      const innerCoreClearance = Math.min(...inner.map((logo) => clearance(logo, core)));
+      const outerInnerRadialClearance = Math.min(...outer.map((logo) => distance(logo, core) - logo.radius))
+        - Math.max(...inner.map((logo) => distance(logo, core) + logo.radius));
+      return {
+        innerCoreClearance,
+        minimumSameRingClearance: Math.min(...pairClearances(outer), ...pairClearances(inner)),
+        outerInnerRadialClearance,
+      };
+    });
+    await assert(
+      projectLogoGeometry.innerCoreClearance >= 1
+        && projectLogoGeometry.minimumSameRingClearance >= 1
+        && projectLogoGeometry.outerInnerRadialClearance >= 1,
+      `Homepage project logo rings collide at ${viewport.width}x${viewport.height}: ${JSON.stringify(projectLogoGeometry)}`
+    );
+    await spatialPage.locator('[data-detail-close]').click();
+    await spatialPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'overview');
     await spatialContext.close();
   }
+
+  // A direct fling keeps navigation intact while re-routing exactly one node
+  // onto a severe, focus-based ellipse. Pause, resume, sound and reset share the
+  // existing native control surface instead of creating a second animation loop.
+  const flingContext = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const flingPage = await flingContext.newPage();
+  flingPage.on('pageerror', (error) => failures.push(`Fling homepage pageerror: ${error.message}`));
+  await flingPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
+  await flingPage.locator('[data-synthesis]').waitFor();
+  await flingPage.evaluate(() => {
+    window.__orbitalTestCues = [];
+    window.__orbitalTestFling = null;
+    window.addEventListener('orbital:sound', (event) => window.__orbitalTestCues.push(event.detail?.cue));
+    window.addEventListener('orbital:fling', (event) => { window.__orbitalTestFling = event.detail; });
+  });
+  const flingTarget = await flingPage.evaluate(() => {
+    for (const element of document.querySelectorAll('[data-orbit-object]')) {
+      const bounds = element.getBoundingClientRect();
+      const x = bounds.left + bounds.width / 2;
+      const y = bounds.top + bounds.height / 2;
+      if (x < 150 || x > innerWidth - 150 || y < 120 || y > innerHeight - 120) continue;
+      const hit = document.elementFromPoint(x, y);
+      if (hit !== element && hit?.closest('[data-orbit-object]') !== element) continue;
+      return {
+        key: element.dataset.orbitObject,
+        start: { x, y },
+        end: {
+          x: Math.max(150, Math.min(innerWidth - 150, x + (x < innerWidth / 2 ? 150 : -150))),
+          y: Math.max(120, Math.min(innerHeight - 120, y + (y < innerHeight / 2 ? 100 : -100))),
+        },
+      };
+    }
+    return null;
+  });
+  await assert(Boolean(flingTarget), 'Homepage has no unobscured desktop node to fling');
+  if (flingTarget) {
+    const flingNode = flingPage.locator(`[data-orbit-object="${flingTarget.key}"]`);
+    await flingPage.mouse.move(flingTarget.start.x, flingTarget.start.y);
+    await flingPage.mouse.down();
+    await flingPage.mouse.move(flingTarget.end.x, flingTarget.end.y, { steps: 9 });
+    await flingPage.mouse.up();
+    await flingPage.waitForFunction(() => Boolean(document.querySelector('[data-synthesis]')?.dataset.comet));
+    await flingPage.waitForTimeout(820);
+
+    const flung = await flingPage.evaluate(() => {
+      const root = document.querySelector('[data-synthesis]');
+      const node = document.querySelector('.orbit-node.is-comet');
+      const track = document.querySelector('.track.is-comet-track');
+      const trackStyle = track && getComputedStyle(track);
+      const plane = document.querySelector('[data-orbit-plane]');
+      const trackWidth = Number.parseFloat(trackStyle?.width);
+      const trackHeight = Number.parseFloat(trackStyle?.height);
+      const point = {
+        x: Number.parseFloat(getComputedStyle(node).getPropertyValue('--x')),
+        y: Number.parseFloat(getComputedStyle(node).getPropertyValue('--y')),
+      };
+      const tailAngle = Number.parseFloat(getComputedStyle(node).getPropertyValue('--tail-angle'));
+      const expectedTailAngle = Math.atan2(point.y - plane.clientHeight * .02, point.x - plane.clientWidth * .04) * 180 / Math.PI;
+      const tailAngleError = Math.abs(((tailAngle - expectedTailAngle + 540) % 360) - 180);
+      const glitters = Array.from(node?.querySelectorAll('.comet-wake b') || []);
+      return {
+        audioState: root?.dataset.audioState,
+        activeControl: document.activeElement?.matches('[data-orbit-reset]') || false,
+        comet: root?.dataset.comet,
+        customNodes: document.querySelectorAll('.orbit-node.is-comet').length,
+        customTracks: document.querySelectorAll('.track.is-comet-track').length,
+        eccentricity: Number.parseFloat(track?.querySelector('i')?.dataset.eccentricity),
+        fling: window.__orbitalTestFling,
+        hash: location.hash,
+        phase: root?.dataset.phase,
+        resetDisabled: document.querySelector('[data-orbit-reset]')?.disabled,
+        glitterAnimations: glitters.map((glitter) => getComputedStyle(glitter).animationName),
+        glitterCount: glitters.length,
+        glitterVisible: glitters.some((glitter) => {
+          const bounds = glitter.getBoundingClientRect();
+          return Number.parseFloat(getComputedStyle(glitter).opacity) > .2
+            && bounds.width >= 2
+            && bounds.height >= 1;
+        }),
+        tailAngleError,
+        trackAspect: trackWidth > 0 && trackHeight > 0
+          ? Math.max(trackWidth / trackHeight, trackHeight / trackWidth)
+          : 0,
+        wakeOpacity: Number.parseFloat(getComputedStyle(node?.querySelector('.comet-wake')).opacity),
+      };
+    });
+    await assert(
+      flung.comet === flingTarget.key && flung.customNodes === 1 && flung.customTracks === 1,
+      'Desktop fling does not create exactly one altered orbit'
+    );
+    await assert(flung.phase === 'overview' && flung.hash === '', 'Desktop fling accidentally opens a destination');
+    await assert(flung.eccentricity >= .9 && flung.trackAspect >= 2.2, 'Desktop fling path is not a severe ellipse');
+    await assert(flung.fling?.period >= 18 && flung.fling?.period <= 34, 'Desktop comet is not faster than the regular 178–360 second orbits');
+    await assert(flung.resetDisabled === false && flung.wakeOpacity > 0, 'Desktop fling does not expose its wake and reset control');
+    await assert(
+      flung.tailAngleError <= 1 && flung.glitterCount === 8 && flung.glitterVisible
+        && flung.glitterAnimations.every((name) => name === 'comet-glitter'),
+      'Desktop comet tail does not face away from AC with eight fading glitter particles'
+    );
+    await assert(flung.audioState === 'running', 'Desktop fling does not activate the action-sound engine');
+    await assert(flung.activeControl, 'Desktop fling leaves keyboard focus on the moving node instead of the stable reset control');
+
+    const displacement = (before, after, key) => {
+      const start = before.find((point) => point.key === key);
+      const end = after.find((point) => point.key === key);
+      return start && end ? Math.hypot(end.x - start.x, end.y - start.y) : 0;
+    };
+    const apoBefore = await readOrbitCoordinates(flingPage);
+    await flingPage.waitForTimeout(320);
+    const apoAfter = await readOrbitCoordinates(flingPage);
+    const apoDistance = displacement(apoBefore, apoAfter, flingTarget.key);
+    const apoRadius = await flingPage.evaluate((key) => {
+      const plane = document.querySelector('[data-orbit-plane]');
+      const node = document.querySelector(`[data-orbit-object="${key}"]`);
+      const focusX = plane.clientWidth * .04;
+      const focusY = plane.clientHeight * .02;
+      const x = Number.parseFloat(getComputedStyle(node).getPropertyValue('--x'));
+      const y = Number.parseFloat(getComputedStyle(node).getPropertyValue('--y'));
+      return Math.hypot(x - focusX, y - focusY);
+    }, flingTarget.key);
+    await flingPage.waitForFunction(({ key, threshold }) => {
+      const plane = document.querySelector('[data-orbit-plane]');
+      const node = document.querySelector(`[data-orbit-object="${key}"]`);
+      if (!plane || !node) return false;
+      const focusX = plane.clientWidth * .04;
+      const focusY = plane.clientHeight * .02;
+      const x = Number.parseFloat(getComputedStyle(node).getPropertyValue('--x'));
+      const y = Number.parseFloat(getComputedStyle(node).getPropertyValue('--y'));
+      return Math.hypot(x - focusX, y - focusY) <= threshold;
+    }, { key: flingTarget.key, threshold: apoRadius * .58 }, { timeout: 30000, polling: 100 });
+    const inboundBefore = await readOrbitCoordinates(flingPage);
+    await flingPage.waitForTimeout(420);
+    const inboundAfter = await readOrbitCoordinates(flingPage);
+    const inboundDistance = displacement(inboundBefore, inboundAfter, flingTarget.key);
+    const regularDistances = inboundBefore
+      .filter(({ key }) => key !== flingTarget.key)
+      .map(({ key }) => displacement(inboundBefore, inboundAfter, key));
+    const averageRegularDistance = regularDistances.reduce((total, distance) => total + distance, 0)
+      / Math.max(regularDistances.length, 1);
+    await assert(
+      apoDistance > .4 && inboundDistance > apoDistance * 1.35,
+      `Altered node does not visibly accelerate from apoapsis toward the AC focus (${apoDistance.toFixed(2)}px → ${inboundDistance.toFixed(2)}px)`
+    );
+    await assert(
+      inboundDistance > averageRegularDistance * 1.8,
+      `Inbound comet is not substantially faster than the regular orbit nodes (${inboundDistance.toFixed(2)}px vs ${averageRegularDistance.toFixed(2)}px average)`
+    );
+
+    await flingPage.locator('[data-motion-toggle]').click();
+    const pausedBefore = await readOrbitCoordinates(flingPage);
+    await flingPage.waitForTimeout(750);
+    const pausedAfter = await readOrbitCoordinates(flingPage);
+    await assert(JSON.stringify(pausedBefore) === JSON.stringify(pausedAfter), 'Pause does not freeze the altered orbit');
+    await assert(
+      await flingPage.locator('.orbit-node.is-comet .comet-wake b').first().evaluate((element) => getComputedStyle(element).animationPlayState) === 'paused',
+      'Pause does not freeze the comet glitter trail'
+    );
+    await flingPage.locator('[data-motion-toggle]').click();
+
+    await flingPage.locator('[data-orbit-reset]').click();
+    await flingPage.waitForTimeout(820);
+    const resetState = await flingPage.evaluate(() => ({
+      comet: document.querySelector('[data-synthesis]')?.dataset.comet || null,
+      customNodes: document.querySelectorAll('.orbit-node.is-comet').length,
+      customTracks: document.querySelectorAll('.track.is-comet-track').length,
+      cues: window.__orbitalTestCues,
+      resetDisabled: document.querySelector('[data-orbit-reset]')?.disabled,
+      resettingNodes: document.querySelectorAll('.orbit-node.is-resetting').length,
+    }));
+    await assert(
+      resetState.comet === null && resetState.customNodes === 0 && resetState.customTracks === 0
+        && resetState.resettingNodes === 0 && resetState.resetDisabled,
+      'Reset does not restore the original orbital field'
+    );
+    await assert(
+      resetState.cues.includes('fling') && resetState.cues.includes('reset'),
+      'Fling and reset do not emit their action sounds'
+    );
+
+    await flingPage.locator('[data-motion-toggle]').click();
+    await flingNode.click();
+    await flingPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'focused');
+    await assert(
+      new URL(flingPage.url()).hash === `#facet-${flingTarget.key}`,
+      'A normal click no longer opens a node after fling reset'
+    );
+
+    await flingPage.locator('[data-detail-close]').click();
+    await flingPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'overview');
+    await flingPage.locator('[data-map-target="projects"]').click();
+    await flingPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'focused');
+    const projectConstellation = await flingPage.evaluate(() => {
+      const logos = Array.from(document.querySelectorAll('[data-facet-detail="projects"] .project-app-logo'));
+      const sources = logos.map((logo) => logo.querySelector('img')?.getAttribute('src') || '');
+      return {
+        ariaLabel: document.querySelector('[data-facet-detail="projects"] .project-app-orbits')?.getAttribute('aria-label') || '',
+        circular: logos.every((logo) => getComputedStyle(logo).borderRadius === '50%' && getComputedStyle(logo).overflow === 'hidden'),
+        loaded: logos.every((logo) => {
+          const image = logo.querySelector('img');
+          return image?.complete && image.naturalWidth > 0;
+        }),
+        logoCount: logos.length,
+        outerSources: Array.from(document.querySelectorAll('[data-facet-detail="projects"] .project-app-ring--outer img'))
+          .map((image) => image.getAttribute('src') || ''),
+        ringAnimations: Array.from(document.querySelectorAll('[data-facet-detail="projects"] .project-app-ring'))
+          .map((ring) => getComputedStyle(ring).animationName),
+        sources,
+        titles: Array.from(document.querySelectorAll('[data-facet-detail="projects"] .focus-satellites strong'))
+          .map((title) => title.textContent?.trim()),
+      };
+    });
+    await assert(
+      projectConstellation.logoCount === 12 && projectConstellation.loaded && projectConstellation.circular,
+      'Highlighted-project app constellation is not twelve loaded circular logo medallions'
+    );
+    await assert(
+      ['ic_bitcoin_wallet_logo.svg', 'ic_itvx_logo.svg', 'ic_ocbc_logo.png']
+        .every((filename) => projectConstellation.outerSources.some((src) => src.endsWith(filename))),
+      'Bitcoin.com Wallet, ITVX, and OCBC Business are not all on the prominent app ring'
+    );
+    await assert(
+      projectConstellation.ringAnimations.every((name) => name === 'project-app-ring-spin'),
+      'Highlighted-project app rings are not animated'
+    );
+    await assert(
+      JSON.stringify(projectConstellation.titles) === JSON.stringify(['Bitcoin.com Wallet', 'ITVX', 'OCBC Business']),
+      'Highlighted-project satellites do not use the selected production trio'
+    );
+    await assert(
+      await flingPage.locator('[data-facet-detail="profile"] .landing-copy a').getAttribute('href') === '/about.html#profile-map',
+      'Skills and interests CTA does not lead to the capability tree'
+    );
+  }
+  await flingContext.close();
 
   // Reduced motion keeps the complete mobile interaction model but freezes all
   // continuous motion and makes camera/focus transitions effectively immediate.
@@ -608,6 +989,34 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     JSON.stringify(reducedBefore) === JSON.stringify(reducedAfter),
     'Reduced-motion homepage still moves orbit nodes'
   );
+  const reducedFlingState = await reducedHomePage.locator('[data-orbit-object]').first().evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    const x = bounds.left + bounds.width / 2;
+    const y = bounds.top + bounds.height / 2;
+    const pointer = (type, clientX, clientY) => element.dispatchEvent(new PointerEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      clientX,
+      clientY,
+      isPrimary: true,
+      pointerId: 41,
+      pointerType: 'touch',
+    }));
+    pointer('pointerdown', x, y);
+    pointer('pointermove', x + 80, y - 60);
+    pointer('pointerup', x + 80, y - 60);
+    return {
+      comet: document.querySelector('[data-synthesis]')?.dataset.comet || null,
+      resetDisabled: document.querySelector('[data-orbit-reset]')?.disabled,
+      touchAction: getComputedStyle(element).touchAction,
+      wakeDisplay: getComputedStyle(element.querySelector('.comet-wake')).display,
+    };
+  });
+  await assert(
+    reducedFlingState.comet === null && reducedFlingState.resetDisabled
+      && reducedFlingState.touchAction === 'manipulation' && reducedFlingState.wakeDisplay === 'none',
+    'Reduced-motion homepage still enables continuous fling behavior'
+  );
   await reducedHomePage.locator('.scene-controls').scrollIntoViewIfNeeded();
   await reducedHomePage.locator('[data-view-toggle]').click();
   await assert(
@@ -629,6 +1038,18 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && reducedSatellitesBefore.every(({ opacity }) => Number.parseFloat(opacity) > 0)
       && JSON.stringify(reducedSatellitesBefore) === JSON.stringify(reducedSatellitesAfter),
     'Reduced-motion homepage satellites are hidden or still moving'
+  );
+  const reducedProjectConstellation = await reducedHomePage.evaluate(() => {
+    const logos = Array.from(document.querySelectorAll('[data-facet-detail="projects"] .project-app-logo img'));
+    return {
+      animations: Array.from(document.querySelectorAll('[data-facet-detail="projects"] .project-app-ring'))
+        .map((ring) => getComputedStyle(ring).animationName),
+      loaded: logos.length === 12 && logos.every((image) => image.complete && image.naturalWidth > 0),
+    };
+  });
+  await assert(
+    reducedProjectConstellation.loaded && reducedProjectConstellation.animations.every((name) => name === 'none'),
+    'Reduced-motion project logos are missing or their rings still animate'
   );
   const reducedBackdropPoint = await findVisibleBackdropPoint(reducedHomePage);
   await assert(Boolean(reducedBackdropPoint), 'Reduced-motion homepage has no outside-dismiss target');

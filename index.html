@@ -65,8 +65,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&amp;family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
   <link href="/assets/css/neural-background.css?v=20260722-flow5" rel="stylesheet">
-  <link href="/assets/css/orbital-option-8.css?v=20260806-22" rel="stylesheet">
-  <script src="/assets/js/orbital-option-8.js?v=20260806-22" defer></script>
+  <link href="/assets/css/orbital-option-8.css?v=20260806-23" rel="stylesheet">
+  <script src="/assets/js/orbital-option-8.js?v=20260806-23" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -123,6 +123,7 @@
           <span><small data-view-action>Rotate to top view</small><strong data-view-label>Orbit · 38°</strong></span>
         </button>
         <button type="button" data-motion-toggle aria-pressed="false">[pause]</button>
+        <button type="button" data-orbit-reset disabled aria-label="Reset the altered orbital path">[reset orbit]</button>
       </div>
 
       <div class="camera-window" data-camera-window data-orbit-stage>
@@ -203,20 +204,42 @@
 
       <article class="facet-detail" data-facet-detail="profile" aria-labelledby="facet-profile-title">
         <figure class="landing-object"><span class="landing-code">OBJECT 02 / CAPABILITY LATTICE</span><span class="sculpture sculpture--range" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b><b></b></span><figcaption>Engineering and human interests sharing one connected framework.</figcaption></figure>
-        <div class="landing-copy"><p class="eyebrow">[SKILLS + INTERESTS]</p><h2 id="facet-profile-title">What I build—and what keeps me curious.</h2><p>Mobile is home turf. I follow the work outward into backend systems, architecture, reliability, and agent-first delivery—and inward into family, cameras, the night sky, philosophy, fitness, and small ventures.</p><a href="/about.html">Explore the complete About page <span aria-hidden="true">→</span></a></div>
+        <div class="landing-copy"><p class="eyebrow">[SKILLS + INTERESTS]</p><h2 id="facet-profile-title">What I build—and what keeps me curious.</h2><p>Mobile is home turf. I follow the work outward into backend systems, architecture, reliability, and agent-first delivery—and inward into family, cameras, the night sky, philosophy, fitness, and small ventures.</p><a href="/about.html#profile-map">Explore the capability tree <span aria-hidden="true">→</span></a></div>
         <div class="focus-satellites" aria-label="Skills and interests focus points"><span style="--sx:5%;--sy:14%"><small>02.A / SURFACES</small><strong>Android + iOS + backend</strong><em>Kotlin, Swift, Objective-C, Rust, APIs, and shared native code.</em></span><span style="--sx:78%;--sy:12%"><small>02.B / CRAFT</small><strong>Architecture + reliability</strong><em>Composable systems, performance, CI/CD, and release hardening.</em></span><span style="--sx:81%;--sy:72%"><small>02.C / INTERESTS</small><strong>Place + observation</strong><em>Family, travel, cameras, astronomy, philosophy, fitness, and ventures.</em></span></div>
       </article>
 
       <article class="facet-detail" data-facet-detail="work" aria-labelledby="facet-work-title">
         <figure class="landing-object"><span class="landing-code">OBJECT 03 / PRODUCTION GYROSCOPE</span><span class="sculpture sculpture--production" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b></span><figcaption>A full record of work balanced around production outcomes.</figcaption></figure>
-        <div class="landing-copy"><p class="eyebrow">[WORK / PORTFOLIO]</p><h2 id="facet-work-title">I build the parts people notice when they fail.</h2><p>I work wherever the product needs me—Android, iOS, backend, or architecture. I lead teams, stay close to the code, and use AI to move from idea to verified release faster.</p><a href="/work.html">Open the full portfolio <span aria-hidden="true">→</span></a></div>
+        <div class="landing-copy"><p class="eyebrow">[WORK / PORTFOLIO]</p><h2 id="facet-work-title">I build the parts people notice when they fail.</h2><p>More than 10 years across crypto, banking, streaming, telecom, payments, transport, safety, and commerce—leading teams, staying close to the code, and carrying systems through release.</p><a href="/work.html">Open the full portfolio <span aria-hidden="true">→</span></a></div>
         <div class="focus-satellites" aria-label="Work focus points"><span style="--sx:5%;--sy:14%"><small>03.A / RANGE</small><strong>10+ years in production</strong><em>Crypto, banking, streaming, telecom, payments, transport, safety, and commerce.</em></span><span style="--sx:78%;--sy:12%"><small>03.B / ROLE</small><strong>Lead + build</strong><em>Direction, mentoring, architecture, implementation, and release.</em></span><span style="--sx:81%;--sy:72%"><small>03.C / EVIDENCE</small><strong>Systems + outcomes</strong><em>Case notes, public builds, product context, and operating constraints.</em></span></div>
       </article>
 
       <article class="facet-detail" data-facet-detail="projects" aria-labelledby="facet-projects-title">
-        <figure class="landing-object"><span class="landing-code">OBJECT 04 / PROJECT ARMATURE</span><span class="sculpture sculpture--opensource" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b><b></b></span><figcaption>Selected systems joined by the decisions and constraints behind them.</figcaption></figure>
-        <div class="landing-copy"><p class="eyebrow">[HIGHLIGHTED PROJECTS]</p><h2 id="facet-projects-title">I go where the product needs me.</h2><p>I’m a problem solver who works wherever the product needs me—Android, iOS, backend, or architecture. I lead teams, stay close to the code, and use AI to get from idea to verified release faster.</p><a href="/work.html">Browse the complete portfolio <span aria-hidden="true">→</span></a></div>
-        <div class="focus-satellites focus-satellites--projects" aria-label="Highlighted projects"><a class="project-satellite--primary" style="--sx:3%;--sy:11%" href="/work.html#production-work"><small>LEAD PROJECT / ANDROID</small><strong>Bitcoin.com Wallet</strong><em>Multichain rewards, market predictions, Bitcoin transaction replacement, wallet migration, shared Rust, and release hardening.</em></a><a style="--sx:77%;--sy:10%" href="https://github.com/ac-opensource/persons-finder" target="_blank" rel="noreferrer"><small>KOTLIN / POSTGIS</small><strong>Persons Finder</strong><em>Location history, nearby search, and a guarded AI bio boundary.</em></a><a style="--sx:80%;--sy:72%" href="https://github.com/ac-opensource/Orchestrum" target="_blank" rel="noreferrer"><small>ELIXIR / AGENTS</small><strong>Orchestrum</strong><em>Isolated runs, proof-of-work, and operator-facing state.</em></a></div>
+        <figure class="landing-object landing-object--project-logos">
+          <span class="landing-code">OBJECT 04 / APP CONSTELLATION</span>
+          <span class="project-app-orbits" role="img" aria-label="Twelve selected apps including Bitcoin.com Wallet, ITVX, and OCBC Business orbiting one engineering practice">
+            <span class="project-app-ring project-app-ring--outer">
+              <span class="project-app-logo" style="--logo-x:50%;--logo-y:0%"><img src="/assets/images/work/ic_bitcoin_wallet_logo.svg" alt="" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:93%;--logo-y:25%"><img src="/assets/images/work/ic_itvx_logo.svg" alt="" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:93%;--logo-y:75%"><img src="/assets/images/work/ic_ocbc_logo.png" alt="" width="512" height="512" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:50%;--logo-y:100%"><img src="/assets/images/work/ic_stc_logo.png" alt="" width="512" height="512" decoding="async"></span>
+              <span class="project-app-logo project-app-logo--contain" style="--logo-x:7%;--logo-y:75%"><img src="/assets/images/work/ic_openpay_logo.svg" alt="" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:7%;--logo-y:25%"><img src="/assets/images/work/ic_owto_logo.webp" alt="" decoding="async"></span>
+            </span>
+            <span class="project-app-ring project-app-ring--inner">
+              <span class="project-app-logo" style="--logo-x:50%;--logo-y:0%"><img src="/assets/images/work/ic_popslide_logo.png" alt="" width="170" height="170" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:93%;--logo-y:25%"><img src="/assets/images/work/ic_websafety_logo.webp" alt="" width="400" height="400" decoding="async"></span>
+              <span class="project-app-logo project-app-logo--contain" style="--logo-x:93%;--logo-y:75%"><img src="/assets/images/work/ic_solo_logo.png" alt="" width="1080" height="411" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:50%;--logo-y:100%"><img src="/assets/images/work/ic_projectbass_logo.webp" alt="" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:7%;--logo-y:75%"><img src="/assets/images/work/ic_ntu_pass_logo.png" alt="" width="512" height="512" decoding="async"></span>
+              <span class="project-app-logo project-app-logo--contain" style="--logo-x:7%;--logo-y:25%"><img src="/assets/images/work/ic_aqua_expeditions_logo.svg" alt="" decoding="async"></span>
+            </span>
+            <span class="project-app-core"><b>12</b><small>SELECTED APPS</small></span>
+          </span>
+          <figcaption>App identities orbiting one cross-platform engineering practice.</figcaption>
+        </figure>
+        <div class="landing-copy"><p class="eyebrow">[HIGHLIGHTED PROJECTS]</p><h2 id="facet-projects-title">Selected systems, up close.</h2><p>A self-custody wallet, streaming player, and business bank—three production systems with very different constraints, each represented by the work I actually shipped.</p><a href="/work.html#production-work">Explore production projects <span aria-hidden="true">→</span></a></div>
+        <div class="focus-satellites focus-satellites--projects" aria-label="Highlighted projects"><a class="project-satellite--primary" style="--sx:3%;--sy:11%" href="/work.html#production-work"><small>LEAD PROJECT / ANDROID</small><strong>Bitcoin.com Wallet</strong><em>Multichain rewards, market predictions, transaction replacement, wallet migration, shared Rust, and release hardening.</em></a><a style="--sx:77%;--sy:10%" href="/work.html#production-work"><small>ANDROID / STREAMING</small><strong>ITVX</strong><em>Playback UI, in-player recommendations, preview scrubbing, phone, tablet, and reliability work.</em></a><a style="--sx:80%;--sy:72%" href="/blog/case-study-ocbc-banking-experience.html"><small>ANDROID / BANKING</small><strong>OCBC Business</strong><em>Onboarding, accounts, transfers, identity integrations, state, lifecycle, and network reliability.</em></a></div>
       </article>
 
       <article class="facet-detail" data-facet-detail="threads" aria-labelledby="facet-threads-title">
