@@ -5,8 +5,16 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Wed, 05 Aug 2026 14:19:07 GMT</lastBuildDate>
+  <lastBuildDate>Thu, 06 Aug 2026 05:43:54 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Rebuilding My Homepage as an Interactive Orbital System</title>
+    <link>https://ac-opensource.github.io/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html</guid>
+    <pubDate>Thu, 06 Aug 2026 00:00:00 GMT</pubDate>
+    <description>I’m not a web developer, but with Codex I turned a static portfolio into a working orbital interface—and spent more time shaping the product than wrestling with syntax.</description>
+<category>ai-workflow</category><category>product-engineering</category><category>web-animation</category><category>ux</category><category>accessibility</category><category>quality-engineering</category><category>cross-disciplinary-engineering</category><category>technical</category>
+  </item>
   <item>
     <title>It’s Not Okay to Not Be Okay</title>
     <link>https://ac-opensource.github.io/blog/2026-07-22-its-not-okay-to-stay-not-okay.html</link>
