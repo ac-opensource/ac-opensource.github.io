@@ -59,8 +59,8 @@
     { key: "profile", angle: 12, rx: .255, ry: .17, cx: .065, cy: -.025, tilt: 13, period: 204 },
     { key: "work", angle: 82, rx: .315, ry: .215, cx: .02, cy: .025, tilt: -17, period: 232 },
     { key: "projects", angle: 137, rx: .37, ry: .255, cx: .08, cy: -.035, tilt: 7, period: 260 },
-    { key: "threads", angle: 211, rx: .42, ry: .29, cx: .11, cy: -.01, tilt: 19, period: 286, direction: -1 },
-    { key: "contact", angle: 292, rx: .47, ry: .325, cx: .065, cy: .035, tilt: -11, period: 314, direction: -1 },
+    { key: "threads", angle: 211, rx: .42, ry: .29, cx: .11, cy: -.01, tilt: 19, period: 286 },
+    { key: "contact", angle: 292, rx: .47, ry: .325, cx: .065, cy: .035, tilt: -11, period: 314 },
   ];
   const phoneProfiles = new Map([
     ["about", { angleOffset: -88, rx: .24, ry: .26, cx: .01, cy: .04, tilt: -6 }],
