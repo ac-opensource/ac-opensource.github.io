@@ -1,0 +1,351 @@
+.work-trajectory-map [hidden],
+.work-trajectory-console[hidden],
+.work-trajectory-jump[hidden] {
+  display: none !important;
+}
+
+.work-trajectory-status {
+  max-width: 76rem;
+  min-height: 3em;
+  margin: 1.25rem 0 0;
+  color: var(--mission-muted);
+  font: 650 0.71rem/1.55 "Space Grotesk", sans-serif;
+  letter-spacing: 0.045em;
+}
+
+.work-trajectory-reset,
+.work-trajectory-pager button {
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid var(--mission-line);
+  padding: 0.65rem 0;
+  color: var(--mission-ink);
+  background: transparent;
+  font: 700 0.64rem/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.work-trajectory-reset:disabled,
+.work-trajectory-pager button:disabled {
+  cursor: default;
+  opacity: 0.38;
+}
+
+.work-trajectory-projects {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 0.25rem clamp(0.55rem, 1vw, 1rem);
+  margin-top: 1.25rem;
+}
+
+.work-trajectory-project {
+  position: relative;
+  display: grid;
+  min-height: 4.6rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.55rem;
+  align-content: center;
+  border: 0;
+  border-bottom: 1px solid var(--mission-line-soft);
+  padding: 0.65rem 0.2rem 0.65rem 0;
+  color: var(--mission-ink);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: color 160ms ease, opacity 160ms ease, transform 160ms ease;
+}
+
+.work-trajectory-project:hover,
+.work-trajectory-project:focus-visible,
+.work-trajectory-project.is-selected {
+  color: var(--mission-blue);
+}
+
+.work-trajectory-project__label {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.work-trajectory-project__kind {
+  color: var(--mission-quiet);
+  font: 700 0.54rem/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.work-trajectory-project__label strong {
+  font: 700 0.78rem/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.work-trajectory-project__rail,
+.mission-entry-route__rail {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  align-items: center;
+  gap: 0;
+}
+
+.work-trajectory-project__rail::before,
+.mission-entry-route__rail::before {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--mission-line);
+  content: "";
+}
+
+.work-trajectory-project__dot,
+.mission-entry-route__dot {
+  position: relative;
+  z-index: 1;
+  width: 0.42rem;
+  height: 0.42rem;
+  justify-self: center;
+  border: 1px solid rgba(57, 75, 64, 0.28);
+  border-radius: 50%;
+  background: var(--mission-paper);
+}
+
+.work-trajectory-project__dot.is-present,
+.mission-entry-route__dot.is-present {
+  border-color: var(--mission-blue);
+  background: var(--mission-blue);
+}
+
+.work-trajectory-project__dot[data-route-stage="ai"].is-present,
+.mission-entry-route__dot[data-route-stage="ai"].is-present {
+  border-color: var(--mission-violet);
+  background: var(--mission-violet);
+}
+
+.work-trajectory-project__dot[data-route-stage="release"].is-present,
+.mission-entry-route__dot[data-route-stage="release"].is-present {
+  border-color: var(--mission-teal);
+  background: var(--mission-teal);
+}
+
+.work-trajectory-project__dot.is-active,
+.mission-entry-route__dot.is-active {
+  box-shadow: 0 0 0 0.3rem var(--mission-blue-soft);
+  transform: scale(1.35);
+}
+
+.work-trajectory-pager {
+  display: grid;
+  grid-template-columns: auto minmax(12rem, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.work-trajectory-pager > span {
+  color: var(--mission-quiet);
+  font: 650 0.62rem/1.4 "Space Grotesk", sans-serif;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.work-trajectory-jump {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: var(--mission-blue);
+  font: 700 0.65rem/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.mission-entry-route {
+  position: absolute;
+  z-index: 3;
+  top: clamp(2rem, 5vw, 5rem);
+  right: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: minmax(10rem, 1fr) minmax(14rem, 2fr);
+  gap: 2rem;
+  align-items: center;
+  pointer-events: none;
+}
+
+.mission-entry-route__label {
+  color: var(--mission-quiet);
+  font: 700 0.56rem/1.4 "Space Grotesk", sans-serif;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.flight-strip .mission-entry-route {
+  top: 2rem;
+  right: 0;
+  left: clamp(4rem, 7vw, 7rem);
+}
+
+.telemetry-record .mission-entry-route {
+  top: 2rem;
+}
+
+.has-trajectory-focus [data-portfolio-entry] {
+  transition: opacity 180ms ease, filter 180ms ease;
+}
+
+.has-trajectory-focus [data-portfolio-entry].is-project-context {
+  opacity: 0.43;
+}
+
+.has-trajectory-focus [data-portfolio-entry].is-project-selected {
+  opacity: 1;
+}
+
+.has-trajectory-focus [data-portfolio-entry].is-stage-context:not(.is-project-selected) {
+  opacity: 0.5;
+}
+
+.has-trajectory-focus [data-portfolio-entry].is-stage-match {
+  opacity: 1;
+}
+
+[data-trajectory-stage] {
+  transition: opacity 180ms ease, color 180ms ease, filter 180ms ease, background-color 180ms ease;
+}
+
+[data-trajectory-stage].is-trajectory-muted {
+  opacity: 0.42;
+}
+
+[data-trajectory-stage].is-trajectory-hit {
+  position: relative;
+  opacity: 1;
+}
+
+p[data-trajectory-stage].is-trajectory-hit,
+.work-case__meta .is-trajectory-hit,
+a[data-trajectory-stage].is-trajectory-hit {
+  color: var(--mission-blue);
+}
+
+p[data-trajectory-stage].is-trajectory-hit {
+  padding-left: 1rem;
+  box-shadow: inset 2px 0 var(--mission-blue);
+}
+
+figure[data-trajectory-stage].is-trajectory-hit,
+div[data-trajectory-stage].is-trajectory-hit {
+  filter: saturate(1.04) drop-shadow(0 1rem 2rem rgba(31, 92, 186, 0.1));
+}
+
+.work-trajectory-project.is-context,
+.work-trajectory-project.is-stage-context {
+  opacity: 0.42;
+}
+
+.work-trajectory-project.is-stage-match,
+.work-trajectory-project.is-selected {
+  opacity: 1;
+}
+
+.work-trajectory-map.is-trajectory-pulsing .work-pipeline__flow {
+  animation: mission-route-pulse 680ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+@keyframes mission-route-pulse {
+  0% { opacity: 0.08; stroke-dashoffset: 102; }
+  52% { opacity: 0.9; }
+  100% { opacity: 0.18; stroke-dashoffset: 0; }
+}
+
+:focus-visible {
+  outline: 3px solid rgba(31, 92, 186, 0.62);
+  outline-offset: 4px;
+}
+
+@media (max-width: 1050px) {
+  .work-trajectory-projects {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .work-trajectory-project:nth-child(n) {
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .work-trajectory-projects {
+    grid-template-columns: repeat(16, minmax(8.75rem, 1fr));
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.65rem;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+  }
+
+  .work-trajectory-project {
+    min-height: 4.5rem;
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+    scroll-snap-align: start;
+  }
+
+  .work-trajectory-project:nth-child(n) {
+    transform: none;
+  }
+
+  .work-trajectory-pager {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .work-trajectory-pager > span {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .mission-entry-route {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    order: 0;
+    margin-bottom: 2.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .flight-strip .mission-entry-route,
+  .telemetry-record .mission-entry-route {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    order: 0;
+    padding-left: 0;
+  }
+
+  .has-trajectory-focus [data-portfolio-entry].is-project-context,
+  .has-trajectory-focus [data-portfolio-entry].is-stage-context:not(.is-project-selected) {
+    opacity: 0.62;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-trajectory-map.is-trajectory-pulsing .work-pipeline__flow {
+    animation: none;
+  }
+
+  .work-trajectory-project,
+  [data-portfolio-entry],
+  [data-trajectory-stage] {
+    transition: none;
+  }
+}

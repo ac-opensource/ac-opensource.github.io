@@ -23,7 +23,13 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
   <link href="/assets/css/neural-background.css" rel="stylesheet"/>
-  <link href="/assets/css/work-portfolio.css?v=20260806-hero2" rel="stylesheet"/>
+  <link href="/assets/css/work-portfolio.css?v=20260807-compact2" rel="stylesheet"/>
+  <link href="/assets/experiments/universe-options/work-round-05/supernova-portfolio.css?v=20260807-default1" rel="stylesheet"/>
+  <link href="/assets/css/route-signal-handoff.css?v=20260806-t3" rel="stylesheet"/>
+  <link href="/assets/css/universe-field-map.css?v=20260807" rel="stylesheet"/>
+  <script src="/assets/js/universe-theme-transition.js?v=20260807-fast2"></script>
+  <script src="/assets/js/route-signal-handoff.js?v=20260806-t3" defer></script>
+  <script src="/assets/experiments/universe-options/work-round-05/supernova-portfolio.js?v=20260807-default1" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -61,7 +67,7 @@
   }
   </script>
 </head>
-<body class="bg-[#FAF9F4] text-[#2F342D] font-['Manrope'] selection:bg-[#1F5CBA] selection:text-white overflow-x-hidden">
+<body class="work-supernova-theme bg-[#FAF9F4] text-[#2F342D] font-['Manrope'] selection:bg-[#1F5CBA] selection:text-white overflow-x-hidden" data-route-signal-page="work" data-universe-region="work">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <div class="neural-global-bg" aria-hidden="true">
@@ -80,6 +86,8 @@
     <div class="bust-gradient"></div>
     <div class="canvas-grid"></div>
   </div>
+
+  <div class="work-supernova-geometry" data-nova-geometry aria-hidden="true"></div>
 
   <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
     <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
@@ -104,6 +112,7 @@
 
   <main id="main" class="work-page">
     <section class="work-hero" aria-labelledby="work-title">
+      <canvas class="work-supernova-canvas" data-supernova-canvas aria-hidden="true"></canvas>
       <div class="work-hero__copy">
         <span class="work-eyebrow">[portfolio]</span>
         <h1 id="work-title" class="work-hero__title">
@@ -122,8 +131,8 @@
         </div>
       </div>
 
-      <div class="work-hero__art" role="img" aria-label="A product problem moves through a shared engineering core, branches across Android, iOS, and backend with AI assistance, then converges into a verified release.">
-        <svg class="work-pipeline" viewBox="0 0 560 520">
+      <div class="work-hero__art">
+        <svg class="work-pipeline" viewBox="0 0 560 520" role="img" aria-label="A product problem moves through a shared engineering core, branches across Android, iOS, and backend with AI assistance, then converges into a verified release.">
           <circle class="work-pipeline__halo" cx="280" cy="264" r="204"/>
           <text class="work-pipeline__kicker" x="52" y="58">DELIVERY PIPELINE</text>
           <g class="work-pipeline__status" transform="translate(376 34)">
@@ -182,6 +191,13 @@
             <text class="work-pipeline__meta" x="122" y="41">QUALITY GATES PASSED</text>
           </g>
         </svg>
+        <aside class="route-signal-receiver route-signal-receiver--work" data-route-signal-receiver="work" hidden role="status" aria-live="polite">
+          <span>[mission trajectory / inbound]</span>
+          <strong>Dashboard signal received.</strong>
+          <span data-route-signal-receiver-route>DASHBOARD → WORK · DESTINATION ID: WORK</span>
+          <span class="route-signal-receiver__rail" aria-hidden="true"><i></i></span>
+          <small data-route-signal-receiver-state>LOCKING PORTFOLIO TRAJECTORY</small>
+        </aside>
       </div>
 
       <dl class="work-signals" aria-label="Career signals">
@@ -472,6 +488,7 @@
     </div>
   </footer>
 
+  <script src="/assets/js/universe-field-map.js?v=20260807"></script>
   <script>
     (() => {
       const path = window.location.pathname.replace(/\/index\.html$/, "/");

@@ -1,0 +1,111 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<link rel="canonical" href="https://ac-opensource.github.io/experiments/universe-options/logs/04-gravitational-lens-archive.html"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<title>Logs Option 04 · Gravitational Lens Archive</title>
+<meta name="description" content="A light editorial archive organized around a gravitationally lensed black-hole field and Andrew Concepcion's published writing."/>
+<link rel="stylesheet" href="/assets/experiments/universe-options/logs/gravitational-lens-archive.css?v=20260807"/>
+<script>document.documentElement.classList.replace("no-js","js");</script>
+</head>
+<body data-universe-region="logs" data-log-option="gravitational-lens">
+<a class="skip-link" href="#main">Skip to archive</a>
+<header class="option-nav">
+  <a class="option-nav__brand" href="/">Andrew Concepcion</a>
+  <p>Logs redesign field tests</p>
+  <nav aria-label="Logs design options">
+    <a href="/experiments/universe-options/logs/01-radio-telescope.html">01 · Radio telescope</a>
+    <a href="/experiments/universe-options/logs/02-nebula-archive.html">02 · Nebula archive</a>
+    <a href="/experiments/universe-options/logs/03-constellation-threads.html">03 · Constellation threads</a>
+    <a href="/experiments/universe-options/logs/04-gravitational-lens-archive.html" aria-current="page">04 · Gravitational lens</a>
+    <a href="/experiments/universe-options/logs/05-spiral-galaxy-archive.html">05 · Spiral galaxy</a>
+  </nav>
+</header>
+
+<main id="main" class="gravity-archive">
+  <section class="gravity-hero" aria-labelledby="gravity-title">
+    <div class="gravity-hero__copy">
+      <p class="eyebrow">[received transmissions · newest first]</p>
+      <h1 id="gravity-title">Logs.<br/><em>Gravitational lens.</em></h1>
+      <p class="gravity-hero__lede">I write about production engineering, agent-assisted delivery, privacy, photography, and the questions that follow me beyond the screen.</p>
+      <div class="gravity-hero__ledger" aria-label="Archive summary">
+        <span id="gravity-total">Published entries</span>
+        <span id="gravity-range">2022 → present</span>
+        <a href="/blog/rss.xml">RSS</a>
+      </div>
+
+      <form id="gravity-tuner" class="gravity-tuner" role="search" hidden>
+        <label for="gravity-search">Search the archive</label>
+        <div class="gravity-tuner__search">
+          <input id="gravity-search" type="search" autocomplete="off" maxlength="160" placeholder="Engineering, privacy, photography…"/>
+          <button type="reset">Clear</button>
+        </div>
+        <div id="gravity-categories" class="gravity-categories" role="group" aria-label="Filter entries by category"></div>
+        <output id="gravity-count" for="gravity-search" aria-live="polite"></output>
+      </form>
+    </div>
+
+    <div id="gravity-field" class="gravity-field" aria-label="Published entries arranged around a gravitational lens" hidden>
+      <div class="gravity-field__visual" aria-hidden="true">
+        <svg class="gravity-field__lensing" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="lens-hot" x1="0" x2="1">
+              <stop offset="0" stop-color="#fff7d5" stop-opacity="0"/>
+              <stop offset="0.23" stop-color="#ffe396" stop-opacity=".78"/>
+              <stop offset="0.55" stop-color="#f29f4a" stop-opacity=".32"/>
+              <stop offset="1" stop-color="#f29f4a" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="lens-cool" x1="1" x2="0">
+              <stop offset="0" stop-color="#d8e9ff" stop-opacity="0"/>
+              <stop offset="0.25" stop-color="#8bbdff" stop-opacity=".64"/>
+              <stop offset="0.7" stop-color="#5280c4" stop-opacity=".22"/>
+              <stop offset="1" stop-color="#5280c4" stop-opacity="0"/>
+            </linearGradient>
+            <filter id="soft-glow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="8"/>
+            </filter>
+          </defs>
+          <path class="gravity-field__arc gravity-field__arc--upper" d="M75 471 C248 210 752 210 925 471"/>
+          <path class="gravity-field__arc gravity-field__arc--lower" d="M75 529 C248 790 752 790 925 529"/>
+          <ellipse class="gravity-field__disk gravity-field__disk--glow" cx="500" cy="500" rx="302" ry="72"/>
+          <path class="gravity-field__disk gravity-field__disk--far" d="M200 500 C286 432 714 432 800 500"/>
+          <path class="gravity-field__disk gravity-field__disk--near" d="M200 500 C286 568 714 568 800 500"/>
+        </svg>
+        <div class="gravity-field__mass"><span></span></div>
+      </div>
+      <div id="gravity-nodes" class="gravity-nodes"></div>
+      <aside id="gravity-focus" class="gravity-focus" aria-live="polite" aria-labelledby="gravity-focus-title" hidden>
+        <button id="gravity-release" type="button" aria-label="Close selected entry">Close</button>
+        <p id="gravity-focus-meta"></p>
+        <h2 id="gravity-focus-title"></h2>
+        <p id="gravity-focus-summary"></p>
+        <a id="gravity-focus-link" href="/blog/">Read entry <span aria-hidden="true">↗</span></a>
+      </aside>
+    </div>
+  </section>
+
+  <section class="gravity-index" aria-labelledby="gravity-index-title">
+    <header class="gravity-index__header">
+      <div>
+        <p class="eyebrow">[published archive]</p>
+        <h2 id="gravity-index-title">Latest entries</h2>
+      </div>
+      <p>Engineering systems, delivery notes, reflective essays, and field observations from 2022 to the present.</p>
+    </header>
+    <div id="gravity-list" class="gravity-list" aria-live="polite">
+      <p class="gravity-list__loading">Loading published entries…</p>
+    </div>
+    <p id="gravity-empty" class="gravity-empty" hidden>No published entries match this search.</p>
+    <noscript><p class="gravity-empty">The complete archive remains available in <a href="/blog/">Logs</a>.</p></noscript>
+  </section>
+</main>
+
+<script src="/assets/experiments/universe-options/logs/gravitational-lens-archive.js?v=20260807"></script>
+</body>
+</html>

@@ -26,14 +26,21 @@
   const previewArticles = [...root.querySelectorAll("[data-preview]")];
   const previewCode = root.querySelector("[data-preview-code]");
   const previewStatus = root.querySelector("[data-preview-status]");
+  const previousFacet = root.querySelector("[data-facet-previous]");
+  const nextFacet = root.querySelector("[data-facet-next]");
+  const facetPosition = root.querySelector("[data-facet-position]");
+  const facetStatus = root.querySelector("[data-facet-status]");
 
   if (
     !overview || !plane || !cameraWindow || nodes.length !== 6 || tracks.length !== 6 || mapControls.length !== 6 ||
     details.length !== 6 || !mapHome || !detailLayer || !backdrop || !closeButton ||
-    !viewToggle || !motionToggle || !resetToggle || !previewPanel || previewArticles.length !== 6
+    !viewToggle || !motionToggle || !resetToggle || !previewPanel || previewArticles.length !== 6 ||
+    !previousFacet || !nextFacet || !facetPosition || !facetStatus
   ) return;
 
   const keys = ["about", "profile", "work", "projects", "threads", "contact"];
+  const transferOutDuration = 420;
+  const transferNeutralDuration = 34;
   const labels = new Map([
     ["about", "About"],
     ["profile", "Skills + interests"],
@@ -104,33 +111,54 @@
     activeAudio: new Set(),
     nodeVisibility: new Map(keys.map((key) => [key, 1])),
     orbitRates: new Map(keys.map((key) => [key, 1])),
+    focusAfterTransition: null,
+    facetGesture: null,
+    pendingFacet: null,
   };
 
-  nodes.forEach((node) => {
+  const cometParticlePalette = [
+    "40,100,199",
+    "104,127,196",
+    "22,140,134",
+    "233,139,39",
+    "223,100,44",
+  ];
+  const cometParticleSample = (nodeIndex, particleIndex, salt) => {
+    const value = Math.sin((nodeIndex + 1) * 31.73 + (particleIndex + 1) * 19.19 + salt * 11.41) * 43758.5453;
+    return value - Math.floor(value);
+  };
+
+  nodes.forEach((node, nodeIndex) => {
     node.setAttribute("aria-grabbed", "false");
     const wake = document.createElement("span");
     wake.className = "comet-wake";
     wake.setAttribute("aria-hidden", "true");
     for (let line = 0; line < 3; line += 1) wake.append(document.createElement("i"));
-    [
-      ["14%", "38%", "-1.35s", "-3px"],
-      ["24%", "66%", "-.7s", "4px"],
-      ["35%", "27%", "-1.7s", "-5px"],
-      ["47%", "55%", "-.15s", "3px"],
-      ["58%", "76%", "-1.05s", "5px"],
-      ["69%", "34%", "-.45s", "-4px"],
-      ["81%", "61%", "-1.55s", "4px"],
-      ["91%", "43%", "-.9s", "-2px"],
-    ].forEach(([left, top, delay, drift], index) => {
-      const glitter = document.createElement("b");
-      glitter.style.setProperty("--spark-left", left);
-      glitter.style.setProperty("--spark-top", top);
-      glitter.style.setProperty("--spark-delay", delay);
-      glitter.style.setProperty("--spark-drift", drift);
-      glitter.style.setProperty("--spark-size", index % 3 === 0 ? "10px" : "7px");
-      glitter.style.setProperty("--spark-mobile-size", index % 3 === 0 ? "7px" : "5px");
-      wake.append(glitter);
-    });
+    for (let particleIndex = 0; particleIndex < 22; particleIndex += 1) {
+      const particle = document.createElement("b");
+      const dust = particleIndex % 5 === 1 || particleIndex % 5 === 4;
+      const duration = (dust ? 1.6 : 1.08) + cometParticleSample(nodeIndex, particleIndex, 1) * (dust ? .9 : .68);
+      const distance = (dust ? 52 : 72) + cometParticleSample(nodeIndex, particleIndex, 2) * (dust ? 54 : 58);
+      const size = (dust ? 1.05 : .82) + cometParticleSample(nodeIndex, particleIndex, 3) * (dust ? 2.3 : 1.82);
+      const trail = (dust ? 5 : 7) + cometParticleSample(nodeIndex, particleIndex, 4) * (dust ? 9 : 12);
+      const vertical = (cometParticleSample(nodeIndex, particleIndex, 5) - .5) * (dust ? 9 : 5.5);
+      const jitter = (cometParticleSample(nodeIndex, particleIndex, 6) - .5) * (dust ? 5 : 2.5);
+      const paletteIndex = dust
+        ? 3 + (particleIndex % 2)
+        : particleIndex % 3;
+      particle.className = `comet-particle comet-particle--${dust ? "dust" : "ion"}`;
+      particle.style.setProperty("--particle-rgb", cometParticlePalette[paletteIndex]);
+      particle.style.setProperty("--particle-delay", `${(-duration * cometParticleSample(nodeIndex, particleIndex, 7)).toFixed(3)}s`);
+      particle.style.setProperty("--particle-duration", `${duration.toFixed(3)}s`);
+      particle.style.setProperty("--particle-distance", `${distance.toFixed(2)}px`);
+      particle.style.setProperty("--particle-size", `${size.toFixed(2)}px`);
+      particle.style.setProperty("--particle-mobile-size", `${Math.max(.7, size * .82).toFixed(2)}px`);
+      particle.style.setProperty("--particle-trail", `${trail.toFixed(2)}px`);
+      particle.style.setProperty("--particle-y", `${vertical.toFixed(2)}px`);
+      particle.style.setProperty("--particle-jitter", `${jitter.toFixed(2)}px`);
+      particle.style.setProperty("--particle-alpha", (.54 + cometParticleSample(nodeIndex, particleIndex, 8) * .46).toFixed(3));
+      wake.append(particle);
+    }
     node.append(wake);
   });
 
@@ -166,6 +194,13 @@
   const clearTransitionTimers = () => {
     state.transitionTimers.forEach((timer) => window.clearTimeout(timer));
     state.transitionTimers = [];
+  };
+
+  const clearTransferState = () => {
+    state.pendingFacet = null;
+    delete root.dataset.transferStage;
+    delete root.dataset.transferFrom;
+    delete root.dataset.transferTo;
   };
 
   const later = (callback, delay) => {
@@ -355,6 +390,34 @@
     node.style.setProperty("--tail-angle", `${awayFromFocus.toFixed(3)}deg`);
   };
 
+  const syncCometWake = (node, point, previousPoint = null, orbitDirection = 1) => {
+    const focusX = state.width * .04;
+    const focusY = state.height * .02;
+    const radialX = point.x - focusX;
+    const radialY = point.y - focusY;
+    const solarDistance = Math.hypot(radialX, radialY);
+    const scale = Math.max(1, Math.min(state.width, state.height));
+    const distanceRatio = clamp((solarDistance - scale * .045) / (scale * .73), 0, 1);
+    const proximity = 1 - distanceRatio;
+    const wakeScale = .64 + proximity * .78;
+    let dustSide = -Math.sign(orbitDirection || 1);
+
+    if (previousPoint) {
+      const velocityX = point.x - previousPoint.x;
+      const velocityY = point.y - previousPoint.y;
+      const orbitalCross = radialX * velocityY - radialY * velocityX;
+      if (Math.abs(orbitalCross) > .01) dustSide = -Math.sign(orbitalCross);
+    }
+
+    syncTailDirection(node, point);
+    node.style.setProperty("--wake-scale", wakeScale.toFixed(3));
+    node.style.setProperty("--wake-inverse", (1 / wakeScale).toFixed(3));
+    node.style.setProperty("--wake-intensity", (.72 + proximity * .28).toFixed(3));
+    node.style.setProperty("--solar-proximity", proximity.toFixed(3));
+    node.style.setProperty("--dust-angle", `${(dustSide * (2.5 + proximity * 4.5)).toFixed(3)}deg`);
+    node.style.setProperty("--dust-bend", `${(dustSide * (5 + proximity * 11)).toFixed(3)}px`);
+  };
+
   const render = () => {
     if (!state.width || !state.height) measure();
     const points = profiles.map(pointOnEllipse);
@@ -368,15 +431,7 @@
       node.style.setProperty("--depth", point.depth.toFixed(3));
       node.style.setProperty("--layer", String(point.layer));
       if (custom && !(state.drag?.active && state.drag.key === profile.key)) {
-        syncTailDirection(node, point);
-        if (custom.previousPoint) {
-          const travelX = point.x - custom.previousPoint.x;
-          const travelY = point.y - custom.previousPoint.y;
-          const travel = Math.hypot(travelX, travelY);
-          if (travel > .05) {
-            node.style.setProperty("--wake-scale", clamp(.68 + travel * .22, .68, 1.9).toFixed(3));
-          }
-        }
+        syncCometWake(node, point, custom.previousPoint, custom.direction);
         custom.previousPoint = point;
       }
     });
@@ -412,7 +467,7 @@
     state.lastFrame = timestamp;
     profiles.forEach((profile) => {
       const custom = state.customOrbits.get(profile.key);
-      if (state.held.has(profile.key) && !custom) return;
+      if (state.held.has(profile.key)) return;
       const period = state.phone ? 360 : (state.compact ? 330 : profile.period);
       const orbitRate = custom ? 1 : easedOrbitRate(profile, delta);
       profile.angle += (profile.direction || 1) * (360 / period) * orbitRate * (delta / 1000);
@@ -556,39 +611,79 @@
       detail.setAttribute("aria-hidden", String(!selected));
       detail.inert = !selected;
     });
+    if (state.selected) {
+      const selectedIndex = keys.indexOf(state.selected);
+      const previousKey = keys[(selectedIndex - 1 + keys.length) % keys.length];
+      const nextKey = keys[(selectedIndex + 1) % keys.length];
+      facetPosition.textContent = `${String(selectedIndex + 1).padStart(2, "0")} / ${String(keys.length).padStart(2, "0")} · ${labels.get(state.selected).toUpperCase()}`;
+      const summaries = {
+        about: "Professional and personal.",
+        profile: "Platforms, craft, and interests.",
+        work: "Production record, leadership, and delivery.",
+        projects: "Bitcoin.com Wallet and selected shipped systems.",
+        threads: "Agents, privacy, and observation.",
+        contact: "Complex systems and thoughtful collaboration."
+      };
+      facetStatus.textContent = `${labels.get(state.selected)} · ${summaries[state.selected]}`;
+      previousFacet.setAttribute("aria-label", `Focus previous destination, ${labels.get(previousKey)}`);
+      nextFacet.setAttribute("aria-label", `Focus next destination, ${labels.get(nextKey)}`);
+      previousFacet.querySelector("small").textContent = labels.get(previousKey);
+      nextFacet.querySelector("small").textContent = labels.get(nextKey);
+    }
   };
 
   const setFocusShift = (key) => {
     const node = nodeByKey.get(key);
     const sculpture = node?.querySelector(".sculpture");
-    const nodeRect = sculpture?.getBoundingClientRect();
+    if (!sculpture) return;
+
+    // A destination can be selected at any point in its orbit. Measure the
+    // unzoomed field synchronously, then make that live point the camera's
+    // transform origin so the focus transition grows out of the object itself.
+    cameraWindow.style.setProperty("transition", "none");
+    cameraWindow.style.setProperty("transform", "none");
+    const nodeRect = sculpture.getBoundingClientRect();
+    const cameraRect = cameraWindow.getBoundingClientRect();
     const rootRect = root.getBoundingClientRect();
-    if (!nodeRect) return;
+    const nodeX = nodeRect.left + nodeRect.width / 2;
+    const nodeY = nodeRect.top + nodeRect.height / 2;
     const targetX = rootRect.left + rootRect.width * (state.compact ? .5 : .63);
-    const targetY = rootRect.top + rootRect.height * (state.compact ? .56 : .5);
-    const shiftX = Math.max(-190, Math.min(190, (targetX - (nodeRect.left + nodeRect.width / 2)) * .55));
-    const shiftY = Math.max(-130, Math.min(130, (targetY - (nodeRect.top + nodeRect.height / 2)) * .55));
+    const targetY = rootRect.top + rootRect.height * (state.compact ? .56 : .52);
+    const shiftX = targetX - nodeX;
+    const shiftY = targetY - nodeY;
+    root.style.setProperty("--focus-origin-x", `${(nodeX - cameraRect.left).toFixed(1)}px`);
+    root.style.setProperty("--focus-origin-y", `${(nodeY - cameraRect.top).toFixed(1)}px`);
     root.style.setProperty("--focus-shift-x", `${shiftX.toFixed(1)}px`);
     root.style.setProperty("--focus-shift-y", `${shiftY.toFixed(1)}px`);
+    // Force the unzoomed measurement to become the start of the next camera
+    // transition without exposing an intermediate painted frame.
+    cameraWindow.getBoundingClientRect();
+    cameraWindow.style.removeProperty("transition");
+    cameraWindow.style.removeProperty("transform");
   };
 
   const focusDestination = () => {
     setPhase("focused");
     playCue("focus");
-    closeButton.focus({ preventScroll: true });
+    const focusTarget = state.focusAfterTransition;
+    state.focusAfterTransition = null;
+    (focusTarget || closeButton).focus({ preventScroll: true });
   };
 
   const selectFacet = (key, options = {}) => {
     if (!validKey(key)) return;
-    const { historyMode = "push", sound = true, immediate = false, opener = null } = options;
+    const { historyMode = "push", sound = true, immediate = false, opener = null, focusAfterTransition = null } = options;
     if (state.selected === key && state.phase === "focused") return;
     clearTransitionTimers();
+    clearTransferState();
     const enteringFromOverview = !state.selected;
+    const activeFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     if (state.phone && enteringFromOverview) state.overviewScrollY = window.scrollY;
     if (state.selected) state.held.delete(state.selected);
     state.selected = key;
     state.held.add(key);
     state.opener = opener || nodeByKey.get(key);
+    state.focusAfterTransition = focusAfterTransition || (enteringFromOverview ? closeButton : activeFocus || closeButton);
     root.dataset.selected = key;
     clearPreview();
     syncSelection();
@@ -611,10 +706,12 @@
     }
 
     if (immediate || state.reduced) {
-      window.requestAnimationFrame(() => closeButton.focus({ preventScroll: true }));
+      const focusTarget = state.focusAfterTransition || closeButton;
+      state.focusAfterTransition = null;
+      window.requestAnimationFrame(() => focusTarget.focus({ preventScroll: true }));
       return;
     }
-    later(focusDestination, 620);
+    later(focusDestination, 760);
   };
 
   const finishDismiss = (restoreFocus) => {
@@ -625,8 +722,11 @@
     state.selected = null;
     state.opener = null;
     delete root.dataset.selected;
+    clearPreview();
     root.style.removeProperty("--focus-shift-x");
     root.style.removeProperty("--focus-shift-y");
+    root.style.removeProperty("--focus-origin-x");
+    root.style.removeProperty("--focus-origin-y");
     setPhase("overview");
     syncSelection();
     startFrame();
@@ -641,8 +741,10 @@
 
   const dismiss = (options = {}) => {
     if (!state.selected) return;
-    const { historyMode = "push", sound = true, restoreFocus = true, immediate = false } = options;
+    const { historyMode = "push", sound = true, restoreFocus = true, immediate = false, opener = null } = options;
     clearTransitionTimers();
+    clearTransferState();
+    if (opener?.isConnected) state.opener = opener;
     if (historyMode) writeHistory(null, historyMode);
     if (sound) playCue("dismiss");
     if (immediate || state.reduced) {
@@ -652,6 +754,79 @@
     setPhase("dismissing");
     stopFrame();
     later(() => finishDismiss(restoreFocus), 480);
+  };
+
+  const finishFacetTransfer = () => {
+    const transfer = state.pendingFacet;
+    if (!transfer || state.phase !== "transferring") return;
+
+    const outgoingKey = state.selected;
+    if (outgoingKey) state.held.delete(outgoingKey);
+    state.selected = transfer.key;
+    state.held.add(transfer.key);
+    state.opener = transfer.opener || nodeByKey.get(transfer.key);
+    state.focusAfterTransition = transfer.focusTarget || closeButton;
+    root.dataset.selected = transfer.key;
+    root.dataset.transferStage = "incoming";
+    clearPreview();
+    syncSelection();
+    detailLayer.scrollTop = 0;
+    detailByKey.get(transfer.key).scrollTop = 0;
+    setFocusShift(transfer.key);
+    const heading = detailByKey.get(transfer.key)?.querySelector("h2");
+    if (heading?.id) detailLayer.setAttribute("aria-labelledby", heading.id);
+    if (transfer.historyMode) writeHistory(transfer.key, transfer.historyMode);
+    overview.inert = true;
+    startFrame();
+
+    later(() => {
+      if (state.pendingFacet !== transfer || state.phase !== "transferring") return;
+      clearTransferState();
+      setPhase("focusing");
+      startFrame();
+      later(focusDestination, 760);
+    }, transferNeutralDuration);
+  };
+
+  const transferFacet = (key, options = {}) => {
+    if (!validKey(key) || !state.selected || state.phase !== "focused" || key === state.selected) return;
+    const {
+      historyMode = "push",
+      sound = true,
+      opener = nodeByKey.get(key),
+      focusTarget = document.activeElement instanceof HTMLElement ? document.activeElement : closeButton,
+    } = options;
+
+    if (state.reduced) {
+      selectFacet(key, { historyMode, sound, immediate: true, opener, focusAfterTransition: focusTarget });
+      return;
+    }
+
+    clearTransitionTimers();
+    clearTransferState();
+    state.pendingFacet = { key, historyMode, opener, focusTarget };
+    root.dataset.transferStage = "outgoing";
+    root.dataset.transferFrom = state.selected;
+    root.dataset.transferTo = key;
+    facetStatus.textContent = `Transferring from ${labels.get(state.selected)} to ${labels.get(key)}.`;
+    setPhase("transferring");
+    if (sound) playCue("select");
+    startFrame();
+    later(finishFacetTransfer, transferOutDuration);
+  };
+
+  const traverseFacet = (step, { absolute = false, focusTarget = null } = {}) => {
+    if (!state.selected || state.phase !== "focused") return;
+    const currentIndex = keys.indexOf(state.selected);
+    const nextIndex = absolute
+      ? Math.max(0, Math.min(keys.length - 1, step))
+      : (currentIndex + step + keys.length) % keys.length;
+    const nextKey = keys[nextIndex];
+    if (nextKey === state.selected) return;
+    transferFacet(nextKey, {
+      opener: nodeByKey.get(nextKey),
+      focusTarget: focusTarget || (document.activeElement instanceof HTMLElement ? document.activeElement : closeButton),
+    });
   };
 
   const moveMapFocus = (current, event) => {
@@ -764,6 +939,11 @@
       node.classList.remove("is-resetting");
       node.style.removeProperty("--tail-angle");
       node.style.removeProperty("--wake-scale");
+      node.style.removeProperty("--wake-inverse");
+      node.style.removeProperty("--wake-intensity");
+      node.style.removeProperty("--solar-proximity");
+      node.style.removeProperty("--dust-angle");
+      node.style.removeProperty("--dust-bend");
       if (state.selected !== key && !node.matches(":hover") && document.activeElement !== node) state.held.delete(key);
       state.resetTimers.delete(key);
       startFrame();
@@ -896,12 +1076,7 @@
       x: clamp(drag.startPoint.x + delta.x, state.width * -.54, state.width * .54),
       y: clamp(drag.startPoint.y + delta.y, state.height * -.5, state.height * .5),
     };
-    const travelX = drag.point.x - previousPoint.x;
-    const travelY = drag.point.y - previousPoint.y;
-    syncTailDirection(drag.node, drag.point);
-    if (Math.hypot(travelX, travelY) > .05) {
-      drag.node.style.setProperty("--wake-scale", clamp(.72 + Math.hypot(travelX, travelY) * .06, .72, 1.9).toFixed(3));
-    }
+    syncCometWake(drag.node, drag.point, previousPoint);
     const time = performance.now();
     drag.samples.push({ ...drag.point, time });
     drag.samples = drag.samples.filter((sample) => time - sample.time <= 140);
@@ -1010,6 +1185,9 @@
     const key = control.dataset.mapTarget;
     control.addEventListener("click", () => {
       if (state.selected === key) dismiss({ restoreFocus: false });
+      else if (state.selected && state.phase === "focused") {
+        transferFacet(key, { opener: control, focusTarget: control });
+      }
       else selectFacet(key, { opener: control });
     });
     control.addEventListener("pointerenter", () => showPreview(key, nodeByKey.get(key)));
@@ -1045,16 +1223,66 @@
     window.dispatchEvent(new CustomEvent("orbital:reset", { detail: { key } }));
   });
 
-  backdrop.addEventListener("click", () => dismiss());
+  backdrop.addEventListener("click", () => dismiss({ opener: mapHome }));
   closeButton.addEventListener("click", () => dismiss({ opener: mapHome }));
+  previousFacet.addEventListener("click", () => traverseFacet(-1, { focusTarget: previousFacet }));
+  nextFacet.addEventListener("click", () => traverseFacet(1, { focusTarget: nextFacet }));
+  detailLayer.addEventListener("pointerdown", (event) => {
+    if (
+      !state.selected || event.isPrimary === false || event.button > 0 ||
+      event.target.closest("a, button, input, textarea, select, [contenteditable='true']")
+    ) {
+      state.facetGesture = null;
+      return;
+    }
+    state.facetGesture = {
+      id: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      time: performance.now(),
+    };
+  });
+  detailLayer.addEventListener("pointercancel", () => {
+    state.facetGesture = null;
+  });
+  detailLayer.addEventListener("pointerup", (event) => {
+    const gesture = state.facetGesture;
+    state.facetGesture = null;
+    if (!gesture || gesture.id !== event.pointerId || !state.selected) return;
+    const deltaX = event.clientX - gesture.x;
+    const deltaY = event.clientY - gesture.y;
+    if (
+      performance.now() - gesture.time > 720 ||
+      Math.abs(deltaX) < 56 ||
+      Math.abs(deltaX) < Math.abs(deltaY) * 1.25
+    ) return;
+    event.preventDefault();
+    traverseFacet(deltaX < 0 ? 1 : -1, { focusTarget: closeButton });
+  });
   detailLayer.querySelectorAll(".focus-satellites a, .landing-copy > a").forEach((link) => {
     link.addEventListener("click", () => playCue("satellite"));
   });
 
   document.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.key === "Escape" && state.selected) {
       event.preventDefault();
-      dismiss();
+      dismiss({ opener: mapHome });
+      return;
+    }
+    if (!state.selected || event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable='true']")) return;
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      traverseFacet(-1);
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      traverseFacet(1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      traverseFacet(0, { absolute: true });
+    } else if (event.key === "End") {
+      event.preventDefault();
+      traverseFacet(keys.length - 1, { absolute: true });
     }
   });
 

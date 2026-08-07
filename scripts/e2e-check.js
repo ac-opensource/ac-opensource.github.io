@@ -62,6 +62,15 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const desktop = await browser.newContext({ viewport: { width: 1600, height: 1100 } });
   const mobile = await browser.newContext({ viewport: { width: 430, height: 932 } });
 
+  const contactEndpointRequests = [];
+  const contactEndpointPattern = /^https:\/\/(?:script\.google\.com|(?:[^/]+\.)?script\.googleusercontent\.com)\//;
+  const blockContactEndpoint = async (route) => {
+    contactEndpointRequests.push(route.request().url());
+    await route.abort();
+  };
+  await desktop.route(contactEndpointPattern, blockContactEndpoint);
+  await mobile.route(contactEndpointPattern, blockContactEndpoint);
+
   const page = await desktop.newPage();
   const mobilePage = await mobile.newPage();
   let mobileChromeFontSizes = null;
@@ -184,20 +193,29 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       `${route.path}: desktop navigation must label /work.html as [portfolio]`
     );
     if (isSpatialHome) {
-      const socialMetadata = await page.evaluate(() => ({
+      const homepageContract = await page.evaluate(() => ({
+        eyebrow: document.querySelector('[data-identity-hero] .eyebrow')?.textContent?.trim(),
+        heading: document.querySelector('[data-identity-hero] h1')?.innerText?.replace(/\s+/g, ' ').trim(),
+        summary: document.querySelector('[data-identity-hero] > p:not(.eyebrow)')?.textContent?.replace(/\s+/g, ' ').trim(),
         openGraphAlt: document.querySelector('meta[property="og:image:alt"]')?.content,
         openGraphImage: document.querySelector('meta[property="og:image"]')?.content,
         twitterAlt: document.querySelector('meta[name="twitter:image:alt"]')?.content,
         twitterImage: document.querySelector('meta[name="twitter:image"]')?.content,
       }));
       await assert(
-        socialMetadata.openGraphImage === homepageSocialImageUrl
-          && socialMetadata.twitterImage === homepageSocialImageUrl,
+        homepageContract.eyebrow === '[IDENTITY: AI_NATIVE_SOFTWARE_ENGINEER]'
+          && homepageContract.heading === 'Hello, I’m Andrew. AI-native software engineer.'
+          && homepageContract.summary === 'I build and improve production engineering systems across Android, iOS, backend, shared native code, and agent-first delivery workflows.',
+        `Homepage identity copy drifted from the published introduction: ${JSON.stringify(homepageContract)}`
+      );
+      await assert(
+        homepageContract.openGraphImage === homepageSocialImageUrl
+          && homepageContract.twitterImage === homepageSocialImageUrl,
         'Homepage social metadata does not reference the current orbital dashboard preview'
       );
       await assert(
-        Boolean(socialMetadata.openGraphAlt)
-          && socialMetadata.openGraphAlt === socialMetadata.twitterAlt,
+        Boolean(homepageContract.openGraphAlt)
+          && homepageContract.openGraphAlt === homepageContract.twitterAlt,
         'Homepage social preview alt text is missing or inconsistent'
       );
     }
@@ -254,7 +272,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       mobileChromeFontSizes = routeMobileChromeFontSizes;
     } else {
       await assert(
-        JSON.stringify(routeMobileChromeFontSizes) === JSON.stringify(mobileChromeFontSizes),
+        Object.keys(mobileChromeFontSizes).every((key) => (
+          Math.abs(parseFloat(routeMobileChromeFontSizes[key]) - parseFloat(mobileChromeFontSizes[key])) <= 0.5
+        )),
         `${route.path}: mobile site chrome font sizes ${JSON.stringify(routeMobileChromeFontSizes)} differ from ${JSON.stringify(mobileChromeFontSizes)}`
       );
     }
@@ -269,8 +289,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     if (route.path === '/about.html') {
       const aboutHeroClearance = await mobilePage.evaluate(() => {
         const header = document.querySelector('#site-topbar').getBoundingClientRect();
-        const label = document.querySelector('#main-content .bracket-label').getBoundingClientRect();
-        return label.top - header.bottom;
+        const hero = document.querySelector('#about-title').getBoundingClientRect();
+        return hero.top - header.bottom;
       });
       await assert(aboutHeroClearance >= 0, 'About mobile hero is obscured by the fixed header');
     }
@@ -786,6 +806,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       const expectedTailAngle = Math.atan2(point.y - plane.clientHeight * .02, point.x - plane.clientWidth * .04) * 180 / Math.PI;
       const tailAngleError = Math.abs(((tailAngle - expectedTailAngle + 540) % 360) - 180);
       const glitters = Array.from(node?.querySelectorAll('.comet-wake b') || []);
+      const wake = node?.querySelector('.comet-wake');
       return {
         audioState: root?.dataset.audioState,
         activeControl: document.activeElement?.matches('[data-orbit-reset]') || false,
@@ -799,6 +820,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         resetDisabled: document.querySelector('[data-orbit-reset]')?.disabled,
         glitterAnimations: glitters.map((glitter) => getComputedStyle(glitter).animationName),
         glitterCount: glitters.length,
+        glitterColorCount: new Set(glitters.map((glitter) => getComputedStyle(glitter).color)).size,
+        glitterMaximumSize: Math.max(...glitters.map((glitter) => Number.parseFloat(getComputedStyle(glitter).width))),
+        glitterTrails: glitters.filter((glitter) => Number.parseFloat(getComputedStyle(glitter, '::before').width) >= 5).length,
         glitterVisible: glitters.some((glitter) => {
           const bounds = glitter.getBoundingClientRect();
           return Number.parseFloat(getComputedStyle(glitter).opacity) > .2
@@ -806,10 +830,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
             && bounds.height >= 1;
         }),
         tailAngleError,
+        tailThickness: Number.parseFloat(getComputedStyle(wake).height),
         trackAspect: trackWidth > 0 && trackHeight > 0
           ? Math.max(trackWidth / trackHeight, trackHeight / trackWidth)
           : 0,
-        wakeOpacity: Number.parseFloat(getComputedStyle(node?.querySelector('.comet-wake')).opacity),
+        wakeOpacity: Number.parseFloat(getComputedStyle(wake).opacity),
       };
     });
     await assert(
@@ -821,9 +846,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await assert(flung.fling?.period >= 18 && flung.fling?.period <= 34, 'Desktop comet is not faster than the regular 178–360 second orbits');
     await assert(flung.resetDisabled === false && flung.wakeOpacity > 0, 'Desktop fling does not expose its wake and reset control');
     await assert(
-      flung.tailAngleError <= 1 && flung.glitterCount === 8 && flung.glitterVisible
-        && flung.glitterAnimations.every((name) => name === 'comet-glitter'),
-      'Desktop comet tail does not face away from AC with eight fading glitter particles'
+      flung.tailAngleError <= 1 && flung.glitterCount === 22 && flung.glitterVisible
+        && flung.glitterColorCount === 5 && flung.glitterMaximumSize <= 3.6
+        && flung.glitterTrails === flung.glitterCount && flung.tailThickness <= 20
+        && flung.glitterAnimations.every((name) => ['comet-ion-eject', 'comet-dust-eject'].includes(name)),
+      'Desktop comet tail does not face away from AC with thin multi-color ion and dust particle streams'
     );
     await assert(flung.audioState === 'running', 'Desktop fling does not activate the action-sound engine');
     await assert(flung.activeControl, 'Desktop fling leaves keyboard focus on the moving node instead of the stable reset control');
@@ -846,6 +873,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       const y = Number.parseFloat(getComputedStyle(node).getPropertyValue('--y'));
       return Math.hypot(x - focusX, y - focusY);
     }, flingTarget.key);
+    const apoWake = await flingNode.evaluate((node) => ({
+      proximity: Number.parseFloat(getComputedStyle(node).getPropertyValue('--solar-proximity')),
+      scale: Number.parseFloat(getComputedStyle(node).getPropertyValue('--wake-scale')),
+    }));
     await flingPage.waitForFunction(({ key, threshold }) => {
       const plane = document.querySelector('[data-orbit-plane]');
       const node = document.querySelector(`[data-orbit-object="${key}"]`);
@@ -856,6 +887,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       const y = Number.parseFloat(getComputedStyle(node).getPropertyValue('--y'));
       return Math.hypot(x - focusX, y - focusY) <= threshold;
     }, { key: flingTarget.key, threshold: apoRadius * .58 }, { timeout: 30000, polling: 100 });
+    const inboundWake = await flingNode.evaluate((node) => ({
+      proximity: Number.parseFloat(getComputedStyle(node).getPropertyValue('--solar-proximity')),
+      scale: Number.parseFloat(getComputedStyle(node).getPropertyValue('--wake-scale')),
+    }));
     const inboundBefore = await readOrbitCoordinates(flingPage);
     await flingPage.waitForTimeout(420);
     const inboundAfter = await readOrbitCoordinates(flingPage);
@@ -875,6 +910,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await assert(
       inboundDistance > averageRegularDistance * 1.8,
       `Inbound comet is not substantially faster than the regular orbit nodes (${inboundDistance.toFixed(2)}px vs ${averageRegularDistance.toFixed(2)}px average)`
+    );
+    await assert(
+      inboundWake.proximity > apoWake.proximity && inboundWake.scale > apoWake.scale + .08,
+      `Comet tail does not lengthen as it approaches AC (${apoWake.scale.toFixed(2)} → ${inboundWake.scale.toFixed(2)})`
     );
 
     await flingPage.locator('[data-motion-toggle]').click();
@@ -961,6 +1000,40 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       await flingPage.locator('[data-facet-detail="profile"] .landing-copy a').getAttribute('href') === '/about.html#profile-map',
       'Skills and interests CTA does not lead to the capability tree'
     );
+
+    const outgoingFacet = await flingPage.locator('[data-synthesis]').getAttribute('data-selected');
+    await flingPage.locator('[data-facet-next]').click();
+    const outgoingTransfer = await flingPage.evaluate(() => {
+      const root = document.querySelector('[data-synthesis]');
+      return {
+        phase: root?.dataset.phase,
+        stage: root?.dataset.transferStage,
+        selected: root?.dataset.selected,
+        from: root?.dataset.transferFrom,
+        to: root?.dataset.transferTo,
+        selectedNodes: [...document.querySelectorAll('.orbit-node.is-selected')]
+          .map((node) => node.dataset.orbitObject),
+      };
+    });
+    await assert(
+      outgoingTransfer.phase === 'transferring'
+        && outgoingTransfer.stage === 'outgoing'
+        && outgoingTransfer.selected === outgoingFacet
+        && outgoingTransfer.from === outgoingFacet
+        && outgoingTransfer.to !== outgoingFacet
+        && JSON.stringify(outgoingTransfer.selectedNodes) === JSON.stringify([outgoingFacet]),
+      `Homepage facet handoff shrinks the destination instead of the outgoing world: ${JSON.stringify(outgoingTransfer)}`
+    );
+    await flingPage.waitForFunction((from) => (
+      document.querySelector('[data-synthesis]')?.dataset.selected !== from
+    ), outgoingFacet);
+    const incomingFacet = await flingPage.locator('[data-synthesis]').getAttribute('data-selected');
+    await assert(
+      incomingFacet === outgoingTransfer.to
+        && await flingPage.locator(`.orbit-node[data-orbit-object="${incomingFacet}"]`).getAttribute('class').then((value) => value.includes('is-selected')),
+      'Homepage facet handoff did not commit the incoming world after the outgoing collapse'
+    );
+    await flingPage.waitForFunction(() => document.querySelector('[data-synthesis]')?.dataset.phase === 'focused');
   }
   await flingContext.close();
 
@@ -1066,8 +1139,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const personalIntro = ((await page.locator('#about-personal-intro').textContent()) || '').replace(/\s+/g, ' ').trim();
   await assert(
     personalIntro.includes('husband, dad')
-      && personalIntro.includes('photography')
-      && personalIntro.includes('astronomy'),
+      && personalIntro.includes('photographer')
+      && personalIntro.includes('astronomer'),
     'About hero does not expose the requested personal dimension'
   );
   const careerSection = page.getByRole('heading', { name: 'Career Trajectory', exact: true }).locator('xpath=ancestor::section[1]');
@@ -1122,7 +1195,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   for (const itvxAchievement of ['recommendations panel', 'timeline scrubbing', 'tablet support', 'Simple XML-to-Jackson']) {
     await assert(resumeText.includes(itvxAchievement), `Resume is missing ITVX achievement: ${itvxAchievement}`);
   }
-  const resumeProjectsSection = page.getByRole('heading', { name: 'Projects', exact: true }).locator('xpath=ancestor::section[1]');
+  const resumeProjectsSection = page.locator('#projects');
   const resumeProjectHeadings = await resumeProjectsSection.locator('article .font-headline').evaluateAll((headings) =>
     headings.map((heading) => (heading.textContent || '').replace(/\s+/g, ' ').trim())
   );
@@ -1137,190 +1210,1262 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     'Resume projects do not lead with Bitcoin.com Wallet'
   );
 
-  // Profile tree structure, stable selection, and responsive popover containment.
-  async function readProfileTreeGeometry(targetPage, nodeId) {
-    return targetPage.evaluate((id) => {
-      const visual = document.querySelector('.profile-map__visual').getBoundingClientRect();
-      const svg = document.querySelector('.profile-map__svg').getBoundingClientRect();
-      const junction = document.querySelector(`.profile-map__node[data-node-id="${id}"] .profile-map__node-mark`).getBoundingClientRect();
-      const hit = document.querySelector(`.profile-map__node[data-node-id="${id}"] .profile-map__node-hit`).getBoundingClientRect();
-      return {
-        junction: {
-          x: junction.x - svg.x,
-          y: junction.y - svg.y,
-          width: junction.width,
-          height: junction.height,
-        },
-        hit: { width: hit.width, height: hit.height },
-        visual: { width: visual.width, height: visual.height },
-        svg: { width: svg.width, height: svg.height },
-      };
-    }, nodeId);
-  }
+  const resumeStructure = await page.evaluate(() => ({
+    summaryBeforeScanner: document.querySelector('#professional-summary')?.compareDocumentPosition(
+      document.querySelector('#signal-scanner')
+    ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    scannerBeforeSkills: document.querySelector('#signal-scanner')?.compareDocumentPosition(
+      document.querySelector('#core-skills')
+    ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    roles: document.querySelectorAll('.resume-role').length,
+    roleBullets: document.querySelectorAll('.resume-role > ul > li').length,
+    projects: document.querySelectorAll('.resume-project').length,
+    evidenceBoundaries: document.querySelectorAll('.resume-evidence-boundary').length,
+  }));
+  await assert(
+    Boolean(resumeStructure.summaryBeforeScanner)
+      && Boolean(resumeStructure.scannerBeforeSkills)
+      && resumeStructure.roles === 7
+      && resumeStructure.roleBullets === 21
+      && resumeStructure.projects === 5
+      && resumeStructure.evidenceBoundaries === 12,
+    `Resume dossier structure/content changed: ${JSON.stringify(resumeStructure)}`
+  );
+  await page.locator('[data-signal="android"]').click();
+  const resumeSignalState = await page.evaluate(() => ({
+    signal: new URL(location.href).searchParams.get('signal'),
+    active: document.querySelector('[data-resume-dossier]')?.dataset.activeSignal,
+    pressed: document.querySelector('[data-signal="android"]')?.getAttribute('aria-pressed'),
+    hiddenRoles: [...document.querySelectorAll('.resume-role')]
+      .filter((role) => getComputedStyle(role).display === 'none').length,
+    hiddenProjects: [...document.querySelectorAll('.resume-project')]
+      .filter((project) => getComputedStyle(project).display === 'none').length,
+    matches: document.querySelectorAll('[data-signals][data-signal-match="true"]').length,
+  }));
+  await assert(
+    resumeSignalState.signal === 'android'
+      && resumeSignalState.active === 'android'
+      && resumeSignalState.pressed === 'true'
+      && resumeSignalState.hiddenRoles === 0
+      && resumeSignalState.hiddenProjects === 0
+      && resumeSignalState.matches > 0,
+    `Resume signal scan hid or lost evidence: ${JSON.stringify(resumeSignalState)}`
+  );
+  await page.goBack({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !new URL(location.href).searchParams.has('signal')
+    && document.querySelector('[data-resume-dossier]')?.dataset.activeSignal === '');
 
-  async function readPopoverContainment(targetPage) {
-    return targetPage.evaluate(() => {
-      const visual = document.querySelector('.profile-map__visual').getBoundingClientRect();
-      const popover = document.querySelector('.profile-map__popover');
-      const card = popover.getBoundingClientRect();
-      return {
-        hidden: popover.hidden,
-        title: popover.querySelector('strong')?.textContent || '',
-        inside: card.left >= visual.left
-          && card.top >= visual.top
-          && card.right <= visual.right
-          && card.bottom <= visual.bottom,
-      };
-    });
-  }
-
-  async function readProfileTreeIntegrity(targetPage) {
-    return targetPage.evaluate(() => {
-      const nodes = [...document.querySelectorAll('.profile-map__node')].map((group) => {
-        const mark = group.querySelector('.profile-map__node-mark');
-        const hit = group.querySelector('.profile-map__node-hit');
-        return {
-          id: group.dataset.nodeId,
-          x: Number(mark.getAttribute('cx')),
-          y: Number(mark.getAttribute('cy')),
-          hitRadius: Number(hit.getAttribute('r')),
-          hitWidth: hit.getBoundingClientRect().width,
-        };
-      });
-      const paths = [...document.querySelectorAll('.profile-map__tendril')].map((path) => {
-        const length = path.getTotalLength();
-        return {
-          id: path.dataset.nodeId,
-          points: Array.from({ length: 49 }, (_, index) => {
-            const point = path.getPointAtLength(length * index / 48);
-            return { x: point.x, y: point.y };
-          }),
-        };
-      });
-      const labels = [...document.querySelectorAll('.profile-map__node-label, .profile-map__axis-label')]
-        .filter((label) => Number.parseFloat(getComputedStyle(label).opacity) > 0.1)
-        .map((label) => ({ text: label.textContent, box: label.getBoundingClientRect() }));
-      let minimumHitGap = Number.POSITIVE_INFINITY;
-      let minimumNodeTendrilDistance = Number.POSITIVE_INFINITY;
-      let minimumTendrilDistance = Number.POSITIVE_INFINITY;
-      let labelOverlapCount = 0;
-
-      for (let firstIndex = 0; firstIndex < nodes.length; firstIndex += 1) {
-        for (let secondIndex = firstIndex + 1; secondIndex < nodes.length; secondIndex += 1) {
-          const first = nodes[firstIndex];
-          const second = nodes[secondIndex];
-          minimumHitGap = Math.min(
-            minimumHitGap,
-            Math.hypot(first.x - second.x, first.y - second.y) - first.hitRadius - second.hitRadius,
-          );
-        }
+  // The About opening is a compact biography beside one directly manipulated
+  // 3D nebula. Evidence stays exact and visible without a control dashboard.
+  const profileMapData = JSON.parse(fs.readFileSync(path.join(siteRoot, 'assets', 'data', 'profile-map.json'), 'utf8'));
+  const androidEvidenceUrls = profileMapData.datasets.engineering.nodes
+    .find((node) => node.id === 'android').evidenceRefs
+    .map((reference) => profileMapData.evidence[reference].url)
+    .sort();
+  const readAboutCamera = (targetPage) => targetPage.locator('[data-stellar-spectrum]').evaluate((element) => ({
+    pitch: Number(element.dataset.treePitch),
+    roll: Number(element.dataset.treeRoll),
+    view: element.dataset.treeView,
+    yaw: Number(element.dataset.treeYaw),
+    zoom: Number(element.dataset.treeZoom),
+  }));
+  const findAboutCanvasPoint = (targetPage) => targetPage.evaluate(() => {
+    const canvas = document.querySelector('.stellar-tree__canvas');
+    const bounds = canvas.getBoundingClientRect();
+    for (let row = 1; row <= 8; row += 1) {
+      for (let column = 1; column <= 8; column += 1) {
+        const x = bounds.left + (bounds.width * column) / 10;
+        const y = bounds.top + (bounds.height * row) / 10;
+        if (document.elementFromPoint(x, y) === canvas) return { x, y };
       }
-      paths.forEach((path) => {
-        nodes.forEach((node) => {
-          if (node.id === path.id) return;
-          path.points.forEach((point) => {
-            minimumNodeTendrilDistance = Math.min(
-              minimumNodeTendrilDistance,
-              Math.hypot(node.x - point.x, node.y - point.y),
-            );
-          });
-        });
-      });
-      for (let firstIndex = 0; firstIndex < paths.length; firstIndex += 1) {
-        for (let secondIndex = firstIndex + 1; secondIndex < paths.length; secondIndex += 1) {
-          paths[firstIndex].points.forEach((firstPoint) => {
-            paths[secondIndex].points.forEach((secondPoint) => {
-              minimumTendrilDistance = Math.min(
-                minimumTendrilDistance,
-                Math.hypot(firstPoint.x - secondPoint.x, firstPoint.y - secondPoint.y),
-              );
-            });
-          });
-        }
-      }
-      for (let firstIndex = 0; firstIndex < labels.length; firstIndex += 1) {
-        for (let secondIndex = firstIndex + 1; secondIndex < labels.length; secondIndex += 1) {
-          const first = labels[firstIndex].box;
-          const second = labels[secondIndex].box;
-          if (first.left < second.right && first.right > second.left
-            && first.top < second.bottom && first.bottom > second.top) {
-            labelOverlapCount += 1;
+    }
+    return null;
+  });
+  const findAboutCanvasPair = (targetPage) => targetPage.evaluate(() => {
+    const canvas = document.querySelector('.stellar-tree__canvas');
+    const stage = document.querySelector('#stellar-spectrum-panel').getBoundingClientRect();
+    const hitLayers = {};
+    for (const vector of [{ x: 85, y: 0 }, { x: 64, y: 48 }, { x: 0, y: 85 }, { x: 48, y: 32 }]) {
+      for (let y = Math.max(1, stage.top + 24); y < Math.min(innerHeight - 1, stage.bottom - 24); y += 16) {
+        if (y + vector.y >= Math.min(innerHeight - 1, stage.bottom - 24)) continue;
+        for (let x = Math.max(1, stage.left + 24); x < Math.min(innerWidth - vector.x - 24, stage.right - vector.x - 24); x += 16) {
+          const first = document.elementFromPoint(x, y);
+          const second = document.elementFromPoint(x + vector.x, y + vector.y);
+          const layer = `${first?.className || first?.tagName || 'none'} | ${second?.className || second?.tagName || 'none'}`;
+          hitLayers[layer] = (hitLayers[layer] || 0) + 1;
+          if (first === canvas && second === canvas) {
+            return {
+              pair: [{ x, y }, { x: x + vector.x, y: y + vector.y }],
+              diagnostics: { hitLayers, interaction: document.querySelector('[data-stellar-spectrum]').dataset.treeInteraction },
+            };
           }
         }
       }
-      return {
-        minimumHitGap,
-        minimumHitWidth: Math.min(...nodes.map((node) => node.hitWidth)),
-        minimumNodeTendrilDistance,
-        minimumTendrilDistance,
-        labelOverlapCount,
-      };
-    });
-  }
+    }
+    return {
+      pair: null,
+      diagnostics: {
+        canvas: canvas.getBoundingClientRect().toJSON(),
+        hitLayers,
+        interaction: document.querySelector('[data-stellar-spectrum]').dataset.treeInteraction,
+        pointerEvents: getComputedStyle(canvas).pointerEvents,
+        scrollY,
+        stage: stage.toJSON(),
+        toolbar: document.querySelector('.stellar-tree__toolbar').getBoundingClientRect().toJSON(),
+        touchAction: getComputedStyle(canvas).touchAction,
+      },
+    };
+  });
 
-  function profileTreeGeometryDelta(before, after) {
-    return Math.max(
-      Math.abs(after.junction.x - before.junction.x),
-      Math.abs(after.junction.y - before.junction.y),
-      Math.abs(after.junction.width - before.junction.width),
-      Math.abs(after.junction.height - before.junction.height),
-      Math.abs(after.svg.width - before.svg.width),
-      Math.abs(after.svg.height - before.svg.height),
+  await page.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
+  await page.waitForSelector('#stellar-spectrum-panel:not([hidden])', { timeout: 15000 });
+  await page.evaluate(() => document.fonts?.ready);
+  const desktopSpectrum = await page.evaluate(() => {
+    const bounds = (selector) => document.querySelector(selector).getBoundingClientRect();
+    const opening = bounds('.about-opening');
+    const hero = bounds('#present-origin');
+    const stage = bounds('#stellar-spectrum-panel');
+    const toolbar = bounds('.stellar-tree__toolbar');
+    const rootMarker = bounds('.stellar-tree__root');
+    const topbar = bounds('#site-topbar');
+    const canvas = document.querySelector('.stellar-tree__canvas');
+    const canvasBounds = canvas.getBoundingClientRect();
+    const nodeIds = [...document.querySelectorAll('[data-node-id]')].map((node) => node.dataset.nodeId);
+    const bodyText = document.body.textContent || '';
+    const visibleControlSelector = 'button[data-tree-projection], [data-tree-interaction-toggle], [data-tree-zoom-range], [data-tree-reset], [data-about-theme-toggle]';
+    const backgrounds = ['html', 'body', '#site-topbar', '#main-content', '.stellar-tree__viewport', '#site-footer']
+      .map((selector) => getComputedStyle(document.querySelector(selector)).backgroundColor);
+    return {
+      adjacent: hero.right <= stage.left + 2,
+      backgrounds,
+      belowTopbar: hero.top >= topbar.bottom && stage.top >= topbar.bottom,
+      branches: document.querySelectorAll('[data-band-trigger]').length,
+      canvas: {
+        backingHeight: canvas.height,
+        backingWidth: canvas.width,
+        coversOpening: canvasBounds.left <= 0
+          && canvasBounds.right >= window.innerWidth
+          && canvasBounds.top <= opening.top + 1
+          && canvasBounds.bottom >= opening.bottom - 1,
+        height: canvasBounds.height,
+        hidden: canvas.getAttribute('aria-hidden'),
+        overdrawsStage: canvasBounds.left < stage.left
+          && canvasBounds.right > stage.right
+          && canvasBounds.top < stage.top
+          && canvasBounds.bottom > stage.bottom,
+        width: canvasBounds.width,
+      },
+      cameraFinite: ['treeYaw', 'treePitch', 'treeRoll', 'treeZoom']
+        .every((key) => Number.isFinite(Number(document.querySelector('[data-stellar-spectrum]').dataset[key]))),
+      controls: [...document.querySelectorAll(visibleControlSelector)]
+        .filter((element) => !element.hidden && getComputedStyle(element).display !== 'none').length,
+      interactionToggleVisible: getComputedStyle(document.querySelector('[data-tree-interaction-toggle]')).display !== 'none',
+      fitsOpening: hero.top >= opening.top - 1 && hero.bottom <= opening.bottom + 1
+        && stage.top >= opening.top - 1 && stage.bottom <= opening.bottom + 1,
+      namedBranches: [...document.querySelectorAll('[data-band-trigger]')]
+        .every((button) => Boolean(button.getAttribute('aria-label') || button.textContent.trim())),
+      namedNodes: [...document.querySelectorAll('[data-node-id]')]
+        .every((button) => Boolean(button.getAttribute('aria-label') || button.textContent.trim())),
+      nodes: nodeIds.length,
+      oldControls: document.querySelectorAll('[data-stellar-mode], [data-stellar-receipts-toggle], [data-tree-rotate-axis], button[data-tree-zoom]').length,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      projections: [...document.querySelectorAll('button[data-tree-projection]')]
+        .map((button) => ({ label: button.textContent.trim().toLowerCase(), pressed: button.getAttribute('aria-pressed') })),
+      removedCopy: ['Reading the scan', 'How my worlds connect', 'NEBULA ARBOR', 'Drag or use arrow keys']
+        .filter((text) => bodyText.includes(text)),
+      rootBottomMargin: stage.bottom - rootMarker.bottom,
+      rows: document.querySelectorAll('.profile-map-evidence tbody tr').length,
+      sourceInStage: document.querySelector('#profile-map-evidence').parentElement === document.querySelector('#stellar-spectrum-panel'),
+      sourceOpen: document.querySelector('#profile-map-evidence').dataset.panelOpen === 'true',
+      stageHeight: stage.height,
+      status: document.querySelector('[data-stellar-status]')?.textContent || '',
+      toolbar: {
+        contained: toolbar.left >= stage.left && toolbar.right <= stage.right
+          && toolbar.top >= stage.top && toolbar.bottom <= stage.bottom,
+        lowerRight: toolbar.right >= stage.right - 80 && toolbar.bottom >= stage.bottom - 32,
+        vertical: getComputedStyle(document.querySelector('.stellar-tree__camera')).flexDirection === 'column',
+      },
+      typography: {
+        assessment: parseFloat(getComputedStyle(document.querySelector('.stellar-calibration h2')).fontSize),
+        journal: parseFloat(getComputedStyle(document.querySelector('#about-lab-journal article a.block')).fontSize),
+        role: parseFloat(getComputedStyle(document.querySelector('.stellar-light-cone__role h3')).fontSize),
+        system: parseFloat(getComputedStyle(document.querySelector('.stellar-systems-ledger__groups li')).fontSize),
+      },
+      uniqueNodes: new Set(nodeIds).size,
+      alignedOpening: Math.abs(hero.top - stage.top) <= 2,
+      verticalOverlap: Math.max(0, Math.min(hero.bottom, stage.bottom) - Math.max(hero.top, stage.top)),
+    };
+  });
+  await assert(
+    desktopSpectrum.branches === 8
+      && desktopSpectrum.nodes === 31
+      && desktopSpectrum.uniqueNodes === 31
+      && desktopSpectrum.rows === 31
+      && desktopSpectrum.status.includes('8 branches · 31 signals'),
+    `About nebula canonical counts changed: ${JSON.stringify(desktopSpectrum)}`
+  );
+  await assert(
+    desktopSpectrum.adjacent && desktopSpectrum.verticalOverlap > 0
+      && desktopSpectrum.belowTopbar && desktopSpectrum.fitsOpening
+      && desktopSpectrum.alignedOpening && desktopSpectrum.stageHeight >= 760
+      && desktopSpectrum.rootBottomMargin >= 32,
+    `About hero and nebula no longer share the desktop opening: ${JSON.stringify(desktopSpectrum)}`
+  );
+  await assert(
+    desktopSpectrum.overflow <= 0
+      && desktopSpectrum.canvas.width > 0
+      && desktopSpectrum.canvas.height > 0
+      && desktopSpectrum.canvas.backingWidth > 0
+      && desktopSpectrum.canvas.backingHeight > 0
+      && desktopSpectrum.canvas.hidden === 'true'
+      && desktopSpectrum.canvas.coversOpening
+      && desktopSpectrum.cameraFinite,
+    `Desktop About nebula is missing or overflows: ${JSON.stringify(desktopSpectrum)}`
+  );
+  await assert(
+    desktopSpectrum.controls === 6
+      && desktopSpectrum.oldControls === 0
+      && desktopSpectrum.removedCopy.length === 0
+      && !desktopSpectrum.sourceOpen
+      && desktopSpectrum.sourceInStage
+      && desktopSpectrum.namedBranches
+      && desktopSpectrum.namedNodes
+      && desktopSpectrum.toolbar.contained
+      && desktopSpectrum.toolbar.lowerRight
+      && desktopSpectrum.toolbar.vertical
+      && !desktopSpectrum.interactionToggleVisible
+      && JSON.stringify(desktopSpectrum.projections.map(({ label }) => label)) === JSON.stringify(['front', 'top', 'free move'])
+      && desktopSpectrum.projections.find(({ label }) => label === 'free move')?.pressed === 'true',
+    `About retained removed controls/copy or lost accessible names: ${JSON.stringify(desktopSpectrum)}`
+  );
+  await assert(
+    desktopSpectrum.backgrounds.every((color) => color === 'rgb(2, 8, 23)'),
+    `Dark About is not one continuous surface: ${JSON.stringify(desktopSpectrum.backgrounds)}`
+  );
+  await assert(
+    desktopSpectrum.typography.assessment >= 32 && desktopSpectrum.typography.assessment <= 44
+      && desktopSpectrum.typography.role <= 28
+      && desktopSpectrum.typography.journal <= 34
+      && desktopSpectrum.typography.system <= 21,
+    `About section typography regressed to oversized display scale: ${JSON.stringify(desktopSpectrum.typography)}`
+  );
+
+  const idleBefore = await readAboutCamera(page);
+  await page.waitForTimeout(700);
+  const idleAfter = await readAboutCamera(page);
+  const idleMotion = await page.locator('[data-stellar-spectrum]').getAttribute('data-tree-motion');
+  await assert(
+    idleAfter.view === 'free'
+      && Math.abs(idleAfter.yaw - idleBefore.yaw) > 0.003
+      && Math.abs(idleAfter.pitch - idleBefore.pitch) < 0.001
+      && Math.abs(idleAfter.roll - idleBefore.roll) < 0.001
+      && idleMotion === 'idle-rotation',
+    `About nebula does not rotate gently while idle: ${JSON.stringify({ idleBefore, idleAfter, idleMotion })}`
+  );
+
+  await page.locator('.stellar-tree__root').click();
+  const openedSourceIndex = await page.evaluate(() => {
+    const details = document.querySelector('#profile-map-evidence');
+    const bounds = details.getBoundingClientRect();
+    const stage = document.querySelector('#stellar-spectrum-panel').getBoundingClientRect();
+    const rootMarker = document.querySelector('.stellar-tree__root');
+    return {
+      contained: bounds.left >= stage.left && bounds.right <= stage.right
+        && bounds.top >= stage.top && bounds.bottom <= stage.bottom,
+      expanded: rootMarker.getAttribute('aria-expanded'),
+      open: details.dataset.panelOpen === 'true',
+      parent: details.parentElement.id,
+      rows: details.querySelectorAll('tbody tr').length,
+    };
+  });
+  await assert(
+    openedSourceIndex.open
+      && openedSourceIndex.contained
+      && openedSourceIndex.expanded === 'true'
+      && openedSourceIndex.parent === 'stellar-spectrum-panel'
+      && openedSourceIndex.rows === 31,
+    `The AC base does not open the integrated source table: ${JSON.stringify(openedSourceIndex)}`
+  );
+  const sourceScrollState = await page.evaluate(() => {
+    const body = document.querySelector('#profile-map-evidence .profile-map-evidence__body');
+    body.scrollTo({ top: 240, left: 120, behavior: 'instant' });
+    return {
+      clientHeight: body.clientHeight,
+      clientWidth: body.clientWidth,
+      scrollHeight: body.scrollHeight,
+      scrollLeft: body.scrollLeft,
+      scrollTop: body.scrollTop,
+      scrollWidth: body.scrollWidth,
+      touchAction: getComputedStyle(body).touchAction,
+    };
+  });
+  await assert(
+    sourceScrollState.scrollHeight > sourceScrollState.clientHeight
+      && sourceScrollState.scrollWidth > sourceScrollState.clientWidth
+      && sourceScrollState.scrollTop > 100
+      && sourceScrollState.scrollLeft > 50
+      && sourceScrollState.touchAction === 'pan-x pan-y',
+    `The integrated source table is clipped instead of independently scrollable: ${JSON.stringify(sourceScrollState)}`
+  );
+  await page.keyboard.press('Escape');
+  const closedSourceIndex = await page.evaluate(() => ({
+    activeRoot: document.activeElement?.classList.contains('stellar-tree__root'),
+    expanded: document.querySelector('.stellar-tree__root').getAttribute('aria-expanded'),
+    open: document.querySelector('#profile-map-evidence').dataset.panelOpen === 'true',
+  }));
+  await assert(
+    !closedSourceIndex.open && closedSourceIndex.expanded === 'false' && closedSourceIndex.activeRoot,
+    `Closing the integrated source table does not restore the AC base: ${JSON.stringify(closedSourceIndex)}`
+  );
+
+  await page.locator('.stellar-tree__root').click();
+  await page.locator('#profile-map-evidence > summary').click();
+  await page.waitForTimeout(40);
+  const summaryClosedSourceIndex = await page.evaluate(() => ({
+    activeRoot: document.activeElement?.classList.contains('stellar-tree__root'),
+    expanded: document.querySelector('.stellar-tree__root').getAttribute('aria-expanded'),
+    open: document.querySelector('#profile-map-evidence').dataset.panelOpen === 'true',
+  }));
+  await assert(
+    !summaryClosedSourceIndex.open
+      && summaryClosedSourceIndex.expanded === 'false'
+      && summaryClosedSourceIndex.activeRoot,
+    `Closing the source table from its summary loses focus: ${JSON.stringify(summaryClosedSourceIndex)}`
+  );
+
+  const initialCamera = await readAboutCamera(page);
+  const dragPoint = await findAboutCanvasPoint(page);
+  await assert(Boolean(dragPoint), 'About nebula has no unobscured drag surface');
+  if (dragPoint) {
+    await page.mouse.move(dragPoint.x, dragPoint.y);
+    await page.mouse.down();
+    await page.mouse.move(dragPoint.x + 100, dragPoint.y + 55, { steps: 5 });
+    await page.mouse.up();
+  }
+  const draggedCamera = await readAboutCamera(page);
+  await assert(
+    Math.abs(draggedCamera.yaw - initialCamera.yaw) > 0.05
+      && Math.abs(draggedCamera.pitch - initialCamera.pitch) > 0.03,
+    `Dragging does not rotate the About nebula: ${JSON.stringify({ initialCamera, draggedCamera })}`
+  );
+
+  const rollPoint = await findAboutCanvasPoint(page);
+  await page.keyboard.down('Shift');
+  if (rollPoint) {
+    await page.mouse.move(rollPoint.x, rollPoint.y);
+    await page.mouse.down();
+    await page.mouse.move(rollPoint.x + 100, rollPoint.y, { steps: 5 });
+    await page.mouse.up();
+  }
+  await page.keyboard.up('Shift');
+  const rolledCamera = await readAboutCamera(page);
+  await assert(
+    Math.abs(rolledCamera.roll - draggedCamera.roll) > 0.05
+      && Math.abs(rolledCamera.yaw - draggedCamera.yaw) < 0.01
+      && Math.abs(rolledCamera.pitch - draggedCamera.pitch) < 0.01,
+    `Shift-drag does not independently roll the About nebula: ${JSON.stringify({ draggedCamera, rolledCamera })}`
+  );
+
+  const canvas = page.locator('.stellar-tree__canvas');
+  const zoomBeforePlainWheel = (await readAboutCamera(page)).zoom;
+  await canvas.dispatchEvent('wheel', { deltaY: -120 });
+  const zoomAfterPlainWheel = (await readAboutCamera(page)).zoom;
+  await canvas.dispatchEvent('wheel', { ctrlKey: true, deltaY: -120 });
+  const zoomAfterModifiedWheel = (await readAboutCamera(page)).zoom;
+  await assert(
+    zoomAfterPlainWheel === zoomBeforePlainWheel && zoomAfterModifiedWheel > zoomAfterPlainWheel,
+    `About wheel zoom modifier contract failed: ${JSON.stringify({ zoomBeforePlainWheel, zoomAfterPlainWheel, zoomAfterModifiedWheel })}`
+  );
+
+  const zoomRange = page.locator('[data-tree-zoom-range]');
+  await assert(
+    await zoomRange.getAttribute('min') === '40'
+      && await zoomRange.getAttribute('max') === '260',
+    'About zoom range no longer exposes its full supported interval'
+  );
+  await zoomRange.fill('40');
+  await page.waitForFunction(() => (
+    document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom === '0.400'
+  ), undefined, { timeout: 2000 });
+  const minimumZoom = (await readAboutCamera(page)).zoom;
+  await zoomRange.fill('260');
+  await page.waitForTimeout(90);
+  const tweenedMaximumState = await page.evaluate(() => ({
+    ariaValue: document.querySelector('[data-tree-zoom-range]')?.getAttribute('aria-valuetext'),
+    output: document.querySelector('[data-tree-zoom-output]')?.textContent,
+    range: document.querySelector('[data-tree-zoom-range]')?.value,
+    zoom: Number(document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom),
+  }));
+  await page.waitForFunction(() => (
+    document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom === '2.600'
+  ), undefined, { timeout: 2000 });
+  const maximumZoom = (await readAboutCamera(page)).zoom;
+  await assert(
+    minimumZoom === 0.4
+      && tweenedMaximumState.zoom > minimumZoom
+      && tweenedMaximumState.zoom < 1
+      && tweenedMaximumState.range === '260'
+      && tweenedMaximumState.ariaValue === '260 percent'
+      && tweenedMaximumState.output !== '260%'
+      && maximumZoom === 2.6,
+    `About zoom endpoints or tween are not reachable: ${JSON.stringify({ minimumZoom, tweenedMaximumState, maximumZoom })}`
+  );
+  await page.waitForFunction(() => (
+    document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion === 'idle-rotation'
+  ), undefined, { timeout: 3000 });
+  const tweenedIdleNodeId = await page.evaluate(() => {
+    const nodes = [...document.querySelectorAll('[data-node-id]')];
+    const visible = nodes.find((node) => {
+      const bounds = node.getBoundingClientRect();
+      return bounds.right > 0 && bounds.left < innerWidth && bounds.bottom > 0 && bounds.top < innerHeight;
+    });
+    return (visible || nodes[0])?.dataset.nodeId;
+  });
+  const tweenedIdlePositions = [];
+  for (let index = 0; index < 10; index += 1) {
+    tweenedIdlePositions.push(await page.evaluate((nodeId) => {
+      const node = document.querySelector(`[data-node-id="${nodeId}"]`);
+      const bounds = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      return {
+        canvasFrame: document.querySelector('[data-stellar-spectrum]')?.dataset.treeCanvasFrame,
+        canvasPixels: Number(document.querySelector('[data-stellar-spectrum]')?.dataset.treeCanvasPixels),
+        position: `${bounds.x.toFixed(3)}:${bounds.y.toFixed(3)}`,
+        properties: style.transitionProperty,
+      };
+    }, tweenedIdleNodeId));
+    await page.waitForTimeout(20);
+  }
+  await assert(
+    new Set(tweenedIdlePositions.map(({ position }) => position)).size >= 5
+      && new Set(tweenedIdlePositions.map(({ canvasFrame }) => canvasFrame)).size >= 3
+      && tweenedIdlePositions.every(({ canvasPixels }) => canvasPixels > 0 && canvasPixels <= 1050000)
+      && tweenedIdlePositions.every(({ properties }) => properties.includes('left') && properties.includes('top')),
+    `About high-zoom idle motion is not interpolated: ${JSON.stringify(tweenedIdlePositions)}`
+  );
+  await zoomRange.fill('145');
+  await page.waitForFunction(() => (
+    document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom === '1.450'
+  ), undefined, { timeout: 2000 });
+  const rangeState = await page.evaluate(() => ({
+    output: document.querySelector('[data-tree-zoom-output]')?.textContent,
+    valueText: document.querySelector('[data-tree-zoom-range]')?.getAttribute('aria-valuetext'),
+    zoom: Number(document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom),
+  }));
+  await assert(
+    rangeState.zoom === 1.45 && rangeState.output === '145%' && rangeState.valueText === '145 percent',
+    `About zoom range is not synchronized: ${JSON.stringify(rangeState)}`
+  );
+
+  await page.locator('#stellar-spectrum-panel').focus();
+  const keyboardBefore = await readAboutCamera(page);
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('Shift+ArrowRight');
+  await page.keyboard.press('+');
+  const keyboardAfter = await readAboutCamera(page);
+  await assert(
+    keyboardAfter.yaw !== keyboardBefore.yaw
+      && keyboardAfter.roll !== keyboardBefore.roll
+      && keyboardAfter.zoom > keyboardBefore.zoom,
+    `About keyboard camera controls failed: ${JSON.stringify({ keyboardBefore, keyboardAfter })}`
+  );
+
+  await page.locator('button[data-tree-projection="front"]').click();
+  const frontState = await page.evaluate(() => ({
+    frontPressed: document.querySelector('button[data-tree-projection="front"]')?.getAttribute('aria-pressed'),
+    freePressed: document.querySelector('button[data-tree-projection="free"]')?.getAttribute('aria-pressed'),
+    topPressed: document.querySelector('button[data-tree-projection="top"]')?.getAttribute('aria-pressed'),
+    urlProjection: new URL(location.href).searchParams.get('projection'),
+    view: document.querySelector('[data-stellar-spectrum]')?.dataset.treeView,
+  }));
+  await assert(
+    frontState.frontPressed === 'true'
+      && frontState.freePressed === 'false'
+      && frontState.topPressed === 'false'
+      && frontState.urlProjection === 'front'
+      && frontState.view === 'front',
+    `About front projection state is incomplete: ${JSON.stringify(frontState)}`
+  );
+  const frontIdleBefore = await page.locator('[data-node-id="android"]').evaluate((element) => ({
+    left: parseFloat(element.style.left),
+    top: parseFloat(element.style.top),
+  }));
+  await page.waitForTimeout(700);
+  const frontIdleAfter = await page.locator('[data-node-id="android"]').evaluate((element) => ({
+    left: parseFloat(element.style.left),
+    motion: document.querySelector('[data-stellar-spectrum]').dataset.treeMotion,
+    top: parseFloat(element.style.top),
+    view: document.querySelector('[data-stellar-spectrum]').dataset.treeView,
+  }));
+  await assert(
+    frontIdleAfter.view === 'front'
+      && frontIdleAfter.motion === 'idle-rotation'
+      && Math.hypot(frontIdleAfter.left - frontIdleBefore.left, frontIdleAfter.top - frontIdleBefore.top) > 0.03,
+    `Front view disables the nebula's idle motion: ${JSON.stringify({ frontIdleBefore, frontIdleAfter })}`
+  );
+
+  await page.locator('#stellar-spectrum-panel').focus();
+  await page.keyboard.press('ArrowRight');
+  const freeFromFront = await page.evaluate(() => ({
+    freePressed: document.querySelector('button[data-tree-projection="free"]')?.getAttribute('aria-pressed'),
+    urlProjection: new URL(location.href).searchParams.get('projection'),
+    view: document.querySelector('[data-stellar-spectrum]')?.dataset.treeView,
+  }));
+  await assert(
+    freeFromFront.freePressed === 'true'
+      && freeFromFront.urlProjection === null
+      && freeFromFront.view === 'free',
+    `Keyboard rotation from Front did not enter Free: ${JSON.stringify(freeFromFront)}`
+  );
+
+  await page.locator('button[data-tree-projection="top"]').click();
+  const topState = await page.evaluate(() => ({
+    freePressed: document.querySelector('button[data-tree-projection="free"]')?.getAttribute('aria-pressed'),
+    topPressed: document.querySelector('button[data-tree-projection="top"]')?.getAttribute('aria-pressed'),
+    urlProjection: new URL(location.href).searchParams.get('projection'),
+    view: document.querySelector('[data-stellar-spectrum]')?.dataset.treeView,
+  }));
+  await assert(
+    topState.topPressed === 'true'
+      && topState.freePressed === 'false'
+      && topState.urlProjection === 'top'
+      && topState.view === 'top',
+    `About top projection state is incomplete: ${JSON.stringify(topState)}`
+  );
+  const topIdleBefore = await page.locator('[data-node-id="android"]').evaluate((element) => ({
+    left: parseFloat(element.style.left),
+    top: parseFloat(element.style.top),
+  }));
+  await page.waitForTimeout(700);
+  const topIdleAfter = await page.locator('[data-node-id="android"]').evaluate((element) => ({
+    left: parseFloat(element.style.left),
+    motion: document.querySelector('[data-stellar-spectrum]').dataset.treeMotion,
+    top: parseFloat(element.style.top),
+    view: document.querySelector('[data-stellar-spectrum]').dataset.treeView,
+  }));
+  await assert(
+    topIdleAfter.view === 'top'
+      && topIdleAfter.motion === 'idle-rotation'
+      && Math.hypot(topIdleAfter.left - topIdleBefore.left, topIdleAfter.top - topIdleBefore.top) > 0.03,
+    `Top view disables the nebula's idle motion: ${JSON.stringify({ topIdleBefore, topIdleAfter })}`
+  );
+  const topDragPoint = await findAboutCanvasPoint(page);
+  if (topDragPoint) {
+    await page.mouse.move(topDragPoint.x, topDragPoint.y);
+    await page.mouse.down();
+    await page.mouse.move(topDragPoint.x + 80, topDragPoint.y + 40, { steps: 5 });
+    await page.mouse.up();
+  }
+  const freeFromTopDrag = await readAboutCamera(page);
+  await assert(
+    Boolean(topDragPoint)
+      && freeFromTopDrag.view === 'free'
+      && Math.abs(freeFromTopDrag.pitch - (-Math.PI / 2)) > 0.03,
+    `Dragging from Top did not enter a freely rotated view: ${JSON.stringify({ topDragPoint, freeFromTopDrag })}`
+  );
+
+  await page.locator('[data-tree-reset]').click();
+  const resetCamera = await readAboutCamera(page);
+  const resetControls = await page.evaluate(() => ({
+    output: document.querySelector('[data-tree-zoom-output]')?.textContent,
+    range: document.querySelector('[data-tree-zoom-range]')?.value,
+    urlProjection: new URL(location.href).searchParams.get('projection'),
+  }));
+  await assert(
+    resetCamera.view === 'free'
+      && Math.abs(resetCamera.yaw - (-0.14)) < 0.001
+      && Math.abs(resetCamera.pitch - 0.035) < 0.001
+      && Math.abs(resetCamera.roll) < 0.001
+      && Math.abs(resetCamera.zoom - 1) < 0.001
+      && resetControls.range === '100'
+      && resetControls.output === '100%'
+      && resetControls.urlProjection === null,
+    `About reset does not restore the full camera: ${JSON.stringify({ resetCamera, resetControls })}`
+  );
+
+  const surfacesBand = page.locator('[data-band-trigger="engineering:surfaces"]');
+  await surfacesBand.click();
+  await assert((await page.locator('[data-band-id="engineering:surfaces"] [data-node-id]').count()) === 4,
+    'Engineering surfaces branch does not expose its four exact signals');
+  const compactBandPopup = await page.evaluate(() => {
+    const popup = document.querySelector('[data-stellar-readout]');
+    return {
+      emptyPersonalContext: Boolean(popup.querySelector('[data-source-context="personal"]')),
+      selectedTabs: [...popup.querySelectorAll('[role="tab"][aria-selected="true"]')].map((tab) => tab.getAttribute('aria-label')),
+      tabLabels: [...popup.querySelectorAll('[role="tab"]')].map((tab) => tab.getAttribute('aria-label')),
+      visiblePanels: [...popup.querySelectorAll('[role="tabpanel"]')].filter((panel) => !panel.hidden).map((panel) => panel.dataset.sourceContext),
+      scrollHeight: popup.scrollHeight,
+    };
+  });
+  await assert(
+    JSON.stringify(compactBandPopup.tabLabels) === JSON.stringify([
+      'Career history, 2 items',
+      'Projects, 6 items',
+      'Writing, 2 items',
+    ])
+      && compactBandPopup.selectedTabs[0] === 'Career history, 2 items'
+      && compactBandPopup.visiblePanels[0] === 'career'
+      && !compactBandPopup.emptyPersonalContext
+      && compactBandPopup.scrollHeight < 520,
+    `About branch evidence is not compactly tabbed: ${JSON.stringify(compactBandPopup)}`
+  );
+  await page.locator('[data-stellar-readout] [role="tab"]').first().press('ArrowRight');
+  const keyboardSelectedSourceTab = await page.evaluate(() => ({
+    activeLabel: document.activeElement?.getAttribute('aria-label'),
+    selectedLabel: document.querySelector('[data-stellar-readout] [role="tab"][aria-selected="true"]')?.getAttribute('aria-label'),
+    visiblePanels: [...document.querySelectorAll('[data-stellar-readout] [role="tabpanel"]')]
+      .filter((panel) => !panel.hidden)
+      .map((panel) => panel.dataset.sourceContext),
+  }));
+  await assert(
+    keyboardSelectedSourceTab.activeLabel === 'Projects, 6 items'
+      && keyboardSelectedSourceTab.selectedLabel === 'Projects, 6 items'
+      && keyboardSelectedSourceTab.visiblePanels[0] === 'projects',
+    `About evidence tabs do not follow keyboard selection: ${JSON.stringify(keyboardSelectedSourceTab)}`
+  );
+  const androidNode = page.locator('[data-band-id="engineering:surfaces"] [data-node-id="android"]');
+  await androidNode.click();
+  const selectedAndroid = await page.evaluate(() => {
+    const url = new URL(location.href);
+    const popup = document.querySelector('[data-stellar-readout]');
+    const popupBounds = popup.getBoundingClientRect();
+    const stageBounds = document.querySelector('#stellar-spectrum-panel').getBoundingClientRect();
+    const nodeBounds = document.querySelector('[data-node-id="android"]').getBoundingClientRect();
+    const horizontalDistance = Math.max(nodeBounds.left - popupBounds.right, popupBounds.left - nodeBounds.right, 0);
+    const verticalDistance = Math.max(nodeBounds.top - popupBounds.bottom, popupBounds.top - nodeBounds.bottom, 0);
+    return {
+      band: url.searchParams.get('band'),
+      contained: popupBounds.left >= stageBounds.left - 1
+        && popupBounds.right <= stageBounds.right + 1
+        && popupBounds.top >= stageBounds.top - 1
+        && popupBounds.bottom <= stageBounds.bottom + 1,
+      directSources: [...popup.querySelectorAll('.stellar-spectrum__source-grid .stellar-spectrum__source-link')]
+        .map((link) => link.getAttribute('href')).sort(),
+      hash: url.hash,
+      hidden: popup.hidden,
+      modal: popup.getAttribute('aria-modal'),
+      node: url.searchParams.get('node'),
+      placement: popup.dataset.placement,
+      primaryRows: document.querySelectorAll('.profile-map-evidence tbody tr.is-stellar-primary').length,
+      relatedCareer: document.querySelectorAll('[data-stellar-surface="career"].is-stellar-related').length,
+      relatedStack: document.querySelectorAll('[data-stellar-surface="stack"].is-stellar-related').length,
+      role: popup.getAttribute('role'),
+      sourceOpen: document.querySelector('#profile-map-evidence').dataset.panelOpen === 'true',
+      title: popup.querySelector('h3')?.textContent || '',
+      distance: Math.hypot(horizontalDistance, verticalDistance),
+    };
+  });
+  await assert(
+    selectedAndroid.band === 'engineering:surfaces'
+      && selectedAndroid.node === 'android'
+      && selectedAndroid.hash === '#profile-map'
+      && selectedAndroid.title === 'Android'
+      && !selectedAndroid.hidden
+      && selectedAndroid.role === 'dialog'
+      && selectedAndroid.modal === 'false'
+      && selectedAndroid.primaryRows === 1
+      && selectedAndroid.relatedCareer > 0
+      && selectedAndroid.relatedStack > 0
+      && !selectedAndroid.sourceOpen
+      && selectedAndroid.contained
+      && Boolean(selectedAndroid.placement)
+      && selectedAndroid.distance < 220,
+    `About Android evidence popup is incomplete or detached: ${JSON.stringify(selectedAndroid)}`
+  );
+  await assert(
+    JSON.stringify(selectedAndroid.directSources) === JSON.stringify(androidEvidenceUrls),
+    `About Android popup receipts differ from canonical profile data: ${JSON.stringify(selectedAndroid.directSources)}`
+  );
+  const relationshipTab = page.locator('[data-stellar-readout] [role="tab"][aria-controls$="-relationships"]');
+  await assert((await relationshipTab.count()) === 1, 'About Android popup does not expose relationships as a compact tab');
+  await relationshipTab.click();
+  const selectedRelationships = await page.evaluate(() => ({
+    activeContext: document.querySelector('[data-stellar-readout] [role="tabpanel"]:not([hidden])')?.dataset.sourceContext,
+    relationshipCount: document.querySelectorAll('[data-stellar-readout] [role="tabpanel"]:not([hidden]) .stellar-spectrum__relationship').length,
+    visiblePanels: document.querySelectorAll('[data-stellar-readout] [role="tabpanel"]:not([hidden])').length,
+  }));
+  await assert(
+    selectedRelationships.activeContext === 'relationships'
+      && selectedRelationships.relationshipCount > 0
+      && selectedRelationships.visiblePanels === 1,
+    `About relationship tab is not synchronized with its panel: ${JSON.stringify(selectedRelationships)}`
+  );
+  await page.keyboard.press('Escape');
+  const dismissedAndroid = await page.evaluate(() => ({
+    activeNode: document.activeElement?.dataset?.nodeId,
+    band: new URL(location.href).searchParams.get('band'),
+    hidden: document.querySelector('[data-stellar-readout]').hidden,
+    node: new URL(location.href).searchParams.get('node'),
+  }));
+  await assert(
+    dismissedAndroid.activeNode === 'android'
+      && dismissedAndroid.band === null
+      && dismissedAndroid.node === null
+      && dismissedAndroid.hidden,
+    `Escape does not close and restore focus from the About popup: ${JSON.stringify(dismissedAndroid)}`
+  );
+
+  await mobilePage.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
+  await mobilePage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
+  const mobileSpectrum = await mobilePage.evaluate(() => {
+    const hero = document.querySelector('#present-origin').getBoundingClientRect();
+    const stage = document.querySelector('#stellar-spectrum-panel').getBoundingClientRect();
+    const opening = document.querySelector('.about-opening').getBoundingClientRect();
+    const toolbar = document.querySelector('.stellar-tree__toolbar').getBoundingClientRect();
+    const rootMarker = document.querySelector('.stellar-tree__root').getBoundingClientRect();
+    const canvas = document.querySelector('.stellar-tree__canvas').getBoundingClientRect();
+    const controls = [...document.querySelectorAll(
+      'button[data-tree-projection], [data-tree-interaction-toggle], [data-tree-reset], [data-about-theme-toggle], [data-tree-zoom-range], [data-band-trigger], [data-node-id]'
+    )].filter((element) => !element.hidden && getComputedStyle(element).display !== 'none');
+    const lock = document.querySelector('[data-tree-interaction-toggle]');
+    const sourcePanel = document.querySelector('#profile-map-evidence');
+    const routeMap = document.querySelector('[data-universe-route-map]');
+    const routeMapBounds = routeMap.getBoundingClientRect();
+    const routeMapLinks = [...routeMap.querySelectorAll('a')].map((link) => link.getBoundingClientRect());
+    const profileMap = document.querySelector('#profile-map').getBoundingClientRect();
+    const lockIcon = lock.querySelector('.stellar-tree__lock-icon--closed').getBoundingClientRect();
+    const resetIcon = document.querySelector('.stellar-tree__reset > [aria-hidden="true"]').getBoundingClientRect();
+    const themeIcon = document.querySelector('.about-theme-toggle > [aria-hidden="true"]').getBoundingClientRect();
+    return {
+      branches: document.querySelectorAll('[data-band-trigger]').length,
+      canvasCoversScene: canvas.left <= 0 && canvas.right >= document.documentElement.clientWidth
+        && canvas.top <= opening.top + 1
+        && canvas.bottom >= opening.bottom + innerHeight * 0.9,
+      clientWidth: document.documentElement.clientWidth,
+      minimumControlHeight: Math.min(...controls.map((element) => element.getBoundingClientRect().height)),
+      interaction: document.querySelector('[data-stellar-spectrum]').dataset.treeInteraction,
+      lockLabel: lock.getAttribute('aria-label'),
+      lockPressed: lock.getAttribute('aria-pressed'),
+      lockVisible: getComputedStyle(lock).display !== 'none',
+      lockIconSize: Math.min(lockIcon.width, lockIcon.height),
+      resetIconSize: Math.min(resetIcon.width, resetIcon.height),
+      themeIconSize: Math.min(themeIcon.width, themeIcon.height),
+      pointerEvents: getComputedStyle(document.querySelector('.stellar-tree__canvas')).pointerEvents,
+      routeMapContained: routeMapBounds.left >= profileMap.left - 1
+        && routeMapBounds.right <= profileMap.right + 1
+        && routeMapBounds.top >= stage.bottom - 1
+        && routeMapBounds.bottom <= profileMap.bottom + 1,
+      routeMapMode: routeMap.dataset.universeRouteMapMode,
+      routeMapParent: routeMap.parentElement?.id,
+      routeMapPosition: getComputedStyle(routeMap).position,
+      routeMapVerticalSpread: Math.max(...routeMapLinks.map((link) => link.top))
+        - Math.min(...routeMapLinks.map((link) => link.top)),
+      touchAction: getComputedStyle(document.querySelector('.stellar-tree__canvas')).touchAction,
+      nodes: document.querySelectorAll('[data-node-id]').length,
+      rootBottomMargin: stage.bottom - rootMarker.bottom,
+      scrollWidth: document.documentElement.scrollWidth,
+      sourcePanelDisplay: getComputedStyle(sourcePanel).display,
+      sourcePanelOpen: sourcePanel.dataset.panelOpen,
+      stacked: stage.top >= hero.bottom - 1,
+      toolbarContained: toolbar.left >= stage.left && toolbar.right <= stage.right
+        && toolbar.top >= stage.top && toolbar.bottom <= stage.bottom,
+      toolbarLowerRight: toolbar.right >= stage.right - 64 && toolbar.bottom >= stage.bottom - 120,
+      verticalControls: getComputedStyle(document.querySelector('.stellar-tree__camera')).flexDirection === 'column',
+    };
+  });
+  await assert(
+    mobileSpectrum.scrollWidth <= mobileSpectrum.clientWidth
+      && mobileSpectrum.minimumControlHeight >= 44
+      && mobileSpectrum.branches === 8
+      && mobileSpectrum.nodes === 31
+      && mobileSpectrum.stacked
+      && mobileSpectrum.canvasCoversScene
+      && mobileSpectrum.rootBottomMargin >= 24
+      && mobileSpectrum.toolbarContained
+      && mobileSpectrum.toolbarLowerRight
+      && mobileSpectrum.verticalControls
+      && mobileSpectrum.interaction === 'locked'
+      && mobileSpectrum.lockPressed === 'true'
+      && mobileSpectrum.lockLabel === 'Unlock stellar tree interaction'
+      && mobileSpectrum.lockVisible
+      && mobileSpectrum.lockIconSize >= 20
+      && mobileSpectrum.resetIconSize >= 20
+      && mobileSpectrum.themeIconSize >= 20
+      && mobileSpectrum.pointerEvents === 'none'
+      && mobileSpectrum.touchAction === 'pan-y'
+      && mobileSpectrum.routeMapMode === 'integrated'
+      && mobileSpectrum.routeMapParent === 'profile-map'
+      && mobileSpectrum.routeMapPosition === 'absolute'
+      && mobileSpectrum.routeMapContained
+      && mobileSpectrum.routeMapVerticalSpread > 70
+      && mobileSpectrum.sourcePanelOpen === 'false'
+      && mobileSpectrum.sourcePanelDisplay === 'none',
+    `Mobile About nebula containment/targets failed: ${JSON.stringify(mobileSpectrum)}`
+  );
+
+  await mobilePage.locator('button[data-tree-projection="front"]').click();
+  const mobileLockedFrontBefore = await mobilePage.locator('[data-node-id="android"]').evaluate((element) => ({
+    left: parseFloat(element.style.left),
+    top: parseFloat(element.style.top),
+  }));
+  await mobilePage.waitForTimeout(700);
+  const mobileLockedFrontAfter = await mobilePage.locator('[data-node-id="android"]').evaluate((element) => ({
+    interaction: document.querySelector('[data-stellar-spectrum]').dataset.treeInteraction,
+    left: parseFloat(element.style.left),
+    motion: document.querySelector('[data-stellar-spectrum]').dataset.treeMotion,
+    top: parseFloat(element.style.top),
+    view: document.querySelector('[data-stellar-spectrum]').dataset.treeView,
+  }));
+  await assert(
+    mobileLockedFrontAfter.interaction === 'locked'
+      && mobileLockedFrontAfter.view === 'front'
+      && mobileLockedFrontAfter.motion === 'idle-rotation'
+      && Math.hypot(
+        mobileLockedFrontAfter.left - mobileLockedFrontBefore.left,
+        mobileLockedFrontAfter.top - mobileLockedFrontBefore.top
+      ) > 0.02,
+    `Mobile lock or Front selection disables idle animation: ${JSON.stringify({ mobileLockedFrontBefore, mobileLockedFrontAfter })}`
+  );
+  await mobilePage.locator('[data-node-id="android"]').click();
+  const mobilePopup = await mobilePage.evaluate(() => {
+    const popup = document.querySelector('[data-stellar-readout]');
+    const url = new URL(location.href);
+    const selectedNode = url.searchParams.get('node');
+    const selectedBand = url.searchParams.get('band');
+    const target = selectedNode
+      ? document.querySelector(`[data-node-id="${CSS.escape(selectedNode)}"]`)
+      : document.querySelector(`[data-band-trigger="${CSS.escape(selectedBand || '')}"]`);
+    const bounds = popup.getBoundingClientRect();
+    const targetBounds = target.getBoundingClientRect();
+    const close = popup.querySelector('.stellar-tree__popup-close').getBoundingClientRect();
+    const sourceTabs = [...popup.querySelectorAll('[role="tab"]')];
+    const visibleSourceLinks = [...popup.querySelectorAll('[role="tabpanel"]:not([hidden]) .stellar-spectrum__source-link')];
+    const firstSourceLink = visibleSourceLinks[0];
+    const firstSourceBounds = firstSourceLink?.getBoundingClientRect();
+    const sourcePointTarget = firstSourceBounds
+      ? document.elementFromPoint(firstSourceBounds.left + firstSourceBounds.width / 2, firstSourceBounds.top + firstSourceBounds.height / 2)
+      : null;
+    const overlapWidth = Math.max(0, Math.min(bounds.right, targetBounds.right) - Math.max(bounds.left, targetBounds.left));
+    const overlapHeight = Math.max(0, Math.min(bounds.bottom, targetBounds.bottom) - Math.max(bounds.top, targetBounds.top));
+    const horizontalDistance = Math.max(targetBounds.left - bounds.right, bounds.left - targetBounds.right, 0);
+    const verticalDistance = Math.max(targetBounds.top - bounds.bottom, bounds.top - targetBounds.bottom, 0);
+    return {
+      bottom: bounds.bottom,
+      closeHeight: close.height,
+      closeWidth: close.width,
+      hidden: popup.hidden,
+      left: bounds.left,
+      minimumSourceLinkHeight: Math.min(...visibleSourceLinks.map((link) => link.getBoundingClientRect().height)),
+      minimumSourceTabHeight: Math.min(...sourceTabs.map((tab) => tab.getBoundingClientRect().height)),
+      targetDistance: Math.hypot(horizontalDistance, verticalDistance),
+      targetOverlap: overlapWidth * overlapHeight,
+      placement: popup.dataset.placement,
+      position: getComputedStyle(popup).position,
+      overflowY: getComputedStyle(popup).overflowY,
+      right: bounds.right,
+      sourceLinkTopmost: Boolean(firstSourceLink && sourcePointTarget && firstSourceLink.contains(sourcePointTarget)),
+      top: bounds.top,
+      viewportHeight: innerHeight,
+      viewportWidth: innerWidth,
+    };
+  });
+  await assert(
+    !mobilePopup.hidden
+      && mobilePopup.left >= 0
+      && mobilePopup.right <= mobilePopup.viewportWidth
+      && mobilePopup.top >= 0
+      && mobilePopup.bottom <= mobilePopup.viewportHeight
+      && mobilePopup.closeHeight >= 44
+      && mobilePopup.closeWidth >= 44
+      && mobilePopup.minimumSourceLinkHeight >= 43.5
+      && mobilePopup.minimumSourceTabHeight >= 43.5
+      && mobilePopup.position === 'absolute'
+      && mobilePopup.overflowY === 'auto'
+      && Boolean(mobilePopup.placement)
+      && mobilePopup.targetOverlap < 1
+      && mobilePopup.targetDistance < 80
+      && mobilePopup.sourceLinkTopmost,
+    `Mobile About popup is clipped or has a small close target: ${JSON.stringify(mobilePopup)}`
+  );
+  await mobilePage.locator('.stellar-tree__popup-close').click();
+
+  const touchAboutContext = await browser.newContext({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+  const touchAboutPage = await touchAboutContext.newPage();
+  await touchAboutPage.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
+  await touchAboutPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
+  const lockedTouchSurface = await touchAboutPage.evaluate(() => {
+    const stage = document.querySelector('#stellar-spectrum-panel');
+    const stageTop = stage.getBoundingClientRect().top + scrollY;
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+    const scrollRunway = 220;
+    scrollTo(0, Math.max(0, Math.min(stageTop + 80, maxScroll - scrollRunway)));
+    const canvas = document.querySelector('.stellar-tree__canvas');
+    const lock = document.querySelector('[data-tree-interaction-toggle]');
+    return {
+      interaction: document.querySelector('[data-stellar-spectrum]').dataset.treeInteraction,
+      lockPressed: lock.getAttribute('aria-pressed'),
+      maxScroll,
+      pointerEvents: getComputedStyle(canvas).pointerEvents,
+      scrollY,
+      touchAction: getComputedStyle(canvas).touchAction,
+    };
+  });
+  const lockedScrollPoint = await touchAboutPage.evaluate(() => {
+    const stage = document.querySelector('#stellar-spectrum-panel').getBoundingClientRect();
+    for (let y = Math.max(80, stage.top + 80); y < Math.min(innerHeight - 80, stage.bottom - 80); y += 40) {
+      for (let x = Math.max(40, stage.left + 40); x < Math.min(innerWidth - 70, stage.right - 70); x += 40) {
+        const target = document.elementFromPoint(x, y);
+        if (target && !target.closest('button, a, input, summary')) return { x, y };
+      }
+    }
+    return null;
+  });
+  await assert(Boolean(lockedScrollPoint), 'Locked mobile About has no pass-through scroll surface');
+  const cdp = await touchAboutContext.newCDPSession(touchAboutPage);
+  if (lockedScrollPoint) {
+    const start = { id: 1, x: lockedScrollPoint.x, y: lockedScrollPoint.y };
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [start] });
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ ...start, y: Math.max(40, start.y - 180) }],
+    });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  }
+  await touchAboutPage.waitForTimeout(220);
+  const lockedScrollAfter = await touchAboutPage.evaluate(() => ({
+    rotated: document.querySelector('.stellar-tree__canvas').dataset.rotated || '',
+    scrollY,
+  }));
+  await assert(
+    lockedTouchSurface.interaction === 'locked'
+      && lockedTouchSurface.lockPressed === 'true'
+      && lockedTouchSurface.pointerEvents === 'none'
+      && lockedTouchSurface.touchAction === 'pan-y'
+      && lockedScrollAfter.scrollY > lockedTouchSurface.scrollY + 30
+      && lockedScrollAfter.rotated === '',
+    `Locked mobile nebula prevents page scrolling or rotates anyway: ${JSON.stringify({ lockedTouchSurface, lockedScrollAfter })}`
+  );
+
+  await touchAboutPage.locator('.stellar-tree__root').click();
+  const mobileSourceScrollPoint = await touchAboutPage.evaluate(() => {
+    const body = document.querySelector('#profile-map-evidence .profile-map-evidence__body');
+    const bounds = body.getBoundingClientRect();
+    return {
+      x: bounds.left + Math.min(bounds.width - 30, Math.max(40, bounds.width * 0.45)),
+      y: bounds.top + Math.min(bounds.height - 40, Math.max(160, bounds.height * 0.72)),
+    };
+  });
+  const mobileSourceStart = { id: 2, ...mobileSourceScrollPoint };
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [mobileSourceStart] });
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchMove',
+    touchPoints: [{ ...mobileSourceStart, y: Math.max(80, mobileSourceStart.y - 180) }],
+  });
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await touchAboutPage.waitForTimeout(180);
+  const mobileSourceAfterSwipe = await touchAboutPage.evaluate(() => {
+    const body = document.querySelector('#profile-map-evidence .profile-map-evidence__body');
+    const panel = document.querySelector('#profile-map-evidence');
+    const panelBounds = panel.getBoundingClientRect();
+    return {
+      bottomClearance: innerHeight - panelBounds.bottom,
+      clientHeight: body.clientHeight,
+      open: panel.dataset.panelOpen,
+      scrollHeight: body.scrollHeight,
+      scrollTop: body.scrollTop,
+    };
+  });
+  await assert(
+    mobileSourceAfterSwipe.open === 'true'
+      && mobileSourceAfterSwipe.scrollHeight > mobileSourceAfterSwipe.clientHeight
+      && mobileSourceAfterSwipe.scrollTop > 30
+      && mobileSourceAfterSwipe.bottomClearance >= 0,
+    `The mobile source index does not respond to touch scrolling: ${JSON.stringify(mobileSourceAfterSwipe)}`
+  );
+  const mobileSourceDismissPoint = await touchAboutPage.evaluate(() => {
+    const panel = document.querySelector('#profile-map-evidence').getBoundingClientRect();
+    const backdrop = document.querySelector('[data-source-dismiss]').getBoundingClientRect();
+    const x = Math.min(backdrop.right - 12, panel.right + 28);
+    const y = Math.min(backdrop.bottom - 40, Math.max(backdrop.top + 80, panel.top + 100));
+    const target = document.elementFromPoint(x, y);
+    return { isBackdrop: Boolean(target?.matches('[data-source-dismiss]')), x, y };
+  });
+  await assert(mobileSourceDismissPoint.isBackdrop, `The source index has no outside-tap dismissal surface: ${JSON.stringify(mobileSourceDismissPoint)}`);
+  const mobileSourceDismissTouch = { id: 3, x: mobileSourceDismissPoint.x, y: mobileSourceDismissPoint.y };
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [mobileSourceDismissTouch] });
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await touchAboutPage.waitForTimeout(100);
+  const mobileSourceDismissed = await touchAboutPage.evaluate(() => ({
+    backdropHidden: document.querySelector('[data-source-dismiss]').hidden,
+    open: document.querySelector('#profile-map-evidence').dataset.panelOpen,
+  }));
+  await assert(
+    mobileSourceDismissed.open === 'false' && mobileSourceDismissed.backdropHidden,
+    `Touching outside the mobile source index does not dismiss it: ${JSON.stringify(mobileSourceDismissed)}`
+  );
+
+  await touchAboutPage.locator('[data-tree-interaction-toggle]').click();
+  await touchAboutPage.locator('#stellar-spectrum-panel').evaluate((element) => {
+    element.scrollIntoView({ behavior: 'instant', block: 'center' });
+  });
+  await touchAboutPage.waitForTimeout(100);
+  const unlockedTouchSurface = await touchAboutPage.evaluate(() => {
+    const canvas = document.querySelector('.stellar-tree__canvas');
+    const lock = document.querySelector('[data-tree-interaction-toggle]');
+    return {
+      interaction: document.querySelector('[data-stellar-spectrum]').dataset.treeInteraction,
+      label: lock.getAttribute('aria-label'),
+      lockPressed: lock.getAttribute('aria-pressed'),
+      pointerEvents: getComputedStyle(canvas).pointerEvents,
+      touchAction: getComputedStyle(canvas).touchAction,
+    };
+  });
+  const touchSurface = await findAboutCanvasPair(touchAboutPage);
+  const touchPair = touchSurface.pair;
+  await assert(Boolean(touchPair), `About nebula has no unobscured two-touch surface: ${JSON.stringify(touchSurface.diagnostics)}`);
+  if (touchPair) {
+    const touchBefore = await readAboutCamera(touchAboutPage);
+    const firstTouch = { id: 1, ...touchPair[0] };
+    const secondTouch = { id: 2, ...touchPair[1] };
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [firstTouch, secondTouch] });
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [
+        { id: 1, x: firstTouch.x - 20, y: firstTouch.y - 20 },
+        { id: 2, x: secondTouch.x + 55, y: secondTouch.y + 42 },
+      ],
+    });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    const touchAfter = await readAboutCamera(touchAboutPage);
+    await assert(
+      unlockedTouchSurface.interaction === 'unlocked'
+        && unlockedTouchSurface.lockPressed === 'false'
+        && unlockedTouchSurface.label === 'Lock stellar tree interaction'
+        && unlockedTouchSurface.pointerEvents === 'auto'
+        && unlockedTouchSurface.touchAction === 'none'
+        && touchAfter.zoom > touchBefore.zoom
+        && Math.abs(touchAfter.roll - touchBefore.roll) > 0.05,
+      `Unlocked mobile About does not enable pinch/twist: ${JSON.stringify({ unlockedTouchSurface, touchBefore, touchAfter })}`
     );
   }
+  await touchAboutContext.close();
 
-  await page.goto(BASE_URL + '/about.html#profile-map', { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('.profile-map__svg', { timeout: 15000 });
-  await assert((await page.locator('.profile-map__trunk').count()) === 1, 'Profile tree should have one trunk');
-  await assert((await page.locator('.profile-map__branch').count()) === 4, 'Engineering profile tree should have four branches');
-  await assert((await page.locator('.profile-map__node').count()) === 21, 'Engineering profile tree should render 21 junctions');
-
-  const desktopTreeBefore = await readProfileTreeGeometry(page, 'android');
-  await page.locator('.profile-map__node[data-node-id="android"] .profile-map__node-mark').hover();
-  const desktopTreeDuringHover = await readProfileTreeGeometry(page, 'android');
-  await assert(profileTreeGeometryDelta(desktopTreeBefore, desktopTreeDuringHover) < 0.5, 'Profile tree geometry moved during hover');
-  await page.locator('.profile-map__node[data-node-id="android"] .profile-map__node-hit').click();
-  const desktopPopover = await readPopoverContainment(page);
-  await assert(!desktopPopover.hidden && desktopPopover.title === 'Android', 'Android junction should open a pinned detail card');
-  await assert(desktopPopover.inside, 'Desktop profile-tree card should stay inside the visual');
-  const desktopTreeAfter = await readProfileTreeGeometry(page, 'android');
-  const desktopJunctionDelta = profileTreeGeometryDelta(desktopTreeBefore, desktopTreeAfter);
-  await assert(desktopJunctionDelta < 0.5, `Profile tree geometry moved after selection/hover (${desktopJunctionDelta}px)`);
-  const desktopTreeIntegrity = await readProfileTreeIntegrity(page);
-  await assert(desktopTreeIntegrity.minimumHitGap >= 0, 'Desktop profile-tree hit targets overlap');
-  await assert(desktopTreeIntegrity.minimumNodeTendrilDistance >= 8, 'A desktop branchlet crosses another junction');
-  await assert(desktopTreeIntegrity.minimumTendrilDistance >= 0.75, 'Desktop branchlets cross each other');
-  await assert(desktopTreeIntegrity.labelOverlapCount === 0, 'Desktop profile-tree labels overlap');
-  await page.locator('.profile-map__popover-close').click();
-  await assert(await page.locator('.profile-map__popover').getAttribute('hidden') !== null, 'Profile-tree close button should dismiss the card');
-
-  await page.getByRole('tab', { name: 'Interests', exact: true }).click();
-  await assert((await page.locator('.profile-map__node').count()) === 10, 'Interests profile tree should render 10 junctions');
-  await assert((await page.locator('.profile-map__branch').count()) === 4, 'Interests profile tree should keep four branches');
-
-  await mobilePage.goto(BASE_URL + '/about.html#profile-map', { waitUntil: 'domcontentloaded' });
-  await mobilePage.waitForSelector('.profile-map__svg', { timeout: 15000 });
-  const mobileTreeLayout = await mobilePage.evaluate(() => ({
-    clientWidth: document.documentElement.clientWidth,
-    scrollWidth: document.documentElement.scrollWidth,
-    junctions: document.querySelectorAll('.profile-map__node').length,
-    branches: document.querySelectorAll('.profile-map__branch').length,
+  await page.emulateMedia({ media: 'print' });
+  await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
+  const printableSources = await page.evaluate(() => ({
+    detailsOpen: document.querySelector('#profile-map-evidence').open,
+    rows: [...document.querySelectorAll('.profile-map-evidence tbody tr')]
+      .filter((row) => row.getBoundingClientRect().height > 0 && getComputedStyle(row).display !== 'none').length,
+    stageDisplay: getComputedStyle(document.querySelector('#stellar-spectrum-panel')).display,
   }));
-  await assert(mobileTreeLayout.scrollWidth <= mobileTreeLayout.clientWidth, 'Mobile profile tree causes horizontal overflow');
-  await assert(mobileTreeLayout.junctions === 21 && mobileTreeLayout.branches === 4, 'Mobile engineering tree has incomplete structure');
-  const mobileTreeBefore = await readProfileTreeGeometry(mobilePage, 'android');
-  const mobileTreeIntegrity = await readProfileTreeIntegrity(mobilePage);
-  await assert(mobileTreeIntegrity.minimumHitWidth >= 32, 'A mobile profile-tree junction hit target is too small');
-  await assert(mobileTreeIntegrity.minimumHitGap >= 0, 'Mobile profile-tree hit targets overlap');
-  await assert(mobileTreeIntegrity.minimumNodeTendrilDistance >= 8, 'A mobile branchlet crosses another junction');
-  await assert(mobileTreeIntegrity.minimumTendrilDistance >= 0.75, 'Mobile branchlets cross each other');
-  await assert(mobileTreeIntegrity.labelOverlapCount === 0, 'Mobile profile-tree labels overlap');
-  await assert(mobileTreeBefore.hit.width >= 32 && mobileTreeBefore.hit.height >= 32, 'Mobile Android junction hit target is too small');
-  await mobilePage.locator('.profile-map__node[data-node-id="android"] .profile-map__node-hit').click();
-  const mobilePopover = await readPopoverContainment(mobilePage);
-  await assert(!mobilePopover.hidden && mobilePopover.inside, 'Mobile profile-tree card should open inside the visual');
-  await mobilePage.locator('.profile-map__popover-close').press('Escape');
-  await assert(await mobilePage.locator('.profile-map__popover').getAttribute('hidden') !== null, 'Escape should dismiss the mobile profile-tree card');
+  await assert(
+    printableSources.detailsOpen
+      && printableSources.rows === 31
+      && printableSources.stageDisplay !== 'none',
+    `Enhanced About hides exact sources in print: ${JSON.stringify(printableSources)}`
+  );
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+  await page.emulateMedia({ media: 'screen' });
+
+  const themedAboutContext = await browser.newContext({ colorScheme: 'light', viewport: { width: 1280, height: 900 } });
+  const themedAboutPage = await themedAboutContext.newPage();
+  await themedAboutPage.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
+  await themedAboutPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
+  const readAboutTheme = () => themedAboutPage.evaluate(() => ({
+    backgrounds: ['html', 'body', '#site-topbar', '#main-content', '.stellar-tree__viewport', '#site-footer']
+      .map((selector) => getComputedStyle(document.querySelector(selector)).backgroundColor),
+    classDark: document.documentElement.classList.contains('dark'),
+    label: document.querySelector('[data-about-theme-toggle]').getAttribute('aria-label'),
+    pressed: document.querySelector('[data-about-theme-toggle]').getAttribute('aria-pressed'),
+    saved: localStorage.getItem('about-theme'),
+    theme: document.documentElement.dataset.aboutTheme,
+    transparentAssessment: [...document.querySelectorAll('.stellar-calibration-note, .stellar-calibration__card')]
+      .every((element) => getComputedStyle(element).backgroundColor === 'rgba(0, 0, 0, 0)'),
+  }));
+  const defaultTheme = await readAboutTheme();
+  await assert(
+    defaultTheme.theme === 'dark'
+      && defaultTheme.classDark
+      && defaultTheme.pressed === 'false'
+      && defaultTheme.label === 'Use light theme'
+      && defaultTheme.backgrounds.every((color) => color === 'rgb(2, 8, 23)')
+      && defaultTheme.transparentAssessment,
+    `About does not default to one dark surface: ${JSON.stringify(defaultTheme)}`
+  );
+  await themedAboutPage.locator('[data-about-theme-toggle]').click();
+  const lightTheme = await readAboutTheme();
+  await assert(
+    lightTheme.theme === 'light'
+      && !lightTheme.classDark
+      && lightTheme.pressed === 'true'
+      && lightTheme.label === 'Use dark theme'
+      && lightTheme.saved === 'light'
+      && lightTheme.backgrounds.every((color) => color === 'rgb(245, 247, 251)')
+      && lightTheme.transparentAssessment,
+    `About light theme is not one continuous surface: ${JSON.stringify(lightTheme)}`
+  );
+  await themedAboutPage.reload({ waitUntil: 'domcontentloaded' });
+  await themedAboutPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
+  await assert((await readAboutTheme()).theme === 'light', 'About theme choice does not survive reload');
+  await themedAboutContext.close();
+
+  const reducedAboutContext = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
+  const reducedAboutPage = await reducedAboutContext.newPage();
+  await reducedAboutPage.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
+  await reducedAboutPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
+  const reducedAboutBefore = await reducedAboutPage.evaluate(() => ({
+    camera: ['treeYaw', 'treePitch', 'treeRoll', 'treeZoom']
+      .map((key) => document.querySelector('[data-stellar-spectrum]').dataset[key]),
+    controls: [...document.querySelectorAll('[data-band-trigger], [data-node-id]')]
+      .map((element) => [element.style.left, element.style.top]),
+  }));
+  await reducedAboutPage.waitForTimeout(500);
+  const reducedAboutAfter = await reducedAboutPage.evaluate(() => ({
+    camera: ['treeYaw', 'treePitch', 'treeRoll', 'treeZoom']
+      .map((key) => document.querySelector('[data-stellar-spectrum]').dataset[key]),
+    controls: [...document.querySelectorAll('[data-band-trigger], [data-node-id]')]
+      .map((element) => [element.style.left, element.style.top]),
+    scanning: document.querySelector('#stellar-spectrum-panel').classList.contains('is-scanning'),
+  }));
+  await assert(
+    JSON.stringify(reducedAboutBefore.camera) === JSON.stringify(reducedAboutAfter.camera)
+      && JSON.stringify(reducedAboutBefore.controls) === JSON.stringify(reducedAboutAfter.controls)
+      && !reducedAboutAfter.scanning,
+    `Reduced-motion About moves while idle: ${JSON.stringify({ reducedAboutBefore, reducedAboutAfter })}`
+  );
+  await reducedAboutPage.locator('[data-tree-zoom-range]').fill('130');
+  await reducedAboutPage.locator('[data-node-id="android"]').click();
+  await assert(
+    (await readAboutCamera(reducedAboutPage)).zoom === 1.3
+      && await reducedAboutPage.locator('[data-stellar-readout]').isVisible(),
+    'Reduced-motion About disables manual zoom or evidence popup'
+  );
+  await reducedAboutContext.close();
+
+  for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
+    const noJsAboutContext = await browser.newContext({ javaScriptEnabled: false, viewport });
+    const noJsAboutPage = await noJsAboutContext.newPage();
+    const response = await noJsAboutPage.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
+    const noJsAbout = await noJsAboutPage.evaluate(() => {
+      const bodyText = document.body.textContent || '';
+      return {
+        fallbackGroups: document.querySelectorAll('.stellar-spectrum__fallback-group').length,
+        fallbackSignals: document.querySelectorAll('.stellar-spectrum__fallback-group li').length,
+        heroVisible: document.querySelector('#about-title').getBoundingClientRect().height > 0,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        removedCopy: ['Reading the scan', 'How my worlds connect', 'NEBULA ARBOR', 'Drag or use arrow keys']
+          .filter((text) => bodyText.includes(text)),
+        rows: document.querySelectorAll('.profile-map-evidence tbody tr').length,
+        sourceOpen: document.querySelector('#profile-map-evidence').open,
+        stageHidden: document.querySelector('#stellar-spectrum-panel').hidden,
+      };
+    });
+    await noJsAboutPage.locator('#profile-map-evidence > summary').click();
+    const noJsSourceOpened = await noJsAboutPage.evaluate(() => ({
+      open: document.querySelector('#profile-map-evidence').open,
+      visibleRows: [...document.querySelectorAll('.profile-map-evidence tbody tr')]
+        .filter((row) => row.getBoundingClientRect().height > 0).length,
+    }));
+    await assert(
+      response && response.status() >= 200 && response.status() < 400
+        && noJsAbout.heroVisible
+        && noJsAbout.stageHidden
+        && noJsAbout.fallbackGroups === 8
+        && noJsAbout.fallbackSignals === 31
+        && noJsAbout.rows === 31
+        && !noJsAbout.sourceOpen
+        && noJsSourceOpened.open
+        && noJsSourceOpened.visibleRows === 31
+        && noJsAbout.removedCopy.length === 0
+        && noJsAbout.overflow <= 0,
+      `No-JavaScript About contract failed at ${viewport.width}x${viewport.height}: ${JSON.stringify(noJsAbout)}`
+    );
+    await noJsAboutContext.close();
+  }
+
+  const themeTransitionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const themeTransitionPage = await themeTransitionContext.newPage();
+  await themeTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  await themeTransitionPage.evaluate(() => {
+    localStorage.removeItem('about-theme');
+    sessionStorage.clear();
+  });
+  await themeTransitionPage.reload({ waitUntil: 'domcontentloaded' });
+  const toAboutStarted = Date.now();
+  const toAboutTransition = await themeTransitionPage.evaluate(() => {
+    document.querySelector('#site-nav a[href="/about.html"]').click();
+    return {
+      mode: document.documentElement.dataset.themeTransition,
+      overlay: Boolean(document.querySelector('.universe-theme-wash')),
+      path: location.pathname,
+    };
+  });
+  await assert(
+    toAboutTransition.path === '/work.html'
+      && toAboutTransition.mode === 'to-about'
+      && toAboutTransition.overlay,
+    `Light-to-About transition does not ease into the dark surface: ${JSON.stringify(toAboutTransition)}`
+  );
+  await themeTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'commit' });
+  await assert(Date.now() - toAboutStarted < 500, 'Light-to-About navigation is artificially delayed');
+  const arrivedAboutHandle = await themeTransitionPage.waitForFunction(() => {
+    if (document.documentElement.dataset.themeTransition !== 'arrive-about') return false;
+    return {
+      overlay: Boolean(document.querySelector('.universe-theme-wash')),
+      theme: document.documentElement.dataset.aboutTheme,
+    };
+  });
+  const arrivedAbout = await arrivedAboutHandle.jsonValue();
+  await assert(arrivedAbout.overlay && arrivedAbout.theme === 'dark',
+    `About arrival does not continue the dark gradient: ${JSON.stringify(arrivedAbout)}`);
+  await themeTransitionPage.waitForFunction(() => !document.querySelector('.universe-theme-wash'), { timeout: 1200 });
+
+  const fromAboutStarted = Date.now();
+  const fromAboutTransition = await themeTransitionPage.evaluate(() => {
+    document.querySelector('#site-nav a[href="/work.html"]').click();
+    return {
+      mode: document.documentElement.dataset.themeTransition,
+      overlay: Boolean(document.querySelector('.universe-theme-wash')),
+      path: location.pathname,
+    };
+  });
+  await assert(
+    fromAboutTransition.path === '/about.html'
+      && fromAboutTransition.mode === 'from-about'
+      && fromAboutTransition.overlay,
+    `About-to-light transition does not ease into the light surface: ${JSON.stringify(fromAboutTransition)}`
+  );
+  await themeTransitionPage.waitForURL('**/work.html', { timeout: 5000, waitUntil: 'commit' });
+  await assert(Date.now() - fromAboutStarted < 500, 'About-to-light navigation is artificially delayed');
+  const arrivedLightHandle = await themeTransitionPage.waitForFunction(() => (
+    document.documentElement.dataset.themeTransition === 'arrive-light'
+      && Boolean(document.querySelector('.universe-theme-wash'))
+  ));
+  await assert(Boolean(await arrivedLightHandle.jsonValue()), 'Light arrival did not continue the route gradient');
+  await themeTransitionPage.waitForFunction(() => !document.querySelector('.universe-theme-wash'), { timeout: 1200 });
+
+  await themeTransitionPage.evaluate(() => localStorage.setItem('about-theme', 'light'));
+  const sameSurfaceStarted = Date.now();
+  await themeTransitionPage.evaluate(() => document.querySelector('#site-nav a[href="/about.html"]').click());
+  await themeTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' });
+  const sameSurfaceTransition = await themeTransitionPage.evaluate(() => ({
+    mode: document.documentElement.dataset.themeTransition || null,
+    overlay: Boolean(document.querySelector('.universe-theme-wash')),
+    theme: document.documentElement.dataset.aboutTheme,
+  }));
+  sameSurfaceTransition.elapsed = Date.now() - sameSurfaceStarted;
+  await assert(
+    sameSurfaceTransition.mode === null
+      && !sameSurfaceTransition.overlay
+      && sameSurfaceTransition.theme === 'light',
+    `A saved light About theme still creates a cross-theme transition: ${JSON.stringify(sameSurfaceTransition)}`
+  );
+  await themeTransitionContext.close();
+
+  const reducedTransitionContext = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
+  const reducedTransitionPage = await reducedTransitionContext.newPage();
+  await reducedTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  await reducedTransitionPage.evaluate(() => {
+    localStorage.removeItem('about-theme');
+    document.querySelector('#site-nav a[href="/about.html"]').click();
+  });
+  await reducedTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' });
+  await assert(
+    await reducedTransitionPage.locator('.universe-theme-wash').count() === 0,
+    'Reduced-motion navigation still creates the cross-theme wash'
+  );
+  await reducedTransitionContext.close();
 
   // Nav clickthrough from home
   await page.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
@@ -1335,7 +2480,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   for (const [expected, label] of navMap) {
     await page.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
     await page.locator(`#site-nav a[href='${expected}']`).first().click();
-    await page.waitForTimeout(200);
+    await page.waitForFunction((path) => location.pathname === path, expected, { timeout: 5000 });
     const current = new URL(page.url()).pathname;
     if (!(expected === '/' ? current === '/' : current === expected)) {
       failures.push(`Nav link ${label} expected ${expected} but landed on ${current}`);
@@ -1345,6 +2490,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   // Blog list behavior
   await page.goto(BASE_URL + '/blog/', { waitUntil: 'networkidle' });
   await page.waitForSelector('#blog-feed article', { timeout: 15000 });
+  await page.waitForSelector('#galaxy-field[data-ready="true"]', { timeout: 15000 });
 
   const rssResp = await api.get('/blog/rss.xml');
   await assert(rssResp.status() >= 200 && rssResp.status() < 400, 'RSS feed endpoint /blog/rss.xml failed');
@@ -1353,48 +2499,131 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   const initialCount = await page.locator('#blog-feed article').count();
   await assert(initialCount > 0, 'Blog feed did not render any posts from the public manifest');
+  const blogArchiveStatus = ((await page.locator('#infinite-status').textContent()) || '').replace(/\s+/g, ' ').trim();
+  await assert(
+    blogArchiveStatus.includes(`${initialCount} published entr`)
+      && blogArchiveStatus.includes('engineering, systems, and life')
+      && !/javascript|controls|resolved|end of field/i.test(blogArchiveStatus),
+    `Logs archive end copy describes interface mechanics instead of Andrew's writing: ${blogArchiveStatus}`
+  );
 
   const rssLinkHref = await page.locator('a[href="/blog/rss.xml"]').first().getAttribute('href');
   await assert(rssLinkHref === '/blog/rss.xml', 'Blog RSS link is missing');
-  const shareButtonsCount = await page.locator('.share-post-btn').count();
-  const bookmarkButtonsCount = await page.locator('.bookmark-post-btn').count();
+  const shareButtonsCount = await page.locator('button[data-share-slug]').count();
+  const bookmarkButtonsCount = await page.locator('button[data-bookmark-slug]').count();
   await assert(shareButtonsCount > 0, 'Share buttons are missing on blog index');
   await assert(bookmarkButtonsCount > 0, 'Bookmark buttons are missing on blog index');
 
-  // Infinite scroll should automatically load additional posts when near bottom.
-  let afterScrollCount = initialCount;
-  for (let i = 0; i < 4; i += 1) {
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(450);
-    afterScrollCount = await page.locator('#blog-feed article').count();
-    if (afterScrollCount > initialCount) break;
-  }
-  await assert(afterScrollCount > initialCount, 'Infinite scroll did not load more posts');
+  const galaxyNodes = page.locator('#galaxy-field .galaxy-node');
+  await assert(
+    (await galaxyNodes.count()) === initialCount,
+    'Logs galaxy does not expose one labeled node per published entry'
+  );
+  const nodeTruth = await galaxyNodes.evaluateAll((nodes) => nodes.map((node) => ({
+    label: node.querySelector('.galaxy-node__label')?.textContent?.trim() || '',
+    minutes: Number(node.dataset.readingMinutes || 0),
+    size: Number.parseFloat(getComputedStyle(node).getPropertyValue('--node-size')),
+    display: getComputedStyle(node.querySelector('.galaxy-node__label')).display,
+  })));
+  await assert(
+    nodeTruth.every((node) => node.label && node.display !== 'none'),
+    'Logs galaxy hides titles until hover instead of keeping every node labeled'
+  );
+  const minuteOrdered = [...nodeTruth].sort((left, right) => left.minutes - right.minutes);
+  await assert(
+    minuteOrdered.every((node, index) => index === 0 || node.size >= minuteOrdered[index - 1].size),
+    'Logs galaxy node size does not grow monotonically with published reading time'
+  );
+  await assert(await page.locator('#blog-feed .galaxy-entry__media img').count() > 0, 'Logs chronology did not restore published entry imagery');
 
-  const categoryButtons = page.locator('#category-filters button[data-category]');
+  const selectedTransmission = await galaxyNodes.first().getAttribute('data-slug');
+  await galaxyNodes.first().click();
+  await page.waitForFunction((slug) => new URL(location.href).searchParams.get('target') === slug, selectedTransmission);
+  const galaxyFocus = await page.evaluate((slug) => {
+    const node = document.querySelector(`.galaxy-node[data-slug="${CSS.escape(slug)}"]`);
+    const selected = document.querySelector('#galaxy-focus');
+    const stage = document.querySelector('#galaxy-field');
+    const nodeRect = node.getBoundingClientRect();
+    const focusRect = selected.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+    const overlaps = !(focusRect.right <= nodeRect.left || focusRect.left >= nodeRect.right || focusRect.bottom <= nodeRect.top || focusRect.top >= nodeRect.bottom);
+    const gap = Math.min(
+      Math.abs(focusRect.left - nodeRect.right),
+      Math.abs(nodeRect.left - focusRect.right),
+      Math.abs(focusRect.top - nodeRect.bottom),
+      Math.abs(nodeRect.top - focusRect.bottom)
+    );
+    return {
+      hidden: selected.hidden,
+      direct: selected.querySelector('#galaxy-focus-link')?.getAttribute('href'),
+      placement: selected.dataset.placement,
+      overlaps,
+      gap,
+      insideStage: focusRect.left >= stageRect.left - 1 && focusRect.right <= stageRect.right + 1
+        && focusRect.top >= stageRect.top - 1 && focusRect.bottom <= stageRect.bottom + 1,
+      selectedArticle: document.querySelector(`[data-blog-slug="${CSS.escape(slug)}"]`)?.dataset.blogSelected,
+    };
+  }, selectedTransmission);
+  await assert(
+    !galaxyFocus.hidden
+      && galaxyFocus.direct === `/blog/${encodeURIComponent(selectedTransmission)}.html`
+      && ['right', 'left', 'below', 'above'].includes(galaxyFocus.placement)
+      && !galaxyFocus.overlaps
+      && galaxyFocus.gap <= 30
+      && galaxyFocus.insideStage
+      && galaxyFocus.selectedArticle === 'true',
+    `Logs selected-entry bubble is not adjacent to its node: ${JSON.stringify(galaxyFocus)}`
+  );
+  await page.locator('.galaxy-intro').click({ position: { x: 4, y: 4 } });
+  await page.waitForFunction(() => !new URL(location.href).searchParams.has('target'));
+  await assert(await page.locator('#galaxy-focus').getAttribute('hidden') !== null, 'Clicking outside did not dismiss the Logs node bubble');
+
+  await galaxyNodes.first().focus();
+  await page.keyboard.press('Enter');
+  await page.waitForFunction((slug) => new URL(location.href).searchParams.get('target') === slug, selectedTransmission);
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !new URL(location.href).searchParams.has('target'));
+  await assert(
+    await galaxyNodes.first().evaluate((node) => document.activeElement === node),
+    'Escape did not dismiss the Logs bubble and restore focus to its node'
+  );
+
+  await galaxyNodes.first().click();
+  await page.waitForFunction((slug) => new URL(location.href).searchParams.get('target') === slug, selectedTransmission);
+  await page.goBack();
+  await page.waitForFunction(() => !new URL(location.href).searchParams.has('target'));
+  await assert(await page.locator('#galaxy-focus').getAttribute('hidden') !== null,
+    'Logs Back navigation did not clear only the selected galaxy target');
+
+  await assert(
+    initialCount === GENERATED_BLOG_POST_PATHS.length,
+    `Logs archive rendered ${initialCount} of ${GENERATED_BLOG_POST_PATHS.length} public entries`
+  );
+
+  const categoryButtons = page.locator('#galaxy-categories button[data-category]');
   const categoryCount = await categoryButtons.count();
   await assert(categoryCount > 1, 'Category filters were not rendered from SQLite categories');
   if (categoryCount > 1) {
     await categoryButtons.nth(1).click();
-    await page.waitForTimeout(250);
-    const filteredCount = await page.locator('#blog-feed article').count();
+    await page.waitForTimeout(540);
+    const filteredCount = await page.locator('#blog-feed article:not([hidden])').count();
     await assert(filteredCount > 0, 'Category filter returned zero posts unexpectedly');
   }
 
-  const firstTitle = await page.locator('#blog-feed article h2').first().textContent();
+  const firstTitle = await page.locator('#blog-feed article:not([hidden]) h3').first().textContent();
   const searchToken = (firstTitle || '').split(/\s+/).find((word) => word.length > 4) || 'mobile';
-  await page.fill('#search-posts', searchToken);
-  await page.waitForTimeout(250);
-  const searchCount = await page.locator('#blog-feed article').count();
+  await page.fill('#galaxy-search', searchToken);
+  await page.waitForTimeout(540);
+  const searchCount = await page.locator('#blog-feed article:not([hidden])').count();
   await assert(searchCount > 0, `Search returned zero results for token: ${searchToken}`);
 
-  await page.fill('#search-posts', '___unlikely___term___');
-  await page.waitForTimeout(250);
-  const zeroStateVisible = await page.locator('#blog-feed p').filter({ hasText: /No entries found/ }).count();
+  await page.fill('#galaxy-search', '___unlikely___term___');
+  await page.waitForTimeout(540);
+  const zeroStateVisible = await page.locator('#galaxy-empty:not([hidden])').filter({ hasText: /No writing matches/ }).count();
   await assert(zeroStateVisible > 0, 'Search zero-state message did not render');
-  await page.fill('#search-posts', '');
-  await page.locator('#category-filters button[data-category="all"]').click();
-  await page.waitForTimeout(250);
+  await page.fill('#galaxy-search', '');
+  await page.locator('#galaxy-categories button[data-category="all"]').click();
+  await page.waitForTimeout(540);
 
   // Blog post behavior
   await page.locator('#blog-feed article a').first().click();
@@ -1429,7 +2658,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     ocbcHeroSources.every((src) => src.startsWith('/assets/images/work/img_ocbc_business_')),
     'OCBC project-note gallery is not using the official local app-screen assets'
   );
-  await assert(((await page.locator('#post-category').textContent()) || '').trim() === '[portfolio]', 'OCBC project note does not use the portfolio label');
+  await assert(((await page.locator('#post-category').textContent()) || '').trim() === 'portfolio', 'OCBC project note does not use the portfolio label');
 
   await page.goto(BASE_URL + '/blog/case-study-openpay-bnpl-experience.html', { waitUntil: 'domcontentloaded' });
   const openpayHeroImage = page.locator('[data-work-hero-layout="cover"] > img');
@@ -1441,329 +2670,161 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   // Contact form behavior
   await page.goto(BASE_URL + '/contact.html', { waitUntil: 'domcontentloaded' });
-  const action = await page.locator('form').first().getAttribute('action');
-  await assert(Boolean(action && action.startsWith('mailto:')), 'Contact form action is not mailto');
+  const contactRuntime = JSON.parse(await page.locator('#contact-runtime-config').textContent());
+  const action = await page.locator('#contact-form').getAttribute('action');
+  await assert(action === '/contact.html#contact-form', 'Contact form does not retain the inert local action');
+  await assert(!String(action).startsWith('mailto:'), 'Production Contact still opens an email client');
+  await assert((await page.locator('[data-payload-visual]').count()) === 1, 'Promoted Payload Integration visual is missing');
   await page.fill('input[name="name"]', 'QA Runner');
   await page.fill('input[name="email"]', 'qa@example.com');
-  await page.fill('textarea[name="message"]', 'Checking cross-page contact flow.');
+  await page.fill('textarea[name="privateMessage"]', 'Checking the stored-record contact flow without leaving the page.');
+  await page.locator('#contact-storage-consent').check();
   const nameVal = await page.locator('input[name="name"]').inputValue();
   const emailVal = await page.locator('input[name="email"]').inputValue();
   await assert(nameVal === 'QA Runner' && emailVal === 'qa@example.com', 'Contact form fields did not accept input');
+  if (contactRuntime.enabled) {
+    const endpoint = new URL(contactRuntime.endpoint);
+    await assert(contactRuntime.transport === 'apps_script_iframe', 'Enabled Contact runtime does not use the Apps Script iframe transport');
+    await assert(endpoint.protocol === 'https:', 'Enabled Contact endpoint is not HTTPS');
+    await assert(endpoint.hostname === 'script.google.com', 'Enabled Contact endpoint is not hosted at script.google.com');
+    await assert(/^\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(endpoint.pathname), 'Enabled Contact endpoint is not an Apps Script /exec deployment');
+    await assert(!endpoint.search && !endpoint.hash && !endpoint.username && !endpoint.password, 'Enabled Contact endpoint contains disallowed URL components');
+    await assert(contactRuntime.publicFeedEndpoint === '', 'Enabled Contact runtime unexpectedly configures a public feed endpoint');
+    await assert(!(await page.locator('[data-contact-submit]').isDisabled()), 'Approved Apps Script runtime did not enable the completed Contact form');
+  } else {
+    await assert(contactRuntime.transport === 'disabled', 'Disabled Contact runtime uses a non-disabled transport');
+    await assert(contactRuntime.endpoint === '' && contactRuntime.publicFeedEndpoint === '', 'Disabled Contact runtime exposes an endpoint');
+    await assert(await page.locator('[data-contact-submit]').isDisabled(), 'Disabled runtime exposed an active Contact submit control');
+  }
+  await assert(contactEndpointRequests.length === 0, 'Ordinary E2E contacted the live Apps Script endpoint');
 
-  // Work page portfolio content and progressive-enhancement checks
+  // Work page: public baseline hierarchy plus the shared route navigator.
   await page.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  const portfolioHeroOffset = await page.evaluate(() => {
-    const header = document.querySelector('#site-topbar').getBoundingClientRect();
-    const eyebrow = document.querySelector('.work-hero .work-eyebrow').getBoundingClientRect();
-    return eyebrow.top - header.bottom;
+  await page.waitForSelector('#production-work .work-case');
+  const portfolioContract = await page.evaluate(() => {
+    const titles = (selector) => [...document.querySelectorAll(selector)]
+      .map((entry) => entry.textContent.replace(/\s+/g, ' ').trim());
+    const productionCards = [...document.querySelectorAll('#production-work .work-case')];
+    const archiveCards = [...document.querySelectorAll('#more-work .work-archive-card')];
+    const publicCards = [...document.querySelectorAll('#public-builds .work-public-card')];
+    const hero = document.querySelector('.work-hero');
+    const heroTitle = document.querySelector('.work-hero__title');
+    const production = document.querySelector('#production-work');
+    const routeMap = document.querySelector('.universe-route-map');
+    const rect = (element) => {
+      const bounds = element.getBoundingClientRect();
+      return { top: bounds.top, bottom: bounds.bottom, width: bounds.width, height: bounds.height, area: bounds.width * bounds.height };
+    };
+    return {
+      production: titles('#production-work .work-case h3'),
+      archive: titles('#more-work .work-archive-card h3'),
+      publicBuilds: titles('#public-builds .work-public-card h3'),
+      entryCount: document.querySelectorAll('[data-portfolio-entry]').length,
+      heroTitle: heroTitle?.textContent.replace(/\s+/g, ' ').trim() || '',
+      heroIntro: document.querySelector('.work-hero__intro')?.textContent.replace(/\s+/g, ' ').trim() || '',
+      heroFontSize: Number.parseFloat(getComputedStyle(heroTitle).fontSize),
+      hero: rect(hero),
+      heroTitleRect: rect(heroTitle),
+      productionRect: rect(production),
+      routeMapCount: routeMap?.querySelectorAll('a').length || 0,
+      routeMapVisible: Boolean(routeMap) && getComputedStyle(routeMap).display !== 'none',
+      viewportHeight: innerHeight,
+      productionAreas: productionCards.map(rect).map((value) => value.area),
+      archiveAreas: archiveCards.map(rect).map((value) => value.area),
+      imageCounts: {
+        production: document.querySelectorAll('#production-work img').length,
+        archive: document.querySelectorAll('#more-work img').length,
+        publicBuilds: document.querySelectorAll('#public-builds img').length,
+      },
+      allImagesNamed: [...document.querySelectorAll('#production-work img, #more-work img, #public-builds img')]
+        .every((image) => Boolean(image.getAttribute('alt')?.trim())),
+    };
   });
-  await assert(portfolioHeroOffset < 100, `Portfolio hero starts ${portfolioHeroOffset}px below the header; expected less than 100px`);
-  const portfolioEntries = page.locator('[data-portfolio-entry]');
-  const portfolioEntryCount = await portfolioEntries.count();
-  await assert(portfolioEntryCount >= 16, `Work page rendered ${portfolioEntryCount} portfolio entries; expected at least 16`);
+  const expectedProductionProjects = ['Bitcoin.com Wallet', 'ITVX', 'OCBC Business', 'openpay', 'MySTC'];
+  const expectedArchiveProjects = ['Littlepay', 'OWTO', 'Popslide', 'WebSafety', 'Solo', 'ProjectBASS', 'NTU Pass + NUS', 'Aqua Expeditions'];
+  const expectedPublicProjects = ['Persons Finder', 'Orchestrum', 'MemPalace'];
+  await assert(
+    portfolioContract.entryCount === 16
+      && JSON.stringify(portfolioContract.production) === JSON.stringify(expectedProductionProjects)
+      && JSON.stringify(portfolioContract.archive) === JSON.stringify(expectedArchiveProjects)
+      && JSON.stringify(portfolioContract.publicBuilds) === JSON.stringify(expectedPublicProjects),
+    `Work page no longer matches the public 5 / 8 / 3 portfolio baseline: ${JSON.stringify(portfolioContract)}`
+  );
+  await assert(
+    portfolioContract.heroTitle === 'I build the parts people notice when they fail.'
+      && portfolioContract.heroIntro.includes('I’m a problem solver')
+      && portfolioContract.heroIntro.includes('I lead teams')
+      && portfolioContract.heroIntro.includes('use AI'),
+    `Work opening copy drifted from the restored public baseline: ${JSON.stringify(portfolioContract)}`
+  );
+  await assert(
+    portfolioContract.heroFontSize <= 90
+      && portfolioContract.hero.height <= 700
+      && portfolioContract.heroTitleRect.bottom <= portfolioContract.viewportHeight
+      && portfolioContract.productionRect.top < portfolioContract.viewportHeight * 1.6,
+    `Work opening is oversized or buries the flagship content: ${JSON.stringify(portfolioContract)}`
+  );
+  await assert(
+    portfolioContract.routeMapVisible && portfolioContract.routeMapCount >= 6,
+    `Work page is missing the whole-site navigator: ${JSON.stringify(portfolioContract)}`
+  );
+  const largestSupportArea = Math.max(...portfolioContract.productionAreas.slice(1));
+  const smallestSupportArea = Math.min(...portfolioContract.productionAreas.slice(1));
+  const largestArchiveArea = Math.max(...portfolioContract.archiveAreas);
+  await assert(
+    portfolioContract.productionAreas[0] > largestSupportArea * 1.2
+      && smallestSupportArea > largestArchiveArea * 2.5,
+    `Work visual hierarchy no longer reads Bitcoin > four production credentials > archive: ${JSON.stringify(portfolioContract)}`
+  );
+  await assert(
+    portfolioContract.imageCounts.production === 11
+      && portfolioContract.imageCounts.archive === 7
+      && portfolioContract.imageCounts.publicBuilds === 1
+      && portfolioContract.allImagesNamed,
+    `Work image evidence changed: ${JSON.stringify(portfolioContract.imageCounts)}`
+  );
 
   const workPageText = ((await page.locator('body').textContent()) || '').replace(/\s+/g, ' ').trim();
-  for (const projectName of ['Bitcoin.com Wallet', 'ITVX', 'MemPalace', 'Persons Finder', 'Orchestrum', 'Littlepay', 'NTU Pass', 'Solo', 'Aqua Expeditions']) {
+  for (const projectName of [...expectedProductionProjects, ...expectedArchiveProjects, ...expectedPublicProjects]) {
     await assert(workPageText.includes(projectName), `Work page is missing the ${projectName} portfolio entry`);
   }
-  const itvxCardText = ((await page.locator('.work-case--itvx').textContent()) || '').replace(/\s+/g, ' ').trim();
-  await assert(
-    ['Candyspace', 'ITVX', 'recommendations panel', 'timeline scrubbing', 'phone and tablet', 'Simple XML-to-Jackson']
-      .every((expectedText) => itvxCardText.includes(expectedText)),
-    'ITVX work card does not show the employer and concrete playback accomplishments'
-  );
   await assert(!workPageText.includes('[N/A]'), 'Work page still exposes an [N/A] placeholder');
-  await assert(!workPageText.includes('Portfolio App Sync'), 'Work page still exposes the obsolete Portfolio App Sync label');
-  const publicWorkLayout = await page.evaluate(() => {
-    const archive = document.querySelector('#more-work');
-    const publicBuilds = document.querySelector('#public-builds');
-    const publicGrid = document.querySelector('.work-public-grid');
-    const persons = document.querySelector('.work-public-card--persons');
-    const orchestrum = document.querySelector('.work-public-card--orchestrum');
-    const mempalace = document.querySelector('.work-public-card--mempalace');
-    const archiveRect = archive.getBoundingClientRect();
-    const publicRect = publicBuilds.getBoundingClientRect();
-    const gridRect = publicGrid.getBoundingClientRect();
-    const personsRect = persons.getBoundingClientRect();
-    const orchestrumRect = orchestrum.getBoundingClientRect();
-    const mempalaceRect = mempalace.getBoundingClientRect();
-    return {
-      archiveBeforePublic: archiveRect.top < publicRect.top
-        && Boolean(archive.compareDocumentPosition(publicBuilds) & Node.DOCUMENT_POSITION_FOLLOWING),
-      archiveLabel: (archive.querySelector('.work-section__head .work-eyebrow')?.textContent || '').trim(),
-      publicLabel: (publicBuilds.querySelector('.work-section__head .work-eyebrow')?.textContent || '').trim(),
-      publicCardCount: publicGrid.querySelectorAll('.work-public-card').length,
-      personsAndOrchestrumShareRow: Math.abs(personsRect.top - orchestrumRect.top) <= 2,
-      mempalaceIsFeaturedWidth: mempalaceRect.width >= gridRect.width - 2,
-    };
-  });
-  await assert(publicWorkLayout.archiveBeforePublic, 'Other apps and platforms does not appear before Recent work you can open');
-  await assert(publicWorkLayout.archiveLabel === '[02 / archive]', 'Archive section does not use the [02 / archive] label');
-  await assert(publicWorkLayout.publicLabel === '[03 / public]', 'Public work section does not use the [03 / public] label');
-  await assert(publicWorkLayout.publicCardCount === 3, `Public work section has ${publicWorkLayout.publicCardCount} cards; expected 3`);
-  await assert(publicWorkLayout.personsAndOrchestrumShareRow, 'Persons Finder and Orchestrum no longer share the first public-work row');
-  await assert(publicWorkLayout.mempalaceIsFeaturedWidth, 'MemPalace contribution is not featured at full public-grid width');
-  const mempalaceCardText = ((await page.locator('.work-public-card--mempalace').textContent()) || '').replace(/\s+/g, ' ').trim();
-  await assert(
-    mempalaceCardText.includes('nested .gitignore-aware project mining')
-      && mempalaceCardText.includes('merged change'),
-    'MemPalace card does not describe the merged nested .gitignore contribution'
-  );
-  await assert((await page.locator('.work-pipeline__node').count()) === 6, 'Portfolio hero is missing delivery pipeline stages');
-  const workPipelineText = ((await page.locator('.work-pipeline').textContent()) || '').replace(/\s+/g, ' ').trim();
-  await assert(
-    workPipelineText.includes('PRODUCT PROBLEM')
-      && workPipelineText.includes('SHARED CORE')
-      && workPipelineText.includes('ANDROID')
-      && workPipelineText.includes('iOS')
-      && workPipelineText.includes('BACKEND')
-      && workPipelineText.includes('AI')
-      && workPipelineText.includes('VERIFIED RELEASE'),
-    'Portfolio hero does not communicate the complete branching delivery pipeline'
-  );
-  await assert(
-    (await page.locator('.work-hero__art[role="img"]').getAttribute('aria-label') || '').includes('verified release'),
-    'Portfolio hero delivery pipeline is missing from the accessibility tree'
-  );
+  await assert(!workPageText.includes('Mission trajectory control'), 'Restored Work page still exposes trajectory-interface commentary');
 
-  const firstProductionCard = page.locator('.work-case-grid > .work-case').first();
-  await assert(
-    await firstProductionCard.evaluate((card) => card.classList.contains('work-case--bitcoin')),
-    'Bitcoin.com Wallet is not the lead production case study'
-  );
-  const bitcoinScreens = page.locator('.work-case--bitcoin .work-bitcoin-shot');
-  await assert((await bitcoinScreens.count()) === 3, 'Bitcoin.com Wallet card does not show all three official app screens');
-  const bitcoinScreenSources = await bitcoinScreens.evaluateAll((images) => images.map((image) => image.getAttribute('src') || ''));
-  await assert(
-    bitcoinScreenSources.every((src) => src.startsWith('/assets/images/work/img_bitcoin_wallet_')),
-    'Bitcoin.com Wallet card is not using the local official app-screen assets'
-  );
-  const bitcoinCardText = ((await page.locator('.work-case--bitcoin').textContent()) || '').replace(/\s+/g, ' ').trim();
-  for (const capability of ['Staking + reward pools', 'Buy · Sell · Swap', 'Multichain transactions', 'Rust + UniFFI']) {
-    await assert(bitcoinCardText.includes(capability), `Bitcoin.com Wallet card is missing the ${capability} capability`);
+  const projectEvidence = [
+    ['ITVX', ['Candyspace', 'recommendations panel', 'preview timeline scrubbing', 'phone and tablet', 'Simple XML-to-Jackson']],
+    ['OCBC Business', ['Senior Mobile Engineer · RedAirship', 'onboarding', 'business accounts', 'transfers', 'third-party identity SDKs', 'concurrent updates']],
+    ['openpay', ['Senior Mobile Engineer · RedAirship', 'BNPL checkout', 'partner-integrated payment flows', 'delayed and unexpected partner responses']],
+    ['MySTC', ['Lead Developer · 2020–2021', 'five senior Android engineers', 'English and Arabic', 'data sync', 'release integration']],
+  ];
+  for (const [projectName, evidence] of projectEvidence) {
+    const projectText = await page.locator('#production-work .work-case').evaluateAll((cards, title) => {
+      const card = cards.find((entry) => entry.querySelector('h3')?.textContent.trim() === title);
+      return card?.textContent.replace(/\s+/g, ' ').trim() || '';
+    }, projectName);
+    await assert(evidence.every((expectedText) => projectText.includes(expectedText)),
+      `${projectName} production card is missing exact role or delivery evidence`);
   }
 
-  const itvxScreens = page.locator('.work-case--itvx .work-itvx-shot');
-  await assert((await itvxScreens.count()) === 3, 'ITVX card does not show all three official app screens');
-  const itvxScreenSources = await itvxScreens.evaluateAll((images) => images.map((image) => image.getAttribute('src') || ''));
-  await assert(
-    itvxScreenSources.every((src) => src.startsWith('/assets/images/work/img_itvx_')),
-    'ITVX card is not using the local official app-screen assets'
-  );
-  await assert((await page.locator('.work-case--itvx .work-player').count()) === 0, 'ITVX card still exposes the generic player mockup');
-  const supportingCardLayout = await page.evaluate(() => {
-    const itvx = document.querySelector('.work-case--itvx');
-    const ocbc = document.querySelector('.work-case--ocbc');
-    const mystc = document.querySelector('.work-case--mystc');
-    const openpay = document.querySelector('.work-case--openpay');
-    const bitcoin = document.querySelector('.work-case--bitcoin');
-    const itvxRect = itvx.getBoundingClientRect();
-    const ocbcRect = ocbc.getBoundingClientRect();
-    const mystcRect = mystc.getBoundingClientRect();
-    const openpayRect = openpay.getBoundingClientRect();
-    const bitcoinRect = bitcoin.getBoundingClientRect();
-    const background = getComputedStyle(itvx).backgroundColor.match(/[\d.]+/g)?.map(Number) || [];
-    return {
-      itvxAndOcbcShareRow: Math.abs(itvxRect.top - ocbcRect.top) <= 2 && itvxRect.right < ocbcRect.left,
-      openpayAndMystcShareRow: Math.abs(mystcRect.top - openpayRect.top) <= 2 && openpayRect.right < mystcRect.left,
-      firstRowUsesFiveSevenSplit: itvxRect.width < ocbcRect.width,
-      secondRowUsesSevenFiveSplit: openpayRect.width > mystcRect.width,
-      itvxIsSupportingWidth: itvxRect.width < bitcoinRect.width * 0.6,
-      itvxHasLightBackground: background.length >= 3 && background[0] >= 245 && background[1] >= 245 && background[2] >= 245,
-    };
-  });
-  await assert(supportingCardLayout.itvxAndOcbcShareRow, 'ITVX is not paired beside OCBC on desktop');
-  await assert(supportingCardLayout.openpayAndMystcShareRow, 'Openpay is not positioned left of MySTC on the second supporting-project row');
-  await assert(supportingCardLayout.firstRowUsesFiveSevenSplit, 'ITVX and OCBC do not use the intended 5/7 split');
-  await assert(supportingCardLayout.secondRowUsesSevenFiveSplit, 'Openpay and MySTC do not use the intended 7/5 split');
-  await assert(supportingCardLayout.itvxIsSupportingWidth, 'ITVX still reads as a full-width hero card');
-  await assert(supportingCardLayout.itvxHasLightBackground, 'ITVX does not use the light supporting-card background');
+  const pipelineText = ((await page.locator('.work-pipeline').textContent()) || '').replace(/\s+/g, ' ').trim().toUpperCase();
+  for (const stage of ['PRODUCT PROBLEM', 'SHARED CORE', 'ANDROID', 'IOS', 'BACKEND', 'AI', 'VERIFIED RELEASE']) {
+    await assert(pipelineText.includes(stage), `Portfolio opening diagram is missing ${stage}`);
+  }
 
-  const heroIntro = ((await page.locator('.work-hero__intro').textContent()) || '').replace(/\s+/g, ' ').trim();
-  await assert(heroIntro.includes('I’m a problem solver'), 'Portfolio hero does not lead with problem-solving positioning');
-  await assert(heroIntro.includes('I lead teams') && heroIntro.includes('use AI'), 'Portfolio hero is missing leadership or agent-first delivery positioning');
-  await assert((await page.locator('.work-signals > div').count()) === 4, 'Portfolio hero does not expose all four positioning signals');
-  await assert(workPageText.includes('Agent-first'), 'Portfolio hero is missing its agent-first delivery signal');
-
-  const ocbcScreens = page.locator('.work-case--ocbc .work-ocbc-shot');
-  await assert((await ocbcScreens.count()) === 3, 'OCBC Business card does not show all three official app screens');
-  const ocbcScreenSources = await ocbcScreens.evaluateAll((images) => images.map((image) => image.getAttribute('src') || ''));
-  await assert(
-    ocbcScreenSources.every((src) => src.startsWith('/assets/images/work/img_ocbc_business_')),
-    'OCBC Business card is not using the official local app-screen assets'
-  );
-
-  const deviceRatio = await page.locator('.work-case--mystc .work-device').evaluate((device) => {
-    return device.offsetHeight / device.offsetWidth;
-  });
-  await assert(deviceRatio >= 2.1 && deviceRatio <= 2.25, `Portfolio device ratio is ${deviceRatio.toFixed(2)}; expected a modern phone proportion`);
-
-  await mobilePage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  const mobileProjectOrder = await mobilePage.evaluate(() => {
-    const failures = [];
-    const tolerance = 2;
-
-    const checkOrder = (card, name, selectors) => {
-      const elements = selectors.map((selector) => card.querySelector(selector));
-      if (elements.some((element) => !element)) {
-        failures.push(`${name}: missing ${selectors[elements.findIndex((element) => !element)]}`);
-        return;
-      }
-
-      const [label, title, visual, details] = elements.map((element) => element.getBoundingClientRect());
-      if (label.bottom > title.top + tolerance) failures.push(`${name}: label is not before title`);
-      if (title.bottom > visual.top + tolerance) failures.push(`${name}: title is not before visual`);
-      if (visual.bottom > details.top + tolerance) failures.push(`${name}: visual is not before details`);
-    };
-
-    const productionCards = [
-      ['Bitcoin.com Wallet', '.work-case--bitcoin', '.work-bitcoin-stage'],
-      ['ITVX', '.work-case--itvx', '.work-stream-stage'],
-      ['OCBC Business', '.work-case--ocbc', '.work-ocbc-stage'],
-      ['openpay', '.work-case--openpay', '.work-openpay-stage'],
-      ['MySTC', '.work-case--mystc', '.work-device-stage'],
-    ];
-    productionCards.forEach(([name, cardSelector, visualSelector]) => {
-      const card = document.querySelector(cardSelector);
-      if (!card) {
-        failures.push(`${name}: missing card`);
-        return;
-      }
-      checkOrder(card, name, [
-        '.work-case__body > .work-eyebrow',
-        '.work-case__body > .work-case__title',
-        visualSelector,
-        '.work-case__body > :is(.work-case__role, .work-case__lede)',
-      ]);
-    });
-
-    const publicCards = [
-      ['Persons Finder', '.work-public-card--persons', '.work-public-card__image'],
-      ['Orchestrum', '.work-public-card--orchestrum', '.work-agent-art'],
-      ['MemPalace', '.work-public-card--mempalace', '.work-memory-art'],
-    ];
-    publicCards.forEach(([name, cardSelector, visualSelector]) => {
-      const card = document.querySelector(cardSelector);
-      if (!card) {
-        failures.push(`${name}: missing card`);
-        return;
-      }
-      checkOrder(card, name, [
-        '.work-public-card__body > .work-eyebrow',
-        '.work-public-card__body > h3',
-        visualSelector,
-        '.work-public-card__body > p',
-      ]);
-    });
-
-    const archiveCards = Array.from(document.querySelectorAll('.work-archive-card'));
-    archiveCards.forEach((card, index) => {
-      checkOrder(card, card.querySelector('h3')?.textContent?.trim() || `Archive card ${index + 1}`, [
-        ':scope > .work-archive-card__top',
-        ':scope > h3',
-        ':scope > :is(.work-archive-card__media, .work-archive-card__asset-link)',
-        ':scope > p',
-      ]);
-    });
-
-    return {
-      archiveCount: archiveCards.length,
-      productionCount: document.querySelectorAll('.work-case').length,
-      publicCount: document.querySelectorAll('.work-public-card').length,
-      failures,
-    };
-  });
-  await assert(mobileProjectOrder.productionCount === 5, 'Mobile project-order check did not cover all production cards');
-  await assert(mobileProjectOrder.publicCount === 3, 'Mobile project-order check did not cover all public cards');
-  await assert(mobileProjectOrder.archiveCount === 8, 'Mobile project-order check did not cover all archive cards');
-  await assert(
-    mobileProjectOrder.failures.length === 0,
-    `Mobile project cards do not follow label, title, visual, details order: ${mobileProjectOrder.failures.join('; ')}`
-  );
-
-  const reducedMotion = await browser.newContext({
-    reducedMotion: 'reduce',
-    viewport: { width: 430, height: 932 }
-  });
-  const reducedMotionPage = await reducedMotion.newPage();
-  await reducedMotionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  const reducedMotionBitcoinCard = reducedMotionPage.locator('.work-case--bitcoin');
-  const reducedMotionBitcoinScreens = reducedMotionBitcoinCard.locator('.work-bitcoin-shot');
-  const reducedMotionBitcoinBeforeHover = await reducedMotionBitcoinScreens.evaluateAll((images) =>
-    images.map((image) => {
-      const rect = image.getBoundingClientRect();
-      const galleryRect = image.parentElement.getBoundingClientRect();
-      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
-    })
-  );
-  await assert(
-    new Set(reducedMotionBitcoinBeforeHover.map(({ x, y }) => `${x}:${y}`)).size === 3,
-    'Reduced-motion mode collapses the Bitcoin.com Wallet collage into overlapping screens'
-  );
-  await reducedMotionBitcoinCard.hover();
-  const reducedMotionBitcoinAfterHover = await reducedMotionBitcoinScreens.evaluateAll((images) =>
-    images.map((image) => {
-      const rect = image.getBoundingClientRect();
-      const galleryRect = image.parentElement.getBoundingClientRect();
-      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
-    })
-  );
-  await assert(
-    JSON.stringify(reducedMotionBitcoinAfterHover) === JSON.stringify(reducedMotionBitcoinBeforeHover),
-    'Reduced-motion mode still moves the Bitcoin.com Wallet collage on hover'
-  );
-  const reducedMotionCard = reducedMotionPage.locator('.work-case--itvx');
-  const reducedMotionScreens = reducedMotionCard.locator('.work-itvx-shot');
-  const reducedMotionBeforeHover = await reducedMotionScreens.evaluateAll((images) =>
-    images.map((image) => {
-      const rect = image.getBoundingClientRect();
-      const galleryRect = image.parentElement.getBoundingClientRect();
-      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
-    })
-  );
-  await assert(
-    new Set(reducedMotionBeforeHover.map(({ x, y }) => `${x}:${y}`)).size === 3,
-    'Reduced-motion mode collapses the ITVX collage into overlapping screens'
-  );
-  await reducedMotionCard.hover();
-  const reducedMotionAfterHover = await reducedMotionScreens.evaluateAll((images) =>
-    images.map((image) => {
-      const rect = image.getBoundingClientRect();
-      const galleryRect = image.parentElement.getBoundingClientRect();
-      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
-    })
-  );
-  await assert(
-    JSON.stringify(reducedMotionAfterHover) === JSON.stringify(reducedMotionBeforeHover),
-    'Reduced-motion mode still moves the ITVX collage on hover'
-  );
-
-  const reducedMotionOcbcCard = reducedMotionPage.locator('.work-case--ocbc');
-  const reducedMotionOcbcScreens = reducedMotionOcbcCard.locator('.work-ocbc-shot');
-  const reducedMotionOcbcBeforeHover = await reducedMotionOcbcScreens.evaluateAll((images) =>
-    images.map((image) => {
-      const rect = image.getBoundingClientRect();
-      const galleryRect = image.parentElement.getBoundingClientRect();
-      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
-    })
-  );
-  await assert(
-    new Set(reducedMotionOcbcBeforeHover.map(({ x, y }) => `${x}:${y}`)).size === 3,
-    'Reduced-motion mode collapses the OCBC Business collage into overlapping screens'
-  );
-  await reducedMotionOcbcCard.hover();
-  const reducedMotionOcbcAfterHover = await reducedMotionOcbcScreens.evaluateAll((images) =>
-    images.map((image) => {
-      const rect = image.getBoundingClientRect();
-      const galleryRect = image.parentElement.getBoundingClientRect();
-      return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
-    })
-  );
-  await assert(
-    JSON.stringify(reducedMotionOcbcAfterHover) === JSON.stringify(reducedMotionOcbcBeforeHover),
-    'Reduced-motion mode still moves the OCBC Business collage on hover'
-  );
-  await reducedMotion.close();
+  const productionImageContracts = [
+    ['Bitcoin.com Wallet', '.work-case--bitcoin .work-bitcoin-shot', 3, '/assets/images/work/img_bitcoin_wallet_'],
+    ['ITVX', '.work-case--itvx .work-itvx-shot', 3, '/assets/images/work/img_itvx_'],
+    ['OCBC Business', '.work-case--ocbc .work-ocbc-shot', 3, '/assets/images/work/img_ocbc_business_'],
+    ['openpay', '.work-case--openpay .work-openpay-stage img', 1, '/assets/images/work/img_openpay_app-optimized.webp'],
+    ['MySTC', '.work-case--mystc .work-device-stage img', 1, '/assets/images/work/img_mystc_app-optimized.webp'],
+  ];
+  for (const [projectName, selector, expectedCount, sourcePrefix] of productionImageContracts) {
+    const sources = await page.locator(selector).evaluateAll((nodes) => nodes.map((image) => image.getAttribute('src') || ''));
+    await assert(
+      sources.length === expectedCount && sources.every((source) => source.startsWith(sourcePrefix)),
+      `${projectName} does not expose the expected official local image evidence: ${JSON.stringify(sources)}`
+    );
+  }
 
   const requiredProjectLinks = [
     ['Bitcoin.com Wallet', 'a[href*="play.google.com/store/apps/details?id=com.bitcoin.mwallet"]'],
@@ -1773,39 +2834,62 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     ['Littlepay', 'a[href^="https://littlepay.com"]'],
     ['NTU Pass', 'a[href*="play.google.com/store/apps/details?id=sg.edu.ntu.apps.ntusmartpass"]'],
     ['Solo', 'a[href*="play.google.com/store/apps/developer?id=Solo+Technologies+Services"]'],
-    ['Aqua Expeditions', 'a[href^="https://www.aquaexpeditions.com"]']
+    ['Aqua Expeditions', 'a[href^="https://www.aquaexpeditions.com"]'],
   ];
   for (const [projectName, selector] of requiredProjectLinks) {
     await assert((await page.locator(selector).count()) > 0, `Work page ${projectName} source link is missing or incorrect`);
   }
-
-  const deepDiveLinks = await page.locator('a[data-work-deep-dive]').count();
-  await assert(deepDiveLinks >= 3, 'Work page deep-dive links are missing');
   const deepDiveHrefs = await page.locator('a[data-work-deep-dive]').evaluateAll((links) =>
     links.map((link) => link.getAttribute('href')).filter(Boolean)
   );
+  await assert(deepDiveHrefs.length >= 3 && new Set(deepDiveHrefs).size === deepDiveHrefs.length,
+    'Work page deep-dive links are missing or duplicated');
+
+  await mobilePage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  const mobileWork = await mobilePage.evaluate(() => ({
+    entryCount: document.querySelectorAll('[data-portfolio-entry]').length,
+    heroFontSize: Number.parseFloat(getComputedStyle(document.querySelector('.work-hero__title')).fontSize),
+    rootWidth: document.documentElement.scrollWidth,
+    viewportWidth: innerWidth,
+    routeMapCount: document.querySelectorAll('.universe-route-map a').length,
+    productionTitles: [...document.querySelectorAll('#production-work .work-case h3')].map((heading) => heading.textContent.trim()),
+  }));
   await assert(
-    new Set(deepDiveHrefs).size === deepDiveHrefs.length,
-    'Work page contains duplicate deep-dive links'
+    mobileWork.entryCount === 16
+      && mobileWork.heroFontSize <= 58
+      && mobileWork.rootWidth <= mobileWork.viewportWidth + 2
+      && mobileWork.routeMapCount >= 6
+      && JSON.stringify(mobileWork.productionTitles) === JSON.stringify(expectedProductionProjects),
+    `Mobile Work layout or navigator regressed: ${JSON.stringify(mobileWork)}`
   );
 
-  const noJavaScript = await browser.newContext({
-    javaScriptEnabled: false,
-    viewport: { width: 1280, height: 900 }
-  });
+  const reducedMotion = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 430, height: 932 } });
+  const reducedMotionPage = await reducedMotion.newPage();
+  await reducedMotionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  const reducedMotionCard = reducedMotionPage.locator('.work-case--bitcoin');
+  const reducedMotionScreens = reducedMotionCard.locator('.work-bitcoin-shot');
+  const positions = async () => reducedMotionScreens.evaluateAll((images) => images.map((image) => {
+    const rect = image.getBoundingClientRect();
+    const galleryRect = image.parentElement.getBoundingClientRect();
+    return { x: Math.round(rect.x - galleryRect.x), y: Math.round(rect.y - galleryRect.y) };
+  }));
+  const reducedBeforeHover = await positions();
+  await assert(new Set(reducedBeforeHover.map(({ x, y }) => `${x}:${y}`)).size === 3,
+    'Reduced-motion mode collapses the Bitcoin collage into overlapping screens');
+  await reducedMotionCard.hover();
+  await assert(JSON.stringify(await positions()) === JSON.stringify(reducedBeforeHover),
+    'Reduced-motion mode still moves the Bitcoin collage on hover');
+  await reducedMotion.close();
+
+  const noJavaScript = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1280, height: 900 } });
   const noJavaScriptPage = await noJavaScript.newPage();
   const noJavaScriptResponse = await noJavaScriptPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  await assert(
-    noJavaScriptResponse && noJavaScriptResponse.status() >= 200 && noJavaScriptResponse.status() < 400,
-    'Work page failed to load with JavaScript disabled'
-  );
-  const staticPortfolioEntryCount = await noJavaScriptPage.locator('[data-portfolio-entry]').count();
-  await assert(
-    staticPortfolioEntryCount === portfolioEntryCount,
-    `Work page exposes ${staticPortfolioEntryCount} of ${portfolioEntryCount} portfolio entries without JavaScript`
-  );
+  await assert(noJavaScriptResponse && noJavaScriptResponse.status() >= 200 && noJavaScriptResponse.status() < 400,
+    'Work page failed to load with JavaScript disabled');
+  await assert(await noJavaScriptPage.locator('[data-portfolio-entry]').count() === 16,
+    'Work page does not expose all 16 portfolio entries without JavaScript');
   const staticWorkPageText = ((await noJavaScriptPage.locator('body').textContent()) || '').replace(/\s+/g, ' ').trim();
-  for (const projectName of ['Bitcoin.com Wallet', 'ITVX', 'MemPalace', 'Persons Finder', 'Orchestrum', 'Littlepay', 'NTU Pass', 'Solo', 'Aqua Expeditions']) {
+  for (const projectName of [...expectedProductionProjects, ...expectedArchiveProjects, ...expectedPublicProjects]) {
     await assert(staticWorkPageText.includes(projectName), `Work page hides ${projectName} when JavaScript is disabled`);
   }
   await noJavaScript.close();

@@ -1,0 +1,197 @@
+:root {
+  color-scheme: light;
+  --paper: #faf9f3;
+  --paper-blue: #f2f7fa;
+  --ink: #262c30;
+  --muted: #657078;
+  --blue: #185ea8;
+  --blue-bright: #2a83d3;
+  --line: rgba(38, 44, 48, .16);
+  --line-blue: rgba(24, 94, 168, .28);
+  font-family: "Manrope", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { max-width: 100%; overflow-x: clip; scroll-behavior: smooth; }
+body { max-width: 100%; margin: 0; overflow-x: clip; color: var(--ink); background: var(--paper); }
+a { color: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; }
+.skip-link { position: fixed; z-index: 200; top: .65rem; left: .65rem; padding: .7rem .9rem; color: white; background: var(--ink); transform: translateY(-180%); }
+.skip-link:focus { transform: none; }
+.site-head { position: fixed; z-index: 100; inset: 0 0 auto; height: 4rem; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; padding: 0 clamp(1.1rem, 3vw, 3.5rem); background: rgba(250,249,243,.88); backdrop-filter: blur(16px); font: 600 .63rem/1.2 "Space Grotesk", monospace; letter-spacing: .1em; text-transform: uppercase; }
+.site-head::after { content: ""; position: absolute; inset: auto 3vw 0; height: 1px; background: linear-gradient(90deg, transparent, var(--line), transparent); }
+.site-head a { text-decoration: none; }
+.site-head__brand { font-size: .78rem; letter-spacing: .04em; }
+.site-head nav { display: flex; gap: clamp(.8rem, 2vw, 2rem); color: var(--muted); }
+.site-head nav a:hover, .site-head nav a:focus-visible { color: var(--blue); }
+.site-head > span { justify-self: end; color: var(--blue); }
+.signal { margin: 0 0 1rem; color: var(--blue); font: 600 .66rem/1.3 "Space Grotesk", monospace; letter-spacing: .16em; text-transform: uppercase; }
+
+.shipyard { min-height: max(100svh, 840px); position: relative; display: grid; grid-template: auto minmax(31rem, 1fr) auto / minmax(19rem, .72fr) minmax(34rem, 1.28fr); gap: clamp(1.2rem, 2.4vw, 3rem) clamp(1.4rem, 3.8vw, 4.5rem); padding: clamp(6.5rem, 10vh, 8rem) clamp(1.2rem, 3vw, 3.5rem) clamp(2rem, 4vh, 3rem); background:
+  radial-gradient(ellipse at 76% 46%, rgba(24,94,168,.075), transparent 35%),
+  linear-gradient(90deg, transparent 49.94%, rgba(24,94,168,.06) 50%, transparent 50.06%),
+  var(--paper);
+}
+.shipyard::before, .shipyard::after { content: ""; position: absolute; pointer-events: none; border: 1px solid rgba(24,94,168,.12); border-radius: 50%; transform: rotate(-10deg); }
+.shipyard::before { width: 44vw; height: 17vw; right: -9vw; top: 21vh; }
+.shipyard::after { width: 27vw; height: 8vw; left: -6vw; bottom: 9vh; transform: rotate(16deg); }
+.shipyard__intro { align-self: start; position: relative; z-index: 2; }
+.shipyard__intro h1 { margin: 0; max-width: 11ch; font: 500 clamp(2.7rem, 4.8vw, 5.3rem)/.88 "Space Grotesk", sans-serif; letter-spacing: -.065em; }
+.shipyard__intro h1 em { color: var(--blue); font-style: normal; }
+.shipyard__intro > p:last-child { max-width: 570px; margin: 1.1rem 0 0; color: var(--muted); font-size: clamp(.9rem, 1.1vw, 1.08rem); line-height: 1.55; }
+.shipyard__routing { align-self: start; justify-self: stretch; display: grid; grid-template-columns: auto 1fr; gap: .8rem 1.4rem; align-items: center; padding-top: .2rem; position: relative; z-index: 3; }
+.shipyard__routing > p:first-child { margin: 0; color: var(--muted); font: 600 .62rem/1.3 "Space Grotesk", monospace; letter-spacing: .12em; text-transform: uppercase; }
+.capability-router { display: flex; flex-wrap: wrap; gap: .3rem 1rem; }
+.capability-router button { border: 0; border-bottom: 1px solid transparent; padding: .2rem 0; color: var(--muted); background: transparent; cursor: pointer; font: 600 .65rem/1.2 "Space Grotesk", monospace; letter-spacing: .08em; text-transform: uppercase; }
+.capability-router button:hover, .capability-router button:focus-visible, .capability-router button[aria-pressed="true"] { color: var(--blue); border-color: currentColor; }
+.route-status { grid-column: 1 / -1; min-height: 1em; margin: 0; color: var(--blue); font: 500 .61rem/1.3 "Space Grotesk", monospace; letter-spacing: .08em; text-transform: uppercase; }
+
+.dock-field { position: relative; min-height: 31rem; align-self: stretch; isolation: isolate; }
+.dock-field::before { content: "PRODUCTION DOCKS"; position: absolute; left: 0; bottom: 1rem; color: rgba(38,44,48,.28); font: 600 .56rem/1 "Space Grotesk", monospace; letter-spacing: .22em; writing-mode: vertical-rl; transform: rotate(180deg); }
+.dock-field__axis { position: absolute; top: 2%; bottom: 2%; left: 51%; width: 1px; background: linear-gradient(transparent, var(--line-blue) 12%, var(--line-blue) 88%, transparent); }
+.dock-field__axis::before, .dock-field__axis::after { content: ""; position: absolute; left: 50%; width: .45rem; aspect-ratio: 1; border: 1px solid var(--blue); border-radius: 50%; background: var(--paper); transform: translateX(-50%); }
+.dock-field__axis::before { top: 8%; }.dock-field__axis::after { bottom: 8%; }
+.docked-vessel { --shift: 0px; position: absolute; z-index: 1; width: min(78%, 29rem); height: clamp(4rem, 8.2vh, 5.4rem); display: grid; grid-template-columns: 3.3rem 1fr auto; grid-template-rows: 1fr 1fr; align-items: end; column-gap: .8rem; padding: .8rem 2.5rem .7rem 1rem; border: 1px solid var(--line-blue); border-radius: 999px 18% 18% 999px; background: rgba(255,255,255,.42); text-decoration: none; transform: translateX(var(--shift)); transform-origin: center; transition: transform .48s cubic-bezier(.2,.75,.2,1), border-color .25s, background .25s, opacity .25s;
+}
+.docked-vessel::before { content: ""; position: absolute; top: 50%; right: -18%; width: 18%; height: 1px; background: var(--line-blue); }
+.docked-vessel::after { content: ""; position: absolute; top: calc(50% - .25rem); right: -.3rem; width: .5rem; aspect-ratio: 1; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 .45rem rgba(24,94,168,.08); }
+.docked-vessel__index { grid-row: 1 / -1; align-self: center; color: var(--blue); font: 600 .58rem/1 "Space Grotesk", monospace; letter-spacing: .08em; }
+.docked-vessel strong { align-self: end; font: 600 clamp(.8rem, 1.15vw, 1rem)/1.15 "Space Grotesk", sans-serif; letter-spacing: -.02em; }
+.docked-vessel small { grid-column: 2; align-self: start; color: var(--muted); font: 500 .57rem/1.4 "Space Grotesk", monospace; letter-spacing: .08em; text-transform: uppercase; }
+.docked-vessel i { grid-row: 1 / -1; align-self: center; width: 1.4rem; height: .55rem; border: 1px solid var(--line-blue); border-radius: 999px; }
+.docked-vessel--01 { top: 3%; left: 3%; }.docked-vessel--02 { top: 22%; left: 12%; }.docked-vessel--03 { top: 41%; left: 5%; }.docked-vessel--04 { top: 60%; left: 15%; }.docked-vessel--05 { top: 79%; left: 7%; }
+.docked-vessel:hover, .docked-vessel:focus-visible { --shift: .65rem; border-color: var(--blue); outline: none; }
+.docked-vessel.is-active { --shift: clamp(.8rem, 3.2vw, 3.6rem); z-index: 3; border-color: var(--blue); background: white; box-shadow: 0 1.5rem 3rem rgba(27,66,101,.08); }
+.docked-vessel.is-match { border-color: var(--blue-bright); background: rgba(227,241,250,.72); }
+.dock-field.has-route .docked-vessel:not(.is-match) { opacity: .28; }
+
+.inspection-berth { min-width: 0; position: relative; display: grid; grid-template-rows: auto 1fr auto; padding-left: clamp(1rem, 2.8vw, 3rem); align-self: stretch; }
+.inspection-berth::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 1px; background: linear-gradient(transparent, var(--line-blue) 8%, var(--line-blue) 92%, transparent); }
+.inspection-berth__head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: .2rem 1rem; padding-bottom: .6rem; }
+.inspection-berth__head .signal { grid-column: 1 / -1; margin-bottom: .1rem; }
+.inspection-berth__head h2 { margin: 0; font: 500 clamp(1.25rem, 2vw, 2rem)/1 "Space Grotesk", sans-serif; letter-spacing: -.04em; }
+.inspection-berth__head > span { color: var(--muted); font: 600 .58rem/1.2 "Space Grotesk", monospace; letter-spacing: .1em; text-transform: uppercase; }
+.js .vessel-details:not(.is-active) { display: none; }
+.vessel-details { min-width: 0; display: grid; grid-template-columns: minmax(17rem, .82fr) minmax(21rem, 1.18fr); gap: clamp(1rem, 2.6vw, 3.1rem); align-items: center; animation: berth-open .55s cubic-bezier(.2,.75,.2,1) both; }
+.vessel-details + .vessel-details { margin-top: 4rem; padding-top: 4rem; border-top: 1px solid var(--line); }
+.js .vessel-details + .vessel-details { margin-top: 0; padding-top: 0; border: 0; }
+@keyframes berth-open { from { opacity: 0; transform: translateX(1.2rem); } to { opacity: 1; transform: none; } }
+.vessel-details__domain { margin: 0 0 .7rem; color: var(--blue); font: 600 .61rem/1.3 "Space Grotesk", monospace; letter-spacing: .11em; text-transform: uppercase; }
+.vessel-details h3 { margin: 0 0 1rem; font: 500 clamp(2rem, 3.8vw, 4.4rem)/.9 "Space Grotesk", sans-serif; letter-spacing: -.06em; }
+.vessel-details__copy > p { color: var(--muted); font-size: clamp(.76rem, .92vw, .95rem); line-height: 1.55; }
+.vessel-details__copy .vessel-details__lead { color: var(--ink); font-size: clamp(.88rem, 1.15vw, 1.08rem); }
+.vessel-details__systems { padding-top: .7rem; border-top: 1px solid var(--line); font: 600 .61rem/1.6 "Space Grotesk", monospace !important; letter-spacing: .07em; text-transform: uppercase; }
+.vessel-details__evidence { display: flex; flex-wrap: wrap; gap: .9rem; }
+.vessel-details__evidence a { color: var(--blue); text-decoration-thickness: 1px; text-underline-offset: .28rem; }
+.inspection-surface { min-width: 0; height: clamp(21rem, 47vh, 31rem); margin: 0; position: relative; display: flex; align-items: center; justify-content: center; gap: clamp(.4rem, 1vw, 1rem); }
+.inspection-surface::before, .inspection-surface::after { content: ""; position: absolute; inset: 12% 0; border-top: 1px solid var(--line-blue); border-bottom: 1px solid var(--line-blue); pointer-events: none; }
+.inspection-surface::after { inset: 0 14%; border: 0; border-left: 1px solid var(--line-blue); border-right: 1px solid var(--line-blue); }
+.inspection-surface img { position: relative; z-index: 1; max-width: 31%; max-height: 90%; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 1.5rem 1.3rem rgba(31,53,74,.12)); }
+.inspection-surface--phones img:nth-of-type(1) { transform: translateY(4%); }.inspection-surface--phones img:nth-of-type(2) { transform: translateY(-3%); }.inspection-surface--phones img:nth-of-type(3) { transform: translateY(7%); }
+.inspection-surface--wide img { max-width: 100%; max-height: 82%; }.inspection-surface--single img { max-width: 45%; max-height: 92%; }
+.inspection-surface figcaption { position: absolute; z-index: 2; right: 0; bottom: 0; color: var(--muted); font: 500 .55rem/1.2 "Space Grotesk", monospace; letter-spacing: .1em; text-transform: uppercase; }
+.inspection-berth__pager { display: flex; justify-content: space-between; padding-top: .5rem; }
+.inspection-berth__pager button { border: 0; padding: .4rem 0; color: var(--blue); background: transparent; cursor: pointer; font: 600 .62rem/1.2 "Space Grotesk", monospace; letter-spacing: .08em; text-transform: uppercase; }
+.inspection-berth__pager button:hover, .inspection-berth__pager button:focus-visible { color: var(--ink); }
+.shipyard__continue { grid-column: 1 / -1; justify-self: end; color: var(--blue); font: 600 .63rem/1.3 "Space Grotesk", monospace; letter-spacing: .11em; text-transform: uppercase; text-decoration: none; }
+
+.support-zone, .probe-zone { position: relative; padding: clamp(7rem, 14vh, 11rem) clamp(1.2rem, 6vw, 6rem); }
+.support-zone { background: #f4f6f2; }
+.zone-intro { min-height: 70svh; display: grid; align-content: center; max-width: 1060px; }
+.zone-intro h2 { margin: 0; font: 500 clamp(3.4rem, 8vw, 8.6rem)/.85 "Space Grotesk", sans-serif; letter-spacing: -.075em; }
+.zone-intro > p:last-child { max-width: 620px; margin: 2rem 0 0 auto; color: var(--muted); font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.65; }
+.support-rail { position: relative; max-width: 1300px; margin: 0 auto; }
+.support-rail::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: linear-gradient(transparent, var(--line-blue) 4%, var(--line-blue) 96%, transparent); }
+.support-craft { min-height: 64svh; position: relative; display: grid; grid-template-columns: minmax(6rem,.25fr) minmax(18rem,.85fr) minmax(14rem,.7fr); gap: clamp(1.2rem, 4vw, 5rem); align-items: center; }
+.support-craft--reverse { grid-template-columns: minmax(14rem,.7fr) minmax(18rem,.85fr) minmax(6rem,.25fr); }
+.support-craft--reverse .support-craft__marker { grid-column: 3; }.support-craft--reverse .support-craft__copy { grid-column: 2; grid-row: 1; }.support-craft--reverse img { grid-column: 1; grid-row: 1; }
+.support-craft__marker { position: relative; align-self: center; display: grid; justify-items: center; gap: .65rem; }
+.support-craft__marker::after { content: ""; width: min(11vw, 8rem); height: 1px; position: absolute; left: 66%; top: 50%; background: var(--line-blue); }
+.support-craft--reverse .support-craft__marker::after { left: auto; right: 66%; }
+.support-craft__marker span { color: var(--blue); font: 600 .6rem/1 "Space Grotesk", monospace; letter-spacing: .1em; }
+.support-craft__marker strong { width: clamp(4rem, 7vw, 6.5rem); aspect-ratio: 1.8; display: grid; place-items: center; border: 1px solid var(--line-blue); border-radius: 999px; color: var(--blue); font: 600 1rem/1 "Space Grotesk", monospace; background: #f4f6f2; }
+.support-craft__copy { position: relative; z-index: 2; }
+.support-craft__copy > p:first-child, .research-probe__copy > p:first-child { margin: 0 0 .6rem; color: var(--blue); font: 600 .62rem/1.3 "Space Grotesk", monospace; letter-spacing: .12em; text-transform: uppercase; }
+.support-craft h3 { margin: 0 0 1rem; font: 500 clamp(2.8rem, 5vw, 5.4rem)/.9 "Space Grotesk", sans-serif; letter-spacing: -.06em; }
+.support-craft__copy > p:not(:first-child) { margin: 0 0 1.2rem; color: var(--muted); font-size: clamp(.9rem, 1.1vw, 1.06rem); line-height: 1.65; }
+.support-craft__copy a, .research-probe__copy a { display: inline-block; margin: .25rem 1rem .25rem 0; color: var(--blue); font: 600 .66rem/1.3 "Space Grotesk", monospace; letter-spacing: .08em; text-transform: uppercase; text-underline-offset: .28rem; }
+.support-craft > img { justify-self: center; max-width: 100%; max-height: 44svh; object-fit: contain; filter: drop-shadow(0 1.4rem 1.4rem rgba(30,57,79,.11)); }
+.support-craft > img.support-craft__phone { max-width: 45%; }
+
+.probe-zone { padding-bottom: 4rem; background: var(--paper-blue); }
+.zone-intro--probe { margin-left: auto; }
+.research-probe { min-height: 92svh; max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: minmax(5rem,.2fr) minmax(21rem,.75fr) minmax(21rem,1.05fr); gap: clamp(1.5rem, 4vw, 5rem); align-items: center; }
+.research-probe--reverse { grid-template-columns: minmax(21rem,1.05fr) minmax(21rem,.75fr) minmax(5rem,.2fr); }
+.research-probe--reverse .research-probe__signal { grid-column: 3; }.research-probe--reverse .research-probe__copy { grid-column: 2; grid-row: 1; }.research-probe--reverse > :last-child { grid-column: 1; grid-row: 1; }
+.research-probe__signal { align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; color: var(--blue); font: 600 .56rem/1.2 "Space Grotesk", monospace; letter-spacing: .12em; writing-mode: vertical-rl; }
+.research-probe__signal i { flex: 1; max-height: 12rem; width: 1px; background: var(--line-blue); }
+.research-probe__copy h3 { margin: 0 0 1.2rem; font: 500 clamp(3.5rem, 7vw, 7.5rem)/.86 "Space Grotesk", sans-serif; letter-spacing: -.07em; }
+.research-probe__copy > p:not(:first-child) { color: var(--muted); font-size: clamp(.95rem, 1.15vw, 1.1rem); line-height: 1.7; }
+.research-probe__systems { padding-top: 1rem; border-top: 1px solid var(--line-blue); font: 600 .65rem/1.6 "Space Grotesk", monospace !important; letter-spacing: .08em; text-transform: uppercase; }
+.research-probe figure { margin: 0; }
+.research-probe figure img { width: 100%; height: auto; max-height: 68svh; object-fit: contain; }
+.probe-machine { min-height: 25rem; position: relative; display: flex; align-items: center; justify-content: space-around; }
+.probe-machine::before, .probe-machine::after { content: ""; position: absolute; left: 7%; right: 7%; top: 50%; height: 1px; background: var(--line-blue); }
+.probe-machine::after { left: 24%; right: 24%; top: 18%; bottom: 18%; height: auto; border: 1px solid var(--line-blue); border-radius: 50%; background: transparent; transform: rotate(-11deg); }
+.probe-machine span { position: relative; z-index: 1; width: clamp(4rem, 7vw, 6rem); aspect-ratio: 1; display: grid; place-items: center; border: 1px solid var(--blue); border-radius: 50%; color: var(--blue); background: var(--paper-blue); font: 600 .6rem/1 "Space Grotesk", monospace; letter-spacing: .08em; }
+.probe-terminal { min-height: 22rem; display: grid; align-content: center; gap: 2.2rem; padding: 3rem; position: relative; background: linear-gradient(120deg, rgba(255,255,255,.5), transparent); }
+.probe-terminal::before { content: "PROJECT MINER / PR #78 / MERGED"; position: absolute; top: 1rem; left: 1rem; color: var(--blue); font: 600 .56rem/1 "Space Grotesk", monospace; letter-spacing: .1em; }
+.probe-terminal span { display: flex; justify-content: space-between; gap: 2rem; padding-bottom: .75rem; border-bottom: 1px solid var(--line-blue); color: var(--muted); font: 500 .72rem/1.2 "Space Grotesk", monospace; }
+.probe-terminal b { color: var(--blue); }
+
+.shipyard-exit { min-height: 78svh; display: grid; align-content: center; justify-items: center; text-align: center; padding: 7rem 1.2rem; background: var(--paper); }
+.shipyard-exit h2 { margin: 0; font: 500 clamp(3.4rem, 8vw, 8rem)/.88 "Space Grotesk", sans-serif; letter-spacing: -.07em; }
+.shipyard-exit > p:not(.signal) { max-width: 620px; margin: 1.5rem auto 2rem; color: var(--muted); font-size: 1.1rem; line-height: 1.6; }
+.shipyard-exit div { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.4rem; }
+.shipyard-exit a { color: var(--blue); font: 600 .68rem/1.2 "Space Grotesk", monospace; letter-spacing: .09em; text-transform: uppercase; text-underline-offset: .3rem; }
+footer { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.4rem; padding: 1.4rem; color: var(--muted); background: #f2f3ef; font: 600 .6rem/1.2 "Space Grotesk", monospace; letter-spacing: .08em; text-transform: uppercase; }
+
+@media (max-width: 980px) {
+  .site-head { grid-template-columns: 1fr auto; }.site-head > span { display: none; }.site-head nav a:nth-child(2) { display: none; }
+  .shipyard { min-height: auto; grid-template: auto auto minmax(34rem, 62svh) auto auto / 1fr; padding-top: 6.5rem; }
+  .shipyard__routing { grid-row: 2; }.dock-field { grid-row: 3; }.inspection-berth { grid-row: 4; min-height: 78svh; padding: 3rem 0 0; }.inspection-berth::before { inset: 1.5rem 0 auto; width: auto; height: 1px; }
+  .shipyard__continue { grid-row: 5; }
+  .docked-vessel { width: min(71%, 34rem); }
+  .inspection-surface { height: 45svh; }
+  .support-craft, .support-craft--reverse { grid-template-columns: minmax(5rem,.22fr) minmax(18rem,1fr); padding: 4rem 0; }
+  .support-craft--reverse .support-craft__marker { grid-column: 1; }.support-craft--reverse .support-craft__copy { grid-column: 2; }.support-craft > img, .support-craft--reverse > img { grid-column: 2; grid-row: 2; justify-self: start; max-height: 32svh; }
+  .support-rail::before { left: 8%; }
+  .research-probe, .research-probe--reverse { grid-template-columns: minmax(4rem,.15fr) minmax(0,1fr); padding: 5rem 0; }
+  .research-probe--reverse .research-probe__signal { grid-column: 1; }.research-probe--reverse .research-probe__copy { grid-column: 2; }.research-probe > :last-child, .research-probe--reverse > :last-child { grid-column: 2; grid-row: 2; }
+}
+
+@media (max-width: 650px) {
+  .site-head { height: 3.7rem; padding-inline: 1rem; }.site-head nav { gap: .8rem; }.site-head nav a:last-child { display: none; }
+  .shipyard { padding: 6.2rem 1rem 2rem; gap: 1.8rem; }
+  .shipyard__intro h1 { font-size: clamp(3rem, 14vw, 4.7rem); }
+  .shipyard__routing { display: block; }.capability-router { margin: .8rem 0; gap: .35rem .9rem; }
+  .dock-field { min-height: 30rem; }
+  .docked-vessel { width: 84%; height: 4.35rem; grid-template-columns: 2.7rem 1fr auto; padding-right: 1.4rem; }
+  .docked-vessel--01 { top: 2%; left: 0; }.docked-vessel--02 { top: 21%; left: 9%; }.docked-vessel--03 { top: 40%; left: 1%; }.docked-vessel--04 { top: 59%; left: 11%; }.docked-vessel--05 { top: 78%; left: 3%; }
+  .docked-vessel.is-active { --shift: .75rem; }
+  .vessel-details { grid-template-columns: 1fr; gap: 1rem; align-content: start; padding-top: 1.5rem; }
+  .vessel-details__copy > p { font-size: .87rem; }.vessel-details__copy .vessel-details__lead { font-size: .98rem; }
+  .inspection-surface { height: 37svh; }.inspection-surface--single img { max-width: 55%; }
+  .zone-intro { min-height: 78svh; }.zone-intro h2 { font-size: clamp(3.5rem, 16vw, 6rem); }.zone-intro > p:last-child { margin-left: 0; }
+  .support-zone, .probe-zone { padding-inline: 1rem; }
+  .support-rail::before { left: 2.3rem; }
+  .support-craft, .support-craft--reverse { min-height: 78svh; grid-template-columns: 4.6rem 1fr; gap: 1rem; }
+  .support-craft__marker::after { display: none; }.support-craft h3 { font-size: clamp(2.8rem, 14vw, 4.7rem); }
+  .support-craft > img, .support-craft--reverse > img { max-width: 86%; }
+  .research-probe, .research-probe--reverse { min-height: 100svh; grid-template-columns: 2.4rem minmax(0,1fr); gap: 1rem; }
+  .research-probe__copy h3 { font-size: clamp(3.4rem, 16vw, 5.5rem); }
+  .probe-terminal { padding: 3rem 1rem 1rem; }.probe-terminal span { gap: .6rem; font-size: .58rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+@media print {
+  .site-head, .capability-router, .inspection-berth__pager, .shipyard__continue { display: none !important; }
+  .shipyard, .support-zone, .probe-zone, .shipyard-exit { min-height: 0; display: block; padding: 1rem 0; background: white; }
+  .js .vessel-details:not(.is-active) { display: grid; }
+  .vessel-details, .support-craft, .research-probe { min-height: 0; break-inside: avoid; margin: 2rem 0; }
+}

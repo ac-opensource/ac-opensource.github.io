@@ -1,0 +1,195 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://ac-opensource.github.io/experiments/universe-options/contact/option-02-vertical-launch-complex.html"/>
+  <title>Contact Option 02 — Vertical Launch Complex</title>
+  <meta name="description" content="An isolated Contact-page design study built as a page-height preflight tower.">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>document.documentElement.className = "js";</script>
+  <link rel="stylesheet" href="./option-02-vertical-launch-complex.css">
+</head>
+<body>
+  <a class="skip-link" href="#tower-form">Skip to preflight stations</a>
+  <header class="option-bar">
+    <a class="option-bar__brand" href="/">Andrew Concepcion</a>
+    <nav aria-label="Contact design options">
+      <a href="./index.html">All options</a>
+      <a href="./option-01-vehicle-assembly.html">01</a>
+      <a href="./option-02-vertical-launch-complex.html" aria-current="page">02</a>
+      <a href="./option-03-payload-integration.html">03</a>
+    </nav>
+    <span>[archived design study]</span>
+  </header>
+
+  <main id="main">
+    <section class="tower-intro" aria-labelledby="tower-title">
+      <div class="tower-intro__copy">
+        <span>[contact option 02 / vertical launch complex]</span>
+        <h1 id="tower-title">Climb the<br>preflight.</h1>
+        <p>The contact form is the tower. Each station clears one real constraint; each valid answer releases a physical clamp. Normal transport still ends at your email app, not a fabricated receipt.</p>
+      </div>
+      <div class="tower-intro__axis" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i>
+        <span>SCROLL TO ASCEND</span>
+      </div>
+      <dl class="tower-intro__facts">
+        <div><dt>Transport</dt><dd>Email-app handoff</dd></div>
+        <div><dt>Reply window</dt><dd>Typically 1–2 days</dd></div>
+        <div><dt>Default state</dt><dd>Clamped · nothing sent</dd></div>
+      </dl>
+    </section>
+
+    <form id="tower-form" class="tower" action="mailto:aarconcepcion@gmail.com" method="post" enctype="text/plain">
+      <div class="tower__demo" data-demo-flag hidden>
+        <strong>[local launch simulation]</strong>
+        <span>No network request, email, receipt, or publication.</span>
+      </div>
+
+      <div class="tower__visual" aria-hidden="true">
+        <div class="tower__mast">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="tower__umbilical"></div>
+        <div class="tower__rocket">
+          <svg viewBox="0 0 180 520" role="presentation">
+            <path class="vehicle-outline" d="M90 16C58 51 45 92 45 137v231l-26 61v43h142v-43l-26-61V137c0-45-13-86-45-121Z"/>
+            <path d="M46 154h88M45 232h90M45 333h90M47 395h86"/>
+            <circle cx="90" cy="111" r="17"/>
+            <path d="M65 184h50v24H65zM64 263h52v44H64z"/>
+            <path d="M62 395 34 439v33h42l14-77M118 395l28 44v33h-42l-14-77"/>
+            <path class="vehicle-flame" d="M65 486c11 5 16 18 13 30 8-7 11-18 12-31 1 13 4 24 12 31-3-12 2-25 13-30"/>
+          </svg>
+        </div>
+        <div class="tower__clamp tower__clamp--1" data-clamp="mission"><span></span><b>01</b></div>
+        <div class="tower__clamp tower__clamp--2" data-clamp="guidance"><span></span><b>02</b></div>
+        <div class="tower__clamp tower__clamp--3" data-clamp="comms"><span></span><b>03</b></div>
+        <div class="tower__clamp tower__clamp--4" data-clamp="payload"><span></span><b>04</b></div>
+        <div class="tower__clamp tower__clamp--5" data-clamp="release"><span></span><b>05</b></div>
+        <div class="tower__pad"></div>
+      </div>
+
+      <section class="station station--left" data-station="mission" aria-labelledby="station-mission-heading">
+        <span class="station__number">01 / L–04</span>
+        <h2 id="station-mission-heading">Assign the flight.</h2>
+        <p class="station__brief">Private collaboration and public feedback travel under different rules.</p>
+        <fieldset>
+          <legend>Transmission intent</legend>
+          <label class="station-choice">
+            <input type="radio" name="intent" value="private" checked>
+            <span><strong>Private message</strong><small>Email conversation only</small></span>
+          </label>
+          <label class="station-choice js-public-choice">
+            <input type="radio" name="intent" value="public">
+            <span><strong>Public feedback review</strong><small>A separate quote; never automatic publication</small></span>
+          </label>
+        </fieldset>
+        <p class="station__state" data-station-state="mission">CLAMP 01 · ASSIGNMENT READY</p>
+      </section>
+
+      <section class="station station--right" data-station="guidance" aria-labelledby="station-guidance-heading">
+        <span class="station__number">02 / L–03</span>
+        <h2 id="station-guidance-heading">Name the guidance loop.</h2>
+        <p class="station__brief">A real person, not a ticket number.</p>
+        <label class="station-field" for="tower-name">
+          <span>Your name</span>
+          <input id="tower-name" name="name" type="text" autocomplete="name" minlength="2" maxlength="80" placeholder="Your name" required>
+          <small>Used to address the reply.</small>
+        </label>
+        <p class="station__state" data-station-state="guidance">CLAMP 02 · GUIDANCE READY</p>
+      </section>
+
+      <section class="station station--left" data-station="comms" aria-labelledby="station-comms-heading">
+        <span class="station__number">03 / L–02</span>
+        <h2 id="station-comms-heading">Open a return channel.</h2>
+        <p class="station__brief">The address stays on the private reply path.</p>
+        <label class="station-field" for="tower-email">
+          <span>Email address</span>
+          <input id="tower-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@email.com" required>
+          <small>Never eligible for the public Signals surface.</small>
+        </label>
+        <p class="station__state" data-station-state="comms">CLAMP 03 · RETURN CHANNEL READY</p>
+      </section>
+
+      <section class="station station--right station--payload" data-station="payload" aria-labelledby="station-payload-heading">
+        <span class="station__number">04 / L–01</span>
+        <h2 id="station-payload-heading">Load the actual problem.</h2>
+        <p class="station__brief">Constraints and desired outcome are more useful than ceremony.</p>
+        <label class="station-field" for="tower-message">
+          <span>Private message <b data-message-count>0 / 4000</b></span>
+          <textarea id="tower-message" name="message" minlength="20" maxlength="4000" rows="5" placeholder="What are you building, changing, or trying to understand?" required></textarea>
+          <small>These notes remain private even when a separate public quote is proposed.</small>
+        </label>
+        <div class="station-public" data-public-module hidden>
+          <label class="station-field" for="tower-quote">
+            <span>Separate public quote <b data-quote-count>0 / 280</b></span>
+            <textarea id="tower-quote" name="publicQuote" minlength="20" maxlength="280" rows="3" placeholder="The exact quote you would permit human review of…" disabled></textarea>
+          </label>
+          <label class="station-field station-field--compact" for="tower-target">
+            <span>Requested destination</span>
+            <select id="tower-target" name="publicTarget" disabled>
+              <option value="dashboard">Dashboard</option>
+              <option value="portfolio">Portfolio</option>
+              <option value="logs">Logs</option>
+              <option value="about">About</option>
+              <option value="contact">Contact</option>
+              <option value="resume">Resume</option>
+              <option value="skills">Skills graph</option>
+            </select>
+          </label>
+          <fieldset class="station-display">
+            <legend>Public label</legend>
+            <label><input type="radio" name="publicDisplay" value="anonymous" checked disabled> Anonymous</label>
+            <label><input type="radio" name="publicDisplay" value="named" disabled> Use my name</label>
+          </fieldset>
+        </div>
+        <p class="station__state" data-station-state="payload">CLAMP 04 · PAYLOAD READY</p>
+      </section>
+
+      <section class="station station--left station--release" data-station="release" aria-labelledby="station-release-heading">
+        <span class="station__number">05 / T–00</span>
+        <h2 id="station-release-heading">Release only what you mean to.</h2>
+        <p class="station__brief">No visual state can turn a mailto handoff into proof of delivery.</p>
+        <label class="station-consent" data-public-consent-row hidden>
+          <input id="tower-public-consent" name="publicConsent" type="checkbox" disabled>
+          <span>Allow only the exact public quote, target, and display choice above to be considered after human review. It may be rejected or removed.</span>
+        </label>
+        <label class="station-consent">
+          <input id="tower-acknowledgement" name="handoffAcknowledgement" type="checkbox" required>
+          <span>I understand that normal mode only opens my email app. This website cannot confirm sending, delivery, receipt, or publication.</span>
+        </label>
+        <p class="station__state" data-station-state="release">CLAMP 05 · RELEASE AUTHORITY READY</p>
+      </section>
+
+      <section class="station station--ignition" aria-labelledby="ignition-heading">
+        <span class="station__number">T–00 / OPERATOR DECISION</span>
+        <h2 id="ignition-heading">The tower is the form.</h2>
+        <p>When all five clamps are clear, normal mode hands the prepared message to your email app. Only the explicit local demo performs the page-wide launch animation.</p>
+        <p class="tower__status" id="tower-status" role="status" aria-live="polite">Five clamps hold · nothing has left this page.</p>
+        <button type="submit" data-submit>
+          <span data-submit-label>Complete preflight</span>
+          <i aria-hidden="true">↑</i>
+        </button>
+        <a data-demo-link href="?localDemo=1#tower-form">Open explicit local launch demo</a>
+        <nav aria-label="Other contact routes">
+          <a href="https://www.linkedin.com/in/aarconcepcion" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+          <a href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">GitHub ↗</a>
+          <a href="/resume.html">Resume ↗</a>
+        </nav>
+      </section>
+
+      <noscript>
+        <p class="noscript-note">JavaScript is off, so only the private email-app handoff is shown. This readable form does not upload or store your message and cannot observe sending or delivery.</p>
+      </noscript>
+    </form>
+  </main>
+
+  <script src="/assets/js/contact-transport.js"></script>
+  <script src="./option-02-vertical-launch-complex.js"></script>
+</body>
+</html>

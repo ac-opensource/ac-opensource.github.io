@@ -1,7 +1,13 @@
 const fs = require("fs");
+const crypto = require("crypto");
 const os = require("os");
 const path = require("path");
-const { buildStaticBlog } = require("./build-static-blog-pages");
+const {
+  articleMode,
+  buildStaticBlog,
+  decorateArticleBody,
+  trajectoryVariant
+} = require("./build-static-blog-pages");
 const { DEFAULT_DB_PATH, openDatabase } = require("./lib/blog-db");
 
 function main() {
@@ -17,11 +23,16 @@ function main() {
   );
 
   try {
+    const databaseDigestBeforeBuild = crypto.createHash("sha256").update(fs.readFileSync(databasePath)).digest("hex");
     const initial = buildStaticBlog({ dbPath: databasePath, outputRoot });
     if (!initial.posts.length) throw new Error("Expected at least one published post in the fixture database.");
+    if (initial.posts.length !== 26) throw new Error(`Expected all 26 published posts, found ${initial.posts.length}.`);
     const initialIndex = fs.readFileSync(path.join(outputRoot, "blog", "index.html"), "utf8");
     if (!initialIndex.includes(initial.posts[0].title) || initialIndex.includes("Stale fallback")) {
       throw new Error("The no-JavaScript blog fallback was not rebuilt from published posts.");
+    }
+    if ((initialIndex.match(/class="galaxy-entry(?: has-media)?"/g) || []).length !== initial.posts.length) {
+      throw new Error("The no-JavaScript Logs route did not preserve every published transmission.");
     }
 
     const firstPostPage = fs.readFileSync(
@@ -30,6 +41,83 @@ function main() {
     );
     if (firstPostPage.includes("hero-overlay-alpha") || firstPostPage.includes("overlayAlphaPulse")) {
       throw new Error("Article hero images must render without a show/hide animation.");
+    }
+    if (!firstPostPage.includes('/assets/css/article-debrief.css?v=20260807-regions2')
+      || !firstPostPage.includes('/assets/js/article-debrief.js?v=20260807-regions1')
+      || !firstPostPage.includes('/assets/css/universe-field-map.css?v=20260807')
+      || !firstPostPage.includes('/assets/js/universe-theme-transition.js?v=20260807-fast2')
+      || !firstPostPage.includes('/assets/js/universe-field-map.js?v=20260807')) {
+      throw new Error("Generated articles are missing their region and shared navigation assets.");
+    }
+
+    for (const post of initial.posts) {
+      const postPage = fs.readFileSync(path.join(outputRoot, "blog", `${post.slug}.html`), "utf8");
+      const sourceHeadingCount = (post.body_html.match(/<h[23]\b/gi) || []).length;
+      const sourceFigureCount = (post.body_html.match(/<figure\b/gi) || []).length;
+      const decoratedHeadingCount = (postPage.match(/data-debrief-heading/g) || []).length;
+      const trajectoryLinkCount = (postPage.match(/data-trajectory-link/g) || []).length;
+      const expectedVariant = trajectoryVariant(post);
+      const expectedMode = articleMode(post, post.body_html);
+      const mappedStopCount = expectedMode === "photography" && sourceFigureCount
+        ? sourceFigureCount
+        : sourceHeadingCount;
+
+      if (decoratedHeadingCount !== sourceHeadingCount) {
+        throw new Error(`${post.slug}: the generated debrief did not preserve every semantic heading.`);
+      }
+      if (trajectoryLinkCount !== mappedStopCount * 2) {
+        throw new Error(`${post.slug}: desktop/mobile trajectories were not derived exactly from real headings or frames.`);
+      }
+      if (!postPage.includes(`data-debrief-variant="${expectedVariant}"`)) {
+        throw new Error(`${post.slug}: article debrief variant did not follow its source category.`);
+      }
+      if (!postPage.includes(`data-article-mode="${expectedMode}"`)) {
+        throw new Error(`${post.slug}: article region did not follow its real content type.`);
+      }
+      if (/\[(?:context|constraint|decision|implementation|verification|outcome)\]/.test(postPage)) {
+        throw new Error(`${post.slug}: article navigation received inferred engineering claims.`);
+      }
+    }
+
+    const targetPage = fs.readFileSync(
+      path.join(outputRoot, "blog", "2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html"),
+      "utf8"
+    );
+    const targetPhases = [...targetPage.matchAll(/data-debrief-heading data-debrief-phase="([^"]+)"/g)]
+      .map((match) => match[1]);
+    if (JSON.stringify(targetPhases) !== JSON.stringify(Array(8).fill("system"))) {
+      throw new Error(`The technical region did not use its deterministic systems labels: ${targetPhases.join(", ")}`);
+    }
+
+    const reflectionPage = fs.readFileSync(
+      path.join(outputRoot, "blog", "2026-07-22-the-fortress-we-mistake-for-home.html"),
+      "utf8"
+    );
+    if ((reflectionPage.match(/\[observation\]/g) || []).length !== 10) {
+      throw new Error("Reflection pages must use the calmer observation labels in both indexes.");
+    }
+    const photographyPage = fs.readFileSync(
+      path.join(outputRoot, "blog", "2024-09-14-film-photography-gallery.html"),
+      "utf8"
+    );
+    if (!photographyPage.includes('aria-label="Image sequence frames"')
+      || (photographyPage.match(/data-trajectory-link/g) || []).length !== 6
+      || !photographyPage.includes('href="#field-frame-01"')) {
+      throw new Error("The photography region must map its three real figures without fabricated section stops.");
+    }
+
+    const exactFixture = '<section><h2 class="title">A &amp; B</h2><p><a href="/proof">Exact prose</a></p><figure><img src="x.png" alt="x"><figcaption>Caption</figcaption></figure><pre><code>value()</code></pre></section>';
+    const fixtureResult = decorateArticleBody(exactFixture, { category: "technical", slug: "fixture" });
+    const restoredFixture = fixtureResult.bodyHtml
+      .replace(/ id="debrief-[^"]+"/, "")
+      .replace(/ data-debrief-heading data-debrief-phase="[^"]+"/, "")
+      .replace(/ id="field-frame-[^"]+" data-article-figure/, "");
+    if (restoredFixture !== exactFixture) {
+      throw new Error("Decorating headings changed body prose, links, figures, captions, or code.");
+    }
+    const databaseDigestAfterBuild = crypto.createHash("sha256").update(fs.readFileSync(databasePath)).digest("hex");
+    if (databaseDigestAfterBuild !== databaseDigestBeforeBuild) {
+      throw new Error("The static article generator mutated the authoring-only SQLite source.");
     }
 
     const ocbcPage = fs.readFileSync(

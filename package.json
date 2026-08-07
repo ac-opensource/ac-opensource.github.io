@@ -27,7 +27,14 @@
     "verify:deterministic": "node scripts/check-deterministic-build.js",
     "test:build": "node scripts/test-build-pipeline.js",
     "test:writer": "node scripts/test-blog-writer-security.js",
-    "verify": "npm run build && npm run verify:dist && npm run verify:deterministic && npm run test:build && npm run test:writer",
+    "test:contact-apps-script": "node scripts/test-contact-apps-script.js",
+    "test:contact-signals": "node scripts/test-contact-signals.js",
+    "test:contact-signals:browser": "node scripts/test-contact-signals-browser.js",
+    "test:contact-apps-script-verifier": "node scripts/test-contact-apps-script-verifier.js",
+    "test:options": "node scripts/test-universe-options.js",
+    "contact-signals:local": "node scripts/local-contact-signals-server.js",
+    "contact:verify-apps-script": "node scripts/verify-contact-apps-script.js",
+    "verify": "npm run build && npm run verify:dist && npm run verify:deterministic && npm run test:build && npm run test:writer && npm run test:contact-apps-script && npm run test:contact-signals && npm run test:contact-apps-script-verifier",
     "test:e2e": "node scripts/run-e2e.js"
   },
   "dependencies": {

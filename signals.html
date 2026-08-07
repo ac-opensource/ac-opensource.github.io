@@ -1,0 +1,191 @@
+<!doctype html>
+<html class="no-js signals-root" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Signals Registry | Andrew Concepcion</title>
+  <meta name="description" content="A privacy-bounded satellite operations registry for approved public feedback and removal tombstones in deterministic public slots.">
+  <link rel="canonical" href="https://ac-opensource.github.io/signals.html">
+  <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml">
+  <meta name="robots" content="noindex,follow">
+  <meta property="og:site_name" content="Andrew Concepcion">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ac-opensource.github.io/signals.html">
+  <meta property="og:title" content="Signals Registry | Andrew Concepcion">
+  <meta property="og:description" content="An empty-by-default public registry that exposes only approved quotes or privacy-minimal removal tombstones.">
+  <meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/home-orbital-dashboard.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Andrew Concepcion's orbital dashboard">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Signals Registry | Andrew Concepcion">
+  <meta name="twitter:description" content="An empty-by-default public registry for moderated feedback.">
+  <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/home-orbital-dashboard.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="/assets/css/signals-registry.css?v=20260807-ops2" rel="stylesheet">
+  <link href="/assets/css/universe-field-map.css?v=20260807" rel="stylesheet">
+  <script src="/assets/js/universe-theme-transition.js?v=20260807-fast2"></script>
+</head>
+<body data-universe-region="signals">
+  <a class="skip-link" href="#signal-registry">Skip to Signals registry</a>
+
+  <header class="signals-topbar">
+    <div class="signals-topbar__inner">
+      <a class="signals-brand" href="/">Andrew Concepcion</a>
+      <nav class="signals-nav" aria-label="Primary navigation">
+        <a href="/">[dashboard]</a>
+        <a href="/work.html">[portfolio]</a>
+        <a href="/blog/">[logs]</a>
+        <a href="/about.html">[about]</a>
+        <a href="/contact.html">[contact]</a>
+      </nav>
+      <span>[registry: moderated]</span>
+    </div>
+  </header>
+
+  <main class="signals-main" data-signals-root data-feed-state="empty" aria-busy="false">
+    <header class="signals-hero">
+      <div class="signals-hero__copy">
+        <p class="signals-kicker">[SATELLITE OPERATIONS / PRIVACY BOUNDED]</p>
+        <h1>Signals<br>registry.</h1>
+        <p>I publish feedback only when the person offering it has chosen a public quote and it has passed human review. Private, pending, rejected, and unmoderated words stay private.</p>
+        <a class="signals-action signals-action--primary" href="/contact.html?intent=public">Propose public feedback on Contact <span aria-hidden="true">→</span></a>
+      </div>
+      <aside class="signals-hero__telemetry" aria-label="Registry telemetry">
+        <span>[PUBLIC TRACKS]</span>
+        <strong data-registry-total>0</strong>
+        <p><b data-approved-total>0</b> approved</p>
+        <p><b data-removed-total>0</b> removal tombstones</p>
+        <small>Feed version 1 · moderated contract</small>
+      </aside>
+    </header>
+
+    <section class="signals-truth" aria-labelledby="signals-truth-title">
+      <header>
+        <p class="signals-kicker">[LIFECYCLE TRUTH]</p>
+        <h2 id="signals-truth-title">Received privately.<br>Reviewed deliberately.<br>Published minimally.</h2>
+      </header>
+      <ol class="signals-lifecycle" aria-label="Public Signal lifecycle">
+        <li><span>01</span><strong>Private receipt</strong><p>A proposal begins outside this registry. Submission is not publication.</p></li>
+        <li><span>02</span><strong>Human review</strong><p>Only explicitly approved public fields can cross the moderation boundary.</p></li>
+        <li><span>03</span><strong>Minimal track</strong><p>Removal leaves only an opaque ID, removed status, and stable slot—never the quote.</p></li>
+      </ol>
+    </section>
+
+    <div class="signals-runtime-banner" data-signals-runtime-banner role="status" hidden></div>
+
+    <section class="signals-orbit" data-signals-orbit aria-labelledby="signals-orbit-title">
+      <header class="signals-section-heading">
+        <div>
+          <p class="signals-kicker">[SLOT FIELD / 000—999]</p>
+          <h2 id="signals-orbit-title">Public orbital tracks</h2>
+        </div>
+        <p>Approved words keep a stable place here; removal leaves only the minimum record needed to honor that history.</p>
+      </header>
+      <div class="signals-orbit__layout">
+        <div class="signals-orbit__field" data-orbit-field aria-label="Public Signals slot field">
+          <span class="signals-orbit__axis signals-orbit__axis--x" aria-hidden="true"></span>
+          <span class="signals-orbit__axis signals-orbit__axis--y" aria-hidden="true"></span>
+          <span class="signals-orbit__ring signals-orbit__ring--outer" aria-hidden="true"></span>
+          <span class="signals-orbit__ring signals-orbit__ring--middle" aria-hidden="true"></span>
+          <span class="signals-orbit__ring signals-orbit__ring--inner" aria-hidden="true"></span>
+          <span class="signals-orbit__origin" aria-hidden="true"><b>AC</b><small>REGISTRY ORIGIN</small></span>
+          <p class="signals-orbit__empty" data-orbit-empty><strong>NO PUBLIC FEEDBACK YET</strong><span>No approved quote has been published.</span></p>
+          <p class="signals-orbit__empty" data-orbit-filter-empty hidden><strong>NO TRACKS IN FILTER</strong><span>Clear or change the registry filters to restore matching public slots.</span></p>
+          <!-- SIGNALS_ORBIT_START -->
+          <!-- SIGNALS_ORBIT_END -->
+        </div>
+        <aside class="signals-orbit__readout" aria-label="Slot field readout">
+          <p class="signals-kicker">[FIELD READOUT]</p>
+          <p class="signals-orbit__preview" data-orbit-preview aria-live="polite">No approved public feedback has been published yet.</p>
+          <dl>
+            <div><dt>Occupied</dt><dd data-field-total>0</dd></div>
+            <div><dt>Visible</dt><dd data-field-visible>0</dd></div>
+            <div><dt>Position</dt><dd>Stable public slot</dd></div>
+            <div><dt>Source</dt><dd>Moderated registry</dd></div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <section class="signals-registry" id="signal-registry" aria-labelledby="signal-registry-title">
+      <header class="signals-section-heading">
+        <div>
+          <p class="signals-kicker">[SEMANTIC SOURCE OF TRUTH]</p>
+          <h2 id="signal-registry-title">Public registry</h2>
+        </div>
+        <p>Approved quotes stay paired with the smallest public attribution and moderation record needed to understand them.</p>
+      </header>
+
+      <form class="signals-controls" data-signal-filters role="search" aria-label="Search and filter public Signals" hidden>
+        <label class="signals-field signals-field--search" for="signal-search">
+          <span>Search registry</span>
+          <input id="signal-search" name="q" type="search" autocomplete="off" placeholder="Quote, display label, target, or ID">
+        </label>
+        <label class="signals-field" for="signal-target-filter">
+          <span>Local target</span>
+          <select id="signal-target-filter" name="target">
+            <option value="">All targets</option>
+            <option value="dashboard">Dashboard</option>
+            <option value="portfolio">Portfolio</option>
+            <option value="logs">Logs</option>
+            <option value="about">About</option>
+            <option value="contact">Contact</option>
+            <option value="resume">Resume</option>
+            <option value="skills">Skills graph</option>
+          </select>
+        </label>
+        <label class="signals-field" for="signal-date-filter">
+          <span>Approved month</span>
+          <input id="signal-date-filter" name="date" type="month">
+        </label>
+        <button class="signals-clear" type="button" data-clear-filters>Clear filters</button>
+      </form>
+
+      <noscript>
+        <p class="signals-noscript">JavaScript is off. The complete validated public registry is rendered below; the slot field links to these records, while filters and selected-record history remain unavailable.</p>
+      </noscript>
+      <p class="signals-js-status" data-js-status role="status">The public feed currently contains no approved or removed records.</p>
+
+      <section class="signals-detail" id="signal-detail" data-signal-detail tabindex="-1" aria-live="polite" aria-labelledby="signal-detail-title" hidden>
+        <header>
+          <p class="signals-kicker" data-detail-kicker>[SELECTED RECORD]</p>
+          <button type="button" data-close-detail>Close detail</button>
+        </header>
+        <h3 id="signal-detail-title" data-detail-title></h3>
+        <blockquote data-detail-quote hidden></blockquote>
+        <dl data-detail-meta></dl>
+        <a class="signals-action" data-detail-target href="/" hidden>Open local target <span aria-hidden="true">→</span></a>
+      </section>
+
+      <p class="signals-results" data-results-summary aria-live="polite" hidden><strong data-visible-total>0</strong> records shown</p>
+      <p class="signals-empty" data-filter-empty hidden>No public records match these filters.</p>
+      <ol class="signals-list" data-signals-list aria-label="Public Signals records">
+        <!-- SIGNALS_REGISTRY_START -->
+        <li class="signals-empty-record" data-feed-empty>
+          <strong>No public Signals yet.</strong>
+          <span>The default feed is intentionally empty. Nothing pending, rejected, private, or unmoderated is displayed.</span>
+        </li>
+        <!-- SIGNALS_REGISTRY_END -->
+      </ol>
+    </section>
+  </main>
+
+  <footer class="signals-footer">
+    <span>© 2026 Andrew Concepcion</span>
+    <a href="/contact.html">[contact]</a>
+    <a href="/">[dashboard]</a>
+  </footer>
+
+  <script id="contact-runtime-config" type="application/json">{"version":1,"enabled":false,"endpoint":"","publicFeedEndpoint":"","requestTimeoutMs":8000}</script>
+  <script id="signals-feed" type="application/json">{"version":1,"records":[]}</script>
+  <script src="/assets/js/contact-transport.js"></script>
+  <script src="/assets/js/signals-contract.js"></script>
+  <script src="/assets/js/signals-registry.js?v=20260807-ops1"></script>
+  <script src="/assets/js/universe-field-map.js?v=20260807"></script>
+</body>
+</html>

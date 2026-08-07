@@ -1,0 +1,3901 @@
+:root {
+  --about-base: #020817;
+  --stellar-paper: #020817;
+  --stellar-panel: #061126;
+  --stellar-panel-high: #0b1c35;
+  --stellar-ink: #edf6ff;
+  --stellar-muted: #aab9cc;
+  --stellar-blue: #7eb6ff;
+  --stellar-blue-deep: #b7d8ff;
+  --stellar-line: rgba(135, 171, 218, 0.28);
+  --stellar-line-soft: rgba(135, 171, 218, 0.14);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  background: var(--about-base);
+}
+
+body {
+  margin: 0;
+  color: var(--stellar-ink);
+  background: var(--stellar-paper);
+  font-family: "Manrope", system-ui, sans-serif;
+}
+
+body[data-universe-region="about"] {
+  --universe-canvas: var(--about-base);
+  --universe-ink: #edf6ff;
+  --universe-muted: #9eb1c8;
+  --universe-line: rgba(135, 171, 218, 0.28);
+  --universe-blue: #7eb6ff;
+  --universe-blue-soft: rgba(126, 182, 255, 0.15);
+}
+
+body[data-universe-region="about"] .universe-route-map::before { background: transparent; }
+body[data-universe-region="about"] .universe-route-map a::before { background: var(--about-base); }
+
+.about-universe:has(.stellar-spectrum__readout:not([hidden])) {
+  z-index: 49;
+}
+
+@media (max-width: 760px) {
+  body[data-universe-region="about"] .universe-route-map { background: var(--about-base); }
+}
+
+#site-topbar {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  right: 0;
+  left: 0;
+  border-bottom: 1px solid rgba(135, 171, 218, 0.16);
+  background: var(--about-base);
+  backdrop-filter: blur(18px);
+}
+
+#site-topbar > div {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  width: min(100%, 80rem);
+  margin-inline: auto;
+  padding: 0.75rem 1.5rem;
+  gap: 1rem;
+  align-items: center;
+}
+
+#site-topbar > div > a {
+  justify-self: start;
+  color: var(--stellar-ink);
+  font: 700 1.1rem/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+#site-topbar > div > div {
+  justify-self: end;
+  color: var(--stellar-muted);
+  font: 500 0.62rem/1.3 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#site-nav {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-self: center;
+}
+
+#site-nav-mobile {
+  display: none;
+}
+
+#site-nav .site-nav-link,
+#site-nav-mobile .site-nav-link {
+  color: var(--stellar-muted);
+  font: 600 0.72rem/1.3 "Space Grotesk", sans-serif;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+#site-nav .site-nav-link[aria-current="page"],
+#site-nav-mobile .site-nav-link[aria-current="page"] {
+  border-bottom: 2px solid var(--stellar-blue);
+  padding-bottom: 0.25rem;
+  color: var(--stellar-blue);
+}
+
+.about-universe {
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+}
+
+#site-footer {
+  position: relative;
+  z-index: 5;
+  margin-top: 6rem;
+  border-top: 1px solid rgba(135, 171, 218, 0.16);
+  background: var(--about-base);
+}
+
+#site-footer > div {
+  display: flex;
+  width: min(100%, 80rem);
+  margin-inline: auto;
+  padding: 1rem 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  align-items: center;
+  justify-content: center;
+  color: var(--stellar-muted);
+  font: 500 0.62rem/1.3 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+#site-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  padding: 0;
+  color: #f4f8ff;
+  background: var(--stellar-ink);
+  font: 600 0.8rem/1.2 "Space Grotesk", system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.skip-link:focus-visible {
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  padding: 0.75rem 1rem;
+  outline: 3px solid #6799fb;
+  outline-offset: 2px;
+}
+
+:where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 3px solid var(--stellar-blue);
+  outline-offset: 3px;
+}
+
+#site-nav-mobile .site-nav-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+
+#profile-map {
+  scroll-margin-top: 6rem;
+}
+
+.stellar-spectrum {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1rem, 3vw, 2rem);
+  border: 1px solid var(--stellar-line);
+  color: var(--stellar-ink);
+  background:
+    linear-gradient(rgba(120, 124, 115, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 124, 115, 0.055) 1px, transparent 1px),
+    rgba(250, 249, 244, 0.94);
+  background-size: 2.5rem 2.5rem;
+}
+
+.stellar-spectrum::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 10%, rgba(31, 92, 186, 0.035) 50%, transparent 90%);
+  content: "";
+}
+
+.stellar-spectrum > * {
+  position: relative;
+}
+
+.stellar-spectrum__topline {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--stellar-line-soft);
+}
+
+.stellar-spectrum__eyebrow,
+.stellar-spectrum__status,
+.stellar-spectrum__legend,
+.stellar-spectrum__mode,
+.stellar-spectrum__band-trigger,
+.stellar-spectrum__band-meta,
+.stellar-spectrum__readout-kicker,
+.stellar-spectrum__source-context h5,
+.stellar-spectrum__method,
+.stellar-spectrum__fallback-note,
+.stellar-calibration-note {
+  font-family: "Space Grotesk", ui-monospace, monospace;
+}
+
+.stellar-spectrum__eyebrow,
+.stellar-spectrum__status {
+  font-size: 0.68rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.stellar-spectrum__eyebrow {
+  color: var(--stellar-blue);
+  font-weight: 700;
+}
+
+.stellar-spectrum__status {
+  color: #62675f;
+  text-align: right;
+}
+
+.stellar-spectrum__heading {
+  max-width: 24ch;
+  margin: 0;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.stellar-spectrum__intro {
+  max-width: 72ch;
+  margin: 0.85rem 0 1.4rem;
+  color: var(--stellar-muted);
+  line-height: 1.7;
+}
+
+.stellar-spectrum__controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.stellar-spectrum__modes {
+  display: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(100%, 34rem);
+  border-bottom: 1px solid var(--stellar-line);
+}
+
+.stellar-spectrum--enhanced .stellar-spectrum__modes {
+  display: grid;
+}
+
+.stellar-spectrum__mode {
+  min-height: 46px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 0.7rem 1rem;
+  color: var(--stellar-muted);
+  background: transparent;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.stellar-spectrum__mode:hover {
+  color: var(--stellar-blue-deep);
+  background: rgba(31, 92, 186, 0.045);
+}
+
+.stellar-spectrum__mode[aria-selected="true"] {
+  border-bottom-color: var(--stellar-blue);
+  color: var(--stellar-ink);
+  background: rgba(31, 92, 186, 0.055);
+}
+
+.stellar-spectrum__receipts-toggle {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--stellar-line);
+  padding: 0.65rem 0.85rem;
+  color: var(--stellar-muted);
+  background: rgba(255, 255, 255, 0.72);
+  font: 700 0.66rem/1.3 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stellar-spectrum__receipts-toggle[hidden] {
+  display: none;
+}
+
+.stellar-spectrum__receipts-toggle:hover,
+.stellar-spectrum__receipts-toggle[aria-pressed="true"] {
+  border-color: rgba(31, 92, 186, 0.5);
+  color: var(--stellar-blue-deep);
+  background: rgba(31, 92, 186, 0.08);
+}
+
+.stellar-spectrum__mode:focus-visible,
+.stellar-spectrum__receipts-toggle:focus-visible,
+.stellar-spectrum__band-trigger:focus-visible,
+.stellar-spectrum__node:focus-visible,
+.stellar-spectrum__related-node:focus-visible,
+.stellar-spectrum__source-link:focus-visible,
+.profile-map-evidence a:focus-visible,
+.profile-map-evidence summary:focus-visible {
+  outline: 3px solid var(--stellar-blue);
+  outline-offset: 3px;
+}
+
+.stellar-spectrum__legend {
+  display: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem 1.2rem;
+  margin-bottom: 1rem;
+  padding: 0.9rem 0;
+  border-block: 1px solid var(--stellar-line-soft);
+  color: var(--stellar-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.025em;
+  line-height: 1.5;
+}
+
+.stellar-spectrum--enhanced .stellar-spectrum__legend {
+  display: grid;
+}
+
+.stellar-spectrum__legend span {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.stellar-spectrum__legend i {
+  display: block;
+  margin-top: 0.32rem;
+}
+
+.stellar-spectrum__legend-band {
+  height: 0.36rem;
+  background: rgba(31, 92, 186, 0.38);
+  box-shadow: inset 0 0 0 1px rgba(31, 92, 186, 0.34);
+}
+
+.stellar-spectrum__legend-node {
+  width: 2px;
+  height: 0.9rem;
+  margin-left: 0.65rem;
+  background: var(--stellar-blue);
+}
+
+.stellar-spectrum__legend-trace {
+  width: 1.3rem;
+  height: 1px;
+  border-top: 1px dashed var(--stellar-blue);
+}
+
+.stellar-spectrum__stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.42fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.stellar-spectrum__stage[hidden] {
+  display: none;
+}
+
+.stellar-spectrum__stage.is-scanning::after {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  pointer-events: none;
+  background: rgba(31, 92, 186, 0.7);
+  box-shadow: 0 0 14px rgba(31, 92, 186, 0.16);
+  content: "";
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stellar-spectrum__stage.is-scanning::after {
+    animation: stellar-scan-pass 680ms cubic-bezier(0.22, 0.7, 0.2, 1) both;
+  }
+}
+
+@keyframes stellar-scan-pass {
+  from { left: 0; opacity: 0; }
+  15% { opacity: 0.65; }
+  to { left: calc(100% - 1px); opacity: 0; }
+}
+
+.stellar-spectrum__bands {
+  display: grid;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.stellar-spectrum__band {
+  --band-tone: #315f9a;
+  border: 1px solid var(--stellar-line-soft);
+  background: rgba(255, 255, 255, 0.58);
+  transition: border-color 160ms ease, background-color 160ms ease, opacity 160ms ease;
+}
+
+.stellar-spectrum__band.is-active {
+  border-color: color-mix(in srgb, var(--band-tone) 56%, transparent);
+  background: color-mix(in srgb, var(--band-tone) 5%, var(--stellar-paper));
+}
+
+.stellar-spectrum__band.is-quiet {
+  opacity: 0.36;
+}
+
+.stellar-spectrum__band-trigger {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, 0.28fr) minmax(12rem, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  min-height: 4.65rem;
+  border: 0;
+  padding: 0.8rem 1rem;
+  color: var(--stellar-ink);
+  background: transparent;
+  text-align: left;
+}
+
+.stellar-spectrum__band-trigger:hover {
+  background: color-mix(in srgb, var(--band-tone) 5%, transparent);
+}
+
+.stellar-spectrum__band-copy {
+  min-width: 0;
+}
+
+.stellar-spectrum__band-name {
+  display: block;
+  color: var(--stellar-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stellar-spectrum__band-meta {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--stellar-muted);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  text-transform: none;
+}
+
+.stellar-spectrum__track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--node-count), minmax(0, 1fr));
+  align-items: stretch;
+  min-width: 0;
+  height: 2.2rem;
+  overflow: hidden;
+  border-block: 1px solid color-mix(in srgb, var(--band-tone) 24%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--band-tone) 3%, transparent), color-mix(in srgb, var(--band-tone) 11%, transparent), color-mix(in srgb, var(--band-tone) 3%, transparent));
+}
+
+.stellar-spectrum__track::before,
+.stellar-spectrum__track::after {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: color-mix(in srgb, var(--band-tone) 42%, transparent);
+  content: "";
+}
+
+.stellar-spectrum__track::before { top: 36%; }
+.stellar-spectrum__track::after { top: 68%; opacity: 0.52; }
+
+.stellar-spectrum__tick {
+  position: relative;
+  z-index: 1;
+  justify-self: center;
+  width: 2px;
+  height: 100%;
+  background: var(--band-tone);
+  opacity: 0.72;
+}
+
+.stellar-spectrum__band-count {
+  min-width: 4.5rem;
+  color: var(--stellar-muted);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.stellar-spectrum__node-panel {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid var(--stellar-line-soft);
+}
+
+.stellar-spectrum__node-panel[hidden] {
+  display: none;
+}
+
+.stellar-spectrum__node-guidance {
+  margin: 0.75rem 0;
+  color: var(--stellar-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.stellar-spectrum__nodes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.stellar-spectrum__node {
+  display: grid;
+  grid-template-columns: 0.6rem minmax(0, 1fr);
+  gap: 0.55rem;
+  align-items: center;
+  min-height: 46px;
+  border: 1px solid var(--stellar-line-soft);
+  padding: 0.58rem 0.7rem;
+  color: var(--stellar-ink);
+  background: rgba(250, 249, 244, 0.74);
+  text-align: left;
+}
+
+.stellar-spectrum__node:hover,
+.stellar-spectrum__node[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--band-tone) 52%, transparent);
+  color: var(--stellar-blue-deep);
+  background: color-mix(in srgb, var(--band-tone) 7%, var(--stellar-paper));
+}
+
+.stellar-spectrum__node-mark {
+  width: 0.48rem;
+  height: 0.48rem;
+  border: 1px solid var(--band-tone);
+  border-radius: 50%;
+  background: var(--band-tone);
+}
+
+.stellar-spectrum__node[data-maturity="published"] .stellar-spectrum__node-mark {
+  background: transparent;
+}
+
+.stellar-spectrum__node[data-maturity="self-described"] .stellar-spectrum__node-mark {
+  border-style: dashed;
+  background: transparent;
+}
+
+.stellar-spectrum__node-label {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.stellar-spectrum__readout {
+  position: sticky;
+  top: 6rem;
+  min-width: 0;
+  padding: 1.1rem;
+  border: 1px solid var(--stellar-line);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.stellar-spectrum__readout-kicker {
+  margin: 0 0 0.55rem;
+  color: var(--stellar-blue);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.stellar-spectrum__readout h3,
+.stellar-spectrum__readout h4,
+.stellar-spectrum__readout h5 {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
+.stellar-spectrum__readout h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.stellar-spectrum__readout h4 {
+  margin: 1rem 0 0.45rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stellar-spectrum__readout > p:not(.stellar-spectrum__readout-kicker),
+.stellar-spectrum__readout-summary,
+.stellar-spectrum__career-presence {
+  color: var(--stellar-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.stellar-spectrum__readout-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.stellar-spectrum__readout-meta span {
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--stellar-line-soft);
+  color: var(--stellar-muted);
+  font: 600 0.62rem/1.3 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stellar-spectrum__source-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.stellar-spectrum__source-context {
+  min-width: 0;
+  padding: 0.65rem;
+  border-left: 2px solid var(--stellar-line);
+  background: rgba(244, 244, 238, 0.62);
+}
+
+.stellar-spectrum__source-context.has-sources {
+  border-left-color: var(--stellar-blue);
+}
+
+.stellar-spectrum__source-context h5 {
+  margin: 0;
+  color: var(--stellar-ink);
+  font-size: 0.62rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.stellar-spectrum__source-context ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.45rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stellar-spectrum__source-context li,
+.stellar-spectrum__source-empty {
+  color: var(--stellar-muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.stellar-spectrum__source-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--stellar-blue-deep);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+  overflow-wrap: anywhere;
+}
+
+.stellar-spectrum__receipt-hint {
+  margin-top: 0.9rem;
+  padding: 0.7rem 0.8rem;
+  border-left: 2px solid var(--stellar-blue);
+  background: rgba(31, 92, 186, 0.045);
+}
+
+.stellar-spectrum__relationships {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.stellar-spectrum__relationship {
+  padding: 0.65rem;
+  border-left: 2px solid var(--stellar-blue);
+  background: rgba(244, 244, 238, 0.62);
+}
+
+.stellar-spectrum__relationship[data-maturity="published"],
+.stellar-spectrum__relationship[data-maturity="self-described"] {
+  border-left-style: dashed;
+}
+
+.stellar-spectrum__relationship-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.stellar-spectrum__relationship-style {
+  color: var(--stellar-muted);
+  font: 600 0.58rem/1.35 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.stellar-spectrum__relationship p {
+  margin: 0.45rem 0 0;
+  color: var(--stellar-muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.stellar-spectrum__related-node {
+  min-height: 44px;
+  border: 1px solid var(--stellar-line-soft);
+  padding: 0.4rem 0.55rem;
+  color: var(--stellar-muted);
+  background: transparent;
+  font: 650 0.66rem/1.3 "Space Grotesk", system-ui, sans-serif;
+}
+
+.stellar-spectrum__related-node:hover {
+  border-color: rgba(31, 92, 186, 0.45);
+  color: var(--stellar-blue-deep);
+}
+
+.stellar-spectrum__table-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  margin-top: 0.9rem;
+  color: var(--stellar-blue-deep);
+  font: 700 0.66rem/1.3 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.stellar-spectrum__method {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--stellar-line-soft);
+  color: var(--stellar-muted);
+  background: rgba(244, 244, 238, 0.62);
+  font-size: 0.68rem;
+  letter-spacing: 0.025em;
+  line-height: 1.55;
+}
+
+.stellar-spectrum__method[hidden] {
+  display: none;
+}
+
+.stellar-spectrum__fallback {
+  margin-top: 1rem;
+}
+
+.stellar-spectrum--enhanced .stellar-spectrum__fallback {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.stellar-spectrum__fallback-note {
+  margin: 0 0 1rem;
+  color: var(--stellar-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.stellar-spectrum__fallback-datasets {
+  display: grid;
+  gap: 1rem;
+}
+
+.stellar-spectrum__fallback-panel {
+  padding: 1rem;
+  border: 1px solid var(--stellar-line-soft);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.stellar-spectrum__fallback-panel h3 {
+  margin: 0 0 0.8rem;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-size: 1rem;
+}
+
+.stellar-spectrum__fallback-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.stellar-spectrum__fallback-group {
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--stellar-blue);
+}
+
+.stellar-spectrum__fallback-group strong {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-size: 0.78rem;
+}
+
+.stellar-spectrum__fallback-group ul {
+  margin: 0.45rem 0 0;
+  padding-left: 1rem;
+  color: var(--stellar-muted);
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.profile-map-evidence {
+  margin-top: 1.5rem;
+  border: 1px solid var(--stellar-line);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.profile-map-evidence > summary {
+  min-height: 50px;
+  padding: 1rem 1.2rem;
+  color: var(--stellar-ink);
+  cursor: pointer;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.profile-map-evidence__body {
+  padding: 0 1.2rem 1.2rem;
+}
+
+.profile-map-evidence__body > p {
+  max-width: 78ch;
+  color: var(--stellar-muted);
+  line-height: 1.65;
+}
+
+.profile-map-evidence__table-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.profile-map-evidence table {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.profile-map-evidence th,
+.profile-map-evidence td {
+  padding: 0.75rem;
+  border: 1px solid var(--stellar-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.profile-map-evidence th {
+  background: var(--stellar-panel);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profile-map-evidence td a {
+  color: var(--stellar-blue-deep);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.stellar-calibration-note {
+  max-width: 78ch;
+  margin: -1.2rem 0 2rem;
+  padding: 0.8rem 1rem;
+  border-left: 2px solid var(--stellar-blue);
+  color: var(--stellar-muted);
+  background: rgba(244, 244, 238, 0.7);
+  font-size: 0.74rem;
+  letter-spacing: 0.025em;
+  line-height: 1.6;
+}
+
+[data-stellar-surface],
+.profile-map-evidence tbody tr,
+#about-lab-journal article,
+#about-lab-journal > a {
+  transition: opacity 170ms ease, filter 170ms ease, background-color 170ms ease, box-shadow 170ms ease;
+}
+
+.stellar-focus-active [data-stellar-surface].is-stellar-muted,
+.stellar-focus-active .profile-map-evidence tbody tr.is-stellar-muted,
+.stellar-focus-active #about-lab-journal article.is-stellar-muted,
+.stellar-focus-active #about-lab-journal > a.is-stellar-muted {
+  opacity: 0.32;
+  filter: grayscale(0.7);
+}
+
+[data-stellar-surface].is-stellar-related,
+.profile-map-evidence tbody tr.is-stellar-related,
+#about-lab-journal article.is-stellar-related,
+#about-lab-journal > a.is-stellar-related {
+  opacity: 1;
+  filter: none;
+  background-color: rgba(31, 92, 186, 0.09);
+  box-shadow: inset 3px 0 var(--stellar-blue);
+}
+
+[data-stellar-section="stack"] [data-stellar-surface].is-stellar-related {
+  color: #b8d2ff;
+  background-color: rgba(103, 153, 251, 0.14);
+  box-shadow: inset 2px 0 #8fb3ff;
+}
+
+a.is-stellar-source {
+  color: var(--stellar-blue-deep) !important;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.profile-map-evidence tbody tr.is-stellar-related th {
+  color: #001b46;
+}
+
+@media (max-width: 980px) {
+  .stellar-spectrum__stage {
+    grid-template-columns: 1fr;
+  }
+
+  .stellar-spectrum__readout {
+    position: static;
+  }
+
+  .stellar-spectrum__legend {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  #profile-map {
+    scroll-margin-top: 10rem;
+  }
+
+  .stellar-spectrum {
+    margin-inline: -0.5rem;
+    padding: 1rem;
+  }
+
+  .stellar-spectrum__topline {
+    align-items: flex-start;
+  }
+
+  .stellar-spectrum__status {
+    max-width: 15ch;
+  }
+
+  .stellar-spectrum__controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .stellar-spectrum__modes,
+  .stellar-spectrum__receipts-toggle {
+    width: 100%;
+  }
+
+  .stellar-spectrum__mode {
+    padding-inline: 0.45rem;
+    font-size: 0.64rem;
+  }
+
+  .stellar-spectrum__band-trigger {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    min-height: 5rem;
+  }
+
+  .stellar-spectrum__track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    height: 1.6rem;
+  }
+
+  .stellar-spectrum__band-count {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .stellar-spectrum__nodes,
+  .stellar-spectrum__source-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stellar-spectrum__node,
+  .stellar-spectrum__related-node,
+  .stellar-spectrum__table-link {
+    min-height: 44px;
+  }
+
+  .stellar-spectrum__fallback-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-map-evidence__body {
+    padding-inline: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stellar-spectrum__topline {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
+  .stellar-spectrum__status {
+    max-width: none;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stellar-spectrum *,
+  .stellar-spectrum *::before,
+  .stellar-spectrum *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .stellar-spectrum__stage.is-scanning::after {
+    display: none;
+  }
+
+  [data-stellar-surface],
+  .profile-map-evidence tbody tr,
+  #about-lab-journal article,
+  #about-lab-journal > a {
+    transition: none !important;
+  }
+}
+
+@media print {
+  .stellar-spectrum__modes,
+  .stellar-spectrum__receipts-toggle,
+  .stellar-spectrum__legend,
+  .stellar-spectrum__stage,
+  .stellar-spectrum__method {
+    display: none !important;
+  }
+
+  .stellar-spectrum--enhanced .stellar-spectrum__fallback {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 1rem 0 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  .profile-map-evidence {
+    break-inside: avoid;
+  }
+
+  .stellar-focus-active .is-stellar-muted {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Whole-person light cone
+   The route is one instrument. The atlas is only one reading surface inside it.
+   -------------------------------------------------------------------------- */
+
+.about-universe {
+  --about-gutter: clamp(1.5rem, 5vw, 4.75rem);
+  --about-rule: rgba(135, 171, 218, 0.22);
+  --about-rule-soft: rgba(135, 171, 218, 0.11);
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  color: var(--stellar-ink);
+  background: var(--about-base);
+}
+
+.about-universe::before {
+  display: none;
+}
+
+.about-universe :is(
+  .bg-surface,
+  .bg-surface-container,
+  .bg-surface-container-low,
+  .bg-surface-container-high,
+  .bg-surface-container-highest,
+  .bg-surface-variant
+) {
+  background-color: transparent !important;
+}
+
+.about-opening {
+  display: grid;
+  grid-template-columns: minmax(20rem, 0.72fr) minmax(0, 1.28fr);
+  width: min(100%, 90rem);
+  min-height: calc(100svh - 6rem);
+  margin: 0 auto clamp(6rem, 10vw, 10rem);
+  padding: clamp(2.25rem, 5vw, 4.5rem) var(--about-gutter) 0;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+.about-opening > .about-region {
+  width: auto;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.about-opening > .about-region::before { display: none; }
+
+.about-opening .about-origin {
+  display: block;
+  min-height: 0;
+}
+
+.about-opening .about-origin__copy { display: block; }
+
+.about-opening .about-origin h1 {
+  font-size: clamp(3.35rem, 5.15vw, 5.35rem);
+  line-height: 0.88;
+  letter-spacing: -0.07em;
+}
+
+.about-opening .about-origin h1 span { width: auto; white-space: normal; }
+.about-opening .about-origin h1 span:nth-child(2) { margin: 0.2rem 0 0 0.35rem; font-size: 0.78em; }
+.about-opening .about-origin h1 span:nth-child(3) { margin: 0.35rem 0 0 0.7rem; font-size: 0.63em; }
+
+.about-opening .about-origin__prose {
+  grid-template-columns: 1fr;
+  gap: 1.1rem;
+  margin-top: clamp(2rem, 3.5vw, 3.25rem);
+}
+
+.about-opening .about-origin__prose p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.65; }
+.about-opening .about-origin__prose p::before { margin-bottom: 0.65rem; }
+
+.about-opening .stellar-atlas .about-region__heading {
+  display: block !important;
+  margin: 0 0 0.8rem !important;
+}
+
+.about-opening .stellar-atlas .stellar-spectrum__heading { max-width: 11ch; font-size: clamp(2.2rem, 3.3vw, 3.7rem); }
+.about-opening .stellar-atlas .stellar-spectrum__intro { max-width: 48rem; margin-top: 0.8rem; font-size: 0.88rem; line-height: 1.55; }
+.about-opening .stellar-atlas .stellar-spectrum__bands { width: 100%; min-height: 43rem; margin-left: 0; }
+.about-opening .stellar-tree__viewport { height: 43rem; }
+.about-opening .stellar-tree__toolbar { top: 0.2rem; right: 0.2rem; left: auto; width: auto; }
+
+.profile-map-evidence.about-region { padding-top: 0 !important; }
+
+.about-region {
+  position: relative;
+  width: min(100%, 90rem);
+  max-width: 90rem !important;
+  margin: 0 auto clamp(8rem, 15vw, 15rem) !important;
+  padding: clamp(4rem, 8vw, 8rem) var(--about-gutter) 0 !important;
+  scroll-margin-top: 5.5rem;
+}
+
+.about-region:not(.about-origin)::before {
+  position: absolute;
+  top: 0;
+  right: var(--about-gutter);
+  left: var(--about-gutter);
+  height: 1px;
+  background: linear-gradient(90deg, var(--stellar-blue) 0 4.5rem, var(--about-rule) 4.5rem 100%);
+  content: "";
+}
+
+.about-region__kicker {
+  margin: 0 0 1.25rem;
+  color: var(--stellar-blue);
+  font: 700 0.68rem/1.4 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.about-region__heading {
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.92fr) minmax(18rem, 0.58fr);
+  gap: clamp(2rem, 7vw, 7rem) !important;
+  align-items: start !important;
+  margin: 0 0 clamp(3rem, 6vw, 6rem) !important;
+}
+
+.about-region__heading h2,
+.stellar-light-cone__heading h2,
+.about-origin__console h2 {
+  margin: 0;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-weight: 600;
+  line-height: 0.97;
+  letter-spacing: -0.055em;
+}
+
+.about-region__heading h2,
+.stellar-light-cone__heading h2 {
+  font-size: clamp(2.9rem, 6vw, 6.25rem) !important;
+}
+
+.about-region__heading > p,
+.about-region__heading > div + p {
+  max-width: 40rem;
+  margin: 0.15rem 0 0;
+  color: var(--stellar-muted);
+  font: 400 clamp(0.9rem, 1.2vw, 1.05rem)/1.75 "Manrope", sans-serif;
+}
+
+/* Present origin */
+
+.about-origin {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: auto;
+  gap: clamp(2rem, 5vw, 5rem) clamp(1rem, 2.2vw, 2.25rem);
+  min-height: calc(100svh - 3rem);
+  padding-top: clamp(3rem, 8vh, 7rem) !important;
+}
+
+.about-origin__copy {
+  z-index: 2;
+  grid-column: 1 / span 9;
+  grid-row: 1;
+  align-self: start;
+}
+
+.about-origin h1 {
+  max-width: none;
+  margin: 0;
+  color: var(--stellar-ink);
+  font: 600 clamp(4rem, 9.25vw, 9.5rem)/0.82 "Space Grotesk", system-ui, sans-serif;
+  letter-spacing: -0.082em;
+}
+
+.about-origin h1 span {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.about-origin h1 span:nth-child(2) {
+  margin-left: clamp(0.75rem, 4vw, 4rem);
+  font-size: clamp(3rem, 7vw, 6.5rem);
+}
+
+.about-origin h1 span:nth-child(3) {
+  margin-left: clamp(1.5rem, 8vw, 8rem);
+  color: #8fa8c5;
+  font-size: clamp(2.4rem, 6vw, 5.5rem);
+  letter-spacing: -0.065em;
+}
+
+.about-origin__prose {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 4vw, 4rem);
+  max-width: 64rem;
+  margin-top: clamp(3rem, 6vw, 6.5rem);
+}
+
+.about-origin__prose p {
+  margin: 0;
+  color: var(--stellar-muted);
+  font: 350 clamp(1rem, 1.35vw, 1.18rem)/1.75 "Manrope", sans-serif;
+  text-wrap: pretty;
+}
+
+.about-origin__prose p::before {
+  display: block;
+  width: 2rem;
+  height: 1px;
+  margin-bottom: 1rem;
+  background: currentColor;
+  content: "";
+  opacity: 0.45;
+}
+
+.about-origin__regions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1.5rem;
+  margin-top: clamp(2.5rem, 5vw, 5rem);
+  font: 650 0.68rem/1.4 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.about-origin__regions a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--stellar-muted);
+  text-decoration: none;
+}
+
+.about-origin__regions a:hover,
+.about-origin__regions a:focus-visible {
+  color: var(--stellar-blue);
+}
+
+.about-origin__field {
+  position: relative;
+  z-index: 1;
+  grid-column: 8 / -1;
+  grid-row: 1;
+  min-height: 38rem;
+  margin: -2rem -2rem 0 -6rem;
+  pointer-events: none;
+}
+
+.about-origin__field svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.about-origin__field path,
+.about-origin__field circle {
+  fill: none;
+  stroke: rgba(153, 190, 237, 0.24);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.about-origin__field circle:first-of-type {
+  fill: var(--stellar-paper);
+  stroke: var(--stellar-blue);
+  stroke-width: 1.5;
+}
+
+.about-origin__trace {
+  stroke-width: 1.5 !important;
+  stroke-dasharray: 3 8;
+}
+
+.about-origin__eccentric {
+  stroke: rgba(31, 92, 186, 0.55) !important;
+  stroke-dasharray: 1 6;
+}
+
+.about-origin__coordinate {
+  position: absolute;
+  color: rgba(196, 218, 244, 0.64);
+  font: 650 0.58rem/1.35 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.about-origin__coordinate--present {
+  top: 7%;
+  left: 44%;
+  color: var(--stellar-blue);
+}
+
+.about-origin__coordinate--practice { bottom: 4%; left: 0; }
+.about-origin__coordinate--curiosity { right: -1rem; bottom: 4%; }
+
+.about-origin__observer {
+  position: absolute;
+  top: 5.9%;
+  left: 43%;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(31, 92, 186, 0.45);
+  border-radius: 50%;
+  color: var(--stellar-blue);
+  background: rgba(3, 13, 32, 0.88);
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.about-origin__observer strong { font-size: 0.73rem; letter-spacing: 0.08em; }
+.about-origin__observer span { position: absolute; top: calc(100% + 0.45rem); width: 8rem; font-size: 0.52rem; letter-spacing: 0.12em; text-align: center; text-transform: uppercase; }
+
+.about-origin__console {
+  z-index: 3;
+  grid-column: 2 / -2;
+  align-self: end;
+  padding: 1.35rem 0 1rem;
+  border-top: 1px solid var(--about-rule);
+  border-bottom: 1px solid var(--about-rule);
+}
+
+.about-origin__console .stellar-spectrum__topline { margin-bottom: 1.65rem; padding: 0; border: 0; }
+.about-origin__console h2 { max-width: 26ch; font-size: clamp(1.7rem, 3vw, 3.15rem); }
+.about-origin__console > p { max-width: 49rem; margin: 0.8rem 0 1.6rem; color: var(--stellar-muted); line-height: 1.7; }
+.about-origin__console .stellar-spectrum__controls { margin: 0; }
+
+/* Page-wide lens: emphasis only; content always remains available. */
+
+.about-universe [data-stellar-lens],
+.about-universe [data-stellar-lens-copy] {
+  transition: opacity 220ms ease, color 220ms ease, filter 220ms ease;
+}
+
+.about-universe[data-stellar-active-scan="engineering"] [data-stellar-lens="interests"],
+.about-universe[data-stellar-active-scan="engineering"] [data-stellar-lens-copy="interests"],
+.about-universe[data-stellar-active-scan="interests"] [data-stellar-lens="engineering"],
+.about-universe[data-stellar-active-scan="interests"] [data-stellar-lens-copy="engineering"] {
+  opacity: 0.46;
+}
+
+.about-universe[data-stellar-active-scan="engineering"] .about-origin__trace--engineering,
+.about-universe[data-stellar-active-scan="interests"] .about-origin__trace--interests,
+.about-universe[data-stellar-active-scan="combined"] .about-origin__trace {
+  stroke: var(--stellar-blue) !important;
+  stroke-dasharray: none;
+}
+
+.about-universe[data-stellar-active-scan="engineering"] .about-origin__trace--interests,
+.about-universe[data-stellar-active-scan="interests"] .about-origin__trace--engineering {
+  opacity: 0.18;
+}
+
+/* Spectral atlas */
+
+.stellar-atlas.stellar-spectrum {
+  overflow: visible;
+  border: 0;
+  color: var(--stellar-ink);
+  background: transparent;
+}
+
+.stellar-atlas.stellar-spectrum::before { display: none; }
+
+.stellar-atlas .stellar-spectrum__heading {
+  max-width: 10ch;
+  font-size: clamp(3.3rem, 7.5vw, 7.5rem);
+}
+
+.stellar-atlas .stellar-spectrum__intro { margin: 0.2rem 0 0; }
+
+.stellar-spectrum__legend {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin: 0 0 clamp(3rem, 5vw, 5rem);
+  padding: 0 0 1.5rem;
+  border: 0;
+  border-bottom: 1px solid var(--about-rule);
+  color: var(--stellar-muted);
+  background: transparent;
+}
+
+.stellar-spectrum__legend span { align-items: flex-start; line-height: 1.55; }
+
+.stellar-spectrum__stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.55fr);
+  min-height: 38rem;
+  border: 0;
+  background: transparent;
+}
+
+.stellar-spectrum__bands {
+  border: 0;
+  border-top: 1px solid var(--about-rule);
+}
+
+.stellar-spectrum__band {
+  border: 0;
+  border-bottom: 1px solid var(--about-rule);
+  background: transparent;
+}
+
+.stellar-spectrum__band.is-quiet { opacity: 0.33; }
+
+.stellar-spectrum__band-trigger {
+  min-height: 7.25rem;
+  border: 0;
+  padding: 1.35rem 0;
+  color: var(--stellar-ink);
+  background: transparent;
+  grid-template-columns: minmax(14rem, 0.95fr) minmax(10rem, 1.05fr) auto;
+}
+
+.stellar-spectrum__band-trigger:hover,
+.stellar-spectrum__band.is-active .stellar-spectrum__band-trigger {
+  color: var(--stellar-blue-deep);
+  background: linear-gradient(90deg, rgba(31, 92, 186, 0.045), transparent 72%);
+}
+
+.stellar-spectrum__band-name { font-size: clamp(0.88rem, 1.1vw, 1.08rem); letter-spacing: 0.04em; }
+.stellar-spectrum__band-meta { max-width: 31ch; color: var(--stellar-muted); font-size: 0.67rem; line-height: 1.55; }
+.stellar-spectrum__band-count { min-width: 5.5rem; color: var(--stellar-muted); font-size: 0.62rem; }
+
+.stellar-spectrum__track {
+  height: 2.5rem;
+  border: 0;
+  border-bottom: 1px solid var(--band-tone);
+  background: transparent;
+}
+
+.stellar-spectrum__track::before { background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--band-tone) 15%, transparent), transparent); }
+
+.stellar-spectrum__tick {
+  width: 1px;
+  height: 1.15rem;
+  align-self: end;
+  border: 0;
+  border-left: 1px solid var(--band-tone);
+  background: transparent;
+}
+
+.stellar-spectrum__tick[data-maturity="published"] { border-left-style: dashed; }
+.stellar-spectrum__tick[data-maturity="self-described"] { height: 0.7rem; opacity: 0.66; }
+
+.stellar-spectrum__node-panel {
+  border: 0;
+  border-top: 1px dashed var(--about-rule);
+  padding: 1.5rem 0 2rem;
+  background: transparent;
+}
+
+.stellar-spectrum__nodes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.5rem; }
+
+.stellar-spectrum__node {
+  min-height: 3.4rem;
+  justify-content: flex-start;
+  border: 0;
+  border-bottom: 1px solid var(--about-rule-soft);
+  padding: 0.65rem 0;
+  color: var(--stellar-muted);
+  background: transparent;
+  text-align: left;
+}
+
+.stellar-spectrum__node:hover,
+.stellar-spectrum__node[aria-pressed="true"] {
+  color: var(--stellar-blue-deep);
+  background: transparent;
+}
+
+.stellar-spectrum__node-mark { flex: 0 0 0.45rem; width: 0.45rem; height: 0.45rem; border-color: var(--band-tone); border-radius: 50%; background: transparent; }
+.stellar-spectrum__node[aria-pressed="true"] .stellar-spectrum__node-mark { background: var(--stellar-blue); box-shadow: 0 0 0 5px rgba(31, 92, 186, 0.1); }
+
+.stellar-spectrum__readout {
+  align-self: start;
+  min-height: 33rem;
+  border: 0;
+  border-left: 1px solid var(--about-rule);
+  padding: 0.5rem 0 2rem clamp(2rem, 4vw, 4.5rem);
+  background: transparent;
+}
+
+.stellar-spectrum__readout h3 { max-width: 14ch; font-size: clamp(1.8rem, 3vw, 3.15rem); line-height: 0.98; }
+.stellar-spectrum__readout h4 { margin-top: 2.4rem; border-top: 1px solid var(--about-rule); padding-top: 1rem; }
+.stellar-spectrum__readout-meta { border: 0; border-left: 2px solid var(--stellar-blue); padding: 0.1rem 0 0.1rem 1rem; background: transparent; }
+.stellar-spectrum__receipt-hint,
+.stellar-spectrum__career-presence { border: 0; border-top: 1px dashed var(--about-rule); padding: 1rem 0 0; background: transparent; }
+.stellar-spectrum__source-grid { grid-template-columns: 1fr; gap: 1.4rem; }
+.stellar-spectrum__source-context { border: 0; border-top: 1px solid var(--about-rule-soft); padding: 0.85rem 0 0; background: transparent; }
+.stellar-spectrum__relationship { border: 0; border-bottom: 1px solid var(--about-rule-soft); padding: 0.8rem 0; background: transparent; }
+.stellar-spectrum__related-node { border: 0; padding: 0; background: transparent; text-align: left; }
+.stellar-spectrum__table-link { border: 0; border-bottom: 1px solid currentColor; padding: 0.7rem 0 0.2rem; background: transparent; }
+
+.stellar-spectrum__method {
+  margin-top: 2rem;
+  border: 0;
+  border-top: 1px solid var(--about-rule);
+  padding: 1.25rem 0 0;
+  color: var(--stellar-muted);
+  background: transparent;
+}
+
+.stellar-spectrum__fallback { margin-top: 2rem; border: 0; border-top: 1px solid var(--about-rule); padding: 1.5rem 0 0; background: transparent; }
+.stellar-spectrum__fallback-note { max-width: 68ch; }
+.stellar-spectrum__fallback-datasets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(2rem, 5vw, 6rem); }
+.stellar-spectrum__fallback-panel { border: 0; padding: 0; background: transparent; }
+.stellar-spectrum__fallback-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+.stellar-spectrum__fallback-group { border: 0; border-top: 1px solid var(--about-rule); padding: 0.8rem 0 0; background: transparent; }
+
+.profile-map-evidence {
+  margin: clamp(5rem, 9vw, 9rem) 0 0;
+  border: 0;
+  border-top: 1px solid var(--stellar-blue);
+  border-bottom: 1px solid var(--about-rule);
+  background: transparent;
+}
+
+.profile-map-evidence summary {
+  display: flex;
+  min-height: 5.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 0;
+  color: var(--stellar-ink);
+  background: transparent;
+  font: 600 clamp(1rem, 1.6vw, 1.35rem)/1.3 "Space Grotesk", sans-serif;
+}
+
+.profile-map-evidence summary span { color: var(--stellar-blue); font-size: 0.68rem; letter-spacing: 0.14em; }
+.profile-map-evidence summary:hover { color: var(--stellar-blue-deep); background: transparent; }
+.profile-map-evidence__body { border-top: 1px solid var(--about-rule); padding: 2rem 0 3rem; }
+.profile-map-evidence__body > p { max-width: 74ch; font-size: 0.92rem; line-height: 1.75; }
+.profile-map-evidence__table-wrap { margin-top: clamp(4rem, 8vw, 8rem); overflow: visible; border: 0; }
+
+.profile-map-evidence table {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  border-collapse: separate;
+  background: transparent;
+}
+
+.profile-map-evidence thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.profile-map-evidence tbody {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(6rem, 10vw, 10rem) clamp(2rem, 5vw, 5rem);
+  align-items: start;
+  counter-reset: evidence-receipt;
+}
+
+.profile-map-evidence tbody tr {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 18rem;
+  flex-direction: column;
+  border-top: 1px solid var(--about-rule);
+  padding: 1.2rem 0 2rem;
+  background: transparent;
+  counter-increment: evidence-receipt;
+}
+
+.profile-map-evidence tbody tr:nth-child(3n + 2) { transform: translateY(4rem); }
+.profile-map-evidence tbody tr:nth-child(3n + 3) { transform: translateY(1.75rem); }
+
+.profile-map-evidence tbody tr::before {
+  position: absolute;
+  top: -1.75rem;
+  right: 0;
+  color: rgba(31, 92, 186, 0.52);
+  content: "receipt / " counter(evidence-receipt, decimal-leading-zero);
+  font: 650 0.56rem/1.3 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.profile-map-evidence tbody tr > th,
+.profile-map-evidence tbody tr > td {
+  display: block;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.profile-map-evidence tbody tr > td:first-child {
+  color: var(--stellar-blue);
+  font: 650 0.6rem/1.4 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.profile-map-evidence tbody tr > th {
+  margin-top: 0.85rem;
+  color: var(--stellar-ink);
+  font: 550 clamp(1.45rem, 2.4vw, 2.45rem)/1.02 "Space Grotesk", sans-serif;
+  letter-spacing: -0.04em;
+  text-transform: none;
+}
+
+.profile-map-evidence tbody tr > td:nth-of-type(2) {
+  margin-top: 1.4rem;
+  color: var(--stellar-blue-deep);
+  font-size: 0.76rem;
+  line-height: 1.65;
+}
+
+.profile-map-evidence tbody tr > td:last-child {
+  margin-top: 1rem;
+  color: var(--stellar-muted);
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+
+.profile-map-evidence tbody tr:hover { border-top-color: rgba(31, 92, 186, 0.65); background: transparent; }
+
+/* Assessment calibration */
+
+.stellar-calibration-note {
+  max-width: 76ch;
+  margin: -2.5rem 0 clamp(3rem, 6vw, 6rem);
+  color: var(--stellar-muted);
+  font-size: 0.72rem;
+  line-height: 1.65;
+  letter-spacing: 0.05em;
+}
+
+.stellar-calibration > .grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr) !important;
+  gap: clamp(3rem, 7vw, 7rem) !important;
+}
+
+.stellar-calibration article {
+  grid-column: auto !important;
+  border: 0 !important;
+  padding: 0 !important;
+  color: var(--stellar-ink) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.stellar-calibration article + article { border-left: 1px solid var(--about-rule) !important; padding-left: clamp(2rem, 5vw, 5rem) !important; }
+.stellar-calibration article .bg-surface-container-high,
+.stellar-calibration article .bg-surface { border: 0 !important; border-bottom: 1px solid var(--about-rule-soft) !important; padding: 1rem 0 !important; background: transparent !important; }
+.stellar-calibration article .h-2 { height: 1px !important; border: 0 !important; background: var(--about-rule) !important; }
+.stellar-calibration article .h-2 > div { position: relative; top: -1px; height: 3px !important; background: var(--stellar-blue) !important; }
+
+/* Career light cone */
+
+.stellar-light-cone__layout {
+  display: grid !important;
+  grid-template-columns: minmax(17rem, 0.42fr) minmax(0, 1fr);
+  gap: clamp(4rem, 10vw, 10rem) !important;
+}
+
+.stellar-light-cone__heading {
+  position: sticky;
+  top: 7.5rem;
+  width: auto !important;
+}
+
+.stellar-light-cone__heading h2 { max-width: 7ch; text-transform: none !important; }
+.stellar-light-cone__heading > p:last-child { max-width: 24rem !important; color: var(--stellar-muted); font-size: 0.98rem; line-height: 1.75; }
+
+.stellar-light-cone__roles {
+  position: relative;
+  width: auto !important;
+  padding-left: clamp(2rem, 5vw, 5rem);
+}
+
+.stellar-light-cone__roles::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--stellar-blue), var(--about-rule) 30%, transparent);
+  content: "";
+  transform: rotate(1.6deg);
+  transform-origin: top;
+}
+
+.stellar-light-cone__role {
+  position: relative;
+  padding: 0 0 clamp(5rem, 8vw, 8rem) !important;
+  color: var(--stellar-ink);
+}
+
+.stellar-light-cone__role:last-child { padding-bottom: 0 !important; }
+.stellar-light-cone__role::before { position: absolute; top: 0.42rem; left: calc(-1 * clamp(2rem, 5vw, 5rem) - 3px); width: 7px; height: 7px; border: 1px solid var(--stellar-blue); border-radius: 50%; background: var(--stellar-paper); content: ""; }
+.stellar-light-cone__role > .absolute { display: none; }
+.stellar-light-cone__role h3 { max-width: 28ch; margin: 0 0 1rem !important; font-size: clamp(1.75rem, 3.5vw, 3.6rem) !important; font-weight: 550 !important; line-height: 1.02; letter-spacing: -0.045em; }
+.stellar-light-cone__role > .font-label { color: var(--stellar-blue) !important; }
+.stellar-light-cone__role ul { max-width: 50rem !important; color: var(--stellar-muted) !important; font-size: clamp(0.98rem, 1.4vw, 1.15rem) !important; line-height: 1.72 !important; }
+.stellar-light-cone__role li::marker { color: rgba(31, 92, 186, 0.55); }
+.stellar-light-cone__role.is-stellar-related::before { background: var(--stellar-blue); box-shadow: 0 0 0 7px rgba(31, 92, 186, 0.09); }
+
+/* Observation field */
+
+.stellar-observation-field #about-lab-journal {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  gap: clamp(2rem, 5vw, 5rem) !important;
+}
+
+.stellar-observation-field #about-lab-journal > article,
+.stellar-observation-field #about-lab-journal > div,
+.stellar-observation-field #about-lab-journal > a {
+  grid-column: span 4 !important;
+  min-height: 25rem !important;
+  border: 0 !important;
+  border-top: 1px solid var(--about-rule) !important;
+  padding: 1.5rem 0 0 !important;
+  color: var(--stellar-ink) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.stellar-observation-field #about-lab-journal > article:first-child { grid-column: span 8 !important; }
+.stellar-observation-field #about-lab-journal > article a[class*="text-3xl"] { max-width: 18ch; font-size: clamp(2.2rem, 5vw, 5.25rem) !important; font-weight: 550; letter-spacing: -0.055em; }
+.stellar-observation-field #about-lab-journal > article a[class*="text-2xl"] { font-size: clamp(1.6rem, 2.8vw, 2.8rem) !important; font-weight: 550; letter-spacing: -0.04em; }
+.stellar-observation-field #about-lab-journal [class*="bg-surface-variant"] { border: 0 !important; border-bottom: 1px solid var(--about-rule) !important; padding: 0.2rem 0 !important; background: transparent !important; }
+.stellar-observation-field #about-lab-journal > a { position: relative; grid-column: span 8 !important; min-height: 22rem !important; overflow: hidden; border-top-color: var(--stellar-blue) !important; }
+.stellar-observation-field #about-lab-journal > a img { filter: grayscale(1) contrast(0.95); opacity: 0.2 !important; mix-blend-mode: screen; }
+.stellar-observation-field #about-lab-journal > a:hover img { opacity: 0.38 !important; transform: scale(1.01); }
+.stellar-observation-field #about-lab-journal > a .text-white\/15 { color: rgba(31, 92, 186, 0.1) !important; }
+.stellar-observation-field #about-lab-journal > a .text-white\/70 { color: var(--stellar-blue) !important; }
+
+/* Systems field */
+
+.stellar-systems-ledger__surface {
+  position: relative;
+  padding: 0;
+  color: var(--stellar-ink);
+  background: transparent;
+}
+
+.stellar-systems-ledger__groups {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, minmax(26rem, auto));
+  gap: 2rem clamp(1rem, 2.5vw, 2.5rem) !important;
+  min-height: 68rem;
+  isolation: isolate;
+}
+
+.stellar-systems-ledger__groups::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3rem 4% 5rem;
+  border: 1px solid rgba(31, 92, 186, 0.12);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 5px, rgba(31, 92, 186, 0.2) 6px, transparent 7px),
+    linear-gradient(24deg, transparent calc(50% - 0.5px), var(--about-rule-soft) 50%, transparent calc(50% + 0.5px));
+  content: "";
+  transform: rotate(-8deg);
+}
+
+.stellar-systems-ledger__groups > div {
+  position: relative;
+  z-index: 1;
+  min-height: 20rem;
+  border: 0;
+  border-top: 1px solid var(--about-rule);
+  padding: 1.35rem 0 2rem;
+}
+
+.stellar-systems-ledger__groups > div:nth-child(1) { grid-column: 1 / span 5; grid-row: 1; align-self: start; }
+.stellar-systems-ledger__groups > div:nth-child(2) { grid-column: 7 / span 5; grid-row: 1; align-self: end; transform: translateY(5rem); }
+.stellar-systems-ledger__groups > div:nth-child(3) { grid-column: 2 / span 4; grid-row: 2; align-self: start; transform: translateY(-2rem); }
+.stellar-systems-ledger__groups > div:nth-child(4) { grid-column: 8 / span 5; grid-row: 2; align-self: center; transform: translateY(4rem); }
+
+.stellar-systems-ledger__groups > div::before {
+  position: absolute;
+  top: -4.2rem;
+  right: 0;
+  color: rgba(31, 92, 186, 0.08);
+  font: 600 clamp(3.5rem, 8vw, 7.5rem)/1 "Space Grotesk", sans-serif;
+  letter-spacing: -0.07em;
+}
+
+.stellar-systems-ledger__groups > div:nth-child(1)::before { content: "01"; }
+.stellar-systems-ledger__groups > div:nth-child(2)::before { content: "02"; }
+.stellar-systems-ledger__groups > div:nth-child(3)::before { content: "03"; }
+.stellar-systems-ledger__groups > div:nth-child(4)::before { content: "04"; }
+.stellar-systems-ledger__groups > div > div { color: var(--stellar-blue) !important; font-size: 0.67rem !important; }
+.stellar-systems-ledger__groups ul { margin: 0; padding: 0; color: var(--stellar-ink) !important; list-style: none; }
+.stellar-systems-ledger__groups li { position: relative; min-height: 2.8rem; border: 0; padding: 0.5rem 0 0.5rem 1.25rem; color: var(--stellar-ink) !important; font-size: clamp(1rem, 1.8vw, 1.5rem); line-height: 1.3; }
+.stellar-systems-ledger__groups li::before { position: absolute; top: 1.05rem; left: 0; width: 0.35rem; height: 0.35rem; border: 1px solid var(--stellar-blue); border-radius: 50%; content: ""; }
+.stellar-systems-ledger__groups li::after { position: absolute; right: 0; bottom: -1px; left: 0; height: 1px; background: var(--stellar-blue); content: ""; transform: scaleX(0); transform-origin: left; transition: transform 180ms ease; }
+.stellar-systems-ledger__groups li:hover::after,
+.stellar-systems-ledger__groups li.is-stellar-related::after { transform: scaleX(1); }
+
+/* Cross-route source focus remains legible without turning the page into boxes. */
+
+.stellar-focus-active .is-stellar-muted { opacity: 0.19 !important; filter: grayscale(0.75); }
+.stellar-focus-active .is-stellar-related { opacity: 1 !important; filter: none; }
+.stellar-focus-active .is-stellar-source { color: var(--stellar-blue-deep) !important; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.3em; }
+.profile-map-evidence tbody tr.is-stellar-related { border-top-color: var(--stellar-blue); background: transparent; box-shadow: none; }
+.profile-map-evidence tbody tr.is-stellar-primary { box-shadow: none; }
+.profile-map-evidence tbody tr.is-stellar-primary::before { color: var(--stellar-blue-deep); }
+
+@media (max-width: 1024px) {
+  .about-origin { grid-template-rows: auto; min-height: auto; }
+  .about-origin__copy { grid-column: 1 / span 9; }
+  .about-origin__field { grid-column: 8 / -1; min-height: 31rem; opacity: 0.75; }
+  .about-origin__console { grid-column: 1 / -1; }
+  .about-region__heading { grid-template-columns: 1fr minmax(16rem, 0.48fr); }
+  .stellar-spectrum__stage { grid-template-columns: 1fr; }
+  .stellar-spectrum__readout { min-height: 0; border-top: 1px solid var(--about-rule); border-left: 0; padding: 3rem 0 1rem; }
+  .stellar-calibration > .grid { gap: 3rem !important; }
+  .stellar-light-cone__layout { grid-template-columns: minmax(14rem, 0.36fr) minmax(0, 1fr); gap: 4rem !important; }
+  .stellar-observation-field #about-lab-journal > article,
+  .stellar-observation-field #about-lab-journal > div { grid-column: span 6 !important; }
+  .stellar-observation-field #about-lab-journal > article:first-child,
+  .stellar-observation-field #about-lab-journal > a { grid-column: span 12 !important; }
+  .profile-map-evidence tbody { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .profile-map-evidence tbody tr { transform: none; }
+  .profile-map-evidence tbody tr:nth-child(even) { transform: translateY(3rem); }
+  .stellar-systems-ledger__groups { min-height: 64rem; }
+  .stellar-systems-ledger__groups > div { min-height: 19rem; }
+}
+
+@media (max-width: 720px) {
+  #site-topbar > div { grid-template-columns: minmax(0, 1fr) auto; }
+  #site-topbar > div > a { max-width: 8rem; line-height: 1.45; }
+  #site-nav { display: none; }
+  #site-nav-mobile { display: flex; min-height: 44px; padding: 0 1.25rem; gap: 1rem; overflow-x: auto; border-top: 1px solid rgba(120, 124, 115, 0.12); white-space: nowrap; }
+  .about-universe { padding-top: 9rem; }
+  .about-universe { --about-gutter: 1.25rem; }
+  .about-opening { margin-bottom: 6rem; padding-top: 1.25rem; gap: 2.25rem; }
+  .about-opening .about-origin__prose { grid-template-columns: 1fr; gap: 0.85rem; margin-top: 1.7rem; }
+  .about-opening .stellar-atlas .about-region__heading { margin-bottom: 0.35rem !important; }
+  .about-region { margin-bottom: 7.5rem !important; padding-top: 4.5rem !important; }
+  .about-region__heading { grid-template-columns: 1fr; gap: 1.25rem !important; margin-bottom: 3.5rem !important; }
+  .about-region__heading h2,
+  .stellar-light-cone__heading h2 { font-size: clamp(2.7rem, 14vw, 4.5rem) !important; }
+  .about-origin { display: block; padding-top: 2.5rem !important; }
+  .about-origin h1 { font-size: clamp(3.6rem, 18vw, 5.8rem); }
+  .about-origin h1 span { width: auto; white-space: normal; }
+  .about-origin h1 span:nth-child(2) { margin-left: 0.5rem; font-size: clamp(2.9rem, 14vw, 4.4rem); }
+  .about-origin h1 span:nth-child(3) { margin-top: 0.3rem; margin-left: 1rem; font-size: clamp(2.35rem, 11.5vw, 3.6rem); }
+  .about-origin__prose { grid-template-columns: 1fr; gap: 2rem; margin-top: 3.5rem; }
+  .about-origin__regions { gap-inline: 1rem; margin-top: 2.5rem; }
+  .about-origin__field { min-height: 24rem; margin: 1.5rem -3rem -2rem -5rem; opacity: 0.6; }
+  .about-origin__coordinate--practice { left: 12%; }
+  .about-origin__coordinate--curiosity { right: 8%; }
+  .about-origin__console { margin-top: 2rem; padding-top: 1.25rem; }
+  .about-origin__console .stellar-spectrum__controls { align-items: stretch; }
+  .stellar-spectrum__controls { flex-direction: column; align-items: stretch; }
+  .stellar-spectrum__modes,
+  .stellar-spectrum__receipts-toggle { width: 100%; }
+  .stellar-spectrum__legend { grid-template-columns: 1fr; gap: 1rem; }
+  .stellar-spectrum__band-trigger { grid-template-columns: minmax(0, 1fr) auto; min-height: 6.6rem; }
+  .stellar-spectrum__track { grid-column: 1 / -1; grid-row: 2; height: 1.6rem; }
+  .stellar-spectrum__band-count { grid-column: 2; grid-row: 1; }
+  .stellar-spectrum__nodes { grid-template-columns: 1fr; }
+  .stellar-spectrum__fallback-datasets,
+  .stellar-spectrum__fallback-grid { grid-template-columns: 1fr; }
+  .profile-map-evidence summary { display: grid; gap: 0.4rem; align-content: center; }
+  .profile-map-evidence__table-wrap { margin-top: 4rem; }
+  .profile-map-evidence tbody { grid-template-columns: 1fr; gap: 4rem; }
+  .profile-map-evidence tbody tr,
+  .profile-map-evidence tbody tr:nth-child(even) { min-height: 0; transform: none; }
+  .stellar-calibration-note { margin-top: -1.5rem; }
+  .stellar-calibration > .grid { grid-template-columns: 1fr !important; }
+  .stellar-calibration article + article { border-top: 1px solid var(--about-rule) !important; border-left: 0 !important; padding: 3rem 0 0 !important; }
+  .stellar-light-cone__layout { display: block !important; }
+  .stellar-light-cone__heading { position: relative; top: auto; margin-bottom: 4rem; }
+  .stellar-light-cone__roles { padding-left: 2rem; }
+  .stellar-light-cone__role { padding-bottom: 5rem !important; }
+  .stellar-light-cone__role::before { left: calc(-2rem - 3px); }
+  .stellar-observation-field #about-lab-journal { display: block !important; }
+  .stellar-observation-field #about-lab-journal > article,
+  .stellar-observation-field #about-lab-journal > div,
+  .stellar-observation-field #about-lab-journal > a { min-height: 0 !important; margin-bottom: 4rem; }
+  .stellar-observation-field #about-lab-journal > a { min-height: 18rem !important; }
+  .stellar-systems-ledger__groups { display: block !important; min-height: 0; }
+  .stellar-systems-ledger__groups::before { inset: 2rem -45% 4rem 8%; }
+  .stellar-systems-ledger__groups > div { width: 88%; min-height: 0; margin: 0 0 7rem; padding: 1.5rem 0 2rem !important; transform: none !important; }
+  .stellar-systems-ledger__groups > div:nth-child(even) { margin-left: 12%; }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .about-origin { min-height: auto; }
+  .about-origin__field { min-height: 20rem; opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-universe *,
+  .about-universe *::before,
+  .about-universe *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .about-universe { background: #fff; }
+  .about-universe::before,
+  .about-origin__field { display: none; }
+  .about-region { margin-bottom: 3rem !important; padding-top: 2rem !important; }
+  .about-origin { min-height: 0; }
+  .about-origin__copy,
+  .about-origin__console { grid-column: 1 / -1; }
+  .about-origin__regions,
+  .about-origin__console { display: none; }
+  .about-universe [data-stellar-lens],
+  .about-universe [data-stellar-lens-copy] { opacity: 1 !important; }
+  .stellar-light-cone__heading { position: static; }
+}
+
+/* --------------------------------------------------------------------------
+   Volumetric nebula arbor
+   Canvas performs the actual XYZ rotation, camera projection, depth sorting,
+   and occlusion. DOM controls simply follow the projected world positions.
+   -------------------------------------------------------------------------- */
+
+.stellar-tree__toolbar {
+  position: absolute;
+  z-index: 90;
+  top: 0.8rem;
+  right: 0.8rem;
+  left: 0.8rem;
+  display: none;
+  min-width: 0;
+  align-items: stretch;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.stellar-spectrum--enhanced .stellar-tree__toolbar { display: flex; }
+
+.stellar-tree__toolbar .stellar-spectrum__controls { margin: 0; align-items: stretch; justify-content: flex-start; gap: 0.45rem; }
+.stellar-tree__toolbar .stellar-spectrum__modes { width: auto; border: 1px solid rgba(126, 182, 255, 0.2); border-radius: 999px; padding: 0.2rem; background: rgba(7, 23, 51, 0.72); }
+.stellar-tree__toolbar .stellar-spectrum__mode { min-height: 44px; border: 0; border-radius: 999px; padding-inline: 0.75rem; color: #afc2d8; }
+.stellar-tree__toolbar .stellar-spectrum__mode[aria-selected="true"] { color: #fff; background: rgba(26, 78, 145, 0.92); }
+.stellar-tree__toolbar .stellar-spectrum__receipts-toggle { min-height: 44px; border-color: rgba(126, 182, 255, 0.25); border-radius: 999px; color: #cae0fa; background: rgba(7, 23, 51, 0.72); }
+
+.stellar-tree__camera {
+  display: none;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.stellar-spectrum--enhanced .stellar-tree__camera { display: flex; }
+
+.stellar-tree__projection,
+.stellar-tree__zoom,
+.stellar-tree__axis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--about-rule);
+  border-radius: 999px;
+  padding: 0.2rem;
+  background: rgba(7, 23, 51, 0.72);
+}
+
+.stellar-tree__projection,
+.stellar-tree__zoom,
+.stellar-tree__axis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.stellar-tree__orbit {
+  display: flex;
+  min-width: 0;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.stellar-tree__axis { flex: 0 0 auto; }
+
+.stellar-tree__camera button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.55rem 0.68rem;
+  color: #afc2d8;
+  background: transparent;
+  font: 700 0.59rem/1.25 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stellar-tree__camera button { min-height: 44px; }
+.stellar-tree__reset { min-width: 6rem; border: 1px solid var(--about-rule) !important; border-radius: 999px; color: #cae0fa !important; background: rgba(7, 23, 51, 0.72) !important; }
+
+.stellar-tree__camera button:hover { color: #fff; background: rgba(77, 139, 223, 0.22); }
+
+.stellar-tree__projection button[aria-pressed="true"] {
+  color: #f7fbff;
+  background: #0b3f8a;
+}
+
+.stellar-tree__projection button:focus-visible,
+.stellar-tree__orbit button:focus-visible,
+.stellar-tree__zoom button:focus-visible,
+.stellar-tree__reset:focus-visible,
+.stellar-tree__branch-label:focus-visible,
+.stellar-tree__signal:focus-visible,
+.stellar-tree__popup-close:focus-visible {
+  outline: 3px solid #75acff;
+  outline-offset: 3px;
+}
+
+.stellar-atlas .stellar-spectrum__stage {
+  position: relative;
+  display: block;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+}
+
+.stellar-atlas .stellar-spectrum__bands {
+  min-width: 0;
+  min-height: 58rem;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  border: 0;
+}
+
+.stellar-tree__viewport {
+  position: relative;
+  min-width: 0;
+  height: 58rem;
+  overflow: hidden;
+  border: 0;
+  outline: 0;
+  background: #020817;
+  box-shadow: none;
+  isolation: isolate;
+}
+
+.stellar-tree__canvas,
+.stellar-tree__controls-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.stellar-tree__canvas {
+  display: block;
+  cursor: grab;
+  background: transparent;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.stellar-tree__canvas.is-rotating { cursor: grabbing; }
+.stellar-tree__controls-layer { pointer-events: none; }
+
+.stellar-tree__branch-label,
+.stellar-spectrum__node.stellar-tree__signal,
+.stellar-tree__root {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+  transition: color 160ms ease, opacity 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+[data-stellar-spectrum][data-tree-motion="idle-rotation"] .stellar-tree__branch-label,
+[data-stellar-spectrum][data-tree-motion="idle-rotation"] .stellar-spectrum__node.stellar-tree__signal,
+[data-stellar-spectrum][data-tree-motion="idle-rotation"] .stellar-tree__root {
+  will-change: left, top;
+  transition:
+    left var(--stellar-idle-tween-duration, 180ms) linear,
+    top var(--stellar-idle-tween-duration, 180ms) linear,
+    color 160ms ease,
+    opacity 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.stellar-tree__branch-label {
+  display: grid;
+  width: clamp(5.1rem, 6.8vw, 6.25rem);
+  min-height: 2.75rem;
+  align-content: center;
+  border: 1px solid transparent;
+  border-left: 2px solid color-mix(in srgb, var(--band-tone) 62%, transparent);
+  padding: 0.38rem 0.48rem;
+  color: #edf6ff;
+  background: linear-gradient(90deg, rgba(3, 15, 36, 0.68), rgba(3, 15, 36, 0.36));
+  box-shadow: 0 0 1rem color-mix(in srgb, var(--band-tone) 8%, transparent);
+  text-align: left;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.stellar-tree__branch-label[data-tree-edge="right"] {
+  border-right: 2px solid color-mix(in srgb, var(--band-tone) 62%, transparent);
+  border-left-width: 0;
+  text-align: right;
+  transform: translate(calc(-100% - 0.65rem), -50%);
+}
+
+.stellar-tree__branch-label:hover,
+.stellar-tree__branch-label[aria-pressed="true"] {
+  border-color: var(--band-tone);
+  color: #fff;
+  background: rgba(8, 27, 60, 0.94);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--band-tone) 18%, transparent), 0 0 2rem color-mix(in srgb, var(--band-tone) 32%, transparent);
+}
+
+.stellar-tree__branch-dataset,
+.stellar-tree__branch-count {
+  color: color-mix(in srgb, var(--band-tone) 70%, #d9edff);
+  font: 700 0.42rem/1.2 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stellar-tree__branch-label strong {
+  margin-block: 0.08rem;
+  font: 650 clamp(0.67rem, 0.82vw, 0.79rem)/1.1 "Space Grotesk", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.stellar-spectrum__node.stellar-tree__signal {
+  display: grid;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  place-items: center;
+  overflow: visible;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.stellar-spectrum__node.stellar-tree__signal .stellar-spectrum__node-mark {
+  grid-area: 1 / 1;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 1px solid var(--band-tone);
+  border-radius: 50%;
+  background: #eef7ff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--band-tone) 11%, transparent), 0 0 0.75rem var(--band-tone);
+}
+
+.stellar-spectrum__node.stellar-tree__signal[data-maturity="shipped"] .stellar-spectrum__node-mark { background: var(--band-tone); }
+.stellar-spectrum__node.stellar-tree__signal[data-maturity="published"] .stellar-spectrum__node-mark { border-style: dashed; }
+.stellar-spectrum__node.stellar-tree__signal[data-maturity="self-described"] .stellar-spectrum__node-mark { border-style: dotted; }
+
+.stellar-spectrum__node.stellar-tree__signal .stellar-spectrum__node-label {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 0.95rem);
+  width: max-content;
+  max-width: 9.5rem;
+  transform: translateY(-50%);
+  color: rgba(236, 246, 255, 0.9);
+  font: 650 0.57rem/1.25 "Space Grotesk", sans-serif;
+  letter-spacing: 0.01em;
+  overflow-wrap: anywhere;
+  text-align: left;
+  text-shadow: 0 1px 3px #000, 0 0 8px #02091a;
+}
+
+.stellar-spectrum__node.stellar-tree__signal[data-tree-edge="right"] .stellar-spectrum__node-label,
+.stellar-spectrum__node.stellar-tree__signal[data-tree-label-side="left"] .stellar-spectrum__node-label {
+  right: calc(50% + 0.95rem);
+  left: auto;
+  text-align: right;
+}
+
+.stellar-spectrum__node.stellar-tree__signal:hover .stellar-spectrum__node-label,
+.stellar-spectrum__node.stellar-tree__signal:focus .stellar-spectrum__node-label,
+.stellar-spectrum__node.stellar-tree__signal[aria-pressed="true"] .stellar-spectrum__node-label { color: #fff; }
+
+.stellar-spectrum__node.stellar-tree__signal[aria-pressed="true"] .stellar-spectrum__node-mark {
+  background: #fff;
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--band-tone) 25%, transparent), 0 0 1.8rem var(--band-tone);
+}
+
+.stellar-tree__root {
+  display: grid;
+  width: 3.15rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgba(119, 177, 255, 0.72);
+  border-radius: 50%;
+  color: #dcecff;
+  background: rgba(3, 16, 39, 0.9);
+  box-shadow: 0 0 0 0.38rem rgba(89, 157, 255, 0.07), 0 0 1.7rem rgba(89, 157, 255, 0.38);
+}
+
+.stellar-tree__root strong { font: 700 0.8rem/1 "Space Grotesk", sans-serif; letter-spacing: 0.04em; }
+.stellar-tree__root span { position: absolute; top: calc(100% + 0.42rem); width: 7rem; color: rgba(213, 232, 255, 0.74); font: 700 0.48rem/1.2 "Space Grotesk", ui-monospace, monospace; letter-spacing: 0.11em; text-align: center; text-transform: uppercase; }
+
+.stellar-atlas .stellar-spectrum__readout {
+  position: absolute;
+  z-index: 120;
+  top: var(--popup-top, 1rem);
+  left: var(--popup-left, 1rem);
+  width: min(22.5rem, calc(100% - 2rem));
+  min-height: 0;
+  max-height: min(calc(58rem - 2rem), var(--popup-available-height, 56rem));
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid rgba(101, 168, 255, 0.42);
+  padding: 0.75rem 0.85rem 0.9rem;
+  color: var(--stellar-ink);
+  background: rgba(4, 15, 36, 0.96);
+  box-shadow: 0 1.5rem 4rem rgba(0, 3, 14, 0.72);
+  scrollbar-width: thin;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.stellar-atlas .stellar-spectrum__readout[hidden] { display: none; }
+.stellar-atlas .stellar-spectrum__readout * { min-width: 0; overflow-wrap: anywhere; }
+.stellar-atlas .stellar-spectrum__readout h3 {
+  max-width: none;
+  font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+  line-height: 1.05;
+}
+
+.stellar-atlas .stellar-spectrum__readout-summary {
+  margin: 0.25rem 0 0;
+  line-height: 1.4;
+}
+
+.stellar-atlas .stellar-spectrum__readout-meta {
+  flex-wrap: nowrap;
+  gap: 0.3rem;
+  margin-top: 0.55rem;
+  padding: 0 0 0 0.65rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.stellar-atlas .stellar-spectrum__readout-meta span {
+  flex: 0 0 auto;
+  padding: 0.22rem 0.35rem;
+  white-space: nowrap;
+}
+
+.stellar-atlas .stellar-spectrum__readout > h4 {
+  margin: 0.7rem 0 0.4rem;
+  padding-top: 0.55rem;
+  font-size: 0.68rem;
+}
+
+.stellar-tree__popup-header {
+  position: sticky;
+  z-index: 2;
+  top: -0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin: -0.75rem -0.85rem 0.55rem;
+  padding: 0 0.45rem;
+  border-bottom: 1px solid var(--about-rule);
+  background: rgba(4, 15, 36, 0.98);
+}
+
+.stellar-tree__popup-header .stellar-spectrum__readout-kicker { margin: 0; }
+
+.stellar-tree__popup-close {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--about-rule);
+  padding: 0.45rem 0.65rem;
+  color: var(--stellar-blue-deep);
+  background: transparent;
+  font: 700 0.58rem/1.2 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stellar-atlas .stellar-spectrum__source-grid {
+  display: block;
+}
+
+.stellar-spectrum__source-tabs {
+  display: flex;
+  gap: 0.2rem;
+  margin: 0 -0.1rem 0.35rem;
+  padding: 0 0.1rem 0.3rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--about-rule-soft);
+  scrollbar-width: thin;
+}
+
+.stellar-spectrum__source-tab {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.35rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 0.35rem 0.45rem;
+  color: var(--stellar-muted);
+  background: transparent;
+  font: 700 0.58rem/1.2 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stellar-spectrum__source-tab[aria-selected="true"] {
+  border-bottom-color: var(--stellar-blue);
+  color: var(--stellar-blue-deep);
+}
+
+.stellar-spectrum__source-tab-count {
+  min-width: 1.25rem;
+  padding: 0.1rem 0.28rem;
+  border: 1px solid var(--stellar-line-soft);
+  color: inherit;
+  text-align: center;
+}
+
+.stellar-atlas .stellar-spectrum__source-context {
+  border: 0;
+  padding: 0.25rem 0 0;
+}
+
+.stellar-spectrum__source-context[hidden] { display: none; }
+
+.stellar-spectrum__source-grid.is-tabbed .stellar-spectrum__source-context > h5 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.stellar-atlas .stellar-spectrum__source-context ul {
+  gap: 0;
+  margin: 0;
+}
+
+.stellar-atlas .stellar-spectrum__source-context li {
+  border-bottom: 1px solid var(--about-rule-soft);
+  line-height: 1.35;
+}
+
+.stellar-atlas .stellar-spectrum__source-context li:last-child { border-bottom: 0; }
+
+.stellar-atlas .stellar-spectrum__relationships { gap: 0; }
+
+.stellar-atlas .stellar-spectrum__relationship {
+  border: 0;
+  border-bottom: 1px solid var(--about-rule-soft);
+  padding: 0.5rem 0;
+}
+
+.stellar-atlas .stellar-spectrum__relationship:last-child { border-bottom: 0; }
+.stellar-atlas .stellar-spectrum__relationship p { margin-top: 0.25rem; }
+.stellar-atlas .stellar-spectrum__relationship-source { color: var(--stellar-blue-deep); }
+
+@media (hover: hover) and (pointer: fine) {
+  .stellar-atlas .stellar-spectrum__source-link,
+  .stellar-atlas .stellar-spectrum__related-node,
+  .stellar-atlas .stellar-spectrum__table-link {
+    min-height: 32px;
+  }
+
+  .stellar-spectrum__source-tab { min-height: 36px; }
+}
+
+.stellar-thinking-layout { align-items: center; }
+
+.stellar-thinking-mix {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, 0.8fr) minmax(9rem, 1fr);
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: center;
+  margin: 0;
+}
+
+.stellar-thinking-mix__pie {
+  display: grid;
+  width: min(100%, 14rem);
+  aspect-ratio: 1;
+  place-items: center;
+  justify-self: center;
+  border-radius: 50%;
+  background: conic-gradient(
+    #1f5cba 0 33%,
+    #6799fb 33% 65%,
+    #526f8d 65% 85%,
+    #a8bac7 85% 100%
+  );
+  box-shadow: 0 0 0 1px rgba(31, 92, 186, 0.1), 0 1.5rem 3rem rgba(31, 92, 186, 0.08);
+}
+
+.stellar-thinking-mix__pie::before {
+  grid-area: 1 / 1;
+  width: 56%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--stellar-paper);
+  box-shadow: inset 0 0 0 1px var(--about-rule-soft);
+  content: "";
+}
+
+.stellar-thinking-mix__pie > span {
+  z-index: 1;
+  grid-area: 1 / 1;
+  color: var(--stellar-blue-deep);
+  font: 700 0.7rem/1 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.12em;
+}
+
+.stellar-thinking-mix__legend {
+  display: grid;
+  gap: 0.72rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stellar-thinking-mix__legend li {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+  color: var(--stellar-ink);
+  font: 650 0.64rem/1.35 "Space Grotesk", sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stellar-thinking-mix__legend li::before {
+  width: 0.62rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #1f5cba;
+  content: "";
+}
+
+.stellar-thinking-mix__legend li::after {
+  grid-column: 3 / 4;
+  grid-row: 1;
+  align-self: end;
+  border-bottom: 1px dotted var(--about-rule);
+  content: "";
+}
+
+.stellar-thinking-mix__legend li > span,
+.stellar-thinking-mix__legend li > strong { z-index: 1; background: var(--stellar-paper); }
+.stellar-thinking-mix__legend li > span { grid-column: 2; padding-right: 0.2rem; }
+.stellar-thinking-mix__legend li > strong { grid-column: 4; padding-left: 0.2rem; }
+.stellar-thinking-mix__legend li[data-thinking="conceptual"]::before { background: #6799fb; }
+.stellar-thinking-mix__legend li[data-thinking="structural"]::before { background: #526f8d; }
+.stellar-thinking-mix__legend li[data-thinking="social"]::before { background: #a8bac7; }
+
+/* A table is the clearest reference pattern here. Keep it semantic and
+   collapsed by default; confine its wide layout to its own scroll surface. */
+.profile-map-evidence__table-wrap {
+  max-width: 100%;
+  margin-top: 2rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-gutter: stable;
+}
+
+.profile-map-evidence table {
+  display: table;
+  width: 100%;
+  min-width: 62rem;
+  border-collapse: collapse;
+  background: transparent;
+  font-size: 0.8rem;
+}
+
+.profile-map-evidence thead {
+  position: static;
+  display: table-header-group;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  white-space: normal;
+}
+
+.profile-map-evidence tbody { display: table-row-group; counter-reset: none; }
+
+.profile-map-evidence tbody tr,
+.profile-map-evidence tbody tr:nth-child(3n + 2),
+.profile-map-evidence tbody tr:nth-child(3n + 3),
+.profile-map-evidence tbody tr:nth-child(even) {
+  display: table-row;
+  min-height: 0;
+  border: 0;
+  padding: 0;
+  transform: none;
+  counter-increment: none;
+}
+
+.profile-map-evidence tbody tr::before { display: none; }
+
+.profile-map-evidence tbody tr > th,
+.profile-map-evidence tbody tr > td,
+.profile-map-evidence thead th {
+  display: table-cell;
+  margin: 0;
+  border: 1px solid var(--about-rule);
+  padding: 0.78rem;
+  background: transparent;
+  color: var(--stellar-muted);
+  font: 400 0.76rem/1.55 "Manrope", sans-serif;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+  vertical-align: top;
+}
+
+.profile-map-evidence thead th {
+  color: var(--stellar-ink);
+  background: rgba(126, 182, 255, 0.08);
+  font: 700 0.62rem/1.35 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.profile-map-evidence tbody tr > td:first-child { width: 16%; color: var(--stellar-blue-deep); font: 650 0.62rem/1.5 "Space Grotesk", sans-serif; letter-spacing: 0.04em; text-transform: uppercase; }
+.profile-map-evidence tbody tr > th { width: 18%; color: var(--stellar-ink); font: 650 0.8rem/1.4 "Space Grotesk", sans-serif; }
+.profile-map-evidence tbody tr > td:nth-of-type(2) { width: 28%; color: var(--stellar-blue-deep); }
+.profile-map-evidence tbody tr > td:last-child { width: 38%; color: var(--stellar-muted); }
+
+/* Long machine labels, assessment metadata, and nested route surfaces should
+   wrap inside their own columns instead of widening or clipping the viewport. */
+.about-universe section,
+.about-universe article,
+.about-universe header,
+.about-universe div,
+.stellar-calibration article > div,
+.stellar-calibration article > div > * { min-width: 0; }
+
+.stellar-calibration .font-label,
+.stellar-calibration a,
+.stellar-calibration p,
+.stellar-calibration li,
+.stellar-calibration span { overflow-wrap: anywhere; }
+
+/* The Tailwind `lg` split becomes too narrow for the donut, its legend, and
+   the behavior readout at laptop/tablet widths. Collapse the two assessment
+   articles before that collision can happen, then collapse the inner pair at
+   the next breakpoint while keeping the donut and legend together. */
+@media (max-width: 1180px) {
+  .stellar-calibration > .grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 3.5rem !important;
+  }
+
+  .stellar-calibration article + article {
+    border-top: 1px solid var(--about-rule) !important;
+    border-left: 0 !important;
+    padding: 3.5rem 0 0 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .stellar-thinking-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .stellar-thinking-mix {
+    grid-template-columns: minmax(9rem, 0.72fr) minmax(11rem, 1fr);
+    max-width: 38rem;
+  }
+}
+
+@media (max-width: 1120px) {
+  .about-origin__field { margin-right: -1rem; margin-left: -1rem; }
+  .about-origin__coordinate--practice { left: 1rem; }
+  .about-origin__coordinate--curiosity { right: 1rem; }
+}
+
+@media (max-width: 900px) {
+  .about-opening {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    padding-top: 2rem;
+    gap: 3rem;
+  }
+
+  .about-opening .about-origin__prose { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .about-opening .stellar-atlas .stellar-spectrum__intro { display: none; }
+  .about-opening .stellar-atlas .stellar-spectrum__bands,
+  .about-opening .stellar-tree__viewport { min-height: 50rem; height: 50rem; }
+}
+
+@media (max-width: 720px) {
+  .stellar-tree__toolbar { top: 0.5rem; right: 0.5rem; left: 0.5rem; align-items: stretch; flex-direction: column; margin: 0; padding: 0; }
+  .stellar-tree__toolbar .stellar-spectrum__controls { flex-wrap: wrap; }
+  .stellar-tree__toolbar .stellar-spectrum__modes,
+  .stellar-tree__toolbar .stellar-spectrum__receipts-toggle,
+  .stellar-tree__camera { width: 100%; }
+  .stellar-tree__camera button { white-space: normal; }
+  .stellar-tree__orbit { flex-basis: 100%; }
+  .stellar-tree__axis { flex-basis: calc(50% - 0.25rem); }
+  .stellar-atlas .stellar-spectrum__bands,
+  .stellar-tree__viewport { min-height: 50rem; height: 50rem; }
+  .stellar-tree__branch-label { width: 5rem; min-height: 2.8rem; padding: 0.36rem 0.42rem; }
+  .stellar-tree__branch-label strong { font-size: 0.66rem; }
+  .stellar-tree__branch-dataset,
+  .stellar-tree__branch-count { font-size: 0.43rem; }
+  .stellar-spectrum__node.stellar-tree__signal .stellar-spectrum__node-label {
+    display: none;
+    max-width: 7.5rem;
+    border: 1px solid rgba(31, 92, 186, 0.2);
+    padding: 0.3rem 0.4rem;
+    color: #edf6ff;
+    background: rgba(4, 15, 36, 0.96);
+    font-size: 0.56rem;
+    text-shadow: none;
+  }
+  .stellar-spectrum__node.stellar-tree__signal:hover .stellar-spectrum__node-label,
+  .stellar-spectrum__node.stellar-tree__signal:focus .stellar-spectrum__node-label,
+  .stellar-spectrum__node.stellar-tree__signal[aria-pressed="true"] .stellar-spectrum__node-label { display: block; }
+  .stellar-tree__root { width: 3rem; }
+  .stellar-atlas .stellar-spectrum__readout {
+    position: fixed;
+    z-index: 1000;
+    top: auto;
+    right: 0.75rem;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    left: 0.75rem;
+    width: auto;
+    max-height: min(62svh, 32rem);
+  }
+  .stellar-thinking-mix { grid-template-columns: 1fr; }
+  .stellar-thinking-mix__pie { width: min(12rem, 70vw); }
+  .stellar-thinking-mix__legend li { grid-template-columns: auto auto minmax(0, 1fr) auto; }
+  .profile-map-evidence__body { max-width: 100%; overflow: hidden; }
+  .profile-map-evidence__table-wrap { margin-inline: 0; }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .stellar-atlas .stellar-spectrum__bands,
+  .stellar-tree__viewport { min-height: 48rem; height: 48rem; }
+  .stellar-atlas .stellar-spectrum__readout { max-height: calc(100svh - 1.5rem); }
+}
+
+@media print {
+  .stellar-tree__toolbar,
+  .stellar-spectrum__stage { display: none !important; }
+}
+
+/* --------------------------------------------------------------------------
+   Integrated About surface
+   The introduction and spatial profile share the opening viewport. The page
+   uses one uninterrupted base color per theme; structure comes from type,
+   rules, and the nebula itself rather than nested panels.
+   -------------------------------------------------------------------------- */
+
+html[data-about-theme="dark"] {
+  color-scheme: dark;
+  --about-base: #020817;
+  --stellar-paper: #020817;
+  --stellar-panel: #020817;
+  --stellar-panel-high: #020817;
+  --stellar-ink: #edf6ff;
+  --stellar-muted: #aabbd0;
+  --stellar-blue: #7eb6ff;
+  --stellar-blue-deep: #c6e0ff;
+  --stellar-line: rgba(135, 171, 218, 0.28);
+  --stellar-line-soft: rgba(135, 171, 218, 0.14);
+  --about-rule: rgba(135, 171, 218, 0.22);
+  --about-rule-soft: rgba(135, 171, 218, 0.11);
+}
+
+html[data-about-theme="light"] {
+  color-scheme: light;
+  --about-base: #f5f7fb;
+  --stellar-paper: #f5f7fb;
+  --stellar-panel: #f5f7fb;
+  --stellar-panel-high: #f5f7fb;
+  --stellar-ink: #111b2a;
+  --stellar-muted: #4f6074;
+  --stellar-blue: #1f5cba;
+  --stellar-blue-deep: #174b99;
+  --stellar-line: rgba(39, 79, 133, 0.28);
+  --stellar-line-soft: rgba(39, 79, 133, 0.14);
+  --about-rule: rgba(39, 79, 133, 0.22);
+  --about-rule-soft: rgba(39, 79, 133, 0.11);
+}
+
+html[data-about-theme],
+html[data-about-theme] body,
+body[data-universe-region="about"],
+body[data-universe-region="about"] #site-topbar,
+body[data-universe-region="about"] #site-footer,
+body[data-universe-region="about"] .about-universe {
+  background-color: var(--about-base) !important;
+  background-image: none !important;
+}
+
+body[data-universe-region="about"] #site-topbar,
+body[data-universe-region="about"] #site-footer {
+  border-color: var(--about-rule-soft) !important;
+  color: var(--stellar-ink);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body[data-universe-region="about"] :is(#site-topbar, #site-footer) :is(a, div, span) {
+  color: inherit;
+}
+
+body[data-universe-region="about"] :is(#site-nav, #site-nav-mobile) .site-nav-link {
+  color: var(--stellar-muted);
+}
+
+body[data-universe-region="about"] :is(#site-nav, #site-nav-mobile) .site-nav-link[aria-current="page"] {
+  color: var(--stellar-blue);
+}
+
+.about-universe :is(
+  section,
+  article,
+  .stellar-spectrum,
+  .stellar-spectrum__stage,
+  .stellar-tree__viewport,
+  .profile-map-evidence,
+  .profile-map-evidence__body,
+  .stellar-systems-ledger__surface,
+  [class*="bg-surface"]
+) {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.about-universe :is(.text-on-surface, .font-headline) { color: var(--stellar-ink) !important; }
+.about-universe :is(.text-secondary, .text-outline, .text-outline-variant) { color: var(--stellar-muted) !important; }
+.about-universe :is(.text-tertiary, .text-tertiary-dim, .text-tertiary-fixed) { color: var(--stellar-blue) !important; }
+
+.about-universe {
+  min-height: 100svh;
+  padding-top: 5.25rem !important;
+}
+
+.about-opening {
+  grid-template-columns: minmax(18rem, 0.7fr) minmax(0, 1.3fr);
+  width: min(100%, 96rem);
+  min-height: min(52rem, calc(100svh - 5.25rem));
+  margin: 0 auto clamp(6rem, 10vw, 10rem);
+  padding: clamp(1.25rem, 2.5vw, 2.5rem) var(--about-gutter) 0;
+  gap: clamp(1.5rem, 3vw, 3.5rem);
+  align-items: start;
+  overflow: visible;
+}
+
+.about-opening > .about-region {
+  min-width: 0;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.about-opening .about-origin {
+  z-index: 4;
+  align-self: start;
+  padding: 0 !important;
+}
+
+.about-opening .about-origin__copy { max-width: 32rem; }
+
+.about-opening .about-region__kicker {
+  margin-bottom: clamp(1.25rem, 2.2vw, 2rem);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+}
+
+.about-opening .about-origin h1 {
+  max-width: 10ch;
+  font-size: clamp(3.15rem, 5vw, 5.15rem);
+  line-height: 0.9;
+  letter-spacing: -0.075em;
+}
+
+.about-opening .about-origin h1 span,
+.about-opening .about-origin h1 span:nth-child(2),
+.about-opening .about-origin h1 span:nth-child(3) {
+  width: auto;
+  max-width: 100%;
+  margin-left: 0;
+  white-space: normal;
+}
+
+.about-opening .about-origin h1 span:nth-child(2) {
+  margin-top: 0.22rem;
+  font-size: 0.76em;
+}
+
+.about-opening .about-origin h1 span:nth-child(3) {
+  margin-top: 0.34rem;
+  font-size: 0.61em;
+}
+
+.about-opening .about-origin__prose {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.9rem;
+  margin-top: clamp(1.8rem, 3vw, 2.8rem);
+}
+
+.about-opening .about-origin__prose p {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--stellar-muted);
+  font-size: clamp(0.88rem, 1.05vw, 1rem);
+  line-height: 1.68;
+}
+
+.about-opening .about-origin__prose p::before {
+  width: 1.6rem;
+  margin-bottom: 0.6rem;
+  border-color: var(--about-rule);
+}
+
+.about-opening .stellar-atlas {
+  align-self: stretch;
+  overflow: visible;
+  padding: 0 !important;
+}
+
+.about-opening .stellar-atlas::before,
+.about-opening .stellar-atlas > .about-region__heading { display: none !important; }
+
+.about-opening .stellar-atlas .stellar-spectrum__stage,
+.about-opening .stellar-atlas .stellar-spectrum__bands,
+.about-opening .stellar-atlas .stellar-tree__viewport {
+  width: 100%;
+  min-height: 49rem;
+  height: 49rem;
+  margin: 0;
+}
+
+.about-opening .stellar-atlas .stellar-spectrum__bands { overflow: visible; }
+.about-opening .stellar-atlas .stellar-tree__viewport {
+  --stellar-overscan-inline: max(36rem, 62vw);
+  --stellar-overscan-top: max(44rem, 85vh);
+  --stellar-overscan-bottom: max(44rem, 85vh);
+  overflow: visible;
+  background: var(--about-base) !important;
+}
+
+.about-opening .stellar-atlas,
+.about-opening .stellar-atlas .stellar-spectrum__stage,
+.about-opening .stellar-atlas .stellar-spectrum__bands,
+.about-opening .stellar-atlas .stellar-tree__viewport {
+  overflow: visible !important;
+}
+
+/* The scene owns a larger transparent render plane than its layout slot. This
+   lets rotated or highly zoomed branches continue naturally into the shared
+   page surface instead of being sheared off at an artificial panel edge. */
+.about-opening .stellar-tree__canvas,
+.about-opening .stellar-tree__controls-layer {
+  top: calc(-1 * var(--stellar-overscan-top));
+  right: auto;
+  bottom: auto;
+  left: calc(-1 * var(--stellar-overscan-inline));
+  width: calc(100% + var(--stellar-overscan-inline) + var(--stellar-overscan-inline));
+  height: calc(100% + var(--stellar-overscan-top) + var(--stellar-overscan-bottom));
+}
+
+/* The generated method paragraph is intentionally retained as a data hook,
+   but no interface explanation is presented as page copy. */
+.stellar-spectrum__method,
+.stellar-spectrum__receipts-toggle,
+[data-stellar-receipts] { display: none !important; }
+
+.stellar-tree__toolbar,
+.about-opening .stellar-tree__toolbar {
+  top: auto;
+  right: 0.7rem;
+  bottom: 0.9rem;
+  left: auto;
+  width: 4rem;
+  max-width: none;
+  min-height: 44px;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.stellar-tree__toolbar .stellar-spectrum__controls { display: none !important; }
+
+.stellar-tree__camera,
+.stellar-spectrum--enhanced .stellar-tree__camera {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.1rem;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+
+.stellar-tree__camera > *,
+.stellar-tree__projection,
+.stellar-tree__projection button,
+.stellar-tree__interaction-toggle,
+.stellar-tree__zoom-control,
+.stellar-tree__reset,
+.about-theme-toggle {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.stellar-tree__projection {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.stellar-tree__camera button,
+.stellar-tree__reset,
+.about-theme-toggle {
+  display: inline-grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  border: 0 !important;
+  border-radius: 0;
+  padding: 0.35rem 0.5rem;
+  color: var(--stellar-muted) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font: 700 0.58rem/1 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.stellar-tree__projection button { min-width: 44px; }
+
+.stellar-tree__projection button[data-tree-projection="free"] {
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-align: center;
+  white-space: normal;
+}
+
+.stellar-tree__interaction-toggle { display: none !important; }
+
+.stellar-tree__lock-glyph {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+}
+
+.stellar-tree__lock-icon {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stellar-tree__lock-icon--open { display: none; }
+.stellar-tree__interaction-toggle[aria-pressed="false"] .stellar-tree__lock-icon--closed { display: none; }
+.stellar-tree__interaction-toggle[aria-pressed="false"] .stellar-tree__lock-icon--open { display: block; }
+
+.stellar-tree__projection button[aria-pressed="true"] {
+  color: var(--stellar-ink) !important;
+  text-decoration: underline;
+  text-decoration-color: var(--stellar-blue);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.42rem;
+}
+
+.stellar-tree__camera button:hover,
+.stellar-tree__camera button:focus-visible {
+  color: var(--stellar-ink) !important;
+  background: transparent !important;
+}
+
+.stellar-tree__reset,
+.about-theme-toggle {
+  padding: 0;
+  color: var(--stellar-ink) !important;
+}
+
+.stellar-tree__control-icon {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+}
+
+.stellar-tree__control-icon svg {
+  grid-area: 1 / 1;
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.about-theme-toggle__moon { display: none; }
+.about-theme-toggle[aria-pressed="true"] .about-theme-toggle__sun { display: none; }
+.about-theme-toggle[aria-pressed="true"] .about-theme-toggle__moon { display: block; }
+
+.stellar-tree__zoom-control:focus-within {
+  outline: 2px solid var(--stellar-blue);
+  outline-offset: 2px;
+}
+
+.stellar-tree__zoom-control input[type="range"]:focus-visible { outline: none; }
+
+.stellar-tree__zoom-control {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 11.6rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 1.2rem 7.4rem 1.2rem 1.25rem;
+  align-items: center;
+  justify-items: center;
+  gap: 0.12rem;
+  color: var(--stellar-muted);
+  font: 650 0.55rem/1 "Space Grotesk", ui-monospace, monospace;
+}
+
+.stellar-tree__zoom-control output { text-align: center; }
+.stellar-tree__zoom-edge { color: var(--stellar-muted); font-size: 0.78rem; }
+
+.stellar-tree__zoom-control input[type="range"] {
+  box-sizing: border-box;
+  width: 7.4rem;
+  min-width: 7.4rem;
+  height: 44px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  accent-color: var(--stellar-blue);
+  background: transparent;
+  cursor: ns-resize;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  justify-self: center;
+}
+
+.stellar-tree__zoom-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 1px;
+  background: var(--stellar-line);
+}
+
+.stellar-tree__zoom-control input[type="range"]::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -8.5px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--stellar-blue);
+  -webkit-appearance: none;
+}
+
+.stellar-tree__zoom-control input[type="range"]::-moz-range-track {
+  height: 1px;
+  background: var(--stellar-line);
+}
+
+.stellar-tree__zoom-control input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--stellar-blue);
+}
+
+.stellar-tree__root {
+  appearance: none;
+  cursor: pointer;
+}
+
+.stellar-tree__root:hover,
+.stellar-tree__root:focus-visible,
+.stellar-tree__root.is-open {
+  border-color: var(--stellar-blue);
+  color: #fff;
+  box-shadow: 0 0 0 0.45rem color-mix(in srgb, var(--stellar-blue) 14%, transparent), 0 0 2.2rem color-mix(in srgb, var(--stellar-blue) 48%, transparent);
+}
+
+.stellar-tree__root:focus-visible {
+  outline: 3px solid #75acff;
+  outline-offset: 5px;
+}
+
+/* Enhanced mode keeps the complete source table inside the stellar tree.
+   The AC base is its disclosure control; the original details remains the
+   no-JavaScript fallback when enhancement is unavailable. */
+.profile-map-evidence--tree-panel {
+  position: absolute;
+  z-index: 180;
+  display: block;
+  right: 4.75rem;
+  bottom: 4.8rem;
+  left: 0.75rem;
+  width: auto !important;
+  max-width: none !important;
+  height: min(34rem, calc(100% - 7rem));
+  max-height: calc(100% - 7rem);
+  margin: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--about-rule) !important;
+  padding: 0 !important;
+  color: var(--stellar-ink);
+  background: color-mix(in srgb, var(--about-base) 96%, transparent) !important;
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.36) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.profile-map-evidence--tree-panel[data-panel-open="false"] {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.stellar-tree__source-backdrop {
+  position: absolute;
+  z-index: 175;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: default;
+  touch-action: manipulation;
+}
+
+.stellar-tree__source-backdrop[hidden] { display: none !important; }
+
+.profile-map-evidence--tree-panel > summary {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  display: flex;
+  height: 4rem;
+  min-height: 4rem;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  border-bottom: 1px solid var(--about-rule);
+  padding: 0.8rem 1rem;
+  color: var(--stellar-ink);
+  background: var(--about-base);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.profile-map-evidence--tree-panel .profile-map-evidence__body {
+  position: absolute;
+  inset: 4rem 0 0;
+  width: auto !important;
+  max-width: none;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  overflow: auto;
+  padding: 0 !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.profile-map-evidence--tree-panel .profile-map-evidence__body > p { display: none; }
+.profile-map-evidence--tree-panel .profile-map-evidence__table-wrap {
+  max-width: none;
+  margin: 0;
+  overflow: visible;
+}
+.profile-map-evidence--tree-panel table { min-width: 58rem; }
+
+html[data-about-theme="light"] .stellar-tree__canvas {
+  filter: brightness(0.72) contrast(1.14) saturate(0.9);
+}
+
+html[data-about-theme="light"] .stellar-tree__branch-label {
+  color: var(--stellar-ink);
+  background: color-mix(in srgb, var(--about-base) 88%, transparent);
+  box-shadow: 0 0 1rem color-mix(in srgb, var(--band-tone) 10%, transparent);
+}
+
+html[data-about-theme="light"] .stellar-tree__branch-label:hover,
+html[data-about-theme="light"] .stellar-tree__branch-label[aria-pressed="true"] {
+  color: var(--stellar-ink);
+  background: var(--about-base);
+}
+
+html[data-about-theme="light"] .stellar-spectrum__node.stellar-tree__signal .stellar-spectrum__node-label {
+  color: #162238;
+  text-shadow: 0 1px 2px var(--about-base), 0 0 7px var(--about-base);
+}
+
+html[data-about-theme="light"] .stellar-tree__root {
+  color: var(--stellar-ink);
+  background: var(--about-base);
+}
+
+html[data-about-theme="light"] .stellar-tree__root:hover,
+html[data-about-theme="light"] .stellar-tree__root:focus-visible,
+html[data-about-theme="light"] .stellar-tree__root.is-open { color: var(--stellar-ink); }
+
+.stellar-atlas .stellar-spectrum__readout,
+.stellar-tree__popup-header {
+  color: var(--stellar-ink);
+  background: var(--about-base);
+}
+
+.about-opening .stellar-atlas .stellar-spectrum__readout {
+  max-height: min(calc(100% - 1.5rem), var(--popup-available-height, calc(100% - 1.5rem)));
+}
+
+/* Assessment Signals stays open, contrast-safe, and unboxed in both themes. */
+.stellar-calibration .about-region__heading {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem !important;
+  margin-bottom: clamp(1.5rem, 3vw, 2.6rem) !important;
+}
+
+.stellar-calibration .about-region__heading h2 {
+  max-width: 11ch;
+  font-size: clamp(3rem, 5.3vw, 5.6rem) !important;
+  line-height: 0.94;
+}
+
+.stellar-calibration .about-region__heading > p {
+  max-width: 22rem;
+  color: var(--stellar-muted);
+  text-align: right;
+}
+
+.stellar-calibration-note {
+  max-width: 70ch;
+  margin: 0 0 clamp(3rem, 5vw, 5rem);
+  border: 0;
+  border-left: 2px solid var(--stellar-blue);
+  padding: 0.1rem 0 0.1rem clamp(1rem, 2vw, 1.5rem);
+  color: var(--stellar-ink);
+  background: transparent;
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: clamp(0.98rem, 1.25vw, 1.12rem);
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: normal;
+}
+
+.stellar-calibration > .grid {
+  grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr) !important;
+  gap: clamp(3rem, 6vw, 6rem) !important;
+}
+
+.stellar-calibration__card {
+  min-width: 0;
+  border: 0 !important;
+  border-top: 1px solid var(--about-rule) !important;
+  padding: 1.5rem 0 0 !important;
+  color: var(--stellar-ink) !important;
+  background: transparent !important;
+}
+
+.stellar-calibration__card + .stellar-calibration__card {
+  border-top-color: var(--about-rule) !important;
+  border-left: 1px solid var(--about-rule) !important;
+  padding-left: clamp(2rem, 4vw, 4rem) !important;
+}
+
+.stellar-calibration__card > p { color: var(--stellar-muted) !important; }
+
+.stellar-calibration__metric,
+.stellar-calibration__watchpoint {
+  min-width: 0;
+  border: 0 !important;
+  border-bottom: 1px solid var(--about-rule-soft) !important;
+  padding: 0.95rem 0 !important;
+  color: var(--stellar-ink);
+  background: transparent !important;
+}
+
+.stellar-thinking-mix__pie::before,
+.stellar-thinking-mix__legend li > span,
+.stellar-thinking-mix__legend li > strong { background: var(--about-base); }
+
+/* Keep the long-form profile closer to the readable scale and rhythm of the
+   published About page while retaining the spatial redesign. */
+.about-universe > .about-region {
+  margin-bottom: clamp(4rem, 6vw, 6rem) !important;
+  padding-top: clamp(2.75rem, 3.5vw, 3.5rem) !important;
+}
+
+.about-region__heading {
+  gap: clamp(1.25rem, 3vw, 3rem) !important;
+  margin-bottom: clamp(1.5rem, 2.5vw, 2.5rem) !important;
+}
+
+.about-region__heading h2,
+.stellar-light-cone__heading h2,
+.stellar-calibration .about-region__heading h2 {
+  font-size: clamp(2.25rem, 2.4vw, 2.5rem) !important;
+  line-height: 1;
+}
+
+.stellar-calibration-note {
+  max-width: 72ch;
+  margin-bottom: clamp(2.25rem, 4vw, 3.5rem);
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  line-height: 1.68;
+}
+
+.stellar-light-cone__layout {
+  grid-template-columns: minmax(15rem, 0.36fr) minmax(0, 1fr);
+  gap: clamp(3rem, 6vw, 6rem) !important;
+}
+
+.stellar-light-cone__heading > p:last-child {
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.stellar-light-cone__roles { padding-left: clamp(1.75rem, 3vw, 3.5rem); }
+
+.stellar-light-cone__role {
+  padding-bottom: clamp(2.75rem, 3.5vw, 3.5rem) !important;
+}
+
+.stellar-light-cone__role::before {
+  left: calc(-1 * clamp(1.75rem, 3vw, 3.5rem) - 3px);
+}
+
+.stellar-light-cone__role h3 {
+  max-width: 34ch;
+  margin-bottom: 0.7rem !important;
+  font-size: clamp(1.35rem, 1.5vw, 1.65rem) !important;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.stellar-light-cone__role ul {
+  max-width: 54rem !important;
+  font-size: clamp(0.92rem, 1.05vw, 1rem) !important;
+  line-height: 1.65 !important;
+}
+
+.stellar-observation-field #about-lab-journal {
+  gap: clamp(1.5rem, 3vw, 3rem) !important;
+}
+
+.stellar-observation-field #about-lab-journal > article,
+.stellar-observation-field #about-lab-journal > div,
+.stellar-observation-field #about-lab-journal > a {
+  min-height: 18rem !important;
+  padding-top: 1.25rem !important;
+}
+
+.stellar-observation-field #about-lab-journal > article a[class*="text-3xl"] {
+  font-size: clamp(1.65rem, 2vw, 2rem) !important;
+  letter-spacing: -0.045em;
+}
+
+.stellar-observation-field #about-lab-journal > article a[class*="text-2xl"] {
+  font-size: clamp(1.35rem, 1.6vw, 1.7rem) !important;
+}
+
+.stellar-observation-field #about-lab-journal p {
+  font-size: clamp(0.92rem, 1vw, 1rem) !important;
+  line-height: 1.65 !important;
+}
+
+.stellar-observation-field #about-lab-journal > a { min-height: 16rem !important; }
+
+.stellar-systems-ledger__groups {
+  grid-template-rows: repeat(2, minmax(14rem, auto));
+  min-height: 38rem;
+  gap: 1.5rem clamp(1rem, 2vw, 2rem) !important;
+}
+
+.stellar-systems-ledger__groups > div {
+  min-height: 12rem;
+  padding: 1.15rem 0 1.5rem;
+}
+
+.stellar-systems-ledger__groups > div:nth-child(2) { transform: translateY(2rem); }
+.stellar-systems-ledger__groups > div:nth-child(3) { transform: translateY(-0.5rem); }
+.stellar-systems-ledger__groups > div:nth-child(4) { transform: translateY(1.5rem); }
+
+.stellar-systems-ledger__groups li {
+  min-height: 2.25rem;
+  padding: 0.4rem 0 0.4rem 1.1rem;
+  font-size: clamp(0.92rem, 1.25vw, 1.15rem);
+}
+
+.stellar-systems-ledger__groups li::before { top: 0.85rem; }
+
+@media (max-width: 1180px) {
+  .stellar-calibration > .grid { grid-template-columns: minmax(0, 1fr) !important; }
+
+  .stellar-calibration__card + .stellar-calibration__card {
+    border-left: 0 !important;
+    padding-left: 0 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .about-opening {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    padding-top: 2rem;
+    gap: 1.25rem;
+  }
+
+  .about-opening .about-origin__copy { max-width: 42rem; }
+  .about-opening .about-origin__prose { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .about-opening .stellar-atlas { min-height: 46rem; }
+  .about-opening .stellar-atlas .stellar-spectrum__stage,
+  .about-opening .stellar-atlas .stellar-spectrum__bands,
+  .about-opening .stellar-atlas .stellar-tree__viewport {
+    min-height: 46rem;
+    height: 46rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .about-universe { padding-top: 7.25rem !important; }
+
+  .about-opening {
+    margin-bottom: 5.5rem;
+    padding: 1.3rem var(--about-gutter) 0;
+    gap: 0.9rem;
+  }
+
+  .about-opening .about-origin { padding-top: 0 !important; }
+
+  .about-opening .about-origin h1 {
+    max-width: 9.5ch;
+    font-size: clamp(3.15rem, 15vw, 4.6rem);
+    line-height: 0.9;
+  }
+
+  .about-opening .about-origin__prose {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .about-opening .about-origin__prose p {
+    font-size: 0.88rem;
+    line-height: 1.62;
+  }
+
+  .about-opening > .stellar-atlas {
+    width: calc(100% + var(--about-gutter) + var(--about-gutter)) !important;
+    margin-left: calc(-1 * var(--about-gutter)) !important;
+  }
+
+  .about-opening .stellar-atlas .stellar-tree__viewport {
+    --stellar-overscan-inline: max(24rem, 105vw);
+    --stellar-overscan-top: max(44rem, 85vh);
+    --stellar-overscan-bottom: max(44rem, 85vh);
+  }
+
+  .about-opening .stellar-atlas,
+  .about-opening .stellar-atlas .stellar-spectrum__stage,
+  .about-opening .stellar-atlas .stellar-spectrum__bands,
+  .about-opening .stellar-atlas .stellar-tree__viewport {
+    min-height: 44rem;
+    height: 44rem;
+  }
+
+  .about-opening .stellar-atlas[data-universe-route-map-host] {
+    position: relative;
+    height: auto;
+    min-height: 53.5rem;
+    padding-bottom: 9.5rem !important;
+  }
+
+  .stellar-tree__toolbar,
+  .about-opening .stellar-tree__toolbar {
+    top: auto;
+    right: 0.45rem;
+    bottom: 0.9rem;
+    left: auto;
+    width: 4rem;
+    justify-content: flex-end;
+  }
+
+  .stellar-tree__camera,
+  .stellar-spectrum--enhanced .stellar-tree__camera {
+    width: 4rem;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0.1rem;
+  }
+
+  .stellar-tree__interaction-toggle { display: inline-grid !important; }
+
+  .profile-map-evidence--tree-panel[data-panel-open="true"] {
+    position: fixed;
+    z-index: 180;
+    top: calc(7.25rem + env(safe-area-inset-top));
+    right: 4.65rem;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    width: auto !important;
+    height: auto;
+    max-height: none;
+  }
+
+  .stellar-tree__source-backdrop:not([hidden]) {
+    position: fixed;
+    z-index: 175;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+  }
+
+  [data-tree-interaction="locked"] .stellar-tree__canvas {
+    pointer-events: none;
+    touch-action: pan-y;
+    cursor: default;
+  }
+
+  [data-tree-interaction="unlocked"] .stellar-tree__canvas {
+    pointer-events: auto;
+    touch-action: none;
+  }
+
+  .stellar-tree__zoom-control {
+    min-height: 9.8rem;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1rem 5.8rem 1rem 1.2rem;
+    flex: 0 0 auto;
+  }
+
+  .stellar-tree__zoom-control input[type="range"] {
+    width: 5.8rem;
+    min-width: 5.8rem;
+  }
+
+  .stellar-calibration .about-region__heading {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.7rem !important;
+  }
+
+  .stellar-calibration .about-region__heading h2 {
+    font-size: clamp(2.25rem, 10vw, 2.75rem) !important;
+  }
+
+  .stellar-calibration .about-region__heading > p {
+    max-width: none;
+    text-align: left;
+  }
+
+  .stellar-calibration-note {
+    margin-top: 0;
+    margin-bottom: 3rem;
+    font-size: 0.95rem;
+  }
+
+  .stellar-calibration__card,
+  .stellar-calibration__card + .stellar-calibration__card {
+    border-left: 0 !important;
+    padding: 1.35rem 0 0 !important;
+  }
+
+  .stellar-thinking-mix { max-width: 100%; }
+
+  .about-opening .stellar-atlas .stellar-spectrum__readout {
+    position: absolute;
+    top: var(--popup-top, 0.75rem);
+    right: auto;
+    bottom: auto;
+    left: var(--popup-left, 0.75rem);
+    width: min(17rem, calc(100% - 1.5rem));
+    max-height: min(26rem, var(--popup-available-height, calc(100% - 1.5rem)));
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .stellar-spectrum__source-tab,
+  .stellar-atlas .stellar-spectrum__source-link,
+  .stellar-atlas .stellar-spectrum__related-node,
+  .stellar-atlas .stellar-spectrum__table-link {
+    min-height: 44px;
+  }
+
+  .profile-map-evidence--tree-panel {
+    right: 4.15rem;
+    bottom: 0.5rem;
+    left: 0.4rem;
+    height: min(31rem, calc(100% - 6rem));
+    max-height: calc(100% - 6rem);
+  }
+
+  .stellar-observation-field #about-lab-journal { display: block !important; }
+
+  .stellar-observation-field #about-lab-journal > article,
+  .stellar-observation-field #about-lab-journal > div,
+  .stellar-observation-field #about-lab-journal > a {
+    min-height: 0 !important;
+    margin-bottom: 2.75rem;
+  }
+
+  .stellar-observation-field #about-lab-journal > a { min-height: 14rem !important; }
+
+  .stellar-systems-ledger__groups {
+    display: block !important;
+    min-height: 0;
+  }
+
+  .stellar-systems-ledger__groups > div,
+  .stellar-systems-ledger__groups > div:nth-child(2),
+  .stellar-systems-ledger__groups > div:nth-child(3),
+  .stellar-systems-ledger__groups > div:nth-child(4) {
+    width: 100%;
+    min-height: 0;
+    margin: 0 0 3rem;
+    transform: none;
+  }
+}
+
+@media (max-width: 390px) {
+  .stellar-tree__camera { justify-content: flex-start; }
+  .stellar-tree__projection { flex: 0 0 auto; }
+  .stellar-tree__zoom-control { order: initial; flex-basis: auto; }
+}
+
+@media print {
+  html[data-about-theme],
+  html[data-about-theme] body,
+  body[data-universe-region="about"],
+  body[data-universe-region="about"] .about-universe {
+    color: #111 !important;
+    background: #fff !important;
+  }
+
+  .stellar-spectrum--enhanced .stellar-spectrum__stage {
+    display: block !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .stellar-spectrum--enhanced .stellar-tree__toolbar,
+  .stellar-spectrum--enhanced .stellar-spectrum__bands,
+  .stellar-spectrum--enhanced .stellar-spectrum__readout,
+  .stellar-spectrum--enhanced .stellar-tree__source-backdrop {
+    display: none !important;
+  }
+
+  .stellar-spectrum--enhanced .profile-map-evidence--tree-panel,
+  .stellar-spectrum--enhanced .profile-map-evidence--tree-panel[data-panel-open="false"],
+  .stellar-spectrum--enhanced .profile-map-evidence--tree-panel .profile-map-evidence__body {
+    position: static !important;
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    z-index: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .profile-map-evidence,
+  .profile-map-evidence__body,
+  .profile-map-evidence__table-wrap,
+  .profile-map-evidence table {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .profile-map-evidence,
+  .profile-map-evidence summary,
+  .profile-map-evidence table,
+  .profile-map-evidence th,
+  .profile-map-evidence td,
+  .profile-map-evidence tbody tr > td:first-child,
+  .profile-map-evidence tbody tr > th,
+  .profile-map-evidence tbody tr > td:nth-of-type(2),
+  .profile-map-evidence tbody tr > td:last-child {
+    color: #1f2933 !important;
+    background: #fff !important;
+  }
+
+  .profile-map-evidence tbody tr {
+    break-inside: avoid-page;
+    border-color: #a8afb8 !important;
+  }
+
+  .profile-map-evidence a {
+    color: #174f8d !important;
+    text-decoration: underline !important;
+  }
+}

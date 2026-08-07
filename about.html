@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
@@ -24,11 +24,24 @@
 <meta name="twitter:description" content="About Andrew Concepcion: AI-native software engineer with 10+ years shipping Android, iOS, backend, and agent-first product work across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/about.png"/>
 <meta name="twitter:image:alt" content="About Andrew Concepcion: engineer, problem solver, and lifelong explorer"/>
+<script>
+  (() => {
+    try {
+      const savedTheme = localStorage.getItem("about-theme");
+      const theme = savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
+      document.documentElement.dataset.aboutTheme = theme;
+      document.documentElement.classList.toggle("dark", theme === "dark");
+    } catch (_error) {
+      document.documentElement.dataset.aboutTheme = "dark";
+    }
+  })();
+</script>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="/assets/css/neural-background.css?v=20260722-flow5" rel="stylesheet"/>
-<link href="/assets/css/profile-map.css?v=20260723-worldtree17" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20260807-integrated1" rel="stylesheet"/>
+<link href="/assets/css/about-spectrograph.css?v=20260807-about-split41" rel="stylesheet"/>
+<script src="/assets/js/universe-theme-transition.js?v=20260807-fast2"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -37,55 +50,55 @@
                     colors: {
                         "on-error": "#fff7f6",
                         "on-secondary": "#f6f9ff",
-                        "background": "#faf9f4",
-                        "tertiary": "#1f5cba",
+                        "background": "#020817",
+                        "tertiary": "#7eb6ff",
                         "inverse-surface": "#0d0f0c",
-                        "tertiary-fixed": "#6799fb",
-                        "on-secondary-container": "#4a535c",
-                        "tertiary-container": "#6799fb",
-                        "tertiary-dim": "#024fad",
-                        "surface-container-lowest": "#ffffff",
-                        "surface": "#faf9f4",
-                        "outline": "#787c73",
+                        "tertiary-fixed": "#9ac7ff",
+                        "on-secondary-container": "#c1d0e2",
+                        "tertiary-container": "#174f8d",
+                        "tertiary-dim": "#acd1ff",
+                        "surface-container-lowest": "#010510",
+                        "surface": "#020817",
+                        "outline": "#8394aa",
                         "inverse-primary": "#f0f4fb",
                         "error": "#9f403d",
                         "on-secondary-fixed": "#374049",
-                        "surface-container-low": "#f4f4ee",
+                        "surface-container-low": "#061126",
                         "on-primary-fixed": "#3b4045",
                         "secondary-container": "#dae3ef",
-                        "secondary": "#57606a",
+                        "secondary": "#aab9cc",
                         "primary-container": "#dee3e9",
                         "surface-tint": "#5a5f65",
                         "primary-fixed": "#dee3e9",
-                        "on-surface-variant": "#5c6058",
+                        "on-surface-variant": "#b7c5d6",
                         "on-tertiary-container": "#001b46",
-                        "on-background": "#2f342d",
+                        "on-background": "#edf6ff",
                         "surface-dim": "#d7dcd0",
                         "on-tertiary": "#f9f8ff",
-                        "on-surface": "#2f342d",
+                        "on-surface": "#edf6ff",
                         "on-error-container": "#752121",
-                        "surface-container": "#edefe7",
+                        "surface-container": "#09162b",
                         "on-primary-fixed-variant": "#575c62",
                         "inverse-on-surface": "#9d9d99",
                         "secondary-dim": "#4b545d",
-                        "outline-variant": "#afb3aa",
+                        "outline-variant": "#52657d",
                         "primary": "#5a5f65",
                         "error-container": "#fe8983",
-                        "surface-bright": "#faf9f4",
+                        "surface-bright": "#11233e",
                         "primary-fixed-dim": "#d0d5db",
                         "tertiary-fixed-dim": "#598ced",
-                        "surface-variant": "#e0e4d9",
+                        "surface-variant": "#142741",
                         "on-tertiary-fixed-variant": "#002559",
                         "secondary-fixed-dim": "#ccd5e1",
                         "primary-dim": "#4e5358",
                         "error-dim": "#4e0309",
                         "on-tertiary-fixed": "#000000",
-                        "surface-container-highest": "#e0e4d9",
+                        "surface-container-highest": "#10213b",
                         "on-primary": "#f4f8ff",
                         "on-secondary-fixed-variant": "#535c66",
                         "secondary-fixed": "#dae3ef",
                         "on-primary-container": "#4d5258",
-                        "surface-container-high": "#e7e9e0"
+                        "surface-container-high": "#0c1b33"
                     },
                     fontFamily: {
                         "headline": ["Space Grotesk"],
@@ -98,9 +111,7 @@
         }
     </script>
 <style>
-        body {
-            background-color: #faf9f4;
-        }
+        body { background-color: var(--about-base, #020817); }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
@@ -113,24 +124,8 @@
         }
     </style>
 </head>
-<body class="font-body text-on-surface antialiased overflow-x-hidden">
+<body class="font-body text-on-surface antialiased overflow-x-hidden" data-universe-region="about">
 <a class="skip-link" href="#main-content">Skip to content</a>
-<div class="neural-global-bg" aria-hidden="true">
-  <div class="neural-mesh-container">
-    <div class="neural-mesh"></div>
-    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
-    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
-    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
-    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
-    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
-    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
-    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
-    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
-  </div>
-  <div class="bust-gradient"></div>
-  <div class="canvas-grid"></div>
-</div>
 <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
   <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
@@ -151,101 +146,85 @@
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<main class="pt-36 md:pt-24 pb-12" id="main-content">
-<!-- Hero Section with Animated Background -->
-<section class="relative mb-24 overflow-hidden bg-surface-container-low min-h-[60vh] flex items-center">
-<div class="absolute inset-0 bg-gradient-to-br from-surface-container-lowest/60 via-transparent to-tertiary/5 z-0"></div>
-<div class="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
-<div class="md:col-span-7">
-<div class="mb-4 inline-block font-label text-xs uppercase tracking-[0.2em] text-tertiary bracket-label font-bold">whole_person_sequence</div>
-<h1 class="text-6xl md:text-8xl font-headline font-bold text-on-surface leading-[0.9] tracking-tighter mb-8">
-                    AI-Native Software Engineer
-                </h1>
-<div class="space-y-6 text-xl leading-relaxed text-secondary max-w-2xl font-light">
-<p>
-                        I build high-output product work across Android, iOS, backend, and agent-first workflows, backed by more than 10 years shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce.
-                    </p>
-<p id="about-personal-intro">
-                        I’m also a husband, dad, and lifelong explorer. Away from work, I make time for family adventures, photography, astronomy with an 8-inch Dobsonian, reading, fitness, and small practical ventures. Those parts of life keep me observant, grounded, and curious.
-                    </p>
-</div>
-</div>
-<div class="md:col-span-5 hidden md:block">
-<!-- Abstract visual element -->
-<div class="aspect-square bg-white/40 backdrop-blur-sm border border-outline-variant/30 p-8 flex flex-col justify-between shadow-2xl relative group overflow-hidden">
-<div class="absolute inset-0 bg-gradient-to-br from-tertiary/5 to-transparent"></div>
-<div class="relative flex justify-between items-start">
-<span class="font-label text-xs text-outline">[whole_person:v2026]</span>
-<span class="material-symbols-outlined text-tertiary">polyline</span>
-</div>
-<div class="relative py-12">
-<div class="w-full h-px bg-outline-variant/30 mb-4"></div>
-<div class="flex gap-4">
-<div class="w-12 h-12 border border-tertiary/20"></div>
-<div class="w-12 h-12 bg-tertiary/10"></div>
-<div class="w-12 h-12 border border-tertiary"></div>
-</div>
-</div>
-<div class="relative flex justify-end">
-<span class="font-label text-[10px] uppercase tracking-widest text-outline">work_family_curiosity</span>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Evidence Profile Map -->
-<section class="max-w-7xl mx-auto px-6 md:px-12 mb-24" id="profile-map" aria-labelledby="profile-map-heading">
-<div class="profile-map" data-profile-map data-profile-map-mode="full" data-profile-map-default="engineering">
-  <div class="profile-map__topline">
-    <span class="profile-map__eyebrow">[HOW IT CONNECTS]</span>
-    <span class="profile-map__status" data-profile-map-status>[select a junction]</span>
-  </div>
-  <h2 class="profile-map__heading" id="profile-map-heading">How my work connects.</h2>
-  <p class="profile-map__intro">I started in mobile and kept following the hard parts: backend systems, shared native code, reliability, technical leadership, and agent-first delivery. Away from a screen, it’s family, trails, cameras, telescopes, books, and small ventures.</p>
-  <div class="profile-map__tabs" role="tablist" aria-label="Profile tree dataset">
-    <button class="profile-map__tab" type="button" role="tab" aria-selected="true" aria-controls="about-profile-map-panel" data-profile-map-tab="engineering">Engineering</button>
-    <button class="profile-map__tab" type="button" role="tab" aria-selected="false" aria-controls="about-profile-map-panel" data-profile-map-tab="interests" tabindex="-1">Interests</button>
-  </div>
-  <div class="profile-map__stage" id="about-profile-map-panel" role="tabpanel">
-    <div class="profile-map__visual" data-profile-map-visual>
-      <div class="profile-map__popover" data-profile-map-readout role="dialog" aria-modal="false" aria-live="polite" hidden></div>
+<main class="about-universe pt-36 md:pt-24 pb-12" id="main-content" data-stellar-spectrum data-stellar-default="combined" data-stellar-active-scan="combined">
+<div class="about-opening">
+<!-- Present origin: the whole-person profile is the observer, not a score. -->
+<section class="about-origin about-region" id="present-origin" aria-labelledby="about-title" data-stellar-lens="whole">
+  <div class="about-origin__copy">
+    <p class="about-region__kicker">[PRESENT ORIGIN · WHOLE PERSON]</p>
+    <h1 id="about-title"><span>Engineer.</span><span>Problem solver.</span><span>Lifelong explorer.</span></h1>
+    <div class="about-origin__prose">
+      <p data-stellar-lens-copy="engineering">I’m an AI-native software engineer with more than 10 years shipping Android, iOS, backend, and shared systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce.</p>
+      <p id="about-personal-intro" data-stellar-lens-copy="interests">I’m also a husband, dad, photographer, amateur astronomer, reader, fitness enthusiast, and lifelong explorer. Family and curiosity keep my work grounded.</p>
     </div>
-    <aside class="profile-map__side" aria-label="Profile tree context">
-      <h3 class="profile-map__dataset-title" data-profile-map-dataset-title>Engineering</h3>
-      <p class="profile-map__dataset-description" data-profile-map-dataset-description>I build across Android, iOS, backend systems, and shared code, with architecture, reliability, and delivery running through it all.</p>
-      <div class="profile-map__legend" aria-label="Junction evidence legend">
-        <span class="profile-map__legend-item"><span class="profile-map__legend-line" aria-hidden="true"></span><span>Solid junction · shipped work</span></span>
-        <span class="profile-map__legend-item"><span class="profile-map__legend-line profile-map__legend-line--dashed" aria-hidden="true"></span><span>Open junction · writing / profile</span></span>
+  </div>
+</section>
+<!-- The whole-person profile rendered as a spatial nebula beside the introduction. -->
+<section class="stellar-spectrum stellar-atlas about-region" id="profile-map" aria-label="Andrew Concepcion profile nebula" data-stellar-lens="whole" data-universe-route-map-host>
+  <div class="stellar-spectrum__stage" id="stellar-spectrum-panel" role="region" aria-label="Interactive three-dimensional profile" tabindex="0" hidden>
+    <div class="stellar-tree__toolbar" aria-label="Nebula profile controls">
+      <span class="sr-only stellar-spectrum__status" data-stellar-status aria-live="polite">[static profile ready]</span>
+      <div class="stellar-tree__camera">
+        <div class="stellar-tree__projection" role="group" aria-label="Nebula tree projection">
+          <button type="button" data-tree-projection="front" aria-pressed="false">Front</button>
+          <button type="button" data-tree-projection="top" aria-pressed="false">Top</button>
+          <button type="button" data-tree-projection="free" aria-pressed="true">Free move</button>
+        </div>
+        <button class="stellar-tree__interaction-toggle" type="button" data-tree-interaction-toggle aria-pressed="false" aria-label="Unlock stellar tree interaction" title="Unlock drag and pinch controls">
+          <span class="stellar-tree__lock-glyph" aria-hidden="true">
+            <svg class="stellar-tree__lock-icon stellar-tree__lock-icon--closed" viewBox="0 0 24 24" focusable="false"><path d="M7.5 10V7.25a4.5 4.5 0 0 1 9 0V10"/><rect x="5" y="10" width="14" height="10" rx="2.25"/><path d="M12 14.25v2.5"/></svg>
+            <svg class="stellar-tree__lock-icon stellar-tree__lock-icon--open" viewBox="0 0 24 24" focusable="false"><path d="M8 10V7.25a4.5 4.5 0 0 1 8.15-2.65"/><rect x="5" y="10" width="14" height="10" rx="2.25"/><path d="M12 14.25v2.5"/></svg>
+          </span>
+          <span class="sr-only" data-tree-interaction-label>Unlock stellar tree interaction</span>
+        </button>
+        <label class="stellar-tree__zoom-control">
+          <span class="sr-only">Nebula zoom</span>
+          <span class="stellar-tree__zoom-edge" aria-hidden="true">−</span>
+          <input type="range" min="40" max="260" step="1" value="100" data-tree-zoom-range aria-label="Nebula zoom" aria-valuetext="100 percent"/>
+          <span class="stellar-tree__zoom-edge" aria-hidden="true">+</span>
+          <output data-tree-zoom-output aria-hidden="true">100%</output>
+        </label>
+        <button class="stellar-tree__reset" type="button" data-tree-reset aria-label="Reset nebula view" title="Reset view"><span class="stellar-tree__control-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M4 4v6h6"/><path d="M5.4 9.2A8 8 0 1 1 4.6 15"/></svg></span><span class="sr-only">Reset view</span></button>
+        <button class="about-theme-toggle" type="button" data-about-theme-toggle aria-pressed="false" aria-label="Use light theme" title="Toggle light and dark theme"><span class="stellar-tree__control-icon" aria-hidden="true"><svg class="about-theme-toggle__sun" viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="3.25"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.45 1.45M17.25 17.25l1.45 1.45M18.7 5.3l-1.45 1.45M6.75 17.25L5.3 18.7"/></svg><svg class="about-theme-toggle__moon" viewBox="0 0 24 24" focusable="false"><path d="M19.2 15.2A8.1 8.1 0 0 1 8.8 4.8 8.2 8.2 0 1 0 19.2 15.2Z"/></svg></span><span class="sr-only">Toggle light and dark theme</span></button>
       </div>
-      <p class="profile-map__method">Choose a junction for the story behind it. Related paths illuminate when selected.</p>
+    </div>
+    <div class="stellar-spectrum__bands" data-stellar-bands role="tree" aria-label="Branched profile signal cloud"></div>
+    <aside class="stellar-spectrum__readout" data-stellar-readout role="dialog" aria-modal="false" aria-live="polite" aria-label="Selected profile evidence" hidden>
+      <p class="stellar-spectrum__readout-kicker">[READOUT]</p>
+      <h3>Select a branch or signal.</h3>
+      <p>Choose one of the eight branches or its equal signal points to inspect exact evidence.</p>
     </aside>
   </div>
-  <div class="profile-map__fallback">
-    <section class="profile-map__fallback-panel" id="about-profile-engineering" data-profile-map-fallback-panel="engineering">
+  <div class="stellar-spectrum__fallback">
+    <p class="stellar-spectrum__fallback-note">My engineering practice spans native products, shared systems, architecture, reliability, delivery, and agent-first work; my personal life stays rooted in family, exploration, observation, reflection, and building.</p>
+    <div class="stellar-spectrum__fallback-datasets">
+    <section class="stellar-spectrum__fallback-panel" id="about-profile-engineering">
       <h3>Engineering profile</h3>
-      <div class="profile-map__fallback-grid">
-        <div class="profile-map__fallback-group"><strong>Surfaces</strong><ul><li>Android</li><li>iOS</li><li>Backend APIs</li><li>Shared native core</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Languages</strong><ul><li>Kotlin</li><li>Swift / Objective-C</li><li>Java</li><li>SQL / Postgres / PostGIS</li><li>Rust / UniFFI</li><li>JavaScript / Node</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Craft</strong><ul><li>Clean / modular architecture</li><li>Reliability / performance</li><li>CI/CD / release hardening</li><li>Jetpack Compose</li><li>Testing / visual QA</li><li>Async / reactive data</li><li>Privacy / security</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Delivery</strong><ul><li>Technical leadership</li><li>Cross-functional delivery</li><li>Agent-first engineering</li><li>Agent memory / orchestration</li></ul></div>
+      <div class="stellar-spectrum__fallback-grid">
+        <div class="stellar-spectrum__fallback-group"><strong>Surfaces</strong><ul><li>Android</li><li>iOS</li><li>Backend APIs</li><li>Shared native core</li></ul></div>
+        <div class="stellar-spectrum__fallback-group"><strong>Languages</strong><ul><li>Kotlin</li><li>Swift / Objective-C</li><li>Java</li><li>SQL / Postgres / PostGIS</li><li>Rust / UniFFI</li><li>JavaScript / Node</li></ul></div>
+        <div class="stellar-spectrum__fallback-group"><strong>Craft</strong><ul><li>Clean / modular architecture</li><li>Reliability / performance</li><li>CI/CD / release hardening</li><li>Jetpack Compose</li><li>Testing / visual QA</li><li>Async / reactive data</li><li>Privacy / security</li></ul></div>
+        <div class="stellar-spectrum__fallback-group"><strong>Delivery</strong><ul><li>Technical leadership</li><li>Cross-functional delivery</li><li>Agent-first engineering</li><li>Agent memory / orchestration</li></ul></div>
       </div>
     </section>
-    <section class="profile-map__fallback-panel" id="about-profile-interests" data-profile-map-fallback-panel="interests">
+    <section class="stellar-spectrum__fallback-panel" id="about-profile-interests">
       <h3>Interests</h3>
-      <div class="profile-map__fallback-grid">
-        <div class="profile-map__fallback-group"><strong>Place</strong><ul><li>Travel</li><li>Outdoors</li><li>Family time</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Observation</strong><ul><li>Photography</li><li>Astronomy</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Reflection</strong><ul><li>Reflective practice</li><li>Philosophy</li><li>Fitness</li></ul></div>
-        <div class="profile-map__fallback-group"><strong>Building</strong><ul><li>Small ventures</li><li>Financial independence</li></ul></div>
+      <div class="stellar-spectrum__fallback-grid">
+        <div class="stellar-spectrum__fallback-group"><strong>Place</strong><ul><li>Travel</li><li>Outdoors</li><li>Family time</li></ul></div>
+        <div class="stellar-spectrum__fallback-group"><strong>Observation</strong><ul><li>Photography</li><li>Astronomy</li></ul></div>
+        <div class="stellar-spectrum__fallback-group"><strong>Reflection</strong><ul><li>Reflective practice</li><li>Philosophy</li><li>Fitness</li></ul></div>
+        <div class="stellar-spectrum__fallback-group"><strong>Building</strong><ul><li>Small ventures</li><li>Financial independence</li></ul></div>
       </div>
     </section>
+    </div>
   </div>
+</section>
 </div>
 
-<details class="profile-map-evidence" id="profile-map-evidence">
-  <summary>Sources and map key</summary>
+<details class="profile-map-evidence about-region" id="profile-map-evidence">
+  <summary><span>[SOURCE INDEX]</span> Sources and map key</summary>
   <div class="profile-map-evidence__body">
-    <p>These maps bring together my engineering work and personal interests. Topics connect when they appear together in the same source. Solid lines come from shipped work or public projects; dashed lines come from writing or profile material. Every point is the same size, so this is not a proficiency score. The table below lists the sources behind each topic.</p>
+    <p>My engineering record is grounded in shipped roles, public projects, and published technical writing. Personal entries document family travel, photography, astronomy, reflection, fitness, and small ventures. The source trail below keeps each statement tied to the public evidence behind it.</p>
     <div class="profile-map-evidence__table-wrap">
       <table>
         <caption class="sr-only">Sources for Andrew Concepcion’s engineering skills and personal interests</caption>
@@ -287,15 +266,18 @@
     </div>
   </div>
 </details>
-</section>
 <!-- Assessment Signals -->
-<section class="max-w-7xl mx-auto px-6 md:px-12 mb-24">
-<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
-<h2 class="text-4xl font-headline font-bold tracking-tight">Assessment Signals</h2>
-<p class="text-secondary text-sm font-label uppercase tracking-widest">[Emergenetics + Harrison Snapshot]</p>
+<section class="stellar-calibration about-region max-w-7xl mx-auto px-6 md:px-12 mb-24" id="assessment-calibration" data-stellar-lens="whole">
+<div class="about-region__heading">
+<div>
+<p class="about-region__kicker">[CALIBRATION · NOT PROFICIENCY]</p>
+<h2>Assessment Signals</h2>
 </div>
+<p>[Emergenetics + Harrison Snapshot]</p>
+</div>
+<p class="stellar-calibration-note">My published Emergenetics and Harrison results point to an analytical and conceptual thinking mix, paired with a collaborative, flexible working style. I treat them as reflection prompts alongside lived delivery experience.</p>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-<article class="lg:col-span-7 bg-surface-container-low border border-outline-variant/15 p-8 md:p-10">
+<article class="stellar-calibration__card lg:col-span-7">
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
 <div class="font-label text-[10px] uppercase tracking-[0.2em] text-tertiary font-bold">[emergenetics_thinking_mix]</div>
 <div class="flex items-center gap-4">
@@ -306,55 +288,31 @@
 <p class="text-secondary font-light leading-relaxed max-w-2xl">
                 Thinking blend from my published profile, with behavior percentiles used as day-to-day collaboration signals.
               </p>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-<div class="space-y-4">
-<div>
-<div class="flex items-center justify-between text-xs font-label uppercase tracking-widest text-on-surface mb-2">
-<span>Analytical</span>
-<span>33%</span>
-</div>
-<div class="h-2 bg-surface-variant border border-outline-variant/20">
-<div class="h-full bg-tertiary" style="width: 33%"></div>
-</div>
-</div>
-<div>
-<div class="flex items-center justify-between text-xs font-label uppercase tracking-widest text-on-surface mb-2">
-<span>Conceptual</span>
-<span>32%</span>
-</div>
-<div class="h-2 bg-surface-variant border border-outline-variant/20">
-<div class="h-full bg-tertiary/80" style="width: 32%"></div>
-</div>
-</div>
-<div>
-<div class="flex items-center justify-between text-xs font-label uppercase tracking-widest text-on-surface mb-2">
-<span>Structural</span>
-<span>20%</span>
-</div>
-<div class="h-2 bg-surface-variant border border-outline-variant/20">
-<div class="h-full bg-secondary" style="width: 20%"></div>
-</div>
-</div>
-<div>
-<div class="flex items-center justify-between text-xs font-label uppercase tracking-widest text-on-surface mb-2">
-<span>Social</span>
-<span>15%</span>
-</div>
-<div class="h-2 bg-surface-variant border border-outline-variant/20">
-<div class="h-full bg-secondary/70" style="width: 15%"></div>
-</div>
-</div>
-</div>
-<div class="grid grid-cols-1 gap-3">
-<div class="border border-outline-variant/20 bg-surface-container-high p-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 stellar-thinking-layout">
+<figure class="stellar-thinking-mix" aria-labelledby="stellar-thinking-caption">
+  <div class="stellar-thinking-mix__pie" role="img" aria-label="Thinking mix: Analytical 33 percent, Conceptual 32 percent, Structural 20 percent, Social 15 percent.">
+    <span aria-hidden="true">100%</span>
+  </div>
+  <figcaption id="stellar-thinking-caption">
+    <span class="sr-only">Thinking mix totals 100 percent.</span>
+    <ul class="stellar-thinking-mix__legend">
+      <li data-thinking="analytical"><span>Analytical</span><strong>33%</strong></li>
+      <li data-thinking="conceptual"><span>Conceptual</span><strong>32%</strong></li>
+      <li data-thinking="structural"><span>Structural</span><strong>20%</strong></li>
+      <li data-thinking="social"><span>Social</span><strong>15%</strong></li>
+    </ul>
+  </figcaption>
+</figure>
+<div class="stellar-calibration__metrics grid grid-cols-1 gap-3">
+<div class="stellar-calibration__metric">
 <div class="font-label text-[10px] uppercase tracking-widest text-outline mb-1">Behavior Percentile</div>
 <div class="flex items-center justify-between text-sm text-secondary"><span>Expressiveness</span><span class="font-headline font-bold text-on-surface">49%</span></div>
 </div>
-<div class="border border-outline-variant/20 bg-surface-container-high p-4">
+<div class="stellar-calibration__metric">
 <div class="font-label text-[10px] uppercase tracking-widest text-outline mb-1">Behavior Percentile</div>
 <div class="flex items-center justify-between text-sm text-secondary"><span>Assertiveness</span><span class="font-headline font-bold text-on-surface">51%</span></div>
 </div>
-<div class="border border-outline-variant/20 bg-surface-container-high p-4">
+<div class="stellar-calibration__metric">
 <div class="font-label text-[10px] uppercase tracking-widest text-outline mb-1">Behavior Percentile</div>
 <div class="flex items-center justify-between text-sm text-secondary"><span>Flexibility</span><span class="font-headline font-bold text-on-surface">60%</span></div>
 </div>
@@ -367,7 +325,7 @@
                 </a>
 </div>
 </article>
-<article class="lg:col-span-5 bg-surface-container-high border border-outline-variant/15 p-8 md:p-10 flex flex-col">
+<article class="stellar-calibration__card lg:col-span-5 flex flex-col">
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
 <div class="font-label text-[10px] uppercase tracking-[0.2em] text-tertiary font-bold">[harrison_highlights_2025]</div>
 <div class="flex items-center gap-4">
@@ -400,7 +358,7 @@
 <span class="font-headline font-bold text-tertiary">8.0</span>
 </li>
 </ul>
-<div class="mt-6 p-4 border border-outline-variant/20 bg-surface">
+<div class="stellar-calibration__watchpoint mt-6">
 <div class="font-label text-[10px] uppercase tracking-widest text-outline mb-1">Watchpoint</div>
 <p class="text-sm text-secondary leading-relaxed">
                   Assertive scored <span class="font-headline font-bold text-on-surface">4.1</span>, which aligns with a preference for collaborative outcomes over hard self-prioritization.
@@ -416,15 +374,16 @@
 </div>
 </section>
 <!-- Timeline Section -->
-<section class="max-w-7xl mx-auto px-6 md:px-12 mb-24">
-<div class="flex flex-col md:flex-row gap-16">
-<div class="md:w-1/3 md:sticky md:top-32 self-start">
-<h2 class="text-4xl font-headline font-bold uppercase tracking-tight">Career Trajectory</h2>
+<section class="stellar-light-cone about-region max-w-7xl mx-auto px-6 md:px-12 mb-24" id="career-trajectory" data-stellar-section="career" data-stellar-lens="engineering">
+<div class="stellar-light-cone__layout flex flex-col md:flex-row gap-16">
+<header class="stellar-light-cone__heading md:w-1/3 md:sticky md:top-32 self-start">
+<p class="about-region__kicker">[PAST LIGHT CONE · 2014 → PRESENT]</p>
+<h2>Career Trajectory</h2>
 <p class="mt-4 text-base text-secondary font-body max-w-xs leading-relaxed">A resume-based timeline of platform ownership, architecture leadership, and shipped product impact.</p>
-</div>
-<div class="md:w-2/3 space-y-0 border-l border-outline-variant/30">
+</header>
+<div class="stellar-light-cone__roles md:w-2/3 space-y-0">
 <!-- Item 1 -->
-<div class="relative pl-12 pb-16">
+<article class="stellar-light-cone__role relative pl-12 pb-16" data-stellar-surface="career" data-stellar-evidence="rust-core" data-stellar-nodes="android ios backend-apis shared-native kotlin rust-uniffi architecture reliability release compose testing-qa leadership cross-functional ai-engineering agent-memory">
 <div class="absolute -left-[6px] top-0 w-3 h-3 bg-tertiary"></div>
 <div class="font-label text-xs text-tertiary mb-2 uppercase font-bold tracking-widest bracket-label">JUN 2024 — PRESENT</div>
 <h3 class="text-2xl font-headline font-bold mb-3">AI-Native Software Engineer — Bitcoin.com</h3>
@@ -434,9 +393,9 @@
 <li>Co-built Bitcoin replace-by-fee with fee-aware UTXO validation, speed-up/cancel flows, reusable transaction preparation and signing, opt-out controls, and dust protection; led an in-app single-chain-to-multichain wallet migration.</li>
 <li>Modernized staking and liquidity-reward pool reads from legacy RPC to typed REST, shipped provider-aware swap routing and recurring-buy reminders, and hardened startup, native builds, CI, and Android releases.</li>
 </ul>
-</div>
+</article>
 <!-- Item 2 -->
-<div class="relative pl-12 pb-16">
+<article class="stellar-light-cone__role relative pl-12 pb-16" data-stellar-surface="career" data-stellar-nodes="android kotlin java architecture reliability release testing-qa cross-functional">
 <div class="absolute -left-[6px] top-0 w-3 h-3 bg-outline-variant"></div>
 <div class="font-label text-xs text-outline mb-2 uppercase tracking-widest bracket-label">JUN 2023 — JUN 2024</div>
 <h3 class="text-2xl font-headline font-bold mb-3">Senior Mobile Developer — Candyspace</h3>
@@ -446,9 +405,9 @@
 <li>Independently delivered timeline scrubbing with a visual preview so viewers could see where playback would land before seeking.</li>
 <li>Fixed long-standing player issues and improved reliability with stronger error tracking, security fixes, and a Simple XML-to-Jackson migration.</li>
 </ul>
-</div>
+</article>
 <!-- Item 3 -->
-<div class="relative pl-12 pb-16">
+<article class="stellar-light-cone__role relative pl-12 pb-16" data-stellar-surface="career" data-stellar-evidence="ocbc" data-stellar-nodes="android kotlin architecture reliability release testing-qa privacy-security cross-functional">
 <div class="absolute -left-[6px] top-0 w-3 h-3 bg-outline-variant"></div>
 <div class="font-label text-xs text-outline mb-2 uppercase tracking-widest bracket-label">JUN 2021 — JUN 2023</div>
 <h3 class="text-2xl font-headline font-bold mb-3">Senior Android Developer — Red Airship</h3>
@@ -461,9 +420,9 @@
 <li>Integrated third-party SDKs, refactored selected modules to reduce coupling, and improved unit-test coverage for critical fintech flows.</li>
 <li>Improved OpenPay checkout reliability, UI responsiveness, partner-integrated payment flows, and release hardening.</li>
 </ul>
-</div>
+</article>
 <!-- Item 4 -->
-<div class="relative pl-12 pb-16">
+<article class="stellar-light-cone__role relative pl-12 pb-16" data-stellar-surface="career" data-stellar-evidence="mystc" data-stellar-nodes="android kotlin architecture reliability release testing-qa async-reactive leadership cross-functional">
 <div class="absolute -left-[6px] top-0 w-3 h-3 bg-outline-variant"></div>
 <div class="font-label text-xs text-outline mb-2 uppercase tracking-widest bracket-label">MAY 2020 — JUN 2021</div>
 <h3 class="text-2xl font-headline font-bold mb-3">Lead Developer — InnovationTeam</h3>
@@ -473,9 +432,9 @@
 <li>Drove Clean Architecture and MVVM adoption with RxJava and RxKotlin, improving modular boundaries and release confidence.</li>
 <li>Delivered performance, stability, and data synchronization improvements across account, ordering, and support flows.</li>
 </ul>
-</div>
+</article>
 <!-- Item 5 -->
-<div class="relative pl-12 pb-16">
+<article class="stellar-light-cone__role relative pl-12 pb-16" data-stellar-surface="career" data-stellar-evidence="owto" data-stellar-nodes="android ios backend-apis architecture reliability release testing-qa async-reactive leadership cross-functional">
 <div class="absolute -left-[6px] top-0 w-3 h-3 bg-outline-variant"></div>
 <div class="font-label text-xs text-outline mb-2 uppercase tracking-widest bracket-label">JUN 2018 — MAY 2020</div>
 <h3 class="text-2xl font-headline font-bold mb-3">Team Lead — iPARA Technologies and Solutions</h3>
@@ -485,9 +444,9 @@
 <li>Architected the mobile app with Uber RIB-inspired patterns to support modular growth and clearer ownership boundaries.</li>
 <li>Improved booking reliability, payment-path handling, and backend API coordination for real-time transport flows.</li>
 </ul>
-</div>
+</article>
 <!-- Item 6 -->
-<div class="relative pl-12 pb-16">
+<article class="stellar-light-cone__role relative pl-12 pb-16" data-stellar-surface="career" data-stellar-nodes="android kotlin java reliability release testing-qa async-reactive leadership">
 <div class="absolute -left-[6px] top-0 w-3 h-3 bg-outline-variant"></div>
 <div class="font-label text-xs text-outline mb-2 uppercase tracking-widest bracket-label">JUN 2016 — JUN 2018</div>
 <h3 class="text-2xl font-headline font-bold mb-3">Senior Android Developer — YOYO Holdings Pte. Ltd.</h3>
@@ -497,9 +456,9 @@
 <li>Migrated large Java surfaces to Kotlin, reduced regressions in fragile areas, and shipped safer feature rollouts through A/B testing and guardrails.</li>
 <li>Improved API and caching behavior while keeping monetization-critical lockscreen and notification surfaces stable.</li>
 </ul>
-</div>
+</article>
 <!-- Item 7 -->
-<div class="relative pl-12">
+<article class="stellar-light-cone__role relative pl-12" data-stellar-surface="career" data-stellar-evidence="websafety" data-stellar-nodes="android ios backend-apis java architecture reliability testing-qa async-reactive privacy-security cross-functional">
 <div class="absolute -left-[6px] top-0 w-3 h-3 bg-outline-variant"></div>
 <div class="font-label text-xs text-outline mb-2 uppercase tracking-widest bracket-label">MAY 2014 — JUN 2016</div>
 <h3 class="text-2xl font-headline font-bold mb-3">Full-Stack Web and Mobile Developer — Internet Strategy Branding and Execution (ISBX)</h3>
@@ -509,15 +468,18 @@
 <li>Worked through undocumented Android APIs, GPS and sync reliability, and security-sensitive feature requirements.</li>
 <li>Helped ship a robust parental-controls platform with stronger operational and compliance posture.</li>
 </ul>
-</div>
+</article>
 </div>
 </div>
 </section>
 <!-- Lab Journal / Bento -->
-<section class="max-w-7xl mx-auto px-6 md:px-12 mb-24">
-<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
-<h2 class="text-4xl font-headline font-bold uppercase tracking-tight">The Lab Journal</h2>
-<p class="text-secondary text-sm font-label uppercase tracking-widest">[Personal + Hobby Entries From Published Manifest]</p>
+<section class="stellar-observation-field about-region max-w-7xl mx-auto px-6 md:px-12 mb-24" id="lab-journal" data-stellar-section="lab" data-stellar-lens="interests">
+<div class="about-region__heading">
+<div>
+<p class="about-region__kicker">[OBSERVATION FIELD · PUBLISHED MANIFEST]</p>
+<h2>The Lab Journal</h2>
+</div>
+<p>[Personal + Hobby Entries From Published Manifest]</p>
 </div>
 <div id="about-lab-journal" class="grid grid-cols-1 md:grid-cols-3 gap-8">
 <article class="md:col-span-2 bg-surface-container-low p-10 min-h-[360px] border border-outline-variant/10 flex flex-col justify-between">
@@ -538,50 +500,55 @@
 </article>
 </div>
 </section>
-<!-- Tech Stack Grid -->
-<section class="max-w-7xl mx-auto px-6 md:px-12 mb-24">
-<div class="bg-[#2F342D] text-white p-12 md:p-16 relative overflow-hidden">
-<div class="absolute top-0 right-0 w-64 h-64 bg-tertiary/10 blur-[100px] pointer-events-none"></div>
-<h2 class="text-4xl font-headline font-bold uppercase tracking-tight mb-16 relative z-10">Core Tech Stack</h2>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-12 relative z-10">
+<!-- Systems field -->
+<section class="stellar-systems-ledger about-region max-w-7xl mx-auto px-6 md:px-12 mb-24" id="core-stack" data-stellar-section="stack" data-stellar-lens="engineering">
+<div class="stellar-systems-ledger__surface">
+<header class="about-region__heading">
+<div>
+<p class="about-region__kicker">[SYSTEMS FIELD · PRESENT PRACTICE]</p>
+<h2>Systems Field</h2>
+</div>
+<p>Four connected constellations across current working surfaces, architecture, data flow, and adjacent delivery.</p>
+</header>
+<div class="stellar-systems-ledger__groups grid grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-12">
 <div>
 <div class="text-[10px] font-label text-outline-variant uppercase mb-6 tracking-[0.2em] font-bold">_android</div>
 <ul class="space-y-3 font-headline font-medium text-xl">
-<li class="hover:text-tertiary-fixed transition-colors">Kotlin</li>
-<li class="hover:text-tertiary-fixed transition-colors">Java</li>
-<li class="hover:text-tertiary-fixed transition-colors">Jetpack Compose</li>
-<li class="hover:text-tertiary-fixed transition-colors">Android SDK</li>
-<li class="hover:text-tertiary-fixed transition-colors">XML layouts</li>
+<li class="hover:text-tertiary-fixed transition-colors" data-stellar-surface="stack" data-stellar-nodes="kotlin">Kotlin</li>
+<li class="hover:text-tertiary-fixed transition-colors" data-stellar-surface="stack" data-stellar-nodes="java">Java</li>
+<li class="hover:text-tertiary-fixed transition-colors" data-stellar-surface="stack" data-stellar-nodes="compose">Jetpack Compose</li>
+<li class="hover:text-tertiary-fixed transition-colors" data-stellar-surface="stack" data-stellar-nodes="android">Android SDK</li>
+<li class="hover:text-tertiary-fixed transition-colors" data-stellar-surface="stack" data-stellar-nodes="android">XML layouts</li>
 </ul>
 </div>
 <div>
 <div class="text-[10px] font-label text-outline-variant uppercase mb-6 tracking-[0.2em] font-bold">_architecture</div>
 <ul class="space-y-3 font-headline font-medium text-xl">
-<li>Clean Architecture</li>
-<li>MVVM</li>
-<li>Modularization</li>
-<li>SDK integration</li>
-<li>Unit testing</li>
+<li data-stellar-surface="stack" data-stellar-nodes="architecture">Clean Architecture</li>
+<li data-stellar-surface="stack" data-stellar-nodes="architecture">MVVM</li>
+<li data-stellar-surface="stack" data-stellar-nodes="architecture">Modularization</li>
+<li data-stellar-surface="stack" data-stellar-nodes="architecture cross-functional">SDK integration</li>
+<li data-stellar-surface="stack" data-stellar-nodes="testing-qa">Unit testing</li>
 </ul>
 </div>
 <div>
 <div class="text-[10px] font-label text-outline-variant uppercase mb-6 tracking-[0.2em] font-bold">_async_data</div>
 <ul class="space-y-3 font-headline font-medium text-xl">
-<li>Coroutines</li>
-<li>Flow</li>
-<li>RxJava / RxKotlin</li>
-<li>Retrofit</li>
-<li>REST APIs</li>
+<li data-stellar-surface="stack" data-stellar-nodes="async-reactive">Coroutines</li>
+<li data-stellar-surface="stack" data-stellar-nodes="async-reactive">Flow</li>
+<li data-stellar-surface="stack" data-stellar-nodes="async-reactive">RxJava / RxKotlin</li>
+<li data-stellar-surface="stack" data-stellar-nodes="backend-apis">Retrofit</li>
+<li data-stellar-surface="stack" data-stellar-nodes="backend-apis">REST APIs</li>
 </ul>
 </div>
 <div>
 <div class="text-[10px] font-label text-outline-variant uppercase mb-6 tracking-[0.2em] font-bold">_adjacent_delivery</div>
 <ul class="space-y-3 font-headline font-medium text-xl">
-<li>Compose Multiplatform</li>
-<li>Kotlin Multiplatform</li>
-<li>SwiftUI / Swift</li>
-<li>Firebase / SQLite</li>
-<li>CI/CD + release hardening</li>
+<li data-stellar-surface="stack" data-stellar-nodes="shared-native compose">Compose Multiplatform</li>
+<li data-stellar-surface="stack" data-stellar-nodes="shared-native kotlin">Kotlin Multiplatform</li>
+<li data-stellar-surface="stack" data-stellar-nodes="ios swift">SwiftUI / Swift</li>
+<li data-stellar-surface="stack">Firebase / SQLite</li>
+<li data-stellar-surface="stack" data-stellar-nodes="release">CI/CD + release hardening</li>
 </ul>
 </div>
 </div>
@@ -599,7 +566,7 @@
     <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
   </div>
 </footer>
-<script src="/assets/js/profile-map.js?v=20260723-worldtree17"></script>
+<script src="/assets/js/about-spectrograph.js?v=20260807-about-split41"></script>
 <script>
   (() => {
     const labJournalRoot = document.getElementById("about-lab-journal");
@@ -617,6 +584,7 @@
       "engineering",
       "development",
       "devlog",
+      "work",
       "test-category"
     ]);
     const technicalTopicNeedles = [
@@ -847,4 +815,5 @@
     hydrateLabJournal();
   })();
 </script>
+<script src="/assets/js/universe-field-map.js?v=20260807-integrated1"></script>
 </body></html>

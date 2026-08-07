@@ -1,0 +1,1267 @@
+:root {
+  --paper: #faf9f4;
+  --paper-deep: #f2f1ea;
+  --ink: #16202a;
+  --muted: #69727b;
+  --line: rgba(35, 52, 65, 0.17);
+  --blue: #245fa8;
+  --platform: #2c6bb0;
+  --constraint: #6f7695;
+  --reliability: #397982;
+  --evidence: #93705a;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Manrope", sans-serif;
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 72% 18%, rgba(36, 95, 168, 0.055), transparent 28rem),
+    linear-gradient(125deg, rgba(255, 255, 255, 0.66), transparent 46%),
+    var(--paper);
+  overflow-x: clip;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 1000;
+  top: 10px;
+  left: 10px;
+  padding: 0.75rem 1rem;
+  background: var(--ink);
+  color: white;
+  font: 600 0.78rem/1 "Space Grotesk", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateY(-160%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.loom-topbar {
+  position: relative;
+  z-index: 50;
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.65rem clamp(1rem, 2.5vw, 2.4rem);
+  border-bottom: 1px solid rgba(35, 52, 65, 0.14);
+  background: rgba(250, 249, 244, 0.9);
+  backdrop-filter: blur(16px);
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.loom-topbar__brand {
+  width: max-content;
+  color: var(--blue);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.loom-topbar > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.loom-topbar nav {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loom-topbar nav a {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  color: #46525e;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-underline-offset: 0.28rem;
+  text-transform: uppercase;
+}
+
+.loom-topbar nav a:hover,
+.loom-topbar nav a:focus-visible {
+  color: var(--blue);
+}
+
+.loom-app {
+  position: relative;
+  height: calc(100svh - 56px);
+  min-height: 700px;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.loom-app::before,
+.loom-app::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.loom-app::before {
+  inset: 0;
+  opacity: 0.72;
+  background:
+    repeating-linear-gradient(108deg, transparent 0 72px, rgba(35, 52, 65, 0.032) 73px, transparent 74px 150px),
+    linear-gradient(90deg, rgba(250, 249, 244, 0.96) 0 17%, transparent 34%);
+}
+
+.loom-app::after {
+  top: 0;
+  bottom: 0;
+  left: clamp(280px, 23vw, 360px);
+  width: 1px;
+  background: linear-gradient(transparent 3%, rgba(35, 52, 65, 0.14) 15% 87%, transparent 97%);
+}
+
+.loom-intro {
+  position: absolute;
+  z-index: 12;
+  top: clamp(2.1rem, 5vh, 4.4rem);
+  left: clamp(1.25rem, 3.2vw, 3.2rem);
+  width: min(23vw, 320px);
+}
+
+.loom-intro__eyebrow,
+.loom-controls > p,
+.loom-field__register,
+.loom-key,
+.loom-status,
+.loom-release {
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.loom-intro__eyebrow {
+  margin: 0 0 0.9rem;
+  color: var(--blue);
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+
+.loom-intro h1 {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(3.8rem, 6.2vw, 7.4rem);
+  font-weight: 500;
+  letter-spacing: -0.082em;
+  line-height: 0.75;
+}
+
+.loom-intro h1 em {
+  color: var(--blue);
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.loom-intro__copy {
+  max-width: 29rem;
+  margin: 1.8rem 0 0;
+  color: #45515c;
+  font-size: clamp(0.8rem, 1vw, 0.98rem);
+  line-height: 1.68;
+}
+
+.loom-intro__instruction {
+  display: flex;
+  gap: 0.55rem;
+  margin: 1rem 0 0;
+  color: #68727b;
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.loom-intro__instruction span {
+  color: var(--blue);
+}
+
+.loom-controls {
+  position: absolute;
+  z-index: 18;
+  bottom: clamp(2.2rem, 4.8vh, 4.4rem);
+  left: clamp(1.25rem, 3.2vw, 3.2rem);
+  width: min(20vw, 276px);
+}
+
+.loom-controls > p {
+  margin: 0 0 0.55rem;
+  color: #737d85;
+  font-size: 0.57rem;
+  font-weight: 700;
+}
+
+.loom-controls > div {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.loom-controls button {
+  position: relative;
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: 1.75rem 1fr auto;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.3rem 0;
+  border: 0;
+  border-top: 1px solid rgba(35, 52, 65, 0.14);
+  background: transparent;
+  color: #515c66;
+  cursor: pointer;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  text-align: left;
+  text-transform: uppercase;
+  transition: color 180ms ease, padding-left 180ms ease;
+}
+
+.loom-controls button:last-child {
+  border-bottom: 1px solid rgba(35, 52, 65, 0.14);
+}
+
+.loom-controls button span {
+  color: #90979c;
+  font-size: 0.55rem;
+}
+
+.loom-controls button small {
+  color: #8a9299;
+  font-size: 0.48rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.loom-controls button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -0.65rem;
+  width: 0;
+  height: 1px;
+  background: var(--blue);
+  transition: width 180ms ease;
+}
+
+.loom-controls button:hover,
+.loom-controls button:focus-visible,
+.loom-controls button[aria-pressed="true"] {
+  padding-left: 0.5rem;
+  color: var(--blue);
+}
+
+.loom-controls button:hover::before,
+.loom-controls button:focus-visible::before,
+.loom-controls button[aria-pressed="true"]::before {
+  width: 0.85rem;
+}
+
+.loom-controls button:focus-visible,
+.loom-release:focus-visible,
+.loom-knot:focus-visible,
+.loom-annotation a:focus-visible,
+.loom-topbar a:focus-visible,
+.loom-fallback a:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 4px;
+}
+
+.loom-field {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: clip;
+}
+
+.loom-field__grain {
+  position: absolute;
+  z-index: -1;
+  inset: 2.4% 1.5% 2.4% 19%;
+  border: 1px solid rgba(35, 52, 65, 0.08);
+  background:
+    radial-gradient(circle at 15% 12%, rgba(36, 95, 168, 0.05) 0 1px, transparent 1.5px) 0 0 / 19px 19px,
+    repeating-linear-gradient(0deg, transparent 0 16px, rgba(35, 52, 65, 0.018) 17px, transparent 18px 33px);
+  mask-image: linear-gradient(90deg, transparent 0, black 9%, black 96%, transparent 100%);
+}
+
+.loom-field__register {
+  position: absolute;
+  z-index: 4;
+  right: 1.7rem;
+  margin: 0;
+  color: #8b9297;
+  font-size: 0.48rem;
+  font-weight: 600;
+}
+
+.loom-field__register--top {
+  top: 2.7rem;
+}
+
+.loom-field__register--bottom {
+  bottom: 1rem;
+}
+
+.loom-thread-field {
+  position: absolute;
+  z-index: 2;
+  inset: 2.5% 0 2.5% 14%;
+  width: 86%;
+  height: 95%;
+  overflow: visible;
+}
+
+.loom-thread {
+  color: var(--blue);
+  opacity: 0.65;
+  transition: opacity 450ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 450ms ease;
+}
+
+.loom-thread[data-strand-line="platform"] {
+  color: var(--platform);
+}
+
+.loom-thread[data-strand-line="constraint"] {
+  color: var(--constraint);
+}
+
+.loom-thread[data-strand-line="reliability"] {
+  color: var(--reliability);
+}
+
+.loom-thread[data-strand-line="evidence"] {
+  color: var(--evidence);
+}
+
+.loom-thread path {
+  vector-effect: non-scaling-stroke;
+}
+
+.loom-thread__halo {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 16;
+  opacity: 0.095;
+}
+
+.loom-thread__body {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2.2;
+  opacity: 0.72;
+}
+
+.loom-thread__flow {
+  --flow-duration: 34s;
+  --flow-direction: normal;
+  fill: none;
+  stroke: currentColor;
+  stroke-dasharray: 2 18 34 12;
+  stroke-linecap: round;
+  stroke-width: 4.7;
+  opacity: 0.42;
+  animation: none;
+}
+
+.loom-thread:nth-of-type(2) .loom-thread__flow {
+  --flow-duration: 42s;
+  --flow-direction: reverse;
+}
+
+.loom-thread:nth-of-type(3) .loom-thread__flow {
+  --flow-duration: 38s;
+}
+
+.loom-thread:nth-of-type(4) .loom-thread__flow {
+  --flow-duration: 47s;
+  --flow-direction: reverse;
+}
+
+@keyframes loom-flow {
+  to { stroke-dashoffset: -180; }
+}
+
+.loom-app[data-paused="true"] .loom-thread__flow {
+  animation-play-state: paused;
+}
+
+.loom-app:not([data-render-strand="all"]) .loom-thread {
+  opacity: 0.09;
+}
+
+.loom-app[data-render-strand="platform"] [data-strand-line="platform"],
+.loom-app[data-render-strand="constraint"] [data-strand-line="constraint"],
+.loom-app[data-render-strand="reliability"] [data-strand-line="reliability"],
+.loom-app[data-render-strand="evidence"] [data-strand-line="evidence"] {
+  opacity: 1;
+  filter: saturate(1.18);
+}
+
+.loom-app[data-render-strand="platform"] [data-strand-line="platform"] .loom-thread__flow,
+.loom-app[data-render-strand="constraint"] [data-strand-line="constraint"] .loom-thread__flow,
+.loom-app[data-render-strand="reliability"] [data-strand-line="reliability"] .loom-thread__flow,
+.loom-app[data-render-strand="evidence"] [data-strand-line="evidence"] .loom-thread__flow,
+.loom-thread.is-project-linked .loom-thread__flow {
+  animation: loom-flow var(--flow-duration) linear infinite var(--flow-direction);
+}
+
+.loom-thread.is-project-linked {
+  opacity: 0.93;
+}
+
+.loom-knots {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+}
+
+.loom-knot-wrap {
+  --kind: #66717b;
+  position: absolute;
+  z-index: 2;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  transition: opacity 340ms ease, filter 340ms ease;
+}
+
+.loom-knot-wrap[data-category="production"] {
+  --kind: #245fa8;
+}
+
+.loom-knot-wrap[data-category="archive"] {
+  --kind: #6e777f;
+}
+
+.loom-knot-wrap[data-category="public"] {
+  --kind: #2f766f;
+}
+
+.loom-knot-wrap.is-muted {
+  opacity: 0.14;
+  filter: grayscale(0.8);
+}
+
+.loom-knot-wrap.is-previewed,
+.loom-knot-wrap.is-selected,
+.loom-knot-wrap:focus-within,
+.loom-knot-wrap:hover {
+  z-index: 40;
+  opacity: 1;
+  filter: none;
+}
+
+.loom-knot {
+  position: relative;
+  min-width: 150px;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: 31px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.42rem;
+  padding: 0.25rem 0.35rem;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.loom-knot__crossing {
+  position: relative;
+  width: 27px;
+  height: 27px;
+  display: block;
+  border: 1px solid color-mix(in srgb, var(--kind) 72%, white);
+  border-radius: 50%;
+  background: rgba(250, 249, 244, 0.78);
+  box-shadow: 0 0 0 5px rgba(250, 249, 244, 0.58), 0 0 0 6px color-mix(in srgb, var(--kind) 22%, transparent);
+  transition: background 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.loom-knot__crossing::before,
+.loom-knot__crossing::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  width: 41px;
+  height: 1px;
+  background: var(--kind);
+  transform: rotate(24deg);
+  transform-origin: center;
+}
+
+.loom-knot__crossing::after {
+  transform: rotate(-38deg);
+  opacity: 0.54;
+}
+
+.loom-knot__crossing i {
+  position: absolute;
+  inset: 7px;
+  display: block;
+  border-radius: 50%;
+  background: var(--kind);
+}
+
+.loom-knot__brief {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.2rem 0.35rem 0.2rem 0;
+  background: linear-gradient(90deg, rgba(250, 249, 244, 0.88), rgba(250, 249, 244, 0.58) 76%, transparent);
+}
+
+.loom-knot__name {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(0.68rem, 0.86vw, 0.82rem);
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  line-height: 1.08;
+  white-space: nowrap;
+}
+
+.loom-knot__ownership,
+.loom-knot__proof {
+  display: block;
+  margin-top: 0.18rem;
+  color: #5c6770;
+  font-size: 0.56rem;
+  font-weight: 560;
+  line-height: 1.22;
+  white-space: nowrap;
+}
+
+.loom-knot__proof {
+  margin-top: 0.16rem;
+  color: var(--kind);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.loom-knot-wrap[data-category="production"] .loom-knot {
+  min-width: 190px;
+  min-height: 76px;
+  grid-template-columns: 37px minmax(0, 1fr);
+}
+
+.loom-knot-wrap[data-category="production"] .loom-knot__crossing {
+  width: 32px;
+  height: 32px;
+  border-width: 2px;
+}
+
+.loom-knot-wrap[data-category="production"] .loom-knot__crossing i {
+  inset: 8px;
+}
+
+.loom-knot-wrap[data-category="production"] .loom-knot__name {
+  font-size: clamp(0.84rem, 1.12vw, 1.04rem);
+  letter-spacing: -0.025em;
+}
+
+.loom-knot-wrap[data-category="production"] .loom-knot__ownership {
+  color: #34424d;
+  font-size: 0.58rem;
+  font-weight: 650;
+}
+
+.loom-knot-wrap[data-category="public"] .loom-knot__proof {
+  color: #2f766f;
+}
+
+.loom-knot:hover .loom-knot__crossing,
+.loom-knot:focus-visible .loom-knot__crossing,
+.loom-knot[aria-pressed="true"] .loom-knot__crossing {
+  background: color-mix(in srgb, var(--kind) 13%, var(--paper));
+  box-shadow: 0 0 0 7px rgba(250, 249, 244, 0.7), 0 0 0 8px color-mix(in srgb, var(--kind) 50%, transparent), 0 0 24px color-mix(in srgb, var(--kind) 22%, transparent);
+  transform: rotate(18deg) scale(1.08);
+}
+
+.loom-annotation {
+  position: absolute;
+  z-index: 50;
+  top: 48px;
+  left: 22px;
+  width: min(284px, 30vw);
+  padding: 0.8rem 0.9rem 0.85rem 1.05rem;
+  border-left: 2px solid var(--kind);
+  background: rgba(250, 249, 244, 0.96);
+  box-shadow: 12px 18px 40px rgba(27, 40, 50, 0.09);
+  backdrop-filter: blur(14px);
+}
+
+.loom-annotation::before {
+  content: "";
+  position: absolute;
+  top: -28px;
+  left: -2px;
+  width: 1px;
+  height: 28px;
+  background: var(--kind);
+}
+
+.loom-knot-wrap.is-right .loom-annotation {
+  right: 22px;
+  left: auto;
+  border-right: 2px solid var(--kind);
+  border-left: 0;
+  text-align: right;
+}
+
+.loom-knot-wrap.is-right .loom-annotation::before {
+  right: -2px;
+  left: auto;
+}
+
+.loom-knot-wrap.is-lower .loom-annotation {
+  top: auto;
+  bottom: 48px;
+}
+
+.loom-knot-wrap.is-lower .loom-annotation::before {
+  top: auto;
+  bottom: -28px;
+}
+
+.loom-annotation > p:first-child {
+  margin: 0 0 0.35rem;
+  color: var(--kind);
+  font: 700 0.5rem/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.loom-annotation h3 {
+  margin: 0;
+  font: 600 clamp(0.95rem, 1.2vw, 1.18rem)/1.06 "Space Grotesk", sans-serif;
+  letter-spacing: -0.035em;
+}
+
+.loom-annotation__context {
+  margin: 0.25rem 0 0;
+  color: #69727a;
+  font-size: 0.57rem;
+  line-height: 1.35;
+}
+
+.loom-annotation__copy {
+  display: -webkit-box;
+  margin: 0.6rem 0 0;
+  overflow: hidden;
+  color: #38444e;
+  font-size: 0.66rem;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.loom-annotation__strands {
+  margin: 0.55rem 0 0;
+  color: #737c83;
+  font: 600 0.47rem/1.5 "Space Grotesk", sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.loom-annotation__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.35rem 0.7rem;
+  margin-top: 0.58rem;
+}
+
+.is-right .loom-annotation__links {
+  justify-content: flex-end;
+}
+
+.loom-annotation a {
+  color: var(--blue);
+  font: 650 0.56rem/1.35 "Space Grotesk", sans-serif;
+  text-underline-offset: 0.2rem;
+}
+
+.loom-status {
+  position: absolute;
+  z-index: 9;
+  right: 1.7rem;
+  bottom: 2.1rem;
+  max-width: 31rem;
+  margin: 0;
+  color: #667079;
+  font-size: 0.52rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.loom-release {
+  position: absolute;
+  z-index: 20;
+  right: 1.7rem;
+  bottom: 3.2rem;
+  min-height: 36px;
+  padding: 0.4rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--blue);
+  background: transparent;
+  color: var(--blue);
+  cursor: pointer;
+  font-size: 0.57rem;
+  font-weight: 700;
+}
+
+.loom-release span {
+  margin-left: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.loom-key {
+  position: absolute;
+  z-index: 10;
+  top: 1.15rem;
+  right: 1.7rem;
+  display: flex;
+  gap: 1.2rem;
+  color: #747d84;
+  font-size: 0.48rem;
+  font-weight: 600;
+}
+
+.loom-key p {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.loom-key i {
+  width: 7px;
+  height: 7px;
+  display: inline-block;
+  border-radius: 50%;
+  background: #6e777f;
+}
+
+.loom-key i[data-kind="production"] {
+  background: #245fa8;
+}
+
+.loom-key i[data-kind="public"] {
+  background: #2f766f;
+}
+
+.loom-key strong {
+  color: #3b4650;
+  font-weight: 700;
+}
+
+.loom-fallback {
+  width: min(980px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: clamp(3rem, 8vw, 7rem) 0 6rem;
+}
+
+.js .loom-fallback {
+  display: none;
+}
+
+.no-js .loom-app {
+  display: none;
+}
+
+.loom-fallback__intro {
+  max-width: 720px;
+  margin-bottom: 4rem;
+}
+
+.loom-fallback__intro > p:first-child,
+.loom-record header p {
+  color: var(--blue);
+  font: 700 0.62rem/1.4 "Space Grotesk", sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.loom-fallback__intro h1 {
+  margin: 0.75rem 0 1.2rem;
+  font: 500 clamp(3rem, 8vw, 6.6rem)/0.88 "Space Grotesk", sans-serif;
+  letter-spacing: -0.075em;
+}
+
+.loom-fallback__intro > p:not(:first-child) {
+  max-width: 620px;
+  color: #4d5963;
+  line-height: 1.7;
+}
+
+.loom-fallback__intro a,
+.loom-record__evidence a {
+  color: var(--blue);
+  font: 650 0.75rem/1.5 "Space Grotesk", sans-serif;
+  text-underline-offset: 0.25rem;
+}
+
+.loom-record {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(200px, 0.65fr) minmax(280px, 1.35fr);
+  gap: 1.5rem 3rem;
+  padding: 2rem 0;
+  border-top: 1px solid rgba(35, 52, 65, 0.17);
+}
+
+.loom-record::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 21%;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--blue);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.loom-record header {
+  grid-row: 1 / 3;
+}
+
+.loom-record header p {
+  margin: 0 0 0.55rem;
+}
+
+.loom-record h2 {
+  margin: 0;
+  font: 550 clamp(1.7rem, 3vw, 2.8rem)/1 "Space Grotesk", sans-serif;
+  letter-spacing: -0.055em;
+}
+
+.loom-record > [data-project-copy] {
+  margin: 0;
+  color: #44515b;
+  line-height: 1.68;
+}
+
+.loom-record__evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.1rem;
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .loom-app::after {
+    left: 245px;
+  }
+
+  .loom-intro {
+    width: 225px;
+  }
+
+  .loom-intro h1 {
+    font-size: clamp(3.4rem, 6.8vw, 5.5rem);
+  }
+
+  .loom-controls {
+    width: 210px;
+  }
+
+  .loom-controls button small {
+    display: none;
+  }
+
+  .loom-knot {
+    min-width: 124px;
+  }
+
+  .loom-knot__name {
+    white-space: normal;
+  }
+
+  .loom-knot__ownership,
+  .loom-knot__proof {
+    max-width: 102px;
+    white-space: normal;
+  }
+
+  .loom-knot-wrap[data-category="production"] .loom-knot {
+    min-width: 150px;
+    min-height: 72px;
+  }
+
+  .loom-knot-wrap {
+    top: var(--ty);
+  }
+}
+
+@media (max-width: 900px) {
+  .loom-topbar {
+    min-height: 76px;
+    grid-template-columns: 1fr auto;
+    gap: 0.3rem 1rem;
+    padding: 0.65rem 1rem;
+  }
+
+  .loom-topbar > p {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: start;
+    font-size: 0.54rem;
+    text-align: left;
+  }
+
+  .loom-topbar nav {
+    gap: 0.8rem;
+  }
+
+  .loom-topbar nav a {
+    min-height: 28px;
+    font-size: 0.57rem;
+  }
+
+  .loom-topbar nav a:last-child {
+    display: none;
+  }
+
+  .loom-app {
+    height: auto;
+    min-height: 0;
+    padding-top: 0.1px;
+    overflow: visible;
+  }
+
+  .loom-app::before {
+    background: repeating-linear-gradient(106deg, transparent 0 48px, rgba(35, 52, 65, 0.025) 49px, transparent 50px 96px);
+  }
+
+  .loom-app::after {
+    display: none;
+  }
+
+  .loom-intro {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: auto;
+    margin: 2.2rem 1rem 0;
+  }
+
+  .loom-intro h1 {
+    font-size: clamp(4rem, 19vw, 5.2rem);
+    line-height: 0.78;
+  }
+
+  .loom-intro__copy {
+    max-width: 35rem;
+    margin-top: 1.45rem;
+    font-size: 0.8rem;
+  }
+
+  .loom-intro__instruction {
+    max-width: 24rem;
+  }
+
+  .loom-controls {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    width: auto;
+    margin: 2rem 1rem 0;
+  }
+
+  .loom-controls > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1rem;
+  }
+
+  .loom-controls button {
+    min-height: 45px;
+    grid-template-columns: 1.45rem 1fr;
+    font-size: 0.6rem;
+  }
+
+  .loom-controls button:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .loom-controls button small {
+    display: none;
+  }
+
+  .loom-field {
+    position: relative;
+    inset: auto;
+    height: 1200px;
+    margin-top: 1.5rem;
+    border-top: 1px solid rgba(35, 52, 65, 0.13);
+  }
+
+  .loom-field__grain {
+    inset: 0.8rem 0.35rem 1.5rem;
+    mask-image: linear-gradient(transparent 0, black 5%, black 96%, transparent 100%);
+  }
+
+  .loom-field__register {
+    right: 0.7rem;
+    font-size: 0.4rem;
+  }
+
+  .loom-field__register--top {
+    top: 0.65rem;
+  }
+
+  .loom-field__register--bottom {
+    display: none;
+  }
+
+  .loom-thread-field {
+    inset: 1.5rem -10% 1.5rem -8%;
+    width: 118%;
+    height: calc(100% - 3rem);
+  }
+
+  .loom-thread__halo {
+    stroke-width: 12;
+  }
+
+  .loom-knot-wrap {
+    left: var(--mx);
+    top: var(--my);
+  }
+
+  .loom-knot {
+    min-width: 148px;
+    min-height: 58px;
+    grid-template-columns: 28px minmax(0, 1fr);
+    padding: 0.2rem;
+  }
+
+  .loom-knot-wrap[data-category="production"] .loom-knot {
+    min-width: 164px;
+    min-height: 68px;
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+
+  .loom-knot-wrap[data-category="production"] .loom-knot__crossing {
+    width: 28px;
+    height: 28px;
+  }
+
+  .loom-knot__crossing {
+    width: 24px;
+    height: 24px;
+  }
+
+  .loom-knot__crossing i {
+    inset: 6px;
+  }
+
+  .loom-knot__name {
+    max-width: 112px;
+    font-size: 0.67rem;
+    white-space: normal;
+  }
+
+  .loom-knot__ownership,
+  .loom-knot__proof {
+    max-width: 114px;
+    white-space: normal;
+  }
+
+  .loom-knot__ownership {
+    font-size: 0.52rem;
+  }
+
+  .loom-knot__proof {
+    font-size: 0.48rem;
+  }
+
+  .loom-knot-wrap[data-category="production"] .loom-knot__name {
+    font-size: 0.78rem;
+  }
+
+  .loom-knot-wrap[data-category="production"] .loom-knot__ownership {
+    font-size: 0.55rem;
+  }
+
+  .loom-annotation {
+    width: min(258px, calc(100vw - 2rem));
+  }
+
+  .loom-annotation__copy {
+    -webkit-line-clamp: 5;
+  }
+
+  .loom-status {
+    right: 0.7rem;
+    bottom: 0.55rem;
+    left: 0.7rem;
+    max-width: none;
+    font-size: 0.43rem;
+    text-align: left;
+  }
+
+  .loom-release {
+    right: 0.75rem;
+    bottom: 2.55rem;
+  }
+
+  .loom-key {
+    position: relative;
+    top: auto;
+    right: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin: 0 1rem 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(35, 52, 65, 0.13);
+    font-size: 0.42rem;
+  }
+
+  .loom-key p {
+    flex-wrap: wrap;
+  }
+
+  .loom-record {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .loom-record header {
+    grid-row: auto;
+  }
+
+  .loom-record::before {
+    left: 0;
+  }
+}
+
+@media (max-width: 390px) {
+  .loom-topbar__brand {
+    font-size: 0.68rem;
+  }
+
+  .loom-intro {
+    margin-inline: 0.85rem;
+  }
+
+  .loom-controls {
+    margin-inline: 0.85rem;
+  }
+
+  .loom-knot__name {
+    max-width: 108px;
+    font-size: 0.62rem;
+  }
+
+  .loom-annotation {
+    width: min(246px, calc(100vw - 1.5rem));
+    padding: 0.7rem 0.75rem 0.75rem 0.9rem;
+  }
+
+  .loom-annotation__copy {
+    font-size: 0.62rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .loom-thread__flow {
+    animation: none !important;
+    stroke-dashoffset: 0;
+  }
+}
+
+@media print {
+  .loom-topbar,
+  .loom-app {
+    display: none !important;
+  }
+
+  .loom-fallback,
+  .js .loom-fallback {
+    display: block !important;
+  }
+}

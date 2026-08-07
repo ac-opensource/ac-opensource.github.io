@@ -1,450 +1,176 @@
 <!DOCTYPE html>
-
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta name="robots" content="noindex,nofollow,noarchive"/>
-<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/7637791?v=4"/>
-<title>Blog Post | Andrew Concepcion</title>
-<meta name="description" content="Dynamic preview route for Andrew Concepcion blog entries. Canonical published posts are served as static pages.">
-<link rel="canonical" href="https://ac-opensource.github.io/blog/"/>
-<meta name="robots" content="noindex,follow"/>
-<meta property="og:site_name" content="Andrew Concepcion"/>
-<meta property="og:type" content="website"/>
-<meta property="og:url" content="https://ac-opensource.github.io/blog/"/>
-<meta property="og:title" content="Blog | Andrew Concepcion"/>
-<meta property="og:description" content="Dynamic preview route for Andrew Concepcion blog entries. Canonical published posts are served as static pages."/>
-<meta property="og:image" content="https://ac-opensource.github.io/blog/images/new-zealand-aurora.png"/>
-<meta property="og:image:alt" content="Blog preview image"/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Blog | Andrew Concepcion"/>
-<meta name="twitter:description" content="Dynamic preview route for Andrew Concepcion blog entries. Canonical published posts are served as static pages."/>
-<meta name="twitter:image" content="https://ac-opensource.github.io/blog/images/new-zealand-aurora.png"/>
-<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="/assets/css/neural-background.css" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "on-error": "#fff7f6",
-                        "on-secondary": "#f6f9ff",
-                        "background": "#faf9f4",
-                        "tertiary": "#1f5cba",
-                        "inverse-surface": "#0d0f0c",
-                        "tertiary-fixed": "#6799fb",
-                        "on-secondary-container": "#4a535c",
-                        "tertiary-container": "#6799fb",
-                        "tertiary-dim": "#024fad",
-                        "surface-container-lowest": "#ffffff",
-                        "surface": "#faf9f4",
-                        "outline": "#787c73",
-                        "inverse-primary": "#f0f4fb",
-                        "error": "#9f403d",
-                        "on-secondary-fixed": "#374049",
-                        "surface-container-low": "#f4f4ee",
-                        "on-primary-fixed": "#3b4045",
-                        "secondary-container": "#dae3ef",
-                        "secondary": "#57606a",
-                        "primary-container": "#dee3e9",
-                        "surface-tint": "#5a5f65",
-                        "primary-fixed": "#dee3e9",
-                        "on-surface-variant": "#5c6058",
-                        "on-tertiary-container": "#001b46",
-                        "on-background": "#2f342d",
-                        "surface-dim": "#d7dcd0",
-                        "on-tertiary": "#f9f8ff",
-                        "on-surface": "#2f342d",
-                        "on-error-container": "#752121",
-                        "surface-container": "#edefe7",
-                        "on-primary-fixed-variant": "#575c62",
-                        "inverse-on-surface": "#9d9d99",
-                        "secondary-dim": "#4b545d",
-                        "outline-variant": "#afb3aa",
-                        "primary": "#5a5f65",
-                        "error-container": "#fe8983",
-                        "surface-bright": "#faf9f4",
-                        "primary-fixed-dim": "#d0d5db",
-                        "tertiary-fixed-dim": "#598ced",
-                        "surface-variant": "#e0e4d9",
-                        "on-tertiary-fixed-variant": "#002559",
-                        "secondary-fixed-dim": "#ccd5e1",
-                        "primary-dim": "#4e5358",
-                        "error-dim": "#4e0309",
-                        "on-tertiary-fixed": "#000000",
-                        "surface-container-highest": "#e0e4d9",
-                        "on-primary": "#f4f8ff",
-                        "on-secondary-fixed-variant": "#535c66",
-                        "secondary-fixed": "#dae3ef",
-                        "on-primary-container": "#4d5258",
-                        "surface-container-high": "#e7e9e0"
-                    },
-                    fontFamily: {
-                        "headline": ["Space Grotesk"],
-                        "body": ["Manrope"],
-                        "label": ["Space Grotesk"]
-                    },
-                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
-                },
-            },
+<html class="light overflow-x-hidden" lang="en" style="overflow-x: hidden;">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
+  <title>Authoring Preview | Andrew Concepcion</title>
+  <meta name="description" content="Noindex authoring preview for Andrew Concepcion's published Logs. Complete entries are available as static pages."/>
+  <link rel="canonical" href="https://ac-opensource.github.io/blog/"/>
+  <meta name="robots" content="noindex,follow"/>
+  <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="/assets/css/article-debrief.css?v=20260807-regions2" rel="stylesheet"/>
+  <link href="/assets/css/universe-field-map.css?v=20260807" rel="stylesheet"/>
+  <script src="/assets/js/universe-theme-transition.js?v=20260807-fast2"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#faf9f4",
+            "tertiary": "#1f5cba",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f4f4ee",
+            "surface-container": "#edefe7",
+            "surface-container-highest": "#e0e4d9",
+            "secondary": "#57606a",
+            "on-surface": "#2f342d",
+            "outline": "#787c73",
+            "outline-variant": "#afb3aa",
+            "primary": "#5a5f65",
+            "on-primary": "#f4f8ff"
+          },
+          fontFamily: {
+            "headline": ["Space Grotesk"],
+            "body": ["Manrope"],
+            "label": ["Space Grotesk"]
+          },
+          borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"}
         }
-    </script>
-<style>
-        body {
-            background-color: #faf9f4;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .code-block {
-            background: #1A1C1E;
-            color: #DEE3E9;
-            font-family: 'Space Grotesk', monospace;
-            padding: 1.5rem;
-            border-left: 4px solid #1F5CBA;
-        }
-        .code-keyword { color: #6799FB; }
-        .code-type { color: #FE8983; }
-        .code-func { color: #E0E4D9; }
-    </style>
+      }
+    };
+  </script>
 </head>
-<body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
-<div class="neural-global-bg" aria-hidden="true">
-  <div class="neural-mesh-container">
-    <div class="neural-mesh"></div>
-    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
-    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
-    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
-    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
-    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
-    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
-    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
-    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
-  </div>
-  <div class="bust-gradient"></div>
-  <div class="canvas-grid"></div>
-</div>
-<header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
-  <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-    <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
-    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+<body class="article-debrief-page bg-background text-on-surface font-body antialiased" data-universe-region="article" data-article-mode="personal">
+  <a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
+
+  <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
+    <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+      <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
+      <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs" aria-label="Primary navigation">
+        <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+        <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+        <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+        <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+        <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+      </nav>
+      <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: preview]</div>
+    </div>
+    <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]" aria-label="Primary navigation, mobile">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
       <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
-      <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+      <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
-    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
-  </div>
-  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
-    <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
-    <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
-    <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
-    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
-    <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
-  </nav>
-</header>
-<main class="pt-32 md:pt-24 pb-32">
-<article class="max-w-screen-xl mx-auto px-6">
-<!-- Breadcrumbs & Meta Top -->
-<div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
-<span id="post-category" class="bg-surface-container-low px-2 py-1">[log]</span>
-<span id="post-date" class="bg-surface-container-low px-2 py-1">[date]</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[read_time]</span>
-</div>
-<!-- Title & Hero Section -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
-<div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">
-                        Loading entry...
-                    </h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">
-                        Loading summary from SQLite...
-                    </p>
-<div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
-<button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">
-                        [SHARE]
-                    </button>
-<button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">
-                        [BOOKMARK]
-                    </button>
-<a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">
-                        [RSS]
-                    </a>
-</div>
-</div>
-<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
-<div class="absolute inset-0 opacity-10 pointer-events-none">
-<img id="post-hero-image" class="w-full h-full object-cover grayscale" data-alt="Abstract minimalist geometric wireframe showing interconnected nodes and paths in a muted technical blueprint style with soft parchment tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnq7X9cFXRR_MXkKvhERUiCl2fB9U4D5aGBs9AxRoHpTfzeYZ56UNeB4Qag8X9nikLgwNX3HuWgpaSDZKN9mNnuExZAGD58AmpbGC87j8e7j1Ry7DajYSf9p1O0uCDZleWsA7XabaFSlgCv5BLSaWt_flIor2vQbdLS9Y3maCVmCRSvH5zzCR7SMeVWSXQnn37kYYkucLjmT_j1dGXqTetWlKI9TLf6jusQCRQfu--4b8WUBzb6cmjWyJyIpaes726vdceSLqQww"/>
-</div>
-<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
-<div class="flex justify-between items-start">
-<span class="font-label text-xs">[state_machine_v4.svg]</span>
-<span class="material-symbols-outlined text-tertiary">schema</span>
-</div>
-<!-- State Machine Diagram Simulation -->
-<div class="space-y-4">
-<div class="h-1 w-2/3 bg-tertiary/20"></div>
-<div class="flex gap-2">
-<div class="w-4 h-4 border border-tertiary"></div>
-<div class="w-4 h-4 bg-tertiary"></div>
-<div class="w-4 h-4 border border-tertiary"></div>
-</div>
-<div class="h-px w-full bg-outline-variant/50"></div>
-<div class="flex justify-end">
-<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- Article Content -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-<!-- Sidebar Meta -->
-<aside class="lg:col-span-3 hidden lg:block space-y-12">
-<div class="pt-4 border-t border-outline-variant/20">
-<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[author_identity]</h4>
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
-<span class="material-symbols-outlined text-on-surface">account_tree</span>
-</div>
-<div>
-<p id="post-author-name" class="text-sm font-bold">Loading author...</p>
-<p id="post-author-role" class="text-xs text-secondary">[loading]</p>
-</div>
-</div>
-</div>
-<div class="pt-4 border-t border-outline-variant/20">
-<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
-<div id="post-tags" class="flex flex-wrap gap-2">
-<span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#loading</span>
-</div>
-</div>
-<section class="p-6 bg-surface-container-low space-y-4">
-<h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">Loading abstract...</p>
-</section>
-</aside>
-<!-- Long-form Text -->
-<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body">
-<p>Loading entry from SQLite...</p>
-</div>
-</div>
-<!-- Navigation: Previous/Next -->
-<div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
-<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/">
-<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">No previous post</h5>
-<div class="mt-6 flex items-center gap-2 text-tertiary">
-<span class="material-symbols-outlined">arrow_back</span>
-<span class="font-label text-xs">read_entry</span>
-</div>
-</a>
-<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/">
-<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">No next post</h5>
-<div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
-<span class="font-label text-xs">read_entry</span>
-<span class="material-symbols-outlined">arrow_forward</span>
-</div>
-</a>
-</div>
-</article>
-</main>
-<footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
-  <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
-    <span>© 2026 Andrew Concepcion</span>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
-    <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
-  </div>
-</footer>
-<script src="/assets/js/blog-sqlite.js"></script>
-<script>
-  (() => {
-    const path = window.location.pathname.replace(/\/index\.html$/, "/");
-    document.querySelectorAll("#site-nav .site-nav-link").forEach((link) => {
-      const route = link.dataset.route;
-      const active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
-      if (active) {
-        link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
-      }
-    });
+  </header>
 
-    const params = new URLSearchParams(window.location.search);
-    const requestedSlug = params.get("slug");
-    const postCategory = document.getElementById("post-category");
-    const postDate = document.getElementById("post-date");
-    const postReading = document.getElementById("post-reading");
-    const postTitle = document.getElementById("post-title");
-    const postSummary = document.getElementById("post-summary");
-    const postHero = document.getElementById("post-hero-image");
-    const postBody = document.getElementById("post-body");
-    const sidebarAbstract = document.getElementById("sidebar-abstract");
-    const postAuthorName = document.getElementById("post-author-name");
-    const postAuthorRole = document.getElementById("post-author-role");
-    const postTags = document.getElementById("post-tags");
-    const prevLink = document.getElementById("prev-link");
-    const prevTitle = document.getElementById("prev-title");
-    const nextLink = document.getElementById("next-link");
-    const nextTitle = document.getElementById("next-title");
-    const sharePostButton = document.getElementById("share-post-button");
-    const bookmarkPostButton = document.getElementById("bookmark-post-button");
-    const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
+  <main id="main-content" class="article-region-main">
+    <noscript>
+      <article class="article-debrief article-region" data-article-mode="personal">
+        <header class="article-region__header">
+          <div class="article-region__meta">
+            <strong>AUTHORING PREVIEW</strong>
+            <span>NO JAVASCRIPT</span>
+            <span>NOINDEX ROUTE</span>
+          </div>
+          <div class="article-region__title">
+            <h1>This preview reads from SQLite.</h1>
+            <p>JavaScript is required only for this noindex authoring route. Every complete published entry remains available as a durable static page in Logs.</p>
+            <div class="article-region__actions">
+              <a href="/blog/">Open complete static Logs</a>
+              <a href="/blog/rss.xml">RSS</a>
+            </div>
+          </div>
+          <div class="article-region__topic-field">
+            <span>Published by <strong>Andrew Concepcion</strong></span>
+            <span>Static source available</span>
+            <div><span>#authoring_preview</span></div>
+          </div>
+        </header>
+      </article>
+    </noscript>
 
-    function loadBookmarks() {
-      try {
-        const raw = localStorage.getItem(BOOKMARKS_KEY);
-        const parsed = raw ? JSON.parse(raw) : [];
-        if (!Array.isArray(parsed)) return new Set();
-        return new Set(parsed.map((value) => String(value || "").trim()).filter(Boolean));
-      } catch (_error) {
-        return new Set();
-      }
-    }
+    <article id="post-preview" class="article-debrief article-region" data-article-debrief data-debrief-variant="observation" data-article-mode="personal" aria-busy="true" hidden>
+      <header class="article-region__header">
+        <div class="article-region__meta">
+          <strong id="post-region-label">AUTHORING PREVIEW</strong>
+          <span id="post-category">PUBLISHED SQLITE</span>
+          <time id="post-date" datetime="">LOADING</time>
+          <span id="post-reading">READING TIME PENDING</span>
+          <span id="post-content-count">OPENING SOURCE</span>
+          <span>NOINDEX PREVIEW</span>
+        </div>
+        <div class="article-region__title">
+          <h1 id="post-title">Opening the latest published log.</h1>
+          <p id="post-summary">Engineering notes, field observations, and personal essays by Andrew Concepcion.</p>
+          <div id="post-actions" class="article-region__actions">
+            <button id="share-post-button" type="button" disabled>Share</button>
+            <button id="bookmark-post-button" type="button" disabled>Bookmark</button>
+            <a href="/blog/">Complete static Logs</a>
+            <a href="/blog/rss.xml">RSS</a>
+          </div>
+          <span id="post-feedback" class="sr-only" role="status" aria-live="polite"></span>
+        </div>
+        <figure id="post-hero" class="article-region__hero article-region__hero--personal" hidden>
+          <img id="post-hero-image" src="" alt="" loading="eager" decoding="async"/>
+          <figcaption id="post-hero-caption" hidden></figcaption>
+        </figure>
+        <div class="article-region__topic-field">
+          <span>Authored by <strong id="post-author-name">Andrew Concepcion</strong></span>
+          <span id="post-author-role">AUTHORING PREVIEW</span>
+          <div id="post-tags"><span>#published_sqlite</span></div>
+        </div>
+      </header>
 
-    function saveBookmarks(set) {
-      try {
-        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(set)));
-      } catch (_error) {
-        // Ignore storage write failures.
-      }
-    }
+      <div id="post-trajectory-mobile" class="article-debrief__quiet-marker" aria-label="Reading mode">[resolving article trajectory]</div>
 
-    function setBookmarkButtonState(active) {
-      if (!bookmarkPostButton) return;
-      bookmarkPostButton.textContent = active ? "[BOOKMARKED]" : "[BOOKMARK]";
-      bookmarkPostButton.classList.toggle("border-tertiary/40", active);
-      bookmarkPostButton.classList.toggle("text-tertiary", active);
-      bookmarkPostButton.classList.toggle("bg-surface-container-highest", active);
-      bookmarkPostButton.classList.toggle("border-outline-variant/20", !active);
-      bookmarkPostButton.classList.toggle("text-secondary", !active);
-    }
+      <div class="article-debrief__layout article-region__reading">
+        <aside class="article-debrief__sidebar article-region__rail">
+          <div id="post-trajectory-rail"></div>
+          <p class="article-region__reading-signal">
+            <span id="post-reading-region">AUTHORING PREVIEW</span>
+            <span>Published SQLite source</span>
+            <span id="post-reading-count">Resolving content</span>
+          </p>
+        </aside>
+        <div id="post-body" class="article-debrief__body article-region__body" data-debrief-body>
+          <p id="post-status" role="status">Opening the published SQLite source…</p>
+        </div>
+      </div>
 
-    async function shareCurrentPost(shareUrl, title) {
-      const absoluteUrl = new URL(shareUrl, window.location.origin).href;
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: title || "Blog post",
-            url: absoluteUrl
-          });
-          return;
-        } catch (_error) {
-          // Continue to fallback.
-        }
-      }
+      <nav class="article-region__adjacent" aria-label="Adjacent entries">
+        <a id="prev-link" href="/blog/">
+          <span>[previous entry]</span>
+          <h2 id="prev-title">Complete static Logs</h2>
+          <small>← open archive</small>
+        </a>
+        <a id="next-link" href="/blog/">
+          <span>[next entry]</span>
+          <h2 id="next-title">Complete static Logs</h2>
+          <small>open archive →</small>
+        </a>
+      </nav>
+    </article>
+  </main>
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        try {
-          await navigator.clipboard.writeText(absoluteUrl);
-          return;
-        } catch (_error) {
-          // Continue to prompt fallback.
-        }
-      }
+  <footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
+      <span>© 2026 Andrew Concepcion</span>
+      <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
+      <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
+      <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
+      <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
+      <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
+      <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
+    </div>
+  </footer>
 
-      window.prompt("Copy post URL:", absoluteUrl);
-    }
-
-    function fmtDate(raw) {
-      const d = new Date(raw);
-      if (Number.isNaN(d.getTime())) return raw || "UNKNOWN_DATE";
-      return d.toISOString().slice(0, 10).toUpperCase();
-    }
-
-    function postUrl(slug) {
-      return `/blog/${encodeURIComponent(slug)}.html`;
-    }
-
-    async function boot() {
-      if (!window.blogSqlite) return;
-      const post = requestedSlug
-        ? await window.blogSqlite.getPostBySlug(requestedSlug)
-        : await window.blogSqlite.getLatestPost();
-
-      if (!post) {
-        postBody.innerHTML = "<p>Post not found.</p>";
-        return;
-      }
-
-      postCategory.textContent = `[${(post.category || "log").toLowerCase()}]`;
-      postDate.textContent = fmtDate(post.date);
-      postReading.textContent = `[${post.readingTime || "n/a"}]`;
-      postTitle.textContent = post.title;
-      postSummary.textContent = post.summary || "";
-      sidebarAbstract.textContent = post.summary || "No abstract available.";
-      postAuthorName.textContent = post.author || "Andrew Concepcion";
-      postAuthorRole.textContent = `[${(post.category || "log").toLowerCase()}]`;
-      postHero.src = post.heroImage || postHero.src;
-      postHero.alt = post.heroAlt || post.title;
-      postBody.innerHTML = post.bodyHtml || "<p>No body content available.</p>";
-      document.title = `${post.title} — Andrew Concepcion`;
-      const resolvedPostUrl = postUrl(post.slug);
-
-      const tags = [...new Set([...(post.topics || []), post.category].filter(Boolean))];
-      postTags.replaceChildren();
-      if (!tags.length) {
-        const fallback = document.createElement("span");
-        fallback.className = "text-[10px] font-label border border-outline-variant/30 px-2 py-1";
-        fallback.textContent = "#log";
-        postTags.appendChild(fallback);
-      } else {
-        tags.forEach((tag) => {
-          const item = document.createElement("span");
-          item.className = "text-[10px] font-label border border-outline-variant/30 px-2 py-1";
-          item.textContent = `#${String(tag).trim().replace(/\s+/g, "_").toLowerCase()}`;
-          postTags.appendChild(item);
-        });
-      }
-
-      const adjacent = await window.blogSqlite.getAdjacentPosts(post.slug);
-      if (adjacent.previous) {
-        prevLink.href = postUrl(adjacent.previous.slug);
-        prevTitle.textContent = adjacent.previous.title;
-      } else {
-        prevLink.href = "/blog/";
-      }
-      if (adjacent.next) {
-        nextLink.href = postUrl(adjacent.next.slug);
-        nextTitle.textContent = adjacent.next.title;
-      } else {
-        nextLink.href = "/blog/";
-      }
-
-      if (sharePostButton) {
-        sharePostButton.addEventListener("click", () => {
-          shareCurrentPost(resolvedPostUrl, post.title);
-        });
-      }
-
-      if (bookmarkPostButton) {
-        const bookmarks = loadBookmarks();
-        setBookmarkButtonState(bookmarks.has(post.slug));
-        bookmarkPostButton.addEventListener("click", () => {
-          if (bookmarks.has(post.slug)) {
-            bookmarks.delete(post.slug);
-          } else {
-            bookmarks.add(post.slug);
-          }
-          saveBookmarks(bookmarks);
-          setBookmarkButtonState(bookmarks.has(post.slug));
-        });
-      }
-    }
-
-    boot().catch((err) => {
-      postBody.innerHTML = `<p class="text-red-700">Failed to load post: ${err.message}</p>`;
-    });
-  })();
-</script>
-</body></html>
+  <script src="/assets/js/blog-sqlite.js"></script>
+  <script src="/assets/js/blog-post-preview.js?v=20260807"></script>
+  <script src="/assets/js/universe-field-map.js?v=20260807"></script>
+</body>
+</html>

@@ -5,6 +5,7 @@ const { spawnSync } = require("child_process");
 const { buildStaticBlog } = require("./build-static-blog-pages");
 const { syncBlogManifest } = require("./sync-blog-from-db");
 const { rewritePublicImageUrls, shouldExcludeOriginal } = require("./lib/public-images");
+const { renderPublication, syncSignalsSitemap } = require("./render-signals-page");
 const publication = require("./site-publication.config");
 
 const ROOT_DIR = path.join(__dirname, "..");
@@ -66,6 +67,7 @@ function copyPublicAssetDirectory(relativeDirectory, stagingRoot) {
 
   for (const entry of entries) {
     const relativePath = path.posix.join(relativeDirectory.replaceAll(path.sep, "/"), entry.name);
+    if (entry.isDirectory() && publication.excludedAssetDirectories.has(relativePath)) continue;
     if (publication.excludedAssetFiles.has(relativePath)) continue;
 
     if (entry.isDirectory()) {
@@ -89,12 +91,16 @@ function assertNoForbiddenOutput(stagingRoot) {
     const current = pending.pop();
     for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
       const absolutePath = path.join(current, entry.name);
+      const relativePath = path.relative(stagingRoot, absolutePath).split(path.sep).join("/");
+      if (publication.forbiddenPublishedNamePattern.test(relativePath)) {
+        throw new Error(`Local-only artifact name reached the publication output: ${relativePath}`);
+      }
       if (entry.isDirectory()) {
         pending.push(absolutePath);
         continue;
       }
       if (/\.(?:sqlite(?:-(?:shm|wal))?|db)$/i.test(entry.name)) {
-        throw new Error(`Database file reached the publication output: ${path.relative(stagingRoot, absolutePath)}`);
+        throw new Error(`Database file reached the publication output: ${relativePath}`);
       }
     }
   }
@@ -115,6 +121,9 @@ function walkHtmlFiles(root) {
 }
 
 function replaceTailwindRuntime(html, relativePath) {
+  const usesTailwind = /cdn\.tailwindcss\.com/i.test(html)
+    || /\bid=["']tailwind-config["']/i.test(html)
+    || /href=["']\/assets\/css\/tailwind\.css["']/i.test(html);
   const withoutCdn = rewritePublicImageUrls(html)
     .replace(
       /\s*<script\b[^>]*\bsrc=["']https:\/\/cdn\.tailwindcss\.com[^"']*["'][^>]*><\/script>/gi,
@@ -125,6 +134,7 @@ function replaceTailwindRuntime(html, relativePath) {
   if (withoutCdn.includes("cdn.tailwindcss.com") || withoutCdn.includes('id="tailwind-config"')) {
     throw new Error(`Could not remove the Tailwind browser runtime from ${relativePath}.`);
   }
+  if (!usesTailwind) return withoutCdn;
   if (withoutCdn.includes('href="/assets/css/tailwind.css"')) return withoutCdn;
   if (!withoutCdn.includes("</head>")) {
     throw new Error(`Cannot add the compiled Tailwind stylesheet to ${relativePath}: missing </head>.`);
@@ -175,6 +185,12 @@ function populateStagingDirectory(stagingRoot, { dbPath } = {}) {
   for (const publicDownload of publication.publicDownloads) {
     copyFile(publicDownload, stagingRoot);
   }
+  for (const publicExperimentFile of publication.publicExperimentFiles) {
+    copyFile(publicExperimentFile, stagingRoot);
+  }
+  for (const publicExperimentAsset of publication.publicExperimentAssets) {
+    copyFile(publicExperimentAsset, stagingRoot);
+  }
 
   copyFile("blog/index.html", stagingRoot);
   copyPublicAssetDirectory("assets/css", stagingRoot);
@@ -185,6 +201,11 @@ function populateStagingDirectory(stagingRoot, { dbPath } = {}) {
   for (const publicDataFile of publication.publicDataFiles) {
     copyFile(publicDataFile, stagingRoot, { optional: true });
   }
+  for (const publicDataFile of publication.requiredPublicDataFiles) {
+    copyFile(publicDataFile, stagingRoot);
+  }
+
+  const signalsPublication = renderPublication({ stagingRoot });
 
   const manifestPath = path.join(stagingRoot, GENERATED_MANIFEST_NAME);
   const buildResult = buildStaticBlog({
@@ -196,6 +217,7 @@ function populateStagingDirectory(stagingRoot, { dbPath } = {}) {
     dbPath,
     outputPath: path.join(stagingRoot, "blog", "posts.json")
   });
+  syncSignalsSitemap(stagingRoot, signalsPublication);
 
   fs.unlinkSync(manifestPath);
   compileTailwind(stagingRoot);
@@ -254,6 +276,7 @@ if (require.main === module) {
 
 module.exports = {
   DEFAULT_OUTPUT_ROOT,
+  assertNoForbiddenOutput,
   assertReplaceableOutput,
   buildSite,
   compileTailwind,

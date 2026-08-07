@@ -1,0 +1,96 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://ac-opensource.github.io/experiments/universe-options/signals/option-03-relay-field.html"/>
+  <title>Signals Option 03 — Relay Field</title>
+  <meta name="description" content="An isolated Signals design study that maps only validated public records onto deterministic relay paths.">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>document.documentElement.className = "js";</script>
+  <link rel="stylesheet" href="./option-03-relay-field.css">
+</head>
+<body>
+  <a class="skip-link" href="#relay-field">Skip to public Relay field</a>
+  <header class="option-bar">
+    <a class="option-bar__brand" href="/">Andrew Concepcion</a>
+    <nav aria-label="Signals design options">
+      <a href="./index.html">All options</a>
+      <a href="/signals.html">01</a>
+      <a href="./option-02-visitor-constellation.html">02</a>
+      <a href="./option-03-relay-field.html" aria-current="page">03</a>
+    </nav>
+    <span>[isolated study · moderated public paths]</span>
+  </header>
+
+  <main class="relay-root" data-signals-option data-feed-state="empty" aria-busy="true">
+    <div class="runtime-banner" data-runtime-banner role="status" hidden></div>
+
+    <header class="relay-hero">
+      <div class="relay-hero__copy">
+        <span>[signals option 03 / relay field]</span>
+        <h1>A public signal<br>is a relay,<br>not a receipt.</h1>
+        <p>Contact can carry an explicitly separate quote toward human review. That handoff does not prove approval, publication, delivery, or endorsement. Only a contract-valid public feed can energize a relay here.</p>
+        <a href="/contact.html?intent=public">Open the proposal path on Contact ↗</a>
+      </div>
+      <div class="relay-hero__wave" aria-hidden="true">
+        <i></i><b></b><em></em><span></span>
+      </div>
+      <div class="relay-hero__totals" aria-label="Validated public relay totals">
+        <span><b data-approved>0</b> live public relays</span>
+        <span><b data-removed>0</b> interrupted tombstones</span>
+        <strong data-total>0</strong>
+      </div>
+    </header>
+
+    <section class="relay-field" id="relay-field" aria-labelledby="relay-field-title">
+      <header>
+        <span>[validated paths / slots 000—999]</span>
+        <h2 id="relay-field-title">Listen for what<br>actually crossed.</h2>
+        <p>Approved records carry only the consented public quote and public metadata. Removed records break the path and retain only an opaque stable ID, removed status, and slot.</p>
+      </header>
+
+      <div class="relay-empty" data-empty-state>
+        <div class="relay-empty__path" aria-hidden="true"><i></i><b></b><em></em></div>
+        <p><strong>NO PUBLIC RELAYS</strong><span>The waveguide is operational and intentionally silent. No placeholder testimonials or pulses are generated.</span></p>
+      </div>
+
+      <div class="relay-records" data-relay-records></div>
+      <p class="relay-status" data-feed-status role="status" aria-live="polite">The validated public feed contains no approved records or removal tombstones.</p>
+
+      <noscript>
+        <p class="noscript-note">JavaScript is off. This isolated study’s build-time feed is empty, so the silent path above is the complete public state. Public-feedback submission remains on Contact and never implies publication.</p>
+      </noscript>
+    </section>
+
+    <section class="relay-boundary" aria-labelledby="relay-boundary-title">
+      <header>
+        <span>[transport ≠ public state]</span>
+        <h2 id="relay-boundary-title">Four boundaries.<br>No shortcuts.</h2>
+      </header>
+      <ol>
+        <li><b>PRIVATE</b><strong>Contact proposal</strong><p>Name, email, and private notes stay off this surface.</p></li>
+        <li><b>PENDING</b><strong>Human moderation</strong><p>A pending-moderation response is not approval or publication.</p></li>
+        <li><b>APPROVED</b><strong>Minimal public relay</strong><p>The exact consented quote and allowlisted metadata can cross.</p></li>
+        <li><b>REMOVED</b><strong>Privacy-minimal gap</strong><p>ID, status, and slot remain; everything else leaves the feed.</p></li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="signals-footer">
+    <a href="/contact.html?intent=public">Propose feedback on Contact</a>
+    <a href="/signals.html">Current Satellite Registry</a>
+    <span>© 2026 Andrew Concepcion</span>
+  </footer>
+
+  <script id="contact-runtime-config" type="application/json">{"version":1,"enabled":false,"endpoint":"","publicFeedEndpoint":"","requestTimeoutMs":8000}</script>
+  <script id="signals-feed" type="application/json">{"version":1,"records":[]}</script>
+  <script src="/assets/js/contact-transport.js"></script>
+  <script src="/assets/js/signals-contract.js"></script>
+  <script src="./option-03-relay-field.js"></script>
+</body>
+</html>

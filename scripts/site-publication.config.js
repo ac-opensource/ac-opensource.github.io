@@ -1,9 +1,12 @@
+const universeOptions = require("./universe-options-publication-manifest");
+
 module.exports = Object.freeze({
   publicPages: [
     "index.html",
     "about.html",
     "work.html",
     "contact.html",
+    "signals.html",
     "resume.html",
     "skills-graph.html"
   ],
@@ -15,6 +18,15 @@ module.exports = Object.freeze({
     "assets/data/resume-android.json",
     "assets/data/skills-interests.json"
   ],
+  requiredPublicDataFiles: [
+    "assets/data/contact-runtime.json",
+    "assets/data/signals.json"
+  ],
+  publicExperimentFiles: universeOptions.files,
+  publicExperimentAssets: universeOptions.assets,
+  excludedAssetDirectories: new Set([
+    "assets/experiments"
+  ]),
   excludedAssetFiles: new Set([
     "assets/css/blog-post.css",
     "assets/css/graph.css",
@@ -32,6 +44,9 @@ module.exports = Object.freeze({
     "blog/post.html",
     "blog/template.html",
     "blog/writer.html",
+    "scripts/fixtures",
+    "scripts/local-contact-signals-server.js",
     "project-detail.html"
-  ]
+  ],
+  forbiddenPublishedNamePattern: /(?:fixtures?|mocks?|screen[-_]?shots?|private[-_]?data)/i
 });

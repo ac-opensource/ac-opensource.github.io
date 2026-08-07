@@ -32,7 +32,9 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<link href="/assets/css/article-debrief.css?v=20260807-regions2" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20260807" rel="stylesheet"/>
+<script src="/assets/js/universe-theme-transition.js?v=20260807-fast2"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -164,24 +166,8 @@
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html"
 }</script>
 </head>
-<body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
+<body class="article-debrief-page bg-background text-on-surface font-body antialiased" data-universe-region="article" data-article-mode="case-study">
 <a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
-<div class="neural-global-bg" aria-hidden="true">
-  <div class="neural-mesh-container">
-    <div class="neural-mesh"></div>
-    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
-    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
-    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
-    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
-    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
-    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
-    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
-    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
-  </div>
-  <div class="bust-gradient"></div>
-  <div class="canvas-grid"></div>
-</div>
 <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
   <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
@@ -202,78 +188,96 @@
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<main id="main-content" class="pt-32 md:pt-24 pb-32">
-<article class="max-w-screen-xl mx-auto px-6">
-<div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
-<span id="post-category" class="bg-surface-container-low px-2 py-1">[portfolio]</span>
-<span id="post-date" class="bg-surface-container-low px-2 py-1">2024-06-15</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[2 min read]</span>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
-<div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">OWTO: Android, iOS, and the Backend Between Them</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">I led delivery across OWTO&#39;s Android, iOS, and backend work and stayed hands-on with booking, GPS, payments, and the APIs connecting them.</p>
-<div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
-<button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
-<button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
-<a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[RSS]</a>
-</div>
-</div>
+<main id="main-content" class="article-region-main">
+<article class="article-debrief article-region" data-article-debrief data-debrief-variant="mission" data-article-mode="case-study">
+<header class="article-region__header">
+  <div class="article-region__meta">
+    <strong>DELIVERY DOSSIER</strong>
+    <span id="post-category">portfolio</span>
+    <time id="post-date" datetime="2024-06-15">2024-06-15</time>
+    <span id="post-reading">2 min read</span>
+    <span>1 sections</span>
+  </div>
+  <div class="article-region__title">
+    <h1 id="post-title">OWTO: Android, iOS, and the Backend Between Them</h1>
+    <p id="post-summary">I led delivery across OWTO&#39;s Android, iOS, and backend work and stayed hands-on with booking, GPS, payments, and the APIs connecting them.</p>
+    <div id="post-actions" class="article-region__actions">
+      <button id="share-post-button" type="button">Share</button>
+      <button id="bookmark-post-button" type="button">Bookmark</button>
+      <a href="/blog/rss.xml">RSS</a>
+      <a href="/work.html">Return to portfolio</a>
+    </div>
+  </div>
 
 <figure class="work-post-hero work-post-hero--contain lg:col-span-5" data-work-hero-layout="contain">
   <img id="post-hero-image" src="/assets/images/work/img_owto_app-optimized.webp" alt="OWTO ride-hailing app screenshot" loading="eager" decoding="async"/>
   <figcaption class="sr-only">OWTO app booking flow</figcaption>
 </figure>
 
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-<aside class="lg:col-span-3 hidden lg:block space-y-12">
-<div class="pt-4 border-t border-outline-variant/20">
-<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[author_identity]</h4>
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
-<span class="material-symbols-outlined text-on-surface">account_tree</span>
-</div>
-<div>
-<p id="post-author-name" class="text-sm font-bold">Andrew Concepcion</p>
-<p id="post-author-role" class="text-xs text-secondary">[portfolio]</p>
-</div>
-</div>
-</div>
-<div class="pt-4 border-t border-outline-variant/20">
-<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
-<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#owto</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#mobility</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#android</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ios</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#backend</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#work</span></div>
-</div>
-<section class="p-6 bg-surface-container-low space-y-4">
-<h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">I led delivery across OWTO&#39;s Android, iOS, and backend work and stayed hands-on with booking, GPS, payments, and the APIs connecting them.</p>
-</section>
-</aside>
-<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><h2>I could follow one booking through the whole system</h2>
+  <div class="article-region__topic-field">
+    <span>Authored by <strong id="post-author-name">Andrew Concepcion</strong></span>
+    <span id="post-author-role">DELIVERY DOSSIER</span>
+    <div id="post-tags"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#owto</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#mobility</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#android</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ios</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#backend</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#work</span></div>
+  </div>
+</header>
+
+<details class="article-trajectory article-trajectory--mobile" data-trajectory-details>
+  <summary class="article-trajectory__summary">
+    <span>[delivery dossier]</span>
+    <span>1 section</span>
+  </summary>
+  <nav aria-label="Delivery dossier sections">
+    <ol class="article-trajectory__list">
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-i-could-follow-one-booking-through-the-whole-system" data-trajectory-link data-section-id="debrief-i-could-follow-one-booking-through-the-whole-system">
+        <span class="article-trajectory__index">01</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">I could follow one booking through the whole system</span>
+      </a>
+    </li>
+    </ol>
+  </nav>
+</details>
+<div class="article-debrief__layout article-region__reading">
+  <aside class="article-debrief__sidebar article-region__rail">
+
+<nav class="article-trajectory article-trajectory--desktop" aria-label="Delivery dossier sections" data-article-trajectory>
+  <p class="article-trajectory__eyebrow">[delivery dossier]</p>
+  <ol class="article-trajectory__list">
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-i-could-follow-one-booking-through-the-whole-system" data-trajectory-link data-section-id="debrief-i-could-follow-one-booking-through-the-whole-system">
+        <span class="article-trajectory__index">01</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">I could follow one booking through the whole system</span>
+      </a>
+    </li>
+  </ol>
+</nav>
+    <p class="article-region__reading-signal">
+      <span>DELIVERY DOSSIER</span>
+      <span>Published source</span>
+      <span>1 authored section</span>
+    </p>
+  </aside>
+  <div id="post-body" class="article-debrief__body article-region__body" data-debrief-body><h2 id="debrief-i-could-follow-one-booking-through-the-whole-system" data-debrief-heading data-debrief-phase="delivery record">I could follow one booking through the whole system</h2>
       <p>At OWTO I led delivery across the native Android and iOS apps and backend work. I was also hands-on. The clients used Kotlin and Swift, the backend used Node.js with Postgres, Firebase supported operational pieces, and the mobile architecture drew from Uber RIBs.</p>
       <p>A booking didn't belong to one screen or even one repository. The rider's location changed, the network dropped in and out, payment had its own result, and the server remained the shared source for both apps. When those states disagreed, the symptom often appeared on mobile even when the cause sat elsewhere.</p>
       <p>I worked on booking-path changes, GPS behavior, payment handling, and API contracts. Because my scope crossed the clients and backend, I could trace a problem past the first failing UI. If the contract was missing a state the apps needed, I could work on the contract instead of teaching Android and iOS to guess in different ways.</p>
       <p>The lead role also meant sequencing changes across people. A client release couldn't safely depend on an API behavior that wasn't deployed, and a backend change wasn't complete if neither native app could represent its new state. I planned those as one piece of delivery rather than separate tickets that happened to share a feature name.</p>
       <p>That cross-platform scope meant I could take a booking issue from its first mobile symptom through client state, API contract, and backend behavior, then plan the release across all three.</p></div>
 </div>
-<div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
-<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/case-study-popslide-engagement-and-monetization.html">
-<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Popslide: Experiments on a Lockscreen Product</h5>
-<div class="mt-6 flex items-center gap-2 text-tertiary">
-<span class="material-symbols-outlined">arrow_back</span>
-<span class="font-label text-xs">read_entry</span>
-</div>
-</a>
-<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/case-study-solo-whitelabel-delivery-platform.html">
-<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Solo: Android Across a White-Label Food Platform</h5>
-<div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
-<span class="font-label text-xs">read_entry</span>
-<span class="material-symbols-outlined">arrow_forward</span>
-</div>
-</a>
-</div>
+<nav class="article-region__adjacent" aria-label="Adjacent entries">
+  <a id="prev-link" href="/blog/case-study-popslide-engagement-and-monetization.html">
+    <span>[previous entry]</span>
+    <h2 id="prev-title">Popslide: Experiments on a Lockscreen Product</h2>
+    <small>← read entry</small>
+  </a>
+  <a id="next-link" href="/blog/case-study-solo-whitelabel-delivery-platform.html">
+    <span>[next entry]</span>
+    <h2 id="next-title">Solo: Android Across a White-Label Food Platform</h2>
+    <small>read entry →</small>
+  </a>
+</nav>
 </article>
 </main>
 <footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
@@ -287,6 +291,8 @@
     <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
   </div>
 </footer>
+<script src="/assets/js/article-debrief.js?v=20260807-regions1"></script>
+<script src="/assets/js/universe-field-map.js?v=20260807"></script>
 <script>
   (() => {
     const FORCE_ACTIVE_ROUTE = "/work.html";
