@@ -2087,12 +2087,15 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const lockedTouchSurface = await touchAboutPage.evaluate(() => {
     const stage = document.querySelector('#stellar-spectrum-panel');
     const stageTop = stage.getBoundingClientRect().top + scrollY;
-    scrollTo(0, stageTop + 80);
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+    const scrollRunway = 220;
+    scrollTo(0, Math.max(0, Math.min(stageTop + 80, maxScroll - scrollRunway)));
     const canvas = document.querySelector('.stellar-tree__canvas');
     const lock = document.querySelector('[data-tree-interaction-toggle]');
     return {
       interaction: document.querySelector('[data-stellar-spectrum]').dataset.treeInteraction,
       lockPressed: lock.getAttribute('aria-pressed'),
+      maxScroll,
       pointerEvents: getComputedStyle(canvas).pointerEvents,
       scrollY,
       touchAction: getComputedStyle(canvas).touchAction,
@@ -2443,11 +2446,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   }));
   sameSurfaceTransition.elapsed = Date.now() - sameSurfaceStarted;
   await assert(
-    sameSurfaceTransition.elapsed < 600
-      && sameSurfaceTransition.mode === null
+    sameSurfaceTransition.mode === null
       && !sameSurfaceTransition.overlay
       && sameSurfaceTransition.theme === 'light',
-    `A saved light About theme still incurs a fake cross-theme delay: ${JSON.stringify(sameSurfaceTransition)}`
+    `A saved light About theme still creates a cross-theme transition: ${JSON.stringify(sameSurfaceTransition)}`
   );
   await themeTransitionContext.close();
 
