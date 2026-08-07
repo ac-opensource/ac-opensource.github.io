@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://ac-opensource.github.io/experiments/universe-options/work/orbital-shipyard.html"/>
+  <title>Work Option 02 · Orbital Shipyard</title>
+  <meta name="description" content="An orbital shipyard interaction direction for Andrew Concepcion's real engineering portfolio.">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script>document.documentElement.classList.add("js")</script>
+  <link rel="stylesheet" href="/assets/experiments/universe-options/work/shipyard.css?v=20260807">
+  <script src="/assets/experiments/universe-options/work/shipyard.js?v=20260807" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to work</a>
+  <header class="site-head">
+    <a class="site-head__brand" href="/">Andrew Concepcion</a>
+    <nav aria-label="Portfolio redesign options">
+      <a href="/experiments/universe-options/work/">[all work options]</a>
+      <a href="/work.html">[production work]</a>
+      <a href="/contact.html">[contact]</a>
+    </nav>
+    <span>[02 / orbital shipyard]</span>
+  </header>
+
+  <main id="main">
+    <section class="shipyard" data-shipyard data-active-vessel="bitcoin-wallet" aria-labelledby="shipyard-title">
+      <div class="shipyard__intro">
+        <p class="signal">[production fleet · five equal berths]</p>
+        <h1 id="shipyard-title">Dock the work.<br><em>Open the system.</em></h1>
+        <p>I build the parts people notice when they fail. Android, iOS, backend, architecture, and the release path between them.</p>
+      </div>
+
+      <div class="shipyard__routing">
+        <p>Route a delivery system across the fleet</p>
+        <div class="capability-router" data-capability-router hidden role="group" aria-label="Cross-highlight vessels by delivery capability">
+          <button type="button" data-capability="problem" aria-pressed="false">Problem</button>
+          <button type="button" data-capability="architecture" aria-pressed="false">Architecture</button>
+          <button type="button" data-capability="platform" aria-pressed="false">Platform</button>
+          <button type="button" data-capability="reliability" aria-pressed="false">Reliability</button>
+          <button type="button" data-capability="release" aria-pressed="false">Release</button>
+        </div>
+        <p class="route-status" data-route-status aria-live="polite">All production vessels are ready.</p>
+        <noscript><p class="route-status">Delivery route: product problem → architecture → platform → reliability → verified release.</p></noscript>
+      </div>
+
+      <div class="dock-field" aria-label="Production vessel selector">
+        <span class="dock-field__axis" aria-hidden="true"></span>
+        <a class="docked-vessel docked-vessel--01 is-active" href="#inspect-bitcoin-wallet" data-vessel="bitcoin-wallet" data-stages="problem architecture platform reliability release" aria-current="true">
+          <span class="docked-vessel__index">P-01</span><strong>Bitcoin.com Wallet</strong><small>Crypto · self-custody</small><i aria-hidden="true"></i>
+        </a>
+        <a class="docked-vessel docked-vessel--02" href="#inspect-itvx" data-vessel="itvx" data-stages="problem platform reliability release">
+          <span class="docked-vessel__index">P-02</span><strong>ITVX</strong><small>Streaming · playback</small><i aria-hidden="true"></i>
+        </a>
+        <a class="docked-vessel docked-vessel--03" href="#inspect-ocbc" data-vessel="ocbc" data-stages="problem architecture platform reliability release">
+          <span class="docked-vessel__index">P-03</span><strong>OCBC Business</strong><small>Banking · identity</small><i aria-hidden="true"></i>
+        </a>
+        <a class="docked-vessel docked-vessel--04" href="#inspect-openpay" data-vessel="openpay" data-stages="problem architecture platform reliability release">
+          <span class="docked-vessel__index">P-04</span><strong>openpay</strong><small>Payments · BNPL</small><i aria-hidden="true"></i>
+        </a>
+        <a class="docked-vessel docked-vessel--05" href="#inspect-mystc" data-vessel="mystc" data-stages="architecture platform reliability release">
+          <span class="docked-vessel__index">P-05</span><strong>MySTC</strong><small>Telecom · leadership</small><i aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <section class="inspection-berth" id="inspection-berth" aria-labelledby="inspection-title">
+        <div class="inspection-berth__head">
+          <p class="signal">[inspection berth A]</p>
+          <h2 id="inspection-title">Selected vessel, unfolded.</h2>
+          <span data-vessel-position>Vessel 01 of 05</span>
+        </div>
+
+        <article class="vessel-details is-active" id="inspect-bitcoin-wallet" data-vessel-panel="bitcoin-wallet">
+          <div class="vessel-details__copy">
+            <p class="vessel-details__domain">Crypto · Self-custody</p>
+            <h3>Bitcoin.com Wallet</h3>
+            <p class="vessel-details__lead">I led the first end-to-end Android implementation of a multichain rewards platform and built reward-backed crypto market predictions, spanning server-driven quests, wallet linking, cross-chain assets, precise price inputs, and resilient results.</p>
+            <p>I also co-built Bitcoin replace-by-fee, led in-app multichain wallet migration, modernized staking and liquidity-reward pools, shipped provider-aware swaps and recurring-buy reminders, moved services into Rust through UniFFI, and hardened startup and releases.</p>
+            <p class="vessel-details__systems">Staking + reward pools · Buy, sell, swap · Multichain transactions · Rust + UniFFI</p>
+            <p class="vessel-details__evidence"><a href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">Google Play lists 10M+ downloads <span aria-hidden="true">↗</span></a></p>
+          </div>
+          <figure class="inspection-surface inspection-surface--phones">
+            <img src="/assets/images/work/img_bitcoin_wallet_2.webp" alt="Bitcoin.com Wallet Bitcoin market and wallet screen" width="443" height="788">
+            <img src="/assets/images/work/img_bitcoin_wallet_1.webp" alt="Bitcoin.com Wallet multichain portfolio screen" width="443" height="788">
+            <img src="/assets/images/work/img_bitcoin_wallet_3.webp" alt="Bitcoin.com Wallet buy and sell screens" width="443" height="788">
+            <figcaption>Official Android app screens · Google Play</figcaption>
+          </figure>
+        </article>
+
+        <article class="vessel-details" id="inspect-itvx" data-vessel-panel="itvx">
+          <div class="vessel-details__copy">
+            <p class="vessel-details__domain">Candyspace · Android · Media player team</p>
+            <h3>ITVX</h3>
+            <p class="vessel-details__lead">I built ITVX playback features including an in-player recommendations panel and independently delivered preview timeline scrubbing.</p>
+            <p>I coordinated panel animations with control and button movement across phone and tablet, then resolved long-standing player issues with stronger error tracking, security fixes, and a Simple XML-to-Jackson migration.</p>
+            <p class="vessel-details__systems">Android · Playback UI · Scrubbing previews · Tablet · Reliability</p>
+            <p class="vessel-details__evidence"><a href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en" target="_blank" rel="noreferrer">View ITVX on Google Play <span aria-hidden="true">↗</span></a></p>
+          </div>
+          <figure class="inspection-surface inspection-surface--phones">
+            <img src="/assets/images/work/img_itvx_library.webp" alt="ITVX Android app Top Picks browsing screen" width="944" height="2046" loading="lazy">
+            <img src="/assets/images/work/img_itvx_live.webp" alt="ITVX Android app live Six Nations screen" width="944" height="2046" loading="lazy">
+            <img src="/assets/images/work/img_itvx_home.webp" alt="ITVX Android app home screen with streaming series and premium picks" width="944" height="2046" loading="lazy">
+            <figcaption>Official Android app screens · Google Play</figcaption>
+          </figure>
+        </article>
+
+        <article class="vessel-details" id="inspect-ocbc" data-vessel-panel="ocbc">
+          <div class="vessel-details__copy">
+            <p class="vessel-details__domain">Senior Mobile Engineer · RedAirship</p>
+            <h3>OCBC Business</h3>
+            <p class="vessel-details__lead">I built Android flows for onboarding, business accounts, transfers, digital account opening, and third-party identity SDKs.</p>
+            <p>The work centered on state management, concurrent updates, network behavior, and reliable identity flows across lifecycle changes.</p>
+            <p class="vessel-details__systems">Kotlin · SDK integration · Verification · Testing</p>
+            <p class="vessel-details__evidence"><a href="/blog/case-study-ocbc-banking-experience.html">Read the OCBC project note <span aria-hidden="true">↗</span></a> <a href="https://play.google.com/store/apps/details?id=com.ocbc.mobilebv&amp;hl=en" target="_blank" rel="noreferrer">Google Play <span aria-hidden="true">↗</span></a></p>
+          </div>
+          <figure class="inspection-surface inspection-surface--phones">
+            <img src="/assets/images/work/img_ocbc_business_transactions.webp" alt="OCBC Business Android transaction history and inflow-outflow filters" width="608" height="1080" loading="lazy">
+            <img src="/assets/images/work/img_ocbc_business_card_controls.webp" alt="OCBC Business Android digital business debit card controls" width="608" height="1080" loading="lazy">
+            <img src="/assets/images/work/img_ocbc_business_cashflow.webp" alt="OCBC Business Android sales, expenses, and cashflow dashboard" width="608" height="1080" loading="lazy">
+            <figcaption>Official Android app screens · Google Play</figcaption>
+          </figure>
+        </article>
+
+        <article class="vessel-details" id="inspect-openpay" data-vessel-panel="openpay">
+          <div class="vessel-details__copy">
+            <p class="vessel-details__domain">Senior Mobile Engineer · RedAirship</p>
+            <h3>openpay</h3>
+            <p class="vessel-details__lead">I worked on BNPL checkout, spending limits, merchant discovery, screen performance, and partner-integrated payment flows.</p>
+            <p>I hardened checkout state around delayed and unexpected partner responses so the app stayed accurate through payment completion.</p>
+            <p class="vessel-details__systems">Kotlin · Checkout · Partner integrations · Release hardening</p>
+            <p class="vessel-details__evidence"><a href="/blog/case-study-openpay-bnpl-experience.html">Read the openpay project note <span aria-hidden="true">↗</span></a></p>
+          </div>
+          <figure class="inspection-surface inspection-surface--wide">
+            <img src="/assets/images/work/img_openpay_app-optimized.webp" alt="openpay checkout and spending-limit mobile screens" width="1200" height="675" loading="lazy">
+            <figcaption>Checkout and spending-limit surfaces</figcaption>
+          </figure>
+        </article>
+
+        <article class="vessel-details" id="inspect-mystc" data-vessel-panel="mystc">
+          <div class="vessel-details__copy">
+            <p class="vessel-details__domain">Lead Developer · 2020–2021</p>
+            <h3>MySTC</h3>
+            <p class="vessel-details__lead">I led five senior Android engineers working on account, ordering, and support features in English and Arabic. I split work across the team, reviewed architecture, and stayed hands-on with data sync, performance, and release integration.</p>
+            <p class="vessel-details__systems">Kotlin + Java · Architecture · Team leadership</p>
+            <p class="vessel-details__evidence"><a href="/blog/case-study-mystc-scale-and-reliability.html">Read the MySTC project note <span aria-hidden="true">↗</span></a></p>
+          </div>
+          <figure class="inspection-surface inspection-surface--single">
+            <img src="/assets/images/work/img_mystc_app-optimized.webp" alt="MySTC mobile account screens" width="632" height="1322" loading="lazy">
+            <figcaption>Account and ordering surfaces</figcaption>
+          </figure>
+        </article>
+
+        <div class="inspection-berth__pager" data-vessel-pager hidden>
+          <button type="button" data-vessel-previous>← Previous vessel</button>
+          <button type="button" data-vessel-next>Next vessel →</button>
+        </div>
+      </section>
+
+      <a class="shipyard__continue" href="#support-craft">Support fleet and research probes ↓</a>
+    </section>
+
+    <section class="support-zone" id="support-craft" aria-labelledby="support-title">
+      <header class="zone-intro">
+        <p class="signal">[support craft · active archive]</p>
+        <h2 id="support-title">Smaller hulls.<br>Same engineering gravity.</h2>
+        <p>Payments, transport, rewards, safety, food delivery, network data, campus identity, and travel remain attached to the yard—not compressed into a card shelf.</p>
+      </header>
+      <div class="support-rail">
+        <article class="support-craft" id="project-littlepay">
+          <div class="support-craft__marker"><span>S-01</span><strong>LP</strong></div>
+          <div class="support-craft__copy"><p>Transit payments</p><h3>Littlepay</h3><p>I led Android delivery and technical direction. For client-branded apps, I worked through signing, releases, updates, and private-distribution options, including Managed Google Play.</p><a href="https://littlepay.com/" target="_blank" rel="noreferrer">Visit Littlepay ↗</a></div>
+        </article>
+        <article class="support-craft support-craft--reverse" id="project-owto">
+          <div class="support-craft__marker"><span>S-02</span><strong>OW</strong></div>
+          <div class="support-craft__copy"><p>Transport</p><h3>OWTO</h3><p>I led Android, iOS, and Node/Postgres work for a ride-hailing product. I worked across GPS, payments, booking behavior, app releases, and the APIs behind them.</p><a href="/blog/case-study-owto-ride-hailing-platform.html">Read the OWTO project note ↗</a></div>
+          <img src="/assets/images/work/img_owto_app-optimized.webp" alt="OWTO ride-booking mobile screens" width="900" height="764" loading="lazy">
+        </article>
+        <article class="support-craft" id="project-popslide">
+          <div class="support-craft__marker"><span>S-03</span><strong>PS</strong></div>
+          <div class="support-craft__copy"><p>Rewards</p><h3>Popslide</h3><p>I led Android development, moved substantial Java code to Kotlin, and shipped experiments around rewards, lock-screen content, notifications, and caching.</p><a href="/blog/case-study-popslide-engagement-and-monetization.html">Read the Popslide project note ↗</a></div>
+          <img src="/assets/images/work/img_popslide_app-optimized.webp" alt="Popslide rewards app mobile screens" width="900" height="561" loading="lazy">
+        </article>
+        <article class="support-craft support-craft--reverse" id="project-websafety">
+          <div class="support-craft__marker"><span>S-04</span><strong>WS</strong></div>
+          <div class="support-craft__copy"><p>Safety</p><h3>WebSafety</h3><p>I worked across Android, iOS, web, and backend on parental controls, including permissions, background behavior, GPS, data sync, and privacy-sensitive features.</p><a href="/blog/case-study-websafety-parental-controls.html">Read the WebSafety project note ↗</a></div>
+          <img src="/assets/images/work/img_websafety_app-optimized.webp" alt="WebSafety parental-control screens" width="900" height="675" loading="lazy">
+        </article>
+        <article class="support-craft" id="project-solo">
+          <div class="support-craft__marker"><span>S-05</span><strong>SO</strong></div>
+          <div class="support-craft__copy"><p>White-label food</p><h3>Solo</h3><p>I worked on the shared Android code behind many restaurant-branded apps, not one storefront. A common change had to keep working across the existing variants.</p><a href="/blog/case-study-solo-whitelabel-delivery-platform.html">Read the Solo project note ↗</a><a href="https://play.google.com/store/apps/developer?id=Solo+Technologies+Services&amp;hl=en" target="_blank" rel="noreferrer">Browse Solo-powered apps ↗</a></div>
+          <img src="/assets/images/work/img_solo_app-optimized.webp" alt="Wayback Burgers, one restaurant app powered by the Solo white-label platform" width="900" height="593" loading="lazy">
+        </article>
+        <article class="support-craft support-craft--reverse" id="project-projectbass">
+          <div class="support-craft__marker"><span>S-06</span><strong>PB</strong></div>
+          <div class="support-craft__copy"><p>Open source</p><h3>ProjectBASS</h3><p>I contributed Kotlin and Retrofit work to this volunteer-built network-mapping app, including feature work, carrier compatibility, and fixes around shared field data.</p><a href="/blog/case-study-projectbass-crowdsourced-network-mapping.html">Read the ProjectBASS note ↗</a></div>
+          <img src="/assets/images/work/img_projectbass_app-optimized.webp" alt="ProjectBASS crowdsourced signal mapping screens" width="900" height="586" loading="lazy">
+        </article>
+        <article class="support-craft" id="project-ntu-pass">
+          <div class="support-craft__marker"><span>S-07</span><strong>NTU</strong></div>
+          <div class="support-craft__copy"><p>Digital identity</p><h3>NTU Pass + NUS</h3><p>I worked on the NTU Pass Android app, its watch companion, and the equivalent NUS experience, including phone, wearable, Bluetooth reader, and campus-access flows.</p><a href="https://play.google.com/store/apps/details?id=sg.edu.ntu.apps.ntusmartpass&amp;hl=en" target="_blank" rel="noreferrer">View NTU Pass on Google Play ↗</a></div>
+          <img class="support-craft__phone" src="/assets/images/work/img_ntu_pass_digital_key.webp" alt="NTU Pass digital key active screen from the current Google Play listing" width="266" height="592" loading="lazy">
+        </article>
+        <article class="support-craft support-craft--reverse" id="project-aqua-expeditions">
+          <div class="support-craft__marker"><span>S-08</span><strong>AQ</strong></div>
+          <div class="support-craft__copy"><p>Travel</p><h3>Aqua Expeditions</h3><p>I handled selected Android features and production fixes for Aqua Expeditions.</p><a href="https://www.aquaexpeditions.com/" target="_blank" rel="noreferrer">Visit Aqua Expeditions ↗</a></div>
+          <img src="/assets/images/work/img_aqua_nera.webp" alt="Aqua Nera expedition ship on the Amazon at sunset" width="1233" height="1644" loading="lazy">
+        </article>
+      </div>
+    </section>
+
+    <section class="probe-zone" id="research-probes" aria-labelledby="probe-title">
+      <header class="zone-intro zone-intro--probe">
+        <p class="signal">[research probes · public telemetry]</p>
+        <h2 id="probe-title">Open the hull.<br>Read the proof.</h2>
+        <p>These three systems expose their repositories, tests, or merged contribution so the inspection does not stop at the surface.</p>
+      </header>
+
+      <article class="research-probe" id="project-persons-finder">
+        <div class="research-probe__signal"><span>R-01</span><i aria-hidden="true"></i><strong>PUBLIC SOURCE</strong></div>
+        <div class="research-probe__copy"><p>Kotlin · Spring Boot · PostGIS</p><h3>Persons Finder</h3><p>I built a Kotlin and Spring Boot API for storing location history and finding people nearby. It uses PostGIS, keeps an append-only history, and maintains an indexed “latest location” projection. The repo includes Docker setup, real database tests, a small AI boundary for bios, and the benchmark scripts and results.</p><p class="research-probe__systems">Geospatial search · Real database tests · Privacy boundaries</p><a href="https://github.com/ac-opensource/persons-finder" target="_blank" rel="noreferrer">Inspect the repository ↗</a></div>
+        <figure><img src="/blog/images/persons-finder-architecture-hero.svg" alt="Persons Finder architecture showing API, PostGIS projections, history, and a guarded AI boundary" width="1200" height="900" loading="lazy"></figure>
+      </article>
+
+      <article class="research-probe research-probe--reverse" id="project-orchestrum">
+        <div class="research-probe__signal"><span>R-02</span><i aria-hidden="true"></i><strong>PUBLIC SOURCE</strong></div>
+        <div class="research-probe__copy"><p>Elixir · Agent orchestration</p><h3>Orchestrum</h3><p>I built this because agent demos often show the generated code but not the trail needed to review it. Orchestrum turns tracked work into an isolated run, then puts CI results, review feedback, complexity checks, and a walkthrough in front of the operator.</p><p class="research-probe__systems">Isolated runs · Operator review · Proof of work</p><a href="https://github.com/ac-opensource/Orchestrum" target="_blank" rel="noreferrer">Inspect the repository ↗</a></div>
+        <div class="probe-machine" aria-hidden="true"><span>ISSUE</span><span>RUN</span><span>PROOF</span></div>
+      </article>
+
+      <article class="research-probe" id="project-mempalace">
+        <div class="research-probe__signal"><span>R-03</span><i aria-hidden="true"></i><strong>MERGED SOURCE</strong></div>
+        <div class="research-probe__copy"><p>Python · CLI · Open source</p><h3>MemPalace</h3><p>I contributed nested <code>.gitignore</code>-aware project mining to MemPalace, an open-source AI memory system. The merged change preserves rule precedence across nested repositories, adds opt-out and targeted-include controls, and backs the behavior with tests—so workspace scans avoid generated and local-only files by default.</p><p class="research-probe__systems">Open-source contribution · Safe project mining · CLI + tests</p><a href="https://github.com/MemPalace/mempalace/pull/78" target="_blank" rel="noreferrer">Inspect the merged contribution ↗</a></div>
+        <div class="probe-terminal" aria-hidden="true"><span>src/ <b>INDEXED</b></span><span>build/ <b>IGNORED</b></span><span>packages/app/.gitignore <b>APPLIED</b></span></div>
+      </article>
+    </section>
+
+    <section class="shipyard-exit" aria-labelledby="shipyard-exit-title">
+      <p class="signal">[clearance window open]</p>
+      <h2 id="shipyard-exit-title">Questions about a vessel?</h2>
+      <p>I can share more about the public projects and discuss the private work where I’m able to.</p>
+      <div><a href="/contact.html">Open a conversation ↗</a><a href="/resume.html">View résumé ↗</a><a href="/experiments/universe-options/work/">Compare all Work options ↗</a></div>
+    </section>
+  </main>
+
+  <footer><span>© 2026 Andrew Concepcion</span><a href="/">Dashboard</a><a href="/work.html">Production Work</a><a href="/blog/">Logs</a><a href="/about.html">About</a><a href="/contact.html">Contact</a></footer>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://ac-opensource.github.io/experiments/universe-options/signals/option-02-visitor-constellation.html"/>
+  <title>Signals Option 02 — Visitor Constellation</title>
+  <meta name="description" content="An isolated Signals design study that renders only validated public records as a stable constellation.">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>document.documentElement.className = "js";</script>
+  <link rel="stylesheet" href="./option-02-visitor-constellation.css">
+</head>
+<body>
+  <a class="skip-link" href="#constellation-field">Skip to public constellation</a>
+  <header class="option-bar">
+    <a class="option-bar__brand" href="/">Andrew Concepcion</a>
+    <nav aria-label="Signals design options">
+      <a href="./index.html">All options</a>
+      <a href="/signals.html">01</a>
+      <a href="./option-02-visitor-constellation.html" aria-current="page">02</a>
+      <a href="./option-03-relay-field.html">03</a>
+    </nav>
+    <span>[isolated study · public records only]</span>
+  </header>
+
+  <main class="constellation-root" data-signals-option data-feed-state="empty" aria-busy="true">
+    <div class="runtime-banner" data-runtime-banner role="status" hidden></div>
+
+    <header class="constellation-hero">
+      <div class="constellation-hero__copy">
+        <span>[signals option 02 / visitor constellation]</span>
+        <h1>Visible only<br>after review.</h1>
+        <p>Approved public feedback can become a point in this sky. Pending, rejected, private, and unmoderated submissions remain outside it. Removal leaves a stable coordinate and opaque ID—not the quote.</p>
+        <a href="/contact.html?intent=public">Propose public feedback on Contact ↗</a>
+      </div>
+      <div class="constellation-hero__count" aria-label="Validated public feed totals">
+        <span>[public visitors]</span>
+        <strong data-total>0</strong>
+        <p><b data-approved>0</b> approved · <b data-removed>0</b> removed</p>
+        <small>Feed v1 · exact public contract</small>
+      </div>
+      <p class="constellation-hero__truth">Submission ≠ publication</p>
+    </header>
+
+    <section class="constellation-field" id="constellation-field" aria-labelledby="constellation-title">
+      <header class="constellation-field__heading">
+        <span>[stable sky / slots 000—999]</span>
+        <h2 id="constellation-title">Visitor constellation.</h2>
+        <p>Position comes from the validated slot, never feed order. The connecting trace indicates slot order only; it does not claim that visitors know or endorse one another.</p>
+      </header>
+      <div class="constellation-sky" data-constellation-sky aria-label="Validated public Visitor constellation">
+        <svg class="constellation-lines" data-constellation-lines viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <span class="constellation-origin" aria-hidden="true"><b>AC</b><small>PUBLIC ORIGIN</small></span>
+        <span class="constellation-axis constellation-axis--x" aria-hidden="true"></span>
+        <span class="constellation-axis constellation-axis--y" aria-hidden="true"></span>
+        <div class="constellation-stars" data-star-field></div>
+        <p class="constellation-empty" data-empty-state>
+          <strong>NO PUBLIC VISITORS</strong>
+          <span>The sky is operational and intentionally unoccupied. No placeholder praise is generated.</span>
+        </p>
+      </div>
+      <p class="constellation-status" data-feed-status role="status" aria-live="polite">The validated public feed contains no approved records or removal tombstones.</p>
+    </section>
+
+    <section class="constellation-stream" id="public-records" aria-labelledby="stream-title">
+      <header>
+        <span>[semantic public record]</span>
+        <h2 id="stream-title">What the sky is allowed to say.</h2>
+        <p>Approved records expose a quote, chosen public label, local target, dates, stable ID, and slot. A removal tombstone exposes only status, stable ID, and slot.</p>
+      </header>
+      <div class="constellation-stream__records" data-record-stream>
+        <p class="constellation-stream__empty" data-stream-empty><strong>No public Signals yet.</strong><span>Nothing pending, rejected, private, or unmoderated is displayed.</span></p>
+      </div>
+      <noscript>
+        <p class="noscript-note">JavaScript is off. The build-time feed for this isolated study is empty, so no records are omitted from this view. Public-feedback submission still belongs on Contact and does not imply publication.</p>
+      </noscript>
+    </section>
+
+    <section class="constellation-lifecycle" aria-labelledby="lifecycle-title">
+      <header>
+        <span>[the boundary]</span>
+        <h2 id="lifecycle-title">A point earns<br>its place slowly.</h2>
+      </header>
+      <ol>
+        <li><b>01</b><strong>Received privately</strong><p>Contact transport may return only a private acceptance or pending-moderation state. Neither is public approval.</p></li>
+        <li><b>02</b><strong>Reviewed by a human</strong><p>Only explicitly consented public fields can cross the boundary.</p></li>
+        <li><b>03</b><strong>Published minimally</strong><p>Removal erases quote, attribution, target, and dates while keeping the opaque identity and stable slot.</p></li>
+      </ol>
+    </section>
+
+    <section class="constellation-focus" data-record-focus hidden tabindex="-1" aria-live="polite" aria-labelledby="focus-title">
+      <button type="button" data-close-focus>Close public record</button>
+      <span data-focus-kicker>[approved public record]</span>
+      <h2 id="focus-title" data-focus-title></h2>
+      <blockquote data-focus-quote hidden></blockquote>
+      <p data-focus-copy></p>
+      <dl data-focus-meta></dl>
+      <a data-focus-target hidden>Open local target ↗</a>
+    </section>
+  </main>
+
+  <footer class="signals-footer">
+    <a href="/contact.html?intent=public">Propose feedback on Contact</a>
+    <a href="/signals.html">Current Satellite Registry</a>
+    <span>© 2026 Andrew Concepcion</span>
+  </footer>
+
+  <script id="contact-runtime-config" type="application/json">{"version":1,"enabled":false,"endpoint":"","publicFeedEndpoint":"","requestTimeoutMs":8000}</script>
+  <script id="signals-feed" type="application/json">{"version":1,"records":[]}</script>
+  <script src="/assets/js/contact-transport.js"></script>
+  <script src="/assets/js/signals-contract.js"></script>
+  <script src="./option-02-visitor-constellation.js"></script>
+</body>
+</html>

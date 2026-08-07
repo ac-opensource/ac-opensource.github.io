@@ -1,0 +1,38 @@
+{
+  "label": "LOCAL DEMO DATA — NEVER PUBLISH",
+  "privateResponse": {
+    "version": 1,
+    "receiptId": "local_private_receipt_0001",
+    "intent": "private",
+    "state": "confirmed"
+  },
+  "publicResponse": {
+    "version": 1,
+    "receiptId": "local_public_receipt_00001",
+    "intent": "public",
+    "state": "pending_moderation"
+  },
+  "approvedFeed": {
+    "version": 1,
+    "records": [
+      {
+        "id": "sig_local_demo_approved_001",
+        "status": "approved",
+        "display": {
+          "mode": "named",
+          "label": "Local demo operator"
+        },
+        "quote": "Local demo record: this text proves only the exact-loopback registry path.",
+        "target": "contact",
+        "createdAt": "2026-08-01",
+        "approvedAt": "2026-08-02",
+        "slot": 7
+      },
+      {
+        "id": "sig_local_demo_removed_002",
+        "status": "removed",
+        "slot": 11
+      }
+    ]
+  }
+}

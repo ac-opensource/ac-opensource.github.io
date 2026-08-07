@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Logs Option 01 · Radio Telescope</title>
+  <meta name="robots" content="noindex,nofollow"/>
+  <link rel="canonical" href="https://ac-opensource.github.io/experiments/universe-options/logs/01-radio-telescope.html"/>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="/assets/css/blog-radio-telescope.css?v=20260807" rel="stylesheet"/>
+  <style>
+    .experiment-return{position:fixed;z-index:80;top:.8rem;right:.8rem;padding:.65rem .8rem;border:1px solid currentColor;background:#faf9f4;color:#1f5cba;font:600 .62rem/1 "Space Grotesk",sans-serif;letter-spacing:.08em;text-transform:uppercase}
+  </style>
+</head>
+<body>
+  <a class="experiment-return" href="/experiments/universe-options/">Design archive</a>
+  <main id="main" class="logs-observatory">
+    <header class="logs-observatory__mast" aria-labelledby="logs-title">
+      <div class="logs-observatory__copy">
+        <p class="logs-observatory__eyebrow">[logs option 01 · radio telescope]</p>
+        <h1 id="logs-title"><span>Logs.</span><span>Transmission archive.</span></h1>
+        <p class="logs-observatory__intro">A time-based receiver for published engineering notes, essays, and field observations.</p>
+        <div class="logs-observatory__ledger" aria-label="Archive summary">
+          <span id="archive-total-count">Published transmissions</span>
+          <span id="archive-date-range">Archive dates</span>
+          <a href="/blog/">[production logs]</a>
+        </div>
+      </div>
+
+      <section id="logs-tuning" class="logs-tuning" aria-labelledby="logs-tuning-title" hidden>
+        <div class="logs-tuning__heading"><h2 id="logs-tuning-title">Tune the archive</h2><span id="archive-result-count">Static archive</span></div>
+        <label class="logs-tuning__search" for="search-posts"><span>Search</span><input id="search-posts" type="search" maxlength="160" placeholder="Title, summary, or topic"/></label>
+        <div id="category-filters" class="logs-tuning__bands" role="group" aria-label="Tune by archive category"></div>
+      </section>
+
+      <section id="radio-telescope" class="radio-observatory" aria-labelledby="radio-telescope-title" hidden>
+        <div class="radio-observatory__header"><div><p>[receiver array 01]</p><h2 id="radio-telescope-title">Published writing</h2></div><span id="radio-match-count">Static archive</span></div>
+        <div class="radio-observatory__surface" aria-hidden="true">
+          <span class="radio-observatory__sector radio-observatory__sector--outer"></span><span class="radio-observatory__sector radio-observatory__sector--inner"></span>
+          <span class="radio-observatory__axis radio-observatory__axis--x"></span><span class="radio-observatory__axis radio-observatory__axis--y"></span>
+          <span class="radio-observatory__beam"></span><span class="radio-observatory__dish"><span></span></span><span id="radio-traces"></span>
+        </div>
+        <div class="radio-observatory__spectrum" aria-label="Published transmission dates">
+          <div class="radio-observatory__scale" aria-hidden="true"><span id="radio-start-date">earliest</span><span>publication time</span><span id="radio-end-date">latest</span></div>
+          <div id="radio-date-spectrum" class="radio-observatory__markers"></div>
+        </div>
+      </section>
+    </header>
+
+    <section id="radio-selected-transmission" class="selected-transmission" aria-labelledby="selected-transmission-title" aria-live="polite" hidden>
+      <div class="selected-transmission__signal">
+        <p class="selected-transmission__eyebrow">[target lock]</p><p id="selected-transmission-meta" class="selected-transmission__meta"></p>
+        <h2 id="selected-transmission-title"></h2><p id="selected-transmission-summary" class="selected-transmission__summary"></p>
+        <div id="selected-transmission-topics" class="selected-transmission__topics"></div>
+        <div class="selected-transmission__actions"><a id="selected-transmission-link" href="/blog/">[open transmission]</a><button id="radio-clear-target" type="button">[release target]</button></div>
+      </div>
+      <div class="selected-transmission__relationships">
+        <div class="selected-transmission__relationship-heading"><h3>Exact relationship receipts</h3><span id="selected-relationship-count">0 connected signals</span></div>
+        <ol id="radio-relationship-receipts"></ol>
+      </div>
+    </section>
+
+    <section class="transmission-archive" aria-labelledby="transmission-archive-title">
+      <div class="transmission-archive__header"><div><p>[received transmissions]</p><h2 id="transmission-archive-title">Latest entries</h2></div><p>The complete canonical archive remains readable below.</p></div>
+      <section id="blog-feed" class="space-y-12" aria-label="Latest blog posts"><p>Loading published entries…</p></section>
+      <div class="transmission-archive__end"><span id="infinite-status">[static archive]</span></div>
+    </section>
+  </main>
+  <script src="/assets/js/blog-radio-telescope.js?v=20260807"></script>
+</body>
+</html>

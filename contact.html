@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html class="no-js light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
@@ -27,7 +27,11 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<link href="/assets/css/contact-payload-integration.css?v=20260807" rel="stylesheet"/>
+<link href="/assets/css/route-signal-handoff.css?v=20260806-t3" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20260807" rel="stylesheet"/>
+<script src="/assets/js/universe-theme-transition.js?v=20260807-fast2"></script>
+<script src="/assets/js/route-signal-handoff.js?v=20260806-t3" defer></script>
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -105,24 +109,8 @@
         }
     </style>
 </head>
-<body class="font-body text-on-surface selection:bg-tertiary-container selection:text-on-tertiary-container overflow-x-hidden">
+<body class="font-body text-on-surface selection:bg-tertiary-container selection:text-on-tertiary-container overflow-x-hidden" data-universe-region="contact" data-route-signal-page="contact">
 <a class="skip-link" href="#main">Skip to content</a>
-<div class="neural-global-bg" aria-hidden="true">
-  <div class="neural-mesh-container">
-    <div class="neural-mesh"></div>
-    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
-    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
-    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
-    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
-    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
-    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
-    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
-    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
-  </div>
-  <div class="bust-gradient"></div>
-  <div class="canvas-grid"></div>
-</div>
 <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
   <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
@@ -143,130 +131,162 @@
     <a data-route="/contact.html" href="/contact.html" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<main id="main" class="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto min-h-screen">
-<!-- Page Title -->
-<div class="mb-16 border-l-4 border-tertiary pl-6">
-<span class="font-label text-xs uppercase tracking-[0.2em] text-outline">[initiate_connection]</span>
-<h1 class="font-headline text-5xl md:text-7xl font-bold text-on-surface tracking-tighter mt-2">
-                Get in Touch
-            </h1>
-<p class="max-w-2xl mt-4 text-lg text-secondary font-light">
-                For collaboration, architecture support, or direct help from an AI-native software engineer, send a note and I’ll get back to you.
-            </p>
-</div>
-<!-- Layout Grid: 33% / 66% Asymmetry -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
-<!-- Left Column: Signal Status Modules -->
-<div class="space-y-6">
-<div class="bg-surface-container-low p-6 space-y-6 relative overflow-hidden">
-<div class="absolute top-0 right-0 p-2 font-label text-[10px] text-outline-variant opacity-40">[MODULE: COLLABORATION]</div>
-<div>
-<span class="font-label text-[10px] uppercase text-outline">[working_mode]</span>
-<div class="font-headline text-xl font-medium mt-1">Remote collaboration</div>
-</div>
-<div class="grid grid-cols-2 gap-4">
-<div>
-<span class="font-label text-[10px] uppercase text-outline">[response]</span>
-<div class="font-headline text-2xl font-bold mt-1">1–2 days</div>
-</div>
-<div>
-<span class="font-label text-[10px] uppercase text-outline">[time_zone]</span>
-<div id="local-time-value" class="font-headline text-2xl font-bold mt-1">--:--</div>
-</div>
-</div>
-<div class="pt-4 border-t border-outline-variant/20">
-<p class="text-sm leading-relaxed text-secondary">Share the problem, constraints, and desired outcome. I’ll reply with concrete next steps or a focused set of questions.</p>
-</div>
-</div>
-<!-- Abstract Technical Visual -->
-<div class="bg-surface-container-highest aspect-square relative flex items-center justify-center p-8 overflow-hidden" aria-hidden="true">
-<div class="absolute inset-0 canvas-grid opacity-30"></div>
-<div class="w-2/3 aspect-square border border-tertiary/30 rotate-12"></div>
-<div class="absolute w-1/2 aspect-square border border-primary/30 -rotate-12"></div>
-<div class="absolute h-px w-3/4 bg-tertiary/30 rotate-45"></div>
-<div class="absolute bottom-4 left-4 font-label text-[10px] text-primary">[visual_ref: ARCH_WAVE_01]</div>
-</div>
-</div>
-<!-- Right Column: Contact Form -->
-<div class="lg:col-span-2 space-y-8">
-<div class="bg-surface p-8 md:p-12 border border-outline-variant/10 shadow-[0_20px_40px_rgba(47,52,45,0.04)]">
-<form id="contact-form" class="space-y-10" action="mailto:aarconcepcion@gmail.com" method="post" enctype="text/plain">
-<!-- Name Field -->
-<div class="relative group">
-<label for="contact-name" class="block font-label text-xs uppercase tracking-widest text-outline group-focus-within:text-tertiary transition-colors mb-2">
-                                [input: name]
-                            </label>
-<div class="flex items-center border-b border-outline-variant focus-within:border-tertiary transition-all pb-2">
-<input id="contact-name" class="w-full bg-transparent border-none focus:ring-0 font-headline text-2xl p-0 placeholder:text-outline-variant/40" name="name" placeholder="Your name" type="text" autocomplete="name" required/>
-</div>
-</div>
-<!-- Email Field -->
-<div class="relative group">
-<label for="contact-email" class="block font-label text-xs uppercase tracking-widest text-outline group-focus-within:text-tertiary transition-colors mb-2">
-                                [input: protocol_address]
-                            </label>
-<div class="flex items-center border-b border-outline-variant focus-within:border-tertiary transition-all pb-2">
-<input id="contact-email" class="w-full bg-transparent border-none focus:ring-0 font-headline text-2xl p-0 placeholder:text-outline-variant/40" name="email" placeholder="you@email.com" type="email" autocomplete="email" required/>
-</div>
-</div>
-<!-- Payload (Message) Field -->
-<div class="relative group">
-<label for="contact-message" class="block font-label text-xs uppercase tracking-widest text-outline group-focus-within:text-tertiary transition-colors mb-2">
-                                [input: payload]
-                            </label>
-<div class="border-b border-outline-variant focus-within:border-tertiary transition-all pb-4">
-<textarea id="contact-message" class="w-full bg-transparent border-none focus:ring-0 font-headline text-2xl p-0 placeholder:text-outline-variant/40 resize-none" name="message" placeholder="Tell me about your project..." rows="4" minlength="20" required></textarea>
-</div>
-</div>
-<!-- CTA Transmit -->
-<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pt-6">
-<button class="group relative inline-flex items-center justify-center px-10 py-5 bg-primary text-on-primary font-headline font-bold tracking-widest uppercase text-sm hover:bg-primary-dim transition-all active:scale-95" type="submit">
-                                Send Message
-                                <span class="ml-4 material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform" data-icon="send">send</span>
-<div class="absolute bottom-0 left-0 h-0.5 w-0 bg-tertiary group-hover:w-full transition-all duration-300"></div>
-</button>
-<div class="font-label text-[10px] text-outline-variant leading-relaxed max-w-xs">
-                                This opens your default email app. The website does not upload or store your message.
-                            </div>
-</div>
-<p id="contact-form-status" class="font-label text-xs text-secondary" role="status" aria-live="polite"></p>
+<main id="main">
+<form id="contact-form" class="payload-bay" action="/contact.html#contact-form" method="post" data-contact-console data-record-state="idle" data-topology="private" aria-labelledby="contact-page-title">
+  <input type="hidden" name="version" value="2"/>
+  <input type="hidden" name="submissionId" value="" data-submission-id/>
+  <input type="hidden" name="contextPath" value="/contact.html" data-context-path/>
+  <input type="hidden" name="returnOrigin" value="" data-return-origin/>
+  <input type="hidden" name="startedAt" value="" data-started-at/>
+  <label class="payload-bay__trap" aria-hidden="true">Leave this field empty<input name="website" type="text" tabindex="-1" autocomplete="off"/></label>
+
+  <header class="payload-bay__intro">
+    <span>[contact / payload integration bay]</span>
+    <h1 id="contact-page-title">What should<br/>this carry?</h1>
+    <p>Send a private project brief, architecture question, or collaboration request without leaving the page. A separate feedback quote can be requested for human review; your reply address and private notes never become public.</p>
+  </header>
+
+  <p class="payload-bay__runtime" data-runtime-state="offline" data-runtime-message hidden>Record service awaiting personal Google deployment.</p>
+
+  <div class="payload-bay__visual route-signal-contact-instrument" data-payload-visual>
+    <div class="fairing fairing--left" aria-hidden="true"><i></i><i></i><i></i><span>A</span></div>
+    <div class="fairing fairing--right" aria-hidden="true"><i></i><i></i><i></i><span>B</span></div>
+    <div class="payload-orbit payload-orbit--outer" aria-hidden="true"></div>
+    <div class="payload-orbit payload-orbit--inner" aria-hidden="true"></div>
+    <div class="satellite" aria-hidden="true">
+      <div class="satellite__array satellite__array--left" data-payload-part="mission"><i></i><i></i><i></i></div>
+      <div class="satellite__array satellite__array--right" data-payload-part="mission"><i></i><i></i><i></i></div>
+      <div class="satellite__bus">
+        <span class="satellite__identity" data-payload-part="identity">ID</span>
+        <div class="satellite__core" data-payload-part="payload"><i></i></div>
+        <span class="satellite__latch" data-payload-part="release">LOCK</span>
+      </div>
+      <div class="satellite__dish" data-payload-part="comms"><i></i></div>
+      <div class="satellite__beacon"></div>
+    </div>
+    <div class="payload-bay__measure" aria-hidden="true">
+      <span data-topology-label>PRIVATE CAPSULE</span>
+      <i><b></b></i>
+      <strong data-progress-label>1 / 5 MODULES</strong>
+    </div>
+    <aside class="route-signal-receiver route-signal-receiver--contact" data-route-signal-receiver="contact" hidden role="status" aria-live="polite">
+      <span>[mission telemetry / inbound]</span>
+      <strong>Dashboard signal received.</strong>
+      <span data-route-signal-receiver-route>DASHBOARD → CONTACT · DESTINATION ID: CONTACT</span>
+      <span class="route-signal-receiver__rail" aria-hidden="true"><i></i></span>
+      <small data-route-signal-receiver-state>ACQUIRING CONTACT LOCK</small>
+    </aside>
+  </div>
+
+  <div class="payload-bay__integration-rail" role="group" aria-label="Payload integration sequence">
+    <fieldset class="bay-node bay-node--intent" data-module="mission" data-intent-controls>
+      <legend>[01 / payload topology]</legend>
+      <label class="topology-choice">
+        <input type="radio" name="intent" value="private" checked/>
+        <span><strong>Private transmission capsule</strong><small>Stored privately for a direct reply</small></span>
+      </label>
+      <label class="topology-choice js-public-choice" data-js-public-intent>
+        <input type="radio" name="intent" value="public"/>
+        <span><strong>Feedback satellite</strong><small>Separate quote · human review before any public orbit</small></span>
+      </label>
+      <span class="module-state" data-module-state="mission" aria-hidden="true">TOPOLOGY SELECTED</span>
+    </fieldset>
+
+    <div class="bay-node bay-node--identity" data-module="identity">
+      <label for="contact-name">[02 / payload callsign]</label>
+      <input id="contact-name" name="name" type="text" autocomplete="name" minlength="2" maxlength="80" placeholder="Your name" required/>
+      <small>Used only to address the private reply.</small>
+      <span class="module-state" data-module-state="identity" aria-hidden="true">CALLSIGN ETCHED</span>
+    </div>
+
+    <div class="bay-node bay-node--comms" data-module="comms">
+      <label for="contact-email">[03 / return transponder]</label>
+      <input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@email.com" required/>
+      <small>Your reply address stays in the private record.</small>
+      <span class="module-state" data-module-state="comms" aria-hidden="true">TRANSPONDER TUNED</span>
+    </div>
+
+    <div class="bay-node bay-node--message" data-module="payload">
+      <div class="field-heading">
+        <label for="contact-message">[04 / private mission core]</label>
+        <span data-private-count>0 / 4000</span>
+      </div>
+      <textarea id="contact-message" name="privateMessage" maxlength="4000" rows="5" placeholder="Describe the project, constraint, or decision you want help with…" required></textarea>
+      <small>Required for a private capsule; optional for a feedback satellite. Private notes are sealed away from every public surface.</small>
+
+      <fieldset class="feedback-package" data-public-fields hidden>
+        <legend>[public beacon package]</legend>
+        <div class="field-heading">
+          <label for="contact-public-quote">Exact quote for review</label>
+          <span data-public-count>0 / 280</span>
+        </div>
+        <textarea id="contact-public-quote" name="publicQuote" maxlength="280" rows="2" placeholder="The exact quote you would allow to be reviewed…" disabled></textarea>
+        <div class="feedback-package__routing">
+          <label for="contact-public-target">Requested orbit
+            <select id="contact-public-target" name="publicTarget" disabled>
+              <option value="dashboard">Dashboard</option>
+              <option value="portfolio">Portfolio</option>
+              <option value="logs">Logs</option>
+              <option value="about">About</option>
+              <option value="contact">Contact</option>
+              <option value="resume">Resume</option>
+              <option value="skills">Skills graph</option>
+            </select>
+          </label>
+          <fieldset>
+            <legend>Public label</legend>
+            <label><input type="radio" name="publicDisplay" value="anonymous" checked disabled/> Anonymous</label>
+            <label><input type="radio" name="publicDisplay" value="named" disabled/> Use my name</label>
+          </fieldset>
+        </div>
+        <label class="bay-consent">
+          <input id="contact-public-consent" name="publicConsent" type="checkbox" value="yes" disabled/>
+          <span>Allow only this exact quote, orbit, and label to be considered after human review. It may be rejected or removed.</span>
+        </label>
+      </fieldset>
+      <span class="module-state" data-module-state="payload" aria-hidden="true">MISSION CORE LOADED</span>
+    </div>
+
+    <div class="bay-node bay-node--release" data-module="release">
+      <label class="bay-consent bay-consent--release">
+        <input id="contact-storage-consent" name="storageConsent" type="checkbox" value="yes" required/>
+        <span><strong>[05 / fairing release]</strong>Store this transmission privately so Andrew can review it and reply. Public consideration applies only to the separate quote above.</span>
+      </label>
+      <span class="module-state" data-module-state="release" aria-hidden="true">FAIRING RELEASE ARMED</span>
+    </div>
+
+    <div class="payload-bay__action">
+      <p id="contact-form-status" role="status" aria-live="polite">Fairing open · payload incomplete · nothing recorded.</p>
+      <button type="submit" data-contact-submit disabled>
+        <span data-submit-label>Integrate payload</span>
+        <i aria-hidden="true">◇</i>
+      </button>
+      <div class="payload-bay__secondary-actions">
+        <button type="button" data-contact-retry hidden>Retry with preserved content</button>
+        <button type="button" data-skip-launch hidden>Skip deployment animation</button>
+      </div>
+      <section class="payload-bay__receipt" data-receipt aria-labelledby="contact-receipt-heading" hidden>
+        <span data-receipt-kicker>[record state]</span>
+        <strong id="contact-receipt-heading" data-receipt-heading>Nothing has been recorded.</strong>
+        <p data-receipt-body>A receipt appears only after the configured record service acknowledges storage.</p>
+        <span class="payload-bay__receipt-id" data-receipt-id hidden></span>
+      </section>
+    </div>
+
+    <noscript>
+      <p class="noscript-note payload-bay__noscript" data-noscript-contact>The personal record endpoint is not connected in this build. Use LinkedIn below; this form does not open an email client or claim a stored message.</p>
+    </noscript>
+  </div>
 </form>
-</div><div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-<a class="flex items-center justify-between p-6 bg-surface-container-low border border-outline-variant/10 hover:border-tertiary transition-all group" href="https://www.linkedin.com/in/aarconcepcion" target="_blank" rel="noreferrer">
-<div class="space-y-1">
-<span class="font-label text-[10px] uppercase text-outline group-hover:text-tertiary transition-colors">[external_node: professional]</span>
-<div class="font-headline font-bold uppercase tracking-tight">LinkedIn</div>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:text-tertiary transition-colors" data-icon="link">link</span>
-</a>
-<a class="flex items-center justify-between p-6 bg-surface-container-low border border-outline-variant/10 hover:border-tertiary transition-all group" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">
-<div class="space-y-1">
-<span class="font-label text-[10px] uppercase text-outline group-hover:text-tertiary transition-colors">[source_code: repository]</span>
-<div class="font-headline font-bold uppercase tracking-tight">GitHub</div>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:text-tertiary transition-colors" data-icon="terminal">terminal</span>
-</a>
-<a class="flex items-center justify-between p-6 bg-primary text-on-primary hover:bg-primary-dim transition-all group" href="/resume.html">
-<div class="space-y-1">
-<span class="font-label text-[10px] uppercase text-on-primary/60">[action: fetch_credentials]</span>
-<div class="font-headline font-bold uppercase tracking-tight">View Resume</div>
-</div>
-<span class="material-symbols-outlined group-hover:translate-y-0.5 transition-transform" data-icon="download">download</span>
-</a>
-</div>
-<!-- Footer Section Info -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div class="bg-surface-container-low p-6 flex items-center justify-between">
-<div class="font-label text-xs text-secondary">[active_vcs]</div>
-<a class="font-headline font-medium hover:text-tertiary transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">github.com/ac-opensource</a>
-</div>
-<div class="bg-surface-container-low p-6 flex items-center justify-between">
-<div class="font-label text-xs text-secondary">[message_transport]</div>
-<div class="font-headline font-medium">Your email app</div>
-</div>
-</div>
-</div>
-</div>
+
+<aside class="payload-bay__ground" aria-label="Other contact routes">
+  <span>[alternate ground links]</span>
+  <a class="ground-link ground-link--social" href="https://www.linkedin.com/in/aarconcepcion" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+  <a class="ground-link ground-link--social" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">GitHub ↗</a>
+  <a class="ground-link ground-link--primary" href="/resume.html">Resume ↗</a>
+  <a class="ground-link ground-link--secondary" href="/signals.html">Signals ↗</a>
+  <p>Remote collaboration · typically 1–2 days</p>
+</aside>
 </main>
 <footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
   <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
@@ -279,60 +299,8 @@
     <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
   </div>
 </footer>
-<script>
-  (() => {
-    const primaryTimeZone = "Pacific/Auckland";
-
-    function updateLocalTime() {
-      const target = document.getElementById("local-time-value");
-      if (!target) return;
-
-      const now = new Date();
-      const hhmm = new Intl.DateTimeFormat("en-NZ", {
-        timeZone: primaryTimeZone,
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false
-      }).format(now);
-
-      const tz = new Intl.DateTimeFormat("en-NZ", {
-        timeZone: primaryTimeZone,
-        timeZoneName: "short"
-      })
-        .formatToParts(now)
-        .find((part) => part.type === "timeZoneName")?.value || "LOCAL";
-
-      target.textContent = `${hhmm} ${tz.toUpperCase()}`;
-    }
-
-    const path = window.location.pathname.replace(/\/index\.html$/, "/");
-    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
-      const route = link.dataset.route;
-      const active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
-      if (active) {
-        link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
-        link.setAttribute("aria-current", "page");
-      }
-    });
-
-    const form = document.getElementById("contact-form");
-    const formStatus = document.getElementById("contact-form-status");
-    form?.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (!form.reportValidity()) return;
-
-      const values = new FormData(form);
-      const name = String(values.get("name") || "").trim();
-      const email = String(values.get("email") || "").trim();
-      const message = String(values.get("message") || "").trim();
-      const subject = `Portfolio enquiry from ${name}`;
-      const body = `Name: ${name}\nReply-to: ${email}\n\n${message}`;
-      if (formStatus) formStatus.textContent = "Opening your email application…";
-      window.location.href = `mailto:aarconcepcion@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    });
-
-    updateLocalTime();
-    window.setInterval(updateLocalTime, 30000);
-  })();
-</script>
+<script id="contact-runtime-config" type="application/json">{"version":1,"enabled":false,"transport":"disabled","endpoint":"","publicFeedEndpoint":"","requestTimeoutMs":12000}</script>
+<script src="/assets/js/contact-transport.js"></script>
+<script src="/assets/js/contact-payload-integration.js"></script>
+<script src="/assets/js/universe-field-map.js?v=20260807"></script>
 </body></html>

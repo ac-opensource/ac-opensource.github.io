@@ -1,0 +1,111 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="robots" content="noindex,nofollow"/>
+<link rel="canonical" href="https://ac-opensource.github.io/experiments/universe-options/logs/05-spiral-galaxy-archive.html"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<title>Logs Option 05 · Spiral Galaxy Archive</title>
+<meta name="description" content="Andrew Concepcion's published engineering and personal writing arranged as an interactive spiral galaxy around a supermassive black hole."/>
+<link rel="stylesheet" href="/assets/experiments/universe-options/logs/spiral-galaxy-archive.css?v=20260807-10"/>
+<script>document.documentElement.classList.replace("no-js", "js");</script>
+</head>
+<body data-universe-region="logs" data-log-option="spiral-galaxy">
+<a class="skip-link" href="#main">Skip to archive</a>
+
+<header class="option-nav">
+  <a class="option-nav__brand" href="/">Andrew Concepcion</a>
+  <p>Logs redesign field tests</p>
+  <nav aria-label="Logs design options">
+    <a href="/experiments/universe-options/logs/01-radio-telescope.html">01 · Radio telescope</a>
+    <a href="/experiments/universe-options/logs/02-nebula-archive.html">02 · Nebula archive</a>
+    <a href="/experiments/universe-options/logs/03-constellation-threads.html">03 · Constellation threads</a>
+    <a href="/experiments/universe-options/logs/04-gravitational-lens-archive.html">04 · Gravitational lens</a>
+    <a href="/experiments/universe-options/logs/05-spiral-galaxy-archive.html" aria-current="page">05 · Spiral galaxy</a>
+  </nav>
+</header>
+
+<main id="main" class="galaxy-archive">
+  <section class="galaxy-hero" aria-labelledby="galaxy-title">
+    <canvas id="galaxy-sky" class="galaxy-sky" aria-hidden="true"></canvas>
+    <div class="galaxy-hero__stars" aria-hidden="true"></div>
+
+    <div class="galaxy-copy">
+      <header class="galaxy-intro">
+        <p class="eyebrow">[engineering · life · the sky]</p>
+        <h1 id="galaxy-title">Ideas with<br/>their own <em>gravity.</em></h1>
+        <p class="galaxy-intro__lede">I write about building dependable systems, working alongside AI, protecting privacy, and the life beyond the screen that sharpens how I see and build.</p>
+        <div class="galaxy-ledger" aria-label="Archive summary">
+          <span id="galaxy-total">Published writing</span>
+          <span id="galaxy-range">2022 → present</span>
+          <a href="/blog/rss.xml">RSS</a>
+          <a href="/blog/">Current logs</a>
+        </div>
+      </header>
+
+      <form id="galaxy-tuner" class="galaxy-tuner" role="search" hidden>
+        <div class="galaxy-tuner__heading">
+          <label for="galaxy-search">Follow a subject</label>
+          <output id="galaxy-count" for="galaxy-search" aria-live="polite"></output>
+        </div>
+        <div class="galaxy-tuner__search">
+          <input id="galaxy-search" type="search" autocomplete="off" maxlength="160" placeholder="Android, delivery, reflection, photography…"/>
+          <button type="reset">Clear</button>
+        </div>
+        <div id="galaxy-categories" class="galaxy-categories" role="group" aria-label="Filter writing by category"></div>
+      </form>
+    </div>
+
+    <div id="galaxy-field" class="galaxy-field" role="group" aria-label="Published entries arranged along four spiral arms around a central black hole" hidden>
+      <div class="galaxy-core" aria-hidden="true">
+        <span class="galaxy-core__lens"></span>
+        <span class="galaxy-core__disk galaxy-core__disk--far"></span>
+        <span class="galaxy-core__horizon"></span>
+        <span class="galaxy-core__disk galaxy-core__disk--near"></span>
+      </div>
+      <div id="galaxy-nodes" class="galaxy-nodes"></div>
+
+      <aside id="galaxy-focus" class="galaxy-focus" aria-labelledby="galaxy-focus-title" aria-live="polite" hidden>
+        <button id="galaxy-release" type="button" aria-label="Close selected entry">Close</button>
+        <p id="galaxy-focus-meta" class="galaxy-focus__meta"></p>
+        <h2 id="galaxy-focus-title"></h2>
+        <p id="galaxy-focus-summary"></p>
+        <p id="galaxy-focus-topics" class="galaxy-focus__topics"></p>
+        <a id="galaxy-focus-link" href="/blog/">Read entry <span aria-hidden="true">↗</span></a>
+      </aside>
+    </div>
+
+    <a class="galaxy-hero__index-link" href="#galaxy-index"><span>Writing in orbit</span><i aria-hidden="true"></i></a>
+  </section>
+
+  <section id="galaxy-index" class="galaxy-index" aria-labelledby="galaxy-index-title">
+    <header class="galaxy-index__header">
+      <div>
+        <p class="eyebrow">[outward from the core · newest first]</p>
+        <h2 id="galaxy-index-title">Writing in orbit.</h2>
+      </div>
+      <p>Production systems sit beside the observations that sharpen how I think: family, travel, photography, reflection, and the night sky.</p>
+    </header>
+    <div id="galaxy-list" class="galaxy-list" aria-live="polite">
+      <p class="galaxy-list__loading">Loading published writing…</p>
+    </div>
+    <p id="galaxy-empty" class="galaxy-empty" hidden>No writing matches that subject yet.</p>
+    <p class="galaxy-index__end"><span id="infinite-status">[published writing · engineering, systems, and life]</span></p>
+    <noscript>
+      <div class="galaxy-noscript">
+        <h2>The writing remains reachable.</h2>
+        <p>This visual field needs JavaScript, but the published archive does not. Open the complete current Logs page or start with these entries.</p>
+        <p><a href="/blog/">Complete Logs</a> · <a href="/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html">Interactive orbital homepage</a> · <a href="/blog/2026-04-07-one-rust-core-across-android-and-ios.html">One Rust core</a> · <a href="/blog/2024-09-14-film-photography-gallery.html">Photography experiments</a></p>
+      </div>
+    </noscript>
+  </section>
+</main>
+
+<script src="/assets/experiments/universe-options/logs/posts-data.js?v=20260807"></script>
+<script src="/assets/experiments/universe-options/logs/spiral-galaxy-archive.js?v=20260807-11"></script>
+</body>
+</html>

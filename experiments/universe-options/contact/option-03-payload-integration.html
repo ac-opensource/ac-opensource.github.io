@@ -1,0 +1,175 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://ac-opensource.github.io/experiments/universe-options/contact/option-03-payload-integration.html"/>
+  <title>Contact Option 03 — Payload Integration Bay</title>
+  <meta name="description" content="An isolated Contact-page design study in which the message becomes a payload inside an open fairing.">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>document.documentElement.className = "js";</script>
+  <link rel="stylesheet" href="./option-03-payload-integration.css">
+</head>
+<body>
+  <a class="skip-link" href="#payload-form">Skip to payload integration form</a>
+  <header class="option-bar">
+    <a class="option-bar__brand" href="/">Andrew Concepcion</a>
+    <nav aria-label="Contact design options">
+      <a href="./index.html">All options</a>
+      <a href="./option-01-vehicle-assembly.html">01</a>
+      <a href="./option-02-vertical-launch-complex.html">02</a>
+      <a href="./option-03-payload-integration.html" aria-current="page">03</a>
+    </nav>
+    <span>[adopted Contact direction]</span>
+  </header>
+
+  <main id="main">
+    <form id="payload-form" class="payload-bay" action="mailto:aarconcepcion@gmail.com" method="post" enctype="text/plain" data-topology="private">
+      <header class="payload-bay__intro">
+        <span>[contact option 03 / payload integration bay]</span>
+        <h1>What should<br>this carry?</h1>
+        <p>Compose a private capsule or a separate feedback satellite. Your name, reply address, and private notes are never public. Human review remains a hard boundary.</p>
+      </header>
+
+      <div class="payload-bay__demo" data-demo-flag hidden>
+        <strong>LOCAL DEPLOYMENT DEMO</strong>
+        <span>No request, email, receipt, moderation event, or publication.</span>
+      </div>
+
+      <div class="payload-bay__visual" data-payload-visual aria-hidden="true">
+        <div class="fairing fairing--left">
+          <i></i><i></i><i></i>
+          <span>A</span>
+        </div>
+        <div class="fairing fairing--right">
+          <i></i><i></i><i></i>
+          <span>B</span>
+        </div>
+        <div class="payload-orbit payload-orbit--outer"></div>
+        <div class="payload-orbit payload-orbit--inner"></div>
+        <div class="satellite">
+          <div class="satellite__array satellite__array--left" data-payload-part="mission"><i></i><i></i><i></i></div>
+          <div class="satellite__array satellite__array--right" data-payload-part="mission"><i></i><i></i><i></i></div>
+          <div class="satellite__bus">
+            <span class="satellite__identity" data-payload-part="identity">ID</span>
+            <div class="satellite__core" data-payload-part="payload"><i></i></div>
+            <span class="satellite__latch" data-payload-part="release">LOCK</span>
+          </div>
+          <div class="satellite__dish" data-payload-part="comms"><i></i></div>
+          <div class="satellite__beacon"></div>
+        </div>
+        <div class="payload-bay__measure">
+          <span data-topology-label>PRIVATE CAPSULE</span>
+          <i><b></b></i>
+          <strong data-progress-label>1 / 5 MODULES</strong>
+        </div>
+      </div>
+
+      <div class="payload-bay__integration-rail" role="group" aria-label="Payload integration sequence">
+      <fieldset class="bay-node bay-node--intent" data-module="mission">
+        <legend>[01 / payload topology]</legend>
+        <label class="topology-choice">
+          <input type="radio" name="intent" value="private" checked>
+          <span><strong>Private transmission capsule</strong><small>Private reply route · never enters public orbit</small></span>
+        </label>
+        <label class="topology-choice js-public-choice">
+          <input type="radio" name="intent" value="public">
+          <span><strong>Feedback satellite</strong><small>Separate quote · human review before any public orbit</small></span>
+        </label>
+        <span class="module-state" data-module-state="mission">TOPOLOGY SELECTED</span>
+      </fieldset>
+
+      <div class="bay-node bay-node--identity" data-module="identity">
+        <label for="payload-name">[02 / payload callsign]</label>
+        <input id="payload-name" name="name" type="text" autocomplete="name" minlength="2" maxlength="80" placeholder="Your name" required>
+        <small>Used to address the private reply.</small>
+        <span class="module-state" data-module-state="identity">CALLSIGN ETCHED</span>
+      </div>
+
+      <div class="bay-node bay-node--comms" data-module="comms">
+        <label for="payload-email">[03 / return transponder]</label>
+        <input id="payload-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@email.com" required>
+        <small>The reply address never enters a public payload.</small>
+        <span class="module-state" data-module-state="comms">TRANSPONDER TUNED</span>
+      </div>
+
+      <div class="bay-node bay-node--message" data-module="payload">
+        <div class="field-heading">
+          <label for="payload-message">[04 / private mission core]</label>
+          <span data-message-count>0 / 4000</span>
+        </div>
+        <textarea id="payload-message" name="message" maxlength="4000" rows="5" placeholder="Describe the project, constraint, or decision you want help with…" required></textarea>
+        <small>Required for a private capsule; optional for a feedback satellite. Private notes are sealed away from every public surface.</small>
+
+        <div class="feedback-package" data-public-module hidden>
+          <div class="field-heading">
+            <label for="payload-quote">[public beacon copy]</label>
+            <span data-quote-count>0 / 280</span>
+          </div>
+          <textarea id="payload-quote" name="publicQuote" maxlength="280" rows="2" placeholder="The exact quote you would allow to be reviewed…" disabled></textarea>
+          <div class="feedback-package__routing">
+            <label for="payload-target">Requested orbit
+              <select id="payload-target" name="publicTarget" disabled>
+                <option value="dashboard">Dashboard</option>
+                <option value="portfolio">Portfolio</option>
+                <option value="logs">Logs</option>
+                <option value="about">About</option>
+                <option value="contact">Contact</option>
+                <option value="resume">Resume</option>
+                <option value="skills">Skills graph</option>
+              </select>
+            </label>
+            <fieldset>
+              <legend>Public label</legend>
+              <label><input type="radio" name="publicDisplay" value="anonymous" checked disabled> Anonymous</label>
+              <label><input type="radio" name="publicDisplay" value="named" disabled> Use my name</label>
+            </fieldset>
+          </div>
+          <label class="bay-consent" data-public-consent-row>
+            <input id="payload-public-consent" name="publicConsent" type="checkbox" disabled>
+            <span>Allow only this exact quote, orbit, and display choice to be considered after human review. It may be rejected or removed.</span>
+          </label>
+        </div>
+        <span class="module-state" data-module-state="payload">MISSION CORE LOADED</span>
+      </div>
+
+      <div class="bay-node bay-node--release" data-module="release">
+        <label class="bay-consent bay-consent--release">
+          <input id="payload-acknowledgement" name="handoffAcknowledgement" type="checkbox" required>
+          <span><strong>[05 / fairing release]</strong>I understand that this isolated study cannot confirm sending, storage, delivery, receipt, moderation, or publication.</span>
+        </label>
+        <span class="module-state" data-module-state="release">FAIRING RELEASE ARMED</span>
+      </div>
+
+      <div class="payload-bay__action">
+        <p id="payload-status" role="status" aria-live="polite">Fairing open · payload incomplete · nothing sent.</p>
+        <button type="submit" data-submit>
+          <span data-submit-label>Integrate payload</span>
+          <i aria-hidden="true">◇</i>
+        </button>
+      </div>
+
+      <noscript>
+        <p class="noscript-note">JavaScript is off. This isolated study does not upload, store, or publish your message. Use an alternate ground link below.</p>
+      </noscript>
+      </div>
+    </form>
+
+    <aside class="payload-bay__ground" aria-label="Other contact routes">
+      <span>[alternate ground links]</span>
+      <a class="ground-link ground-link--social" href="https://www.linkedin.com/in/aarconcepcion" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+      <a class="ground-link ground-link--social" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">GitHub ↗</a>
+      <a class="ground-link ground-link--primary" href="/resume.html">Resume ↗</a>
+      <a class="ground-link ground-link--secondary" href="/signals.html">Signals ↗</a>
+      <p>Remote collaboration · typically 1–2 days</p>
+    </aside>
+  </main>
+
+  <script src="/assets/js/contact-transport.js"></script>
+  <script src="./option-03-payload-integration.js"></script>
+</body>
+</html>

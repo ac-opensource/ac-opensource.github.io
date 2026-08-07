@@ -1,0 +1,224 @@
+body.observatory-study {
+  background:
+    linear-gradient(rgba(31, 92, 186, .032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31, 92, 186, .032) 1px, transparent 1px),
+    #f8f7f2;
+  background-size: 3.5rem 3.5rem;
+}
+
+.observatory-cover {
+  position: relative;
+  min-height: calc(100svh - 3.25rem);
+  padding: clamp(4rem, 9vh, 8rem) clamp(1rem, 6vw, 7rem) clamp(2rem, 5vh, 4rem);
+  display: grid;
+  grid-template-columns: minmax(17rem, .85fr) minmax(20rem, 1.15fr);
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 6rem);
+  overflow: hidden;
+}
+
+.observatory-cover::before,
+.observatory-cover::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  border: 1px solid rgba(31, 92, 186, .16);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.observatory-cover::before {
+  right: -8vw;
+  top: 5%;
+  width: min(67vw, 68rem);
+  aspect-ratio: 1;
+}
+
+.observatory-cover::after {
+  right: 6vw;
+  top: 21%;
+  width: min(41vw, 39rem);
+  aspect-ratio: 1;
+}
+
+.observatory-cover__copy,
+.observatory-cover__plate,
+.observatory-cover__lower { position: relative; z-index: 1; }
+
+.observatory-cover__copy { align-self: end; }
+
+.observatory-cover__kicker {
+  margin: 0 0 1.3rem;
+  color: var(--blue);
+  font: 600 .67rem/1.4 "Space Grotesk", sans-serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.observatory-cover h1 {
+  max-width: 11ch;
+  margin: 0;
+  font: 500 clamp(3.5rem, 7.8vw, 8.5rem)/.87 "Space Grotesk", sans-serif;
+  letter-spacing: -.072em;
+  text-wrap: balance;
+}
+
+.observatory-cover__summary {
+  max-width: 40rem;
+  margin: clamp(2rem, 5vh, 4rem) 0 1.8rem;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.55vw, 1.28rem);
+  line-height: 1.72;
+}
+
+.observatory-cover__source { display: inline-flex; align-items: center; gap: .7rem; color: var(--blue); font: 600 .7rem/1.5 "Space Grotesk", sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+
+.observatory-cover__plate {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  min-height: min(65svh, 48rem);
+}
+
+.observatory-cover__plate::before {
+  content: "";
+  position: absolute;
+  inset: 3%;
+  border: 1px solid rgba(41, 48, 44, .14);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .43);
+  box-shadow: inset 0 0 0 clamp(1rem, 3vw, 3rem) rgba(248, 247, 242, .58);
+}
+
+.observatory-cover__plate figure { position: relative; width: min(88%, 47rem); margin: 0; }
+.observatory-cover__plate img { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: white; box-shadow: 0 1.5rem 4rem rgba(41, 48, 44, .12); }
+.observatory-cover__plate figcaption { width: min(34rem, 92%); margin: 1rem 0 0 auto; color: var(--muted); font-size: .75rem; line-height: 1.55; }
+
+.observatory-cover__lower {
+  grid-column: 1 / -1;
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  border-top: 1px solid var(--line);
+}
+
+.observatory-cover__authorship { color: var(--muted); font-size: .78rem; }
+.observatory-cover__authorship strong { color: var(--ink); }
+.observatory-cover__lower .article-tags { max-width: 46rem; justify-content: flex-end; }
+
+.observatory-reading {
+  position: relative;
+  padding: clamp(6rem, 11vw, 11rem) clamp(1rem, 5vw, 6rem);
+  display: grid;
+  grid-template-columns: minmax(13rem, .55fr) minmax(20rem, 1.45fr);
+  align-items: start;
+  gap: clamp(3rem, 9vw, 11rem);
+  border-top: 1px solid var(--line);
+}
+
+.observatory-reading::before {
+  content: "";
+  position: absolute;
+  left: clamp(1rem, 5vw, 6rem);
+  right: clamp(1rem, 5vw, 6rem);
+  top: clamp(3rem, 6vw, 6rem);
+  border-top: 1px solid var(--line);
+}
+
+.observatory-instrument {
+  position: sticky;
+  top: 5rem;
+  min-height: calc(100svh - 7rem);
+  display: grid;
+  align-content: center;
+  gap: 2rem;
+}
+
+.observatory-dial {
+  position: relative;
+  width: min(16rem, 100%);
+  aspect-ratio: 1;
+  display: grid;
+  place-content: center;
+  padding: 2.5rem;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  text-align: center;
+}
+
+.observatory-dial::before {
+  content: "";
+  position: absolute;
+  inset: -.45rem;
+  border-radius: 50%;
+  background: conic-gradient(var(--blue) calc(var(--reading-progress) * 1turn), transparent 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
+          mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
+}
+
+.observatory-dial span { color: var(--blue); font: 600 .62rem/1.2 "Space Grotesk", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+.observatory-dial strong { margin-top: .6rem; font: 500 clamp(1rem, 1.5vw, 1.25rem)/1.25 "Space Grotesk", sans-serif; }
+
+.observatory-instrument details { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.observatory-instrument summary { padding: .9rem 0; cursor: pointer; color: var(--muted); font: 600 .65rem/1.4 "Space Grotesk", sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+.observatory-instrument ol { margin: 0; padding: .5rem 0 1rem; list-style: none; }
+.observatory-instrument li + li { margin-top: .5rem; }
+.observatory-instrument a { min-height: 2.75rem; display: grid; grid-template-columns: 2rem 1fr; align-items: center; gap: .65rem; color: var(--muted); font-size: .73rem; line-height: 1.35; text-decoration: none; }
+.observatory-instrument a span:first-child { color: var(--blue); font-family: "Space Grotesk", sans-serif; }
+.observatory-instrument a:hover, .observatory-instrument a:focus-visible, .observatory-instrument a.is-active { color: var(--ink); }
+.observatory-instrument a:focus-visible { outline: 1px solid var(--blue); outline-offset: .2rem; }
+
+.observatory-copy { width: min(100%, 57rem); }
+.observatory-copy > section,
+.observatory-copy > aside { max-width: 45rem; }
+.observatory-copy > section:nth-of-type(even) { margin-left: auto; }
+.observatory-copy > figure { width: min(70vw, 67rem); margin-left: clamp(-16rem, -16vw, -5rem); }
+.observatory-copy > figure figcaption { max-width: 40rem; margin-left: auto; }
+.observatory-copy > aside { max-width: 50rem; }
+
+.observatory-study .mode-calibration { background: #eef0ea; }
+
+@media (max-width: 920px) {
+  .observatory-cover { grid-template-columns: 1fr; }
+  .observatory-cover__copy { align-self: center; }
+  .observatory-cover__plate { grid-column: 1; grid-row: auto; min-height: auto; }
+  .observatory-cover__plate::before { inset: -4%; }
+  .observatory-cover__lower { grid-column: 1; }
+  .observatory-reading { grid-template-columns: 1fr; }
+  .observatory-instrument { position: relative; top: auto; min-height: 0; grid-template-columns: minmax(9rem, .35fr) minmax(15rem, 1fr); align-items: center; }
+  .observatory-dial { max-width: 12rem; }
+  .observatory-copy { margin-inline: auto; }
+  .observatory-copy > figure { width: 100%; margin-left: 0; }
+}
+
+@media (max-width: 600px) {
+  .observatory-cover { padding-top: 4rem; }
+  .observatory-cover h1 { font-size: clamp(3.4rem, 16vw, 5rem); }
+  .observatory-cover::before { width: 110vw; right: -35vw; }
+  .observatory-cover::after { width: 70vw; right: -8vw; }
+  .observatory-cover__plate figcaption { width: 100%; }
+  .observatory-cover__lower { align-items: flex-start; flex-direction: column; }
+  .observatory-cover__lower .article-tags { justify-content: flex-start; }
+  .observatory-reading { padding-top: 5rem; }
+  .observatory-instrument { grid-template-columns: 1fr; }
+  .observatory-dial { width: 9rem; padding: 1.6rem; }
+  .observatory-instrument details { width: 100%; }
+  .observatory-copy > section:nth-of-type(even) { margin-left: 0; }
+}
+
+@media print {
+  .observatory-cover { display: block; min-height: 0; padding: 0 0 2rem; }
+  .observatory-cover::before, .observatory-cover::after, .observatory-cover__plate { display: none; }
+  .observatory-cover h1 { max-width: none; font-size: 36pt; }
+  .observatory-cover__summary { max-width: none; }
+  .observatory-reading { display: block; padding: 0; border: 0; }
+  .observatory-reading::before { display: none; }
+  .observatory-copy { width: auto; }
+  .observatory-copy > section, .observatory-copy > aside { max-width: none; }
+  .observatory-copy > figure { width: auto; margin-left: 0; }
+}

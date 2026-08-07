@@ -1,0 +1,269 @@
+:root {
+  --universe-canvas: #faf9f4;
+  --universe-ink: #2f342d;
+  --universe-muted: #747a72;
+  --universe-line: rgba(104, 116, 108, 0.3);
+  --universe-blue: #1f5cba;
+  --universe-blue-soft: rgba(31, 92, 186, 0.14);
+}
+
+.universe-route-map {
+  position: fixed;
+  z-index: 48;
+  left: clamp(1rem, 2.8vw, 2.8rem);
+  bottom: max(1.1rem, env(safe-area-inset-bottom));
+  width: min(23rem, 34vw);
+  height: 9.5rem;
+  color: var(--universe-muted);
+  font-family: "Space Grotesk", sans-serif;
+  pointer-events: none;
+}
+
+.universe-route-map::before {
+  content: "";
+  position: absolute;
+  inset: -1rem -1.4rem;
+  background: radial-gradient(ellipse at 46% 58%, rgba(250, 249, 244, 0.98) 0 42%, rgba(250, 249, 244, 0.74) 62%, transparent 82%);
+  filter: blur(0.15rem);
+  pointer-events: none;
+}
+
+.universe-route-map svg {
+  position: absolute;
+  inset: 0.35rem 0.65rem 0.55rem;
+  width: calc(100% - 1.3rem);
+  height: calc(100% - 0.9rem);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.universe-route-map path {
+  fill: none;
+  stroke: var(--universe-line);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.universe-route-map a {
+  position: absolute;
+  z-index: 2;
+  left: var(--map-x);
+  top: var(--map-y);
+  display: grid;
+  grid-template-rows: 1.7rem auto;
+  place-items: center;
+  width: 4.25rem;
+  min-height: 2.75rem;
+  padding: 0;
+  color: var(--universe-muted);
+  text-align: center;
+  text-decoration: none;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+.universe-route-map a::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 50%;
+  width: 1.65rem;
+  height: 1.65rem;
+  border: 1px solid var(--universe-line);
+  border-radius: 50%;
+  background: rgba(250, 249, 244, 0.86);
+  transform: translateX(-50%);
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.universe-route-map a[data-map-id="home"]::before {
+  border-style: dashed;
+}
+
+.universe-route-map a span,
+.universe-route-map a strong {
+  display: block;
+  position: relative;
+}
+
+.universe-route-map a span {
+  padding-top: 0.55rem;
+  color: var(--universe-ink);
+  font-size: 0.42rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.universe-route-map a strong {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.47rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.universe-route-map a:hover::before,
+.universe-route-map a:focus-visible::before,
+.universe-route-map a[aria-current="location"]::before {
+  border-color: var(--universe-blue);
+  background: var(--universe-blue);
+  transform: translateX(-50%) scale(1.08);
+}
+
+.universe-route-map a:hover span,
+.universe-route-map a:focus-visible span,
+.universe-route-map a[aria-current="location"] span {
+  color: #fff;
+}
+
+.universe-route-map a:hover strong,
+.universe-route-map a:focus-visible strong,
+.universe-route-map a[aria-current="location"] strong {
+  color: var(--universe-blue);
+}
+
+.universe-route-map a:focus-visible {
+  outline: 2px solid var(--universe-blue);
+  outline-offset: 0.3rem;
+}
+
+body.has-universe-route-map {
+  padding-bottom: 11rem;
+}
+
+@media (max-width: 760px) {
+  .universe-route-map {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: calc(5.35rem + env(safe-area-inset-bottom));
+    padding: 0 0.25rem env(safe-area-inset-bottom);
+    background: linear-gradient(to top, rgba(250, 249, 244, 0.99) 55%, rgba(250, 249, 244, 0.9) 78%, transparent);
+  }
+
+  .universe-route-map::before {
+    display: none;
+  }
+
+  .universe-route-map svg {
+    inset: 0.5rem 1.1rem auto;
+    width: calc(100% - 2.2rem);
+    height: 2.1rem;
+  }
+
+  .universe-route-map a {
+    --mobile-y: 1.05rem;
+    top: var(--mobile-y);
+    left: var(--mobile-x);
+    width: 3.3rem;
+    grid-template-rows: 1.55rem auto;
+  }
+
+  .universe-route-map a:nth-of-type(2),
+  .universe-route-map a:nth-of-type(5) {
+    --mobile-y: 0.72rem;
+  }
+
+  .universe-route-map a:nth-of-type(3),
+  .universe-route-map a:nth-of-type(6) {
+    --mobile-y: 1.28rem;
+  }
+
+  .universe-route-map a::before {
+    width: 1.45rem;
+    height: 1.45rem;
+  }
+
+  .universe-route-map a span {
+    padding-top: 0.48rem;
+    font-size: 0.37rem;
+  }
+
+  .universe-route-map a strong {
+    font-size: 0.4rem;
+  }
+
+  body.has-universe-route-map {
+    padding-bottom: calc(6.15rem + env(safe-area-inset-bottom));
+  }
+
+  /* About owns the route map as part of its nebula instead of presenting a
+     viewport-level navigation rail. Reuse the desktop constellation geometry
+     so the destinations retain their spatial relationship on small screens. */
+  .universe-route-map[data-universe-route-map-mode="integrated"] {
+    position: absolute;
+    z-index: 48;
+    right: auto;
+    bottom: 0;
+    left: 50%;
+    width: min(calc(100% - 1rem), 24rem);
+    height: 9.5rem;
+    padding: 0;
+    background: transparent;
+    transform: translateX(-50%);
+  }
+
+  .universe-route-map[data-universe-route-map-mode="integrated"] svg {
+    inset: 0.35rem 0.65rem 0.55rem;
+    width: calc(100% - 1.3rem);
+    height: calc(100% - 0.9rem);
+  }
+
+  .universe-route-map[data-universe-route-map-mode="integrated"] a {
+    top: var(--map-y);
+    left: var(--map-x);
+    width: 4.25rem;
+    grid-template-rows: 1.7rem auto;
+  }
+
+  .universe-route-map[data-universe-route-map-mode="integrated"] a::before {
+    width: 1.65rem;
+    height: 1.65rem;
+  }
+
+  .universe-route-map[data-universe-route-map-mode="integrated"] a span {
+    padding-top: 0.55rem;
+    font-size: 0.42rem;
+  }
+
+  .universe-route-map[data-universe-route-map-mode="integrated"] a strong {
+    font-size: 0.47rem;
+  }
+
+  body.has-integrated-universe-route-map {
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .universe-route-map:not([data-universe-route-map-mode="integrated"]) a {
+    width: 2.75rem;
+  }
+
+  .universe-route-map:not([data-universe-route-map-mode="integrated"]) a strong {
+    font-size: 0.35rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .universe-route-map a::before {
+    transition: none;
+  }
+}
+
+@media print {
+  .universe-route-map {
+    display: none !important;
+  }
+
+  body.has-universe-route-map {
+    padding-bottom: 0 !important;
+  }
+}

@@ -1,0 +1,299 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://ac-opensource.github.io/experiments/universe-options/contact/option-01-vehicle-assembly.html"/>
+  <title>Contact Option 01 — Vehicle Assembly Building</title>
+  <meta name="description" content="An isolated Contact-page design study in which the form assembles a launch vehicle.">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>document.documentElement.className = "js";</script>
+  <link rel="stylesheet" href="./option-01-vehicle-assembly.css">
+</head>
+<body>
+  <a class="skip-link" href="#assembly-form">Skip to vehicle assembly form</a>
+  <header class="option-bar">
+    <a class="option-bar__brand" href="/">Andrew Concepcion</a>
+    <nav aria-label="Contact design options">
+      <a href="./index.html">All options</a>
+      <a href="./option-01-vehicle-assembly.html" aria-current="page">01</a>
+      <a href="./option-02-vertical-launch-complex.html">02</a>
+      <a href="./option-03-payload-integration.html">03</a>
+    </nav>
+    <span>[archived design study]</span>
+  </header>
+
+  <main id="main">
+    <form id="assembly-form" class="assembly" action="mailto:aarconcepcion@gmail.com" method="post" enctype="text/plain">
+      <header class="assembly__intro">
+        <span>[contact option 01 / vehicle assembly building]</span>
+        <h1>Build the message<br>that leaves the ground.</h1>
+        <p>Five decisions become five working systems. In normal mode, launch readiness hands a draft to your email app—this website cannot confirm sending or delivery.</p>
+      </header>
+
+      <div class="demo-flag" data-demo-flag hidden>
+        <strong>LOCAL LAUNCH DEMO</strong>
+        <span>No request, email, receipt, or public record will be created.</span>
+      </div>
+
+      <div class="assembly__vehicle" data-vehicle aria-hidden="true">
+        <div class="assembly__gantry-line assembly__gantry-line--left"></div>
+        <div class="assembly__gantry-line assembly__gantry-line--right"></div>
+        <svg class="rocket" viewBox="0 0 520 980" role="presentation">
+          <defs>
+            <pattern id="rocket-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="8" class="rocket__hatch-line"/>
+            </pattern>
+            <pattern id="rocket-stringers" width="9" height="9" patternUnits="userSpaceOnUse">
+              <line x1="1" y1="0" x2="1" y2="9" class="rocket__stringer-line"/>
+            </pattern>
+          </defs>
+
+          <g class="rocket__datum">
+            <path class="rocket__datum-line rocket__datum-line--centre" d="M260 38V944"/>
+            <path class="rocket__datum-line" d="M50 66V920M43 66h14M43 159h14M43 234h14M43 432h14M43 484h14M43 806h14M43 855h14M43 920h14"/>
+            <path class="rocket__datum-line" d="M216 126V112M304 126V112M216 119h88"/>
+            <path class="rocket__datum-line" d="M190 920H330M203 927v-14M317 927v-14"/>
+            <text x="8" y="70">STA 00</text>
+            <text x="8" y="163">STA 09</text>
+            <text x="8" y="238">STA 17</text>
+            <text x="8" y="436">STA 37</text>
+            <text x="8" y="488">STA 42</text>
+            <text x="8" y="810">STA 75</text>
+            <text x="8" y="859">STA 80</text>
+            <text x="8" y="924">STA 87</text>
+            <text x="260" y="108" text-anchor="middle">Ø REF</text>
+            <text x="260" y="951" text-anchor="middle">VEHICLE C/L</text>
+            <text x="16" y="965">RELATIVE STATIONS · INTEGRATION SCHEMATIC · NOT FLIGHT HARDWARE</text>
+          </g>
+
+          <g class="rocket__ghost">
+            <path class="rocket__mold-line" d="M260 66C235 85 219 119 216 159V806L222 855M260 66C285 85 301 119 304 159V806L298 855"/>
+            <path class="rocket__structure-line" d="M216 159H304M216 234H304M216 432H304M214 444H306M214 484H306M216 806H304M222 855H298"/>
+            <path d="M219 274Q260 250 301 274M219 337Q260 361 301 337M219 531Q260 504 301 531M219 664Q260 691 301 664"/>
+            <path d="M224 241V425M236 241V425M248 241V425M272 241V425M284 241V425M296 241V425"/>
+            <path d="M221 492V798M233 492V798M245 492V798M275 492V798M287 492V798M299 492V798"/>
+            <path class="rocket__engine-ghost" d="M232 855L223 906H246L252 855M268 855L274 906H297L288 855M251 855L245 918H275L269 855"/>
+          </g>
+
+          <g class="rocket__part rocket__part--mission" data-rocket-part="mission">
+            <path class="part-fill part-fill--oxidizer" d="M219 274Q260 250 301 274V337Q260 361 219 337Z"/>
+            <path class="part-fill part-fill--fuel" d="M219 531Q260 504 301 531V664Q260 691 219 664Z"/>
+            <path class="part-outline" d="M216 234H304V432H216ZM214 484H306L304 806H216Z"/>
+            <path class="part-line" d="M219 274Q260 250 301 274M219 337Q260 361 301 337M219 531Q260 504 301 531M219 664Q260 691 301 664"/>
+            <path class="part-line part-line--fine" d="M224 241V425M236 241V425M248 241V425M272 241V425M284 241V425M296 241V425M221 492V798M233 492V798M245 492V798M275 492V798M287 492V798M299 492V798"/>
+            <text class="part-label" x="260" y="301" text-anchor="middle">S2 · OX</text>
+            <text class="part-label" x="260" y="388" text-anchor="middle">S2 · FUEL</text>
+            <text class="part-label" x="260" y="584" text-anchor="middle">S1 · OX</text>
+            <text class="part-label" x="260" y="734" text-anchor="middle">S1 · FUEL</text>
+          </g>
+
+          <g class="rocket__part rocket__part--payload" data-rocket-part="payload">
+            <path class="part-fill part-fill--fairing" d="M260 66C235 85 219 119 216 159V234H304V159C301 119 285 85 260 66Z"/>
+            <path class="part-outline" d="M260 66C235 85 219 119 216 159V234H304V159C301 119 285 85 260 66Z"/>
+            <path class="part-line part-line--fine" d="M260 66V234M222 159H298M227 184H293"/>
+            <path class="part-hatch" d="M216 159H229V234H216ZM291 159H304V234H291Z"/>
+            <path class="part-fill part-fill--payload" d="M239 149H281V211H239Z"/>
+            <path class="part-outline" d="M239 149H281V211H239ZM246 149L260 129L274 149M232 220H288L281 211H239Z"/>
+            <path class="part-line part-line--fine" d="M247 164H273M247 177H273M247 190H273M260 129V211"/>
+            <text class="part-label" x="260" y="205" text-anchor="middle">PL</text>
+          </g>
+
+          <g class="rocket__part rocket__part--guidance" data-rocket-part="guidance">
+            <path class="part-fill part-fill--avionics" d="M216 385H304V432H216Z"/>
+            <path class="part-outline" d="M216 385H304V432H216Z"/>
+            <path class="part-line" d="M216 397H304M216 421H304"/>
+            <rect class="part-outline" x="229" y="401" width="21" height="16"/>
+            <rect class="part-outline" x="270" y="401" width="21" height="16"/>
+            <circle class="part-outline" cx="260" cy="409" r="7"/>
+            <path class="part-line part-line--fine" d="M250 409H253M267 409H270M260 397V402M260 416V421"/>
+            <text class="part-label" x="260" y="379" text-anchor="middle">AVIONICS / GNC</text>
+          </g>
+
+          <g class="rocket__part rocket__part--comms" data-rocket-part="comms">
+            <path class="part-fill part-fill--interstage" d="M214 432H306V484H214Z"/>
+            <path class="part-outline" d="M214 432H306V484H214Z"/>
+            <path class="part-hatch" d="M214 444H306V474H214Z"/>
+            <path class="part-line" d="M214 444H306M214 474H306M230 432V484M245 432V484M275 432V484M290 432V484"/>
+            <path class="part-outline" d="M214 452L199 442V466L214 458M306 452L321 442V466L306 458"/>
+            <path class="part-line part-line--fine" d="M229 456H245L252 464H268L275 456H291"/>
+            <circle class="part-outline" cx="260" cy="464" r="4"/>
+            <text class="part-label" x="260" y="454" text-anchor="middle">TM</text>
+          </g>
+
+          <g class="rocket__part rocket__part--release" data-rocket-part="release">
+            <path class="part-fill part-fill--thrust" d="M216 806H304L298 855H222Z"/>
+            <path class="part-outline" d="M216 806H304L298 855H222Z"/>
+            <path class="part-line" d="M222 820H298M225 838H295M235 806L245 855M260 806V855M285 806L275 855"/>
+            <path class="part-outline" d="M232 855L223 906H246L252 855M268 855L274 906H297L288 855M251 855L245 918H275L269 855"/>
+            <path class="part-line part-line--fine" d="M229 870H249M271 870H291M248 877H272"/>
+            <path class="part-outline" d="M216 824L202 831V848L222 842M304 824L318 831V848L298 842"/>
+            <g class="rocket__engine-inset">
+              <circle class="part-outline" cx="420" cy="720" r="37"/>
+              <circle class="part-outline" cx="420" cy="720" r="9"/>
+              <circle class="part-outline" cx="420" cy="700" r="7"/>
+              <circle class="part-outline" cx="437" cy="710" r="7"/>
+              <circle class="part-outline" cx="437" cy="730" r="7"/>
+              <circle class="part-outline" cx="420" cy="740" r="7"/>
+              <circle class="part-outline" cx="403" cy="730" r="7"/>
+              <circle class="part-outline" cx="403" cy="710" r="7"/>
+              <path class="part-line part-line--fine" d="M383 720H457M420 683V757"/>
+              <text class="part-label" x="420" y="772" text-anchor="middle">ENGINE CLUSTER / 7</text>
+            </g>
+          </g>
+
+          <g class="rocket__callout" data-rocket-callout="payload">
+            <circle cx="304" cy="164" r="3"/>
+            <path d="M307 164H346L362 146H492"/>
+            <text class="callout__id" x="366" y="132">04 / PAYLOAD BAY</text>
+            <text class="callout__pending" x="366" y="147">FAIRING / AWAITING</text>
+            <text class="callout__verified" x="366" y="147">FAIRING / INTEGRATED</text>
+          </g>
+          <g class="rocket__callout" data-rocket-callout="guidance">
+            <circle cx="304" cy="409" r="3"/>
+            <path d="M307 409H347L363 391H492"/>
+            <text class="callout__id" x="367" y="377">02 / GNC + AVIONICS</text>
+            <text class="callout__pending" x="367" y="392">GNC RING / OPEN</text>
+            <text class="callout__verified" x="367" y="392">GNC RING / CALIBRATED</text>
+          </g>
+          <g class="rocket__callout" data-rocket-callout="comms">
+            <circle cx="214" cy="458" r="3"/>
+            <path d="M211 458H176L158 440H68"/>
+            <text class="callout__id" x="68" y="425">03 / RETURN TELEMETRY</text>
+            <text class="callout__pending" x="68" y="440">TM LINK / OPEN</text>
+            <text class="callout__verified" x="68" y="440">TM LINK / VERIFIED</text>
+          </g>
+          <g class="rocket__callout" data-rocket-callout="mission">
+            <circle cx="216" cy="616" r="3"/>
+            <path d="M213 616H176L158 598H68"/>
+            <text class="callout__id" x="68" y="583">01 / VEHICLE ARCHITECTURE</text>
+            <text class="callout__pending" x="68" y="598">STAGE STACK / OPEN</text>
+            <text class="callout__verified" x="68" y="598">STAGE STACK / CONFIGURED</text>
+          </g>
+          <g class="rocket__callout" data-rocket-callout="release">
+            <circle cx="304" cy="834" r="3"/>
+            <path d="M307 834H347L363 816H492"/>
+            <text class="callout__id" x="367" y="802">05 / ENGINE RELEASE</text>
+            <text class="callout__pending" x="367" y="817">THRUST FRAME / SAFE</text>
+            <text class="callout__verified" x="367" y="817">THRUST FRAME / ARMED</text>
+          </g>
+
+          <g class="rocket__plume">
+            <path d="M232 906C232 929 218 950 205 970M260 918C260 940 252 959 247 973M288 906C288 929 302 950 315 970"/>
+            <path class="rocket__plume-core" d="M246 918C242 939 235 958 226 974M274 918C278 939 285 958 294 974"/>
+          </g>
+        </svg>
+        <div class="assembly__readiness" aria-hidden="true">
+          <span>ASSEMBLY</span>
+          <i><b></b></i>
+          <strong data-progress-label>0 / 5 SYSTEMS</strong>
+        </div>
+      </div>
+
+      <fieldset class="assembly-node assembly-node--mission" data-system="mission">
+        <legend>[01 / mission package]</legend>
+        <p class="assembly-node__title">Choose the vehicle’s job.</p>
+        <label class="choice js-public-choice">
+          <input type="radio" name="intent" value="private" checked>
+          <span><strong>Private transmission</strong><small>Email conversation only</small></span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="intent" value="public">
+          <span><strong>Public feedback review</strong><small>Separate quote · human review required</small></span>
+        </label>
+        <span class="system-state" data-system-state="mission">MISSION PACKAGE INSTALLED</span>
+      </fieldset>
+
+      <div class="assembly-node assembly-node--guidance" data-system="guidance">
+        <label for="assembly-name">[02 / guidance identity]</label>
+        <input id="assembly-name" name="name" type="text" autocomplete="name" minlength="2" maxlength="80" placeholder="Your name" required>
+        <small>Gives the return path a human callsign.</small>
+        <span class="system-state" data-system-state="guidance">GUIDANCE INSTALLED</span>
+      </div>
+
+      <div class="assembly-node assembly-node--comms" data-system="comms">
+        <label for="assembly-email">[03 / return transponder]</label>
+        <input id="assembly-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@email.com" required>
+        <small>Used only for a private reply path.</small>
+        <span class="system-state" data-system-state="comms">COMMS INSTALLED</span>
+      </div>
+
+      <div class="assembly-node assembly-node--payload" data-system="payload">
+        <div class="field-heading">
+          <label for="assembly-message">[04 / private payload]</label>
+          <span data-message-count>0 / 4000</span>
+        </div>
+        <textarea id="assembly-message" name="message" minlength="20" maxlength="4000" rows="4" placeholder="Share the problem, constraints, and desired outcome…" required></textarea>
+        <small>Private notes are never proposed for public display.</small>
+
+        <div class="public-module" data-public-module hidden>
+          <div class="field-heading">
+            <label for="assembly-quote">[separate public quote]</label>
+            <span data-quote-count>0 / 280</span>
+          </div>
+          <textarea id="assembly-quote" name="publicQuote" minlength="20" maxlength="280" rows="2" placeholder="The exact quote you would allow to be reviewed…" disabled></textarea>
+          <div class="public-module__route">
+            <label for="assembly-target">Target
+              <select id="assembly-target" name="publicTarget" disabled>
+                <option value="dashboard">Dashboard</option>
+                <option value="portfolio">Portfolio</option>
+                <option value="logs">Logs</option>
+                <option value="about">About</option>
+                <option value="contact">Contact</option>
+                <option value="resume">Resume</option>
+                <option value="skills">Skills graph</option>
+              </select>
+            </label>
+            <fieldset>
+              <legend>Display</legend>
+              <label><input type="radio" name="publicDisplay" value="anonymous" checked disabled> Anonymous</label>
+              <label><input type="radio" name="publicDisplay" value="named" disabled> Use my name</label>
+            </fieldset>
+          </div>
+          <label class="consent-line">
+            <input id="assembly-public-consent" name="publicConsent" type="checkbox" disabled>
+            <span>Allow only this exact quote, target, and display choice to be considered after human review. It may be rejected or removed.</span>
+          </label>
+        </div>
+        <span class="system-state" data-system-state="payload">PAYLOAD INSTALLED</span>
+      </div>
+
+      <div class="assembly-node assembly-node--release" data-system="release">
+        <label class="consent-line consent-line--release">
+          <input id="assembly-acknowledgement" name="handoffAcknowledgement" type="checkbox" required>
+          <span><strong>[05 / release circuit]</strong>I understand that normal mode only opens my email app. This page cannot confirm sending, delivery, or receipt.</span>
+        </label>
+        <span class="system-state" data-system-state="release">RELEASE CIRCUIT ARMED</span>
+      </div>
+
+      <div class="assembly__action">
+        <p class="assembly__status" id="assembly-status" role="status" aria-live="polite">Vehicle grounded · nothing has left this page.</p>
+        <button type="submit" data-submit>
+          <span data-submit-label>Complete assembly</span>
+          <i aria-hidden="true">↗</i>
+        </button>
+        <a data-demo-link href="?localDemo=1#assembly-form">Open explicit local launch demo</a>
+      </div>
+
+      <noscript>
+        <p class="noscript-note">JavaScript is off. The private form remains readable and submitting opens your email app through the form’s mailto action. This page cannot observe sending or delivery.</p>
+      </noscript>
+    </form>
+
+    <aside class="ground-links" aria-label="Other contact routes">
+      <span>[ground routes]</span>
+      <a href="https://www.linkedin.com/in/aarconcepcion" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+      <a href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">GitHub ↗</a>
+      <a href="/resume.html">Resume ↗</a>
+      <p>Remote collaboration · typical reply in 1–2 days</p>
+    </aside>
+  </main>
+
+  <script src="/assets/js/contact-transport.js"></script>
+  <script src="./option-01-vehicle-assembly.js"></script>
+</body>
+</html>

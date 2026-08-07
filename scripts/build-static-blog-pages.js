@@ -56,6 +56,170 @@ function stripHtml(value) {
     .trim();
 }
 
+function decodeHtmlEntities(value) {
+  return String(value || "")
+    .replace(/&#(\d+);/g, (_match, code) => String.fromCodePoint(Number(code)))
+    .replace(/&#x([0-9a-f]+);/gi, (_match, code) => String.fromCodePoint(Number.parseInt(code, 16)))
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&amp;/gi, "&");
+}
+
+function plainTextFromHtml(value) {
+  return decodeHtmlEntities(stripHtml(value));
+}
+
+function articleMode(post, bodyHtml = "") {
+  if (isWorkPost(post)) return "case-study";
+
+  const category = String(post?.category || "").trim().toLowerCase();
+  const topics = (post?.topics || []).map((topic) => String(topic).trim().toLowerCase());
+  if (category === "technical") return "technical";
+  if (topics.includes("travel")) return "travel";
+  if (topics.includes("photography") || (category === "hobby" && (String(bodyHtml).match(/<figure\b/gi) || []).length >= 3)) {
+    return "photography";
+  }
+  return "personal";
+}
+
+function trajectoryVariant(post) {
+  return ["technical", "case-study"].includes(articleMode(post)) ? "mission" : "observation";
+}
+
+function trajectoryPhase(_title, mode) {
+  const labels = {
+    technical: "system",
+    "case-study": "delivery record",
+    travel: "field note",
+    photography: "frame",
+    personal: "observation",
+    mission: "system",
+    observation: "observation"
+  };
+  return labels[mode] || "section";
+}
+
+function trajectoryHeadingId(title, index, usedIds) {
+  const stem = String(title || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64) || `section-${index + 1}`;
+  const base = `debrief-${stem}`;
+  let candidate = base;
+  let suffix = 2;
+  while (usedIds.has(candidate)) {
+    candidate = `${base}-${suffix}`;
+    suffix += 1;
+  }
+  usedIds.add(candidate);
+  return candidate;
+}
+
+function decorateArticleBody(bodyHtml, post) {
+  const source = String(bodyHtml || "");
+  const headingPattern = /<h([23])\b([^>]*)>([\s\S]*?)<\/h\1>/gi;
+  const matches = [...source.matchAll(headingPattern)];
+  const mode = articleMode(post, source);
+  const variant = ["technical", "case-study"].includes(mode) ? "mission" : "observation";
+  const usedIds = new Set();
+  const headings = matches.map((match, index) => {
+    const attributes = match[2] || "";
+    const existingId = attributes.match(/\bid\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))/i);
+    const title = plainTextFromHtml(match[3]);
+    const id = existingId
+      ? existingId[1] || existingId[2] || existingId[3]
+      : trajectoryHeadingId(title, index, usedIds);
+    usedIds.add(id);
+    return {
+      id,
+      level: Number(match[1]),
+      title,
+      phase: trajectoryPhase(title, mode),
+      index: index + 1
+    };
+  });
+
+  let headingIndex = 0;
+  let decoratedBody = source.replace(headingPattern, (_match, level, attributes, innerHtml) => {
+    const heading = headings[headingIndex];
+    headingIndex += 1;
+    const hasId = /\bid\s*=/i.test(attributes);
+    return `<h${level}${attributes}${hasId ? "" : ` id="${escapeHtml(heading.id)}"`} data-debrief-heading data-debrief-phase="${escapeHtml(heading.phase)}">${innerHtml}</h${level}>`;
+  });
+
+  const figures = [];
+  let figureIndex = 0;
+  decoratedBody = decoratedBody.replace(/<figure\b([^>]*)>([\s\S]*?)<\/figure>/gi, (_match, attributes, innerHtml) => {
+    figureIndex += 1;
+    const existingId = attributes.match(/\bid\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))/i);
+    const captionMatch = innerHtml.match(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i);
+    const altMatch = innerHtml.match(/\balt\s*=\s*(?:"([^"]+)"|'([^']+)')/i);
+    const id = existingId ? existingId[1] || existingId[2] || existingId[3] : `field-frame-${String(figureIndex).padStart(2, "0")}`;
+    const title = plainTextFromHtml(captionMatch?.[1] || altMatch?.[1] || altMatch?.[2] || `Frame ${figureIndex}`);
+    figures.push({ id, title, index: figureIndex, phase: "frame" });
+    const hasId = /\bid\s*=/i.test(attributes);
+    return `<figure${attributes}${hasId ? "" : ` id="${escapeHtml(id)}"`} data-article-figure>${innerHtml}</figure>`;
+  });
+
+  return { bodyHtml: decoratedBody, headings, figures, mode, variant };
+}
+
+function trajectoryLinks(headings) {
+  return headings.map((heading) => `
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#${escapeHtml(heading.id)}" data-trajectory-link data-section-id="${escapeHtml(heading.id)}">
+        <span class="article-trajectory__index">${String(heading.index).padStart(2, "0")}</span>
+        <span class="article-trajectory__phase">[${escapeHtml(heading.phase)}]</span>
+        <span class="article-trajectory__title">${escapeHtml(heading.title)}</span>
+      </a>
+    </li>`).join("");
+}
+
+function buildTrajectoryHtml(headings, mode, figures = []) {
+  const items = mode === "photography" && figures.length ? figures : headings;
+  if (!items.length) {
+    return {
+      mobile: '<div class="article-debrief__quiet-marker" aria-label="Reading mode">[uninterrupted reading field]</div>',
+      desktop: ""
+    };
+  }
+
+  const names = {
+    technical: ["systems debrief", "Systems debrief sections"],
+    "case-study": ["delivery dossier", "Delivery dossier sections"],
+    travel: ["field expedition", "Field expedition notes"],
+    photography: ["image sequence", "Image sequence frames"],
+    personal: ["reflection light cone", "Reflection observations"]
+  };
+  const [modeLabel, label] = names[mode] || ["reading field", "Article sections"];
+  const eyebrow = `[${modeLabel}]`;
+  const links = trajectoryLinks(items);
+  return {
+    mobile: `
+<details class="article-trajectory article-trajectory--mobile" data-trajectory-details>
+  <summary class="article-trajectory__summary">
+    <span>${eyebrow}</span>
+    <span>${items.length} ${mode === "photography" ? (items.length === 1 ? "frame" : "frames") : (items.length === 1 ? "section" : "sections")}</span>
+  </summary>
+  <nav aria-label="${label}">
+    <ol class="article-trajectory__list">${links}
+    </ol>
+  </nav>
+</details>`,
+    desktop: `
+<nav class="article-trajectory article-trajectory--desktop" aria-label="${label}" data-article-trajectory>
+  <p class="article-trajectory__eyebrow">${eyebrow}</p>
+  <ol class="article-trajectory__list">${links}
+  </ol>
+</nav>`
+  };
+}
+
 function addImageDefaults(html) {
   return String(html || "").replace(/<img\b([^>]*)>/gi, (match, attributes) => {
     const selfClosing = /\/\s*$/.test(attributes);
@@ -106,25 +270,45 @@ function postPath(slug) {
   return `/blog/${encodeURIComponent(slug)}.html`;
 }
 
-function buildBlogIndexFallback(posts, limit = 4) {
+function buildBlogIndexFallback(posts) {
   const articles = posts
-    .slice(0, limit)
-    .map((post) => {
+    .map((post, index) => {
       const title = String(post.title || "").trim() || "Untitled";
       const summary = String(post.summary || "").trim() || stripHtml(post.body_html).slice(0, 180);
       const publishedDate = String(post.published_date || "").trim();
       const readingTime = String(post.reading_time || "").trim() || "n/a";
+      const heroData = resolvePublicImage(toAssetUrl(post.hero_image));
+      const heroImage = heroData.src || toAssetUrl(post.hero_image);
+      const heroAlt = String(post.hero_alt || `${title} preview`).trim() || `${title} preview`;
+      const heroResponsiveAttributes = heroData.srcset
+        ? ` srcset="${escapeHtml(heroData.srcset)}" sizes="${escapeHtml(heroData.sizes)}"`
+        : "";
+      const topics = Array.isArray(post.topics) ? post.topics : [];
+      const topicsHtml = topics.length
+        ? `<p class="galaxy-entry__topics" aria-label="Topics">${topics
+            .map((topic) => `<span>${escapeHtml(topic)}</span>`)
+            .join("")}</p>`
+        : "";
+      const heroHtml = heroImage
+        ? `<a class="galaxy-entry__media" href="${escapeHtml(postPath(post.slug))}" aria-label="Read ${escapeHtml(title)}"><img src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="${index === 0 ? "eager" : "lazy"}" decoding="async"/></a>`
+        : "";
 
-      return `  <article class="py-8 border-t border-outline-variant/20">
-    <time class="font-label text-xs text-outline" datetime="${escapeHtml(publishedDate)}">${escapeHtml(publishedDate)} · ${escapeHtml(readingTime)}</time>
-    <h2 class="font-headline text-3xl md:text-4xl font-bold leading-tight mt-3"><a class="hover:text-tertiary" href="${escapeHtml(postPath(post.slug))}">${escapeHtml(title)}</a></h2>
-    <p class="text-secondary text-lg leading-relaxed mt-3">${escapeHtml(summary)}</p>
-  </article>`;
+      return `<article class="galaxy-entry${heroHtml ? " has-media" : ""}" data-slug="${escapeHtml(post.slug)}" data-blog-slug="${escapeHtml(post.slug)}" data-blog-selected="false" data-has-media="${Boolean(heroHtml)}">
+  <p class="galaxy-entry__meta">${escapeHtml(visibleCategory(post.category))}<time datetime="${escapeHtml(publishedDate)}">${escapeHtml(publishedDate)}</time><span>${escapeHtml(readingTime)}</span></p>
+  <div class="galaxy-entry__body">
+    <h3><a href="${escapeHtml(postPath(post.slug))}">${escapeHtml(title)}</a></h3>
+    <p class="galaxy-entry__summary">${escapeHtml(summary)}</p>
+    ${topicsHtml}
+  </div>
+  ${heroHtml}
+</article>`;
     })
     .join("\n");
 
-  return `<section id="blog-feed" class="space-y-12" aria-label="Latest blog posts">
+  return `<section id="blog-feed" aria-label="Published writing">
+<div id="galaxy-list" class="galaxy-list" aria-live="polite">
 ${articles}
+</div>
 </section>`;
 }
 
@@ -133,15 +317,28 @@ function writeBlogIndexFallback(posts, outputBlogDir) {
   if (!fs.existsSync(indexPath)) return false;
 
   const indexHtml = fs.readFileSync(indexPath, "utf8");
-  const feedPattern =
-    /<section id="blog-feed" class="space-y-12" aria-label="Latest blog posts">[\s\S]*?<\/section>/;
+  const feedPattern = /<section id="blog-feed"[^>]*>[\s\S]*?<\/section>/;
   if (!feedPattern.test(indexHtml)) {
     throw new Error(`Cannot update the no-JavaScript blog feed in ${indexPath}.`);
   }
 
+  const years = posts
+    .map((post) => String(post.published_date || "").slice(0, 4))
+    .filter((year) => /^\d{4}$/.test(year))
+    .sort();
+  const yearRange = !years.length
+    ? "date range unavailable"
+    : years[0] === years.at(-1) ? years[0] : `${years[0]} → ${years.at(-1)}`;
+  const publishedCount = `${posts.length} published ${posts.length === 1 ? "entry" : "entries"}`;
+  const updatedIndexHtml = indexHtml
+    .replace(feedPattern, buildBlogIndexFallback(posts))
+    .replace(/(<span id="(?:archive-total-count|galaxy-total)">)[^<]*(<\/span>)/, `$1${publishedCount}$2`)
+    .replace(/(<span id="(?:archive-date-range|galaxy-range)">)[^<]*(<\/span>)/, `$1${yearRange}$2`)
+    .replace(/(<span id="infinite-status">)[^<]*(<\/span>)/, `$1[${posts.length} published entries · engineering, systems, and life]$2`);
+
   fs.writeFileSync(
     indexPath,
-    indexHtml.replace(feedPattern, buildBlogIndexFallback(posts)),
+    updatedIndexHtml,
     "utf8"
   );
   return true;
@@ -222,6 +419,19 @@ ${galleryHtml}
 `;
 }
 
+function buildArticleHeroPanel({ mode, post, heroImage, heroResponsiveAttributes, heroAlt, heroCaption }) {
+  if (mode === "case-study") {
+    return buildWorkHeroPanel({ post, heroImage, heroResponsiveAttributes, heroAlt, heroCaption });
+  }
+
+  return `
+<figure class="article-region__hero article-region__hero--${escapeHtml(mode)}">
+  <img id="post-hero-image" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+  ${heroCaption ? `<figcaption>${escapeHtml(heroCaption)}</figcaption>` : ""}
+</figure>
+`;
+}
+
 function buildStaticPostHtml({ post, previous, next }) {
   const title = String(post.title || "").trim() || "Untitled";
   const author = String(post.author || "Andrew Concepcion").trim() || "Andrew Concepcion";
@@ -229,7 +439,6 @@ function buildStaticPostHtml({ post, previous, next }) {
   const category = String(post.category || "log").trim() || "log";
   const categoryLabel = visibleCategory(category);
   const isWorkDeepDive = isWorkPost(post);
-  const isReflection = category.toLowerCase() === "reflection";
   const publishedDate = String(post.published_date || "").trim();
   const readingTime = String(post.reading_time || "").trim() || "n/a";
   const heroImageData = resolvePublicImage(toAssetUrl(post.hero_image));
@@ -242,8 +451,11 @@ function buildStaticPostHtml({ post, previous, next }) {
   const heroCaption = String(post.hero_caption || "").trim();
   const canonicalPath = postPath(post.slug);
   const canonicalUrl = `${SITE_ORIGIN}${canonicalPath}`;
-  const bodyHtml =
+  const bodyWithImageDefaults =
     addImageDefaults(String(post.body_html || "").trim()) || `<p>${escapeHtml(summary)}</p>`;
+  const debrief = decorateArticleBody(bodyWithImageDefaults, post);
+  const bodyHtml = debrief.bodyHtml;
+  const trajectoryHtml = buildTrajectoryHtml(debrief.headings, debrief.mode, debrief.figures);
   const tags = [...new Set([...(post.topics || []), category].filter(Boolean))];
   const articleTagsMeta = tags
     .map((tag) => `<meta property="article:tag" content="${escapeHtml(tag)}">`)
@@ -268,40 +480,26 @@ function buildStaticPostHtml({ post, previous, next }) {
   const sourceCurrent = isWorkDeepDive ? ' aria-current="page"' : "";
   const blogCurrent = isWorkDeepDive ? "" : ' aria-current="page"';
 
-  const heroPanelHtml = isWorkDeepDive
-    ? buildWorkHeroPanel({ post, heroImage, heroResponsiveAttributes, heroAlt, heroCaption })
-    : isReflection
-      ? `
-<figure class="lg:col-span-5 relative aspect-square bg-surface-container-low border border-outline-variant/20 p-3 overflow-hidden">
-<img id="post-hero-image" class="w-full h-full object-contain bg-surface-container-lowest" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
-${heroCaption ? `<figcaption class="sr-only">${escapeHtml(heroCaption)}</figcaption>` : ""}
-</figure>
-`
-    : `
-<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
-<div class="absolute inset-0 pointer-events-none">
-<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
-</div>
-<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
-<div class="flex justify-between items-start">
-<span class="font-label text-xs">[state_machine_v4.svg]</span>
-<span class="material-symbols-outlined text-tertiary">schema</span>
-</div>
-<div class="space-y-4">
-<div class="h-1 w-2/3 bg-tertiary/20"></div>
-<div class="flex gap-2">
-<div class="w-4 h-4 border border-tertiary"></div>
-<div class="w-4 h-4 bg-tertiary"></div>
-<div class="w-4 h-4 border border-tertiary"></div>
-</div>
-<div class="h-px w-full bg-outline-variant/50"></div>
-<div class="flex justify-end">
-<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
-</div>
-</div>
-</div>
-</div>
-`;
+  const heroPanelHtml = buildArticleHeroPanel({
+    mode: debrief.mode,
+    post,
+    heroImage,
+    heroResponsiveAttributes,
+    heroAlt,
+    heroCaption
+  });
+  const regionLabels = {
+    technical: "SYSTEMS DEBRIEF",
+    "case-study": "DELIVERY DOSSIER",
+    travel: "FIELD EXPEDITION LOG",
+    photography: "IMAGE SEQUENCE",
+    personal: "REFLECTION LIGHT CONE"
+  };
+  const regionLabel = regionLabels[debrief.mode] || "READING FIELD";
+  const contentCount = debrief.mode === "photography" ? debrief.figures.length : debrief.headings.length;
+  const contentUnit = debrief.mode === "photography"
+    ? (contentCount === 1 ? "real frame" : "real frames")
+    : (contentCount === 1 ? "authored section" : "authored sections");
 
   const structuredData = JSON.stringify(
     {
@@ -356,7 +554,9 @@ ${articleTagsMeta}
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<link href="/assets/css/article-debrief.css?v=20260807-regions2" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20260807" rel="stylesheet"/>
+<script src="/assets/js/universe-theme-transition.js?v=20260807-fast2"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -470,24 +670,8 @@ ${articleTagsMeta}
 </style>
 <script type="application/ld+json">${structuredData}</script>
 </head>
-<body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
+<body class="article-debrief-page bg-background text-on-surface font-body antialiased" data-universe-region="article" data-article-mode="${escapeHtml(debrief.mode)}">
 <a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
-<div class="neural-global-bg" aria-hidden="true">
-  <div class="neural-mesh-container">
-    <div class="neural-mesh"></div>
-    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
-    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
-    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
-    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
-    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
-    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
-    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
-    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
-  </div>
-  <div class="bust-gradient"></div>
-  <div class="canvas-grid"></div>
-</div>
 <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
   <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
@@ -508,68 +692,57 @@ ${articleTagsMeta}
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<main id="main-content" class="pt-32 md:pt-24 pb-32">
-<article class="max-w-screen-xl mx-auto px-6">
-<div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
-<span id="post-category" class="bg-surface-container-low px-2 py-1">[${escapeHtml(categoryLabel)}]</span>
-<span id="post-date" class="bg-surface-container-low px-2 py-1">${escapeHtml(publishedDate)}</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[${escapeHtml(readingTime)}]</span>
+<main id="main-content" class="article-region-main">
+<article class="article-debrief article-region" data-article-debrief data-debrief-variant="${escapeHtml(debrief.variant)}" data-article-mode="${escapeHtml(debrief.mode)}">
+<header class="article-region__header">
+  <div class="article-region__meta">
+    <strong>${escapeHtml(regionLabel)}</strong>
+    <span id="post-category">${escapeHtml(categoryLabel)}</span>
+    <time id="post-date" datetime="${escapeHtml(publishedDate)}">${escapeHtml(publishedDate)}</time>
+    <span id="post-reading">${escapeHtml(readingTime)}</span>
+    <span>${contentCount} ${debrief.mode === "photography" ? "frames" : "sections"}</span>
+  </div>
+  <div class="article-region__title">
+    <h1 id="post-title">${escapeHtml(title)}</h1>
+    <p id="post-summary">${escapeHtml(summary)}</p>
+    <div id="post-actions" class="article-region__actions">
+      <button id="share-post-button" type="button">Share</button>
+      <button id="bookmark-post-button" type="button">Bookmark</button>
+      <a href="/blog/rss.xml">RSS</a>
+      ${isWorkDeepDive ? '<a href="/work.html">Return to portfolio</a>' : ""}
+    </div>
+  </div>
+  ${heroPanelHtml}
+  <div class="article-region__topic-field">
+    <span>Authored by <strong id="post-author-name">${escapeHtml(author)}</strong></span>
+    <span id="post-author-role">${escapeHtml(regionLabel)}</span>
+    <div id="post-tags">${tagChipsHtml}</div>
+  </div>
+</header>
+${trajectoryHtml.mobile}
+<div class="article-debrief__layout article-region__reading">
+  <aside class="article-debrief__sidebar article-region__rail">
+    ${trajectoryHtml.desktop}
+    <p class="article-region__reading-signal">
+      <span>${escapeHtml(regionLabel)}</span>
+      <span>Published source</span>
+      <span>${contentCount} ${contentUnit}</span>
+    </p>
+  </aside>
+  <div id="post-body" class="article-debrief__body article-region__body" data-debrief-body>${bodyHtml}</div>
 </div>
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
-<div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">${escapeHtml(title)}</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">${escapeHtml(summary)}</p>
-<div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
-<button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
-<button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
-<a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[RSS]</a>
-</div>
-</div>
-${heroPanelHtml}
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-<aside class="lg:col-span-3 hidden lg:block space-y-12">
-<div class="pt-4 border-t border-outline-variant/20">
-<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[author_identity]</h4>
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
-<span class="material-symbols-outlined text-on-surface">account_tree</span>
-</div>
-<div>
-<p id="post-author-name" class="text-sm font-bold">${escapeHtml(author)}</p>
-<p id="post-author-role" class="text-xs text-secondary">[${escapeHtml(categoryLabel)}]</p>
-</div>
-</div>
-</div>
-<div class="pt-4 border-t border-outline-variant/20">
-<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
-<div id="post-tags" class="flex flex-wrap gap-2">${tagChipsHtml}</div>
-</div>
-<section class="p-6 bg-surface-container-low space-y-4">
-<h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">${escapeHtml(summary)}</p>
-</section>
-</aside>
-<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body">${bodyHtml}</div>
-</div>
-<div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
-<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="${escapeHtml(prevHref)}">
-<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">${escapeHtml(prevTitle)}</h5>
-<div class="mt-6 flex items-center gap-2 text-tertiary">
-<span class="material-symbols-outlined">arrow_back</span>
-<span class="font-label text-xs">read_entry</span>
-</div>
-</a>
-<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="${escapeHtml(nextHref)}">
-<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">${escapeHtml(nextTitle)}</h5>
-<div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
-<span class="font-label text-xs">read_entry</span>
-<span class="material-symbols-outlined">arrow_forward</span>
-</div>
-</a>
-</div>
+<nav class="article-region__adjacent" aria-label="Adjacent entries">
+  <a id="prev-link" href="${escapeHtml(prevHref)}">
+    <span>[previous entry]</span>
+    <h2 id="prev-title">${escapeHtml(prevTitle)}</h2>
+    <small>← read entry</small>
+  </a>
+  <a id="next-link" href="${escapeHtml(nextHref)}">
+    <span>[next entry]</span>
+    <h2 id="next-title">${escapeHtml(nextTitle)}</h2>
+    <small>read entry →</small>
+  </a>
+</nav>
 </article>
 </main>
 <footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
@@ -583,6 +756,8 @@ ${heroPanelHtml}
     <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
   </div>
 </footer>
+<script src="/assets/js/article-debrief.js?v=20260807-regions1"></script>
+<script src="/assets/js/universe-field-map.js?v=20260807"></script>
 <script>
   (() => {
     const FORCE_ACTIVE_ROUTE = ${JSON.stringify(navForceRoute)};
@@ -880,7 +1055,7 @@ function buildStaticBlog({ dbPath, outputRoot = ROOT_DIR, manifestPath } = {}) {
         next = typeof workIndex === "number" ? workPosts[workIndex - 1] || null : null;
       }
 
-      const html = buildStaticPostHtml({ post, previous, next });
+      const html = buildStaticPostHtml({ post, previous, next }).replace(/[ \t]+$/gm, "");
       const outputPath = path.join(outputBlogDir, `${post.slug}.html`);
       fs.writeFileSync(outputPath, html, "utf8");
     }
@@ -933,9 +1108,14 @@ if (require.main === module) {
 module.exports = {
   GENERATED_PAGE_MARKER,
   GENERATOR_ID,
+  articleMode,
   buildBlogIndexFallback,
+  buildTrajectoryHtml,
   buildStaticBlog,
   buildStaticPostHtml,
+  decorateArticleBody,
   pruneStaleGeneratedPages,
+  trajectoryPhase,
+  trajectoryVariant,
   writeBlogIndexFallback
 };

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "enabled": true,
+  "transport": "apps_script_iframe",
+  "endpoint": "https://script.google.com/macros/s/AKfycby-QIwMvDGdDOXkbIu4KjTQE_dhEO8vwoaTf6oxQAq_0Iub3xvgX3XUjQvbTIOaKAtg/exec",
+  "publicFeedEndpoint": "",
+  "requestTimeoutMs": 12000
+}

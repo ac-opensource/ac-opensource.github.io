@@ -3,11 +3,19 @@ const path = require("path");
 const { openDatabase, assertSchema } = require("./lib/blog-db");
 const { shouldExcludeOriginal } = require("./lib/public-images");
 const publication = require("./site-publication.config");
+const SignalsContract = require("../assets/js/signals-contract");
+const ContactTransport = require("../assets/js/contact-transport");
 
 const ROOT_DIR = path.join(__dirname, "..");
 const DEFAULT_DIST_DIR = path.join(ROOT_DIR, "dist");
 const SITE_ORIGIN = "https://ac-opensource.github.io";
 const GOOGLE_SITE_VERIFICATION = "cG-TBeLi9kd77kCjn9ujeH_G6b-5r-Jv69vGJiROZnU";
+const SITE_LOCATION = Object.freeze({
+  origin: SITE_ORIGIN,
+  protocol: "https:",
+  hostname: "ac-opensource.github.io",
+  host: "ac-opensource.github.io"
+});
 
 function walkFiles(root) {
   const files = [];
@@ -39,6 +47,8 @@ function assertPublicInventory(distDir, relativeFiles) {
   for (const requiredPath of [
     ...publication.publicPages,
     ...publication.publicDownloads,
+    ...publication.publicExperimentFiles,
+    ...publication.publicExperimentAssets,
     "blog/index.html",
     "blog/posts.json",
     "blog/rss.xml",
@@ -66,6 +76,7 @@ function assertPublicInventory(distDir, relativeFiles) {
     ".nojekyll",
     "assets",
     "blog",
+    "experiments",
     "robots.txt",
     "sitemap.xml",
     ...publication.publicPages,
@@ -77,6 +88,18 @@ function assertPublicInventory(distDir, relativeFiles) {
   if (unexpected.length) {
     throw new Error(`Unexpected publication root entries: ${unexpected.sort().join(", ")}`);
   }
+
+  const assertExactExperimentInventory = (prefix, expected) => {
+    const actual = relativeFiles.filter((relativePath) => relativePath.startsWith(prefix)).sort();
+    const allowed = [...expected].sort();
+    if (JSON.stringify(actual) !== JSON.stringify(allowed)) {
+      const missing = allowed.filter((relativePath) => !actual.includes(relativePath));
+      const extra = actual.filter((relativePath) => !allowed.includes(relativePath));
+      throw new Error(`Published ${prefix} inventory drifted; missing: ${missing.join(", ") || "none"}; extra: ${extra.join(", ") || "none"}.`);
+    }
+  };
+  assertExactExperimentInventory("experiments/universe-options/", publication.publicExperimentFiles);
+  assertExactExperimentInventory("assets/experiments/universe-options/", publication.publicExperimentAssets);
 
   const databaseFiles = relativeFiles.filter((relativePath) =>
     /(?:^|\/)[^/]+\.(?:sqlite(?:-(?:shm|wal))?|db)$/i.test(relativePath)
@@ -144,7 +167,7 @@ function assertPublishedPosts(distDir, dbPath) {
   return manifest.length;
 }
 
-function extractLocalReferences(html) {
+function extractLocalReferences(html, documentRoute = "/") {
   const references = [];
   const attributePattern = /\b(href|src|srcset)\s*=\s*["']([^"']+)["']/gi;
   let match;
@@ -159,7 +182,7 @@ function extractLocalReferences(html) {
 
       let url;
       try {
-        url = new URL(value, SITE_ORIGIN);
+        url = new URL(value, new URL(documentRoute, `${SITE_ORIGIN}/`));
       } catch (_error) {
         continue;
       }
@@ -180,10 +203,11 @@ function assertReferencesResolve(distDir, files) {
   const missing = [];
   for (const absolutePath of files.filter((file) => file.endsWith(".html"))) {
     const html = fs.readFileSync(absolutePath, "utf8");
-    for (const pathname of extractLocalReferences(html)) {
+    const relativePath = relativePosix(distDir, absolutePath);
+    for (const pathname of extractLocalReferences(html, routeForHtml(relativePath))) {
       const target = referenceTarget(distDir, pathname);
       if (!fs.existsSync(target)) {
-        missing.push(`${relativePosix(distDir, absolutePath)} -> ${pathname}`);
+        missing.push(`${relativePath} -> ${pathname}`);
       }
     }
   }
@@ -293,6 +317,133 @@ function assertNoAuthoringReferences(distDir, files) {
   }
 }
 
+function readInlineJson(html, id) {
+  const pattern = new RegExp('<script\\b[^>]*\\bid="' + id + '"[^>]*>([\\s\\S]*?)<\\/script>', "i");
+  const match = html.match(pattern);
+  if (!match) throw new Error("Missing inline JSON boundary: " + id);
+  try {
+    return JSON.parse(match[1]);
+  } catch (error) {
+    throw new Error("Invalid inline JSON for " + id + ": " + error.message);
+  }
+}
+
+function assertNoContactSignalsArtifacts(distDir, relativeFiles) {
+  const forbidden = relativeFiles.filter(function (relativePath) {
+    return publication.forbiddenPublishedNamePattern.test(relativePath);
+  });
+  if (forbidden.length) {
+    throw new Error("Local-only Contact/Signals artifacts reached publication output: " + forbidden.join(", "));
+  }
+  const localOnlyRoots = ["scripts", ".agents", "test-results", "playwright-report"];
+  for (const relativePath of relativeFiles) {
+    if (localOnlyRoots.some(function (rootName) {
+      return relativePath === rootName || relativePath.startsWith(rootName + "/");
+    })) {
+      throw new Error("Local-only runtime or evidence reached publication output: " + relativePath);
+    }
+  }
+  const forbiddenMarkers = [
+    /\bfixtures?\b/i,
+    /\bmocks?\b/i,
+    /LOCAL DEMO DATA/i,
+    /local_(?:private|public)_receipt/i,
+    /sig_local_demo/i,
+    /Local demo record:/i
+  ];
+  relativeFiles
+    .filter(function (relativePath) { return /\.(?:css|html|js|json|txt|xml)$/i.test(relativePath); })
+    .forEach(function (relativePath) {
+      const contents = fs.readFileSync(path.join(distDir, relativePath), "utf8");
+      forbiddenMarkers.forEach(function (pattern) {
+        if (pattern.test(contents)) {
+          throw new Error("Local-only Contact/Signals marker reached publication output: " + relativePath);
+        }
+      });
+    });
+}
+
+function assertContactSignalsPublication(distDir, relativeFiles) {
+  const required = [
+    "signals.html",
+    "assets/data/contact-runtime.json",
+    "assets/data/signals.json"
+  ];
+  required.forEach(function (relativePath) {
+    if (!relativeFiles.includes(relativePath)) {
+      throw new Error("Required Contact/Signals publication file is missing: " + relativePath);
+    }
+  });
+
+  const runtimePath = path.join(distDir, "assets", "data", "contact-runtime.json");
+  const feedPath = path.join(distDir, "assets", "data", "signals.json");
+  const runtime = ContactTransport.validateRuntimeConfig(
+    JSON.parse(fs.readFileSync(runtimePath, "utf8")),
+    SITE_LOCATION
+  );
+  if (runtime.enabled) {
+    const endpoint = new URL(runtime.endpoint);
+    const approvedAppsScriptEndpoint = runtime.transport === "apps_script_iframe" &&
+      endpoint.protocol === "https:" &&
+      endpoint.hostname === "script.google.com" &&
+      /^\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(endpoint.pathname) &&
+      !endpoint.search &&
+      !runtime.publicFeedEndpoint;
+    if (!approvedAppsScriptEndpoint) {
+      throw new Error("Public Contact runtime may enable only the approved Apps Script /exec Sheet bridge with no public feed endpoint.");
+    }
+  } else if (runtime.transport !== "disabled" || runtime.endpoint || runtime.publicFeedEndpoint) {
+    throw new Error("Disabled public Contact runtime must use the disabled transport with blank endpoints.");
+  }
+  const feed = SignalsContract.validateFeed(JSON.parse(fs.readFileSync(feedPath, "utf8")));
+  const signalsHtml = fs.readFileSync(path.join(distDir, "signals.html"), "utf8");
+  const contactHtml = fs.readFileSync(path.join(distDir, "contact.html"), "utf8");
+  const signalsInlineFeed = SignalsContract.validateFeed(readInlineJson(signalsHtml, "signals-feed"));
+  const signalsRuntime = ContactTransport.validateRuntimeConfig(
+    readInlineJson(signalsHtml, "contact-runtime-config"),
+    SITE_LOCATION
+  );
+  const contactRuntime = ContactTransport.validateRuntimeConfig(
+    readInlineJson(contactHtml, "contact-runtime-config"),
+    SITE_LOCATION
+  );
+  if (JSON.stringify(signalsInlineFeed) !== JSON.stringify(feed)) {
+    throw new Error("Signals inline feed does not match the published public feed.");
+  }
+  if (JSON.stringify(signalsRuntime) !== JSON.stringify(runtime) || JSON.stringify(contactRuntime) !== JSON.stringify(runtime)) {
+    throw new Error("Contact runtime inline config does not match the published config.");
+  }
+
+  const registryIds = Array.from(
+    signalsHtml.matchAll(/<li\b[^>]*\bdata-signal-record\b[^>]*\bdata-signal-id="([^"]+)"/g),
+    function (match) { return match[1]; }
+  );
+  const expectedRegistryIds = feed.records.map(function (record) { return record.id; });
+  if (JSON.stringify(registryIds) !== JSON.stringify(expectedRegistryIds)) {
+    throw new Error("Rendered Signals registry does not exactly match the validated feed.");
+  }
+  const orbitIds = Array.from(
+    signalsHtml.matchAll(/<a\b[^>]*\bdata-satellite\b[^>]*\bdata-signal-id="([^"]+)"/g),
+    function (match) { return match[1]; }
+  );
+  const expectedOrbitIds = SignalsContract.orbitRecords(feed).map(function (record) { return record.id; });
+  if (JSON.stringify(orbitIds) !== JSON.stringify(expectedOrbitIds) || orbitIds.length > 5) {
+    throw new Error("Rendered Signals orbit is not the deterministic maximum-five approved subset.");
+  }
+  if (!expectedOrbitIds.length) {
+    if (!/<meta name="robots" content="noindex,follow">/.test(signalsHtml)) {
+      throw new Error("Signals must remain noindex,follow while it has no approved orbit.");
+    }
+    if (!signalsHtml.includes("No public Signals yet.") && feed.records.length === 0) {
+      throw new Error("Empty Signals feed is missing its honest empty state.");
+    }
+  }
+  if (/DEMO QUOTE|DEMO TESTIMONIAL|FIXTURE QUOTE/i.test(signalsHtml + fs.readFileSync(feedPath, "utf8"))) {
+    throw new Error("Demo testimonial content reached the public Signals boundary.");
+  }
+  assertNoContactSignalsArtifacts(distDir, relativeFiles);
+}
+
 function assertGoogleSiteVerification(distDir) {
   const homepage = fs.readFileSync(path.join(distDir, "index.html"), "utf8");
   const expected = `<meta name="google-site-verification" content="${GOOGLE_SITE_VERIFICATION}">`;
@@ -310,6 +461,7 @@ function verifyDist({ distDir = DEFAULT_DIST_DIR, dbPath } = {}) {
   const files = walkFiles(resolvedDist);
   const relativeFiles = files.map((file) => relativePosix(resolvedDist, file));
   assertPublicInventory(resolvedDist, relativeFiles);
+  assertContactSignalsPublication(resolvedDist, relativeFiles);
   const postCount = assertPublishedPosts(resolvedDist, dbPath);
   assertNoAuthoringReferences(resolvedDist, files);
   assertNoPublishedExif(resolvedDist, files);
@@ -339,6 +491,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  assertContactSignalsPublication,
   assertGoogleSiteVerification,
   assertNoAuthoringReferences,
   assertNoPublishedExif,

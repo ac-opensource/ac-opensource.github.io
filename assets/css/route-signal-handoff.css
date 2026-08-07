@@ -1,0 +1,259 @@
+[data-route-signal-emitter][hidden],
+[data-route-signal-receiver][hidden] {
+  display: none !important;
+}
+
+.route-signal-emitter,
+.route-signal-receiver {
+  --route-signal-blue: #1f5cba;
+  --route-signal-ink: #26332b;
+  --route-signal-muted: #66716a;
+  --route-signal-paper: rgba(250, 249, 244, 0.96);
+  box-sizing: border-box;
+  color: var(--route-signal-ink);
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
+.route-signal-emitter *,
+.route-signal-receiver * {
+  box-sizing: border-box;
+}
+
+.route-signal-emitter {
+  position: fixed;
+  z-index: 320;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  width: min(22rem, calc(100vw - 2rem));
+  padding: 0.85rem 0.95rem 0.9rem;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  animation: routeSignalEmitterIn 160ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.route-signal-emitter > span:first-child,
+.route-signal-receiver > span:first-child {
+  display: block;
+  color: var(--route-signal-blue);
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.route-signal-emitter strong {
+  display: block;
+  margin-top: 0.42rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.1em;
+}
+
+.route-signal-emitter__rail,
+.route-signal-receiver__rail {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin-top: 0.7rem;
+  overflow: hidden;
+  background: rgba(31, 92, 186, 0.14);
+}
+
+.route-signal-emitter__rail i,
+.route-signal-receiver__rail i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 100%;
+  background: var(--route-signal-blue);
+  transform-origin: left center;
+  animation: routeSignalRail 160ms ease-out both;
+}
+
+[data-route-signal-link][data-route-signal-active="true"] {
+  outline: 2px solid rgba(255, 255, 255, 0.88);
+  outline-offset: -4px;
+  box-shadow: 0 0 0 2px #1f5cba, 0 0 20px rgba(31, 92, 186, 0.32);
+}
+
+.route-signal-receiver {
+  z-index: 6;
+  display: grid;
+  gap: 0.38rem;
+  width: min(25rem, calc(100% - 2rem));
+  padding: 0.9rem 1rem;
+  border: 0;
+  background: linear-gradient(90deg, rgba(250, 249, 244, 0.94), rgba(250, 249, 244, 0.7), transparent);
+  box-shadow: none;
+  animation: routeSignalReceiverIn 540ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.route-signal-receiver strong {
+  display: block;
+  font-size: clamp(0.82rem, 1.5vw, 1rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.route-signal-receiver > [data-route-signal-receiver-route] {
+  color: var(--route-signal-muted);
+  font-size: 0.58rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+}
+
+.route-signal-receiver small {
+  color: var(--route-signal-blue);
+  font-size: 0.55rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.11em;
+}
+
+.route-signal-receiver__rail i {
+  animation-duration: 520ms;
+}
+
+.route-signal-receiver--work {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  width: min(24rem, calc(100% - 2.5rem));
+}
+
+body[data-route-signal-arrival="work"] .work-trajectory-stage--release {
+  border-color: #168c86;
+  background: rgba(235, 249, 244, 0.98);
+  animation: routeSignalReleaseLock 540ms ease-out both;
+}
+
+body[data-route-signal-arrival="work"] .work-trajectory-stage--release::after {
+  border-color: #168c86;
+  color: #fff;
+  background: #168c86;
+  content: "LOCKED";
+}
+
+.route-signal-contact-instrument {
+  isolation: isolate;
+}
+
+.route-signal-contact-art {
+  transition: opacity 180ms ease;
+}
+
+.route-signal-receiver--contact {
+  position: absolute;
+  z-index: 4;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  width: auto;
+  overflow: hidden;
+  background: linear-gradient(90deg, rgba(250, 249, 244, 0.98), rgba(250, 249, 244, 0.78), transparent);
+}
+
+body[data-route-signal-arrival="contact"] .route-signal-contact-art {
+  opacity: 0.5;
+}
+
+body[data-route-signal-arrival="contact"] .route-signal-receiver--contact::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: #1f5cba;
+  content: "";
+  animation: routeSignalTelemetryScan 520ms ease-out both;
+}
+
+body[data-route-signal-mode="reduced"] .route-signal-emitter,
+body[data-route-signal-mode="reduced"] .route-signal-receiver,
+body[data-route-signal-mode="reduced"] .route-signal-emitter__rail i,
+body[data-route-signal-mode="reduced"] .route-signal-receiver__rail i,
+body[data-route-signal-mode="reduced"] .work-trajectory-stage--release,
+body[data-route-signal-mode="reduced"] .route-signal-receiver--contact::after,
+body[data-route-signal-mode="constrained"] .route-signal-emitter,
+body[data-route-signal-mode="constrained"] .route-signal-receiver,
+body[data-route-signal-mode="constrained"] .route-signal-emitter__rail i,
+body[data-route-signal-mode="constrained"] .route-signal-receiver__rail i,
+body[data-route-signal-mode="constrained"] .work-trajectory-stage--release,
+body[data-route-signal-mode="constrained"] .route-signal-receiver--contact::after {
+  animation: none;
+}
+
+body[data-route-signal-mode="reduced"] .route-signal-contact-art,
+body[data-route-signal-mode="constrained"] .route-signal-contact-art {
+  transition: none;
+}
+
+@keyframes routeSignalEmitterIn {
+  from { opacity: 0; transform: translateY(0.65rem); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes routeSignalReceiverIn {
+  0% { opacity: 0; clip-path: inset(0 100% 0 0); }
+  28% { opacity: 1; }
+  100% { opacity: 1; clip-path: inset(0); }
+}
+
+@keyframes routeSignalRail {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes routeSignalReleaseLock {
+  0% { box-shadow: 0 0 0 0 rgba(22, 140, 134, 0); }
+  45% { box-shadow: 0 0 0 0.35rem rgba(22, 140, 134, 0.16), 0 16px 34px rgba(22, 140, 134, 0.14); }
+  100% { box-shadow: 0 0 0 0.2rem rgba(22, 140, 134, 0.1), 0 16px 34px rgba(22, 140, 134, 0.12); }
+}
+
+@keyframes routeSignalTelemetryScan {
+  from { opacity: 0; transform: translateX(0); }
+  45% { opacity: 1; }
+  to { opacity: 0; transform: translateX(24rem); }
+}
+
+@media (max-width: 700px) {
+  .route-signal-emitter {
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    width: calc(100vw - 1.5rem);
+  }
+
+  .route-signal-receiver--work {
+    bottom: 0.75rem;
+    width: calc(100% - 1.5rem);
+  }
+
+  .route-signal-receiver--contact {
+    position: fixed;
+    z-index: 220;
+    right: 0.75rem;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    left: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-signal-emitter,
+  .route-signal-receiver,
+  .route-signal-emitter__rail i,
+  .route-signal-receiver__rail i,
+  .work-trajectory-stage--release,
+  .route-signal-receiver--contact::after {
+    animation: none !important;
+  }
+
+  .route-signal-contact-art {
+    transition: none;
+  }
+}

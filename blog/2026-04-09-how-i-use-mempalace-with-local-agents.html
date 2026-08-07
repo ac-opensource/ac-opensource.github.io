@@ -32,7 +32,9 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="/assets/css/neural-background.css" rel="stylesheet"/>
+<link href="/assets/css/article-debrief.css?v=20260807-regions2" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20260807" rel="stylesheet"/>
+<script src="/assets/js/universe-theme-transition.js?v=20260807-fast2"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -164,24 +166,8 @@
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html"
 }</script>
 </head>
-<body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
+<body class="article-debrief-page bg-background text-on-surface font-body antialiased" data-universe-region="article" data-article-mode="technical">
 <a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
-<div class="neural-global-bg" aria-hidden="true">
-  <div class="neural-mesh-container">
-    <div class="neural-mesh"></div>
-    <div class="neural-node" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
-    <div class="neural-node" style="top: 50%; left: 70%; animation-delay: 1.2s;"></div>
-    <div class="neural-node" style="top: 80%; left: 40%; animation-delay: 0.5s;"></div>
-    <div class="neural-node" style="top: 30%; left: 80%; animation-delay: 2s;"></div>
-    <div class="neural-node" style="top: 60%; left: 20%; animation-delay: 1.5s;"></div>
-    <div class="neural-node" style="top: 15%; left: 60%; animation-delay: 0.8s;"></div>
-    <div class="mesh-line" style="top: 20%; left: 30%; width: 400px; transform: rotate(45deg);"></div>
-    <div class="mesh-line" style="top: 50%; left: 70%; width: 500px; transform: rotate(200deg);"></div>
-    <div class="mesh-line" style="top: 80%; left: 40%; width: 300px; transform: rotate(-30deg);"></div>
-  </div>
-  <div class="bust-gradient"></div>
-  <div class="canvas-grid"></div>
-</div>
 <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
   <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
@@ -202,73 +188,176 @@
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<main id="main-content" class="pt-32 md:pt-24 pb-32">
-<article class="max-w-screen-xl mx-auto px-6">
-<div class="flex flex-wrap gap-4 mb-8 font-label text-[10px] tracking-widest uppercase text-outline">
-<span id="post-category" class="bg-surface-container-low px-2 py-1">[technical]</span>
-<span id="post-date" class="bg-surface-container-low px-2 py-1">2026-04-09</span>
-<span id="post-reading" class="bg-surface-container-highest text-tertiary font-bold px-2 py-1">[7 min read]</span>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 items-end">
-<div class="lg:col-span-7">
-<h1 id="post-title" class="font-headline text-5xl md:text-7xl font-bold leading-[0.9] text-on-background tracking-tighter mb-8">How I Use MemPalace to Make Local Agents Better</h1>
-<p id="post-summary" class="text-xl text-secondary max-w-xl font-light leading-relaxed">How I set up MemPalace as a practical tool for local agents: small taxonomy, verify-first retrieval, agent diaries, AAAK wake-up context, and why protocol matters more than storage.</p>
-<div class="mt-5 flex flex-wrap items-center gap-2" id="post-actions">
-<button id="share-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[SHARE]</button>
-<button id="bookmark-post-button" type="button" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[BOOKMARK]</button>
-<a href="/blog/rss.xml" class="font-label text-[10px] px-3 py-1.5 border border-outline-variant/20 uppercase tracking-widest text-secondary hover:bg-surface-container-low transition-colors">[RSS]</a>
-</div>
-</div>
+<main id="main-content" class="article-region-main">
+<article class="article-debrief article-region" data-article-debrief data-debrief-variant="mission" data-article-mode="technical">
+<header class="article-region__header">
+  <div class="article-region__meta">
+    <strong>SYSTEMS DEBRIEF</strong>
+    <span id="post-category">technical</span>
+    <time id="post-date" datetime="2026-04-09">2026-04-09</time>
+    <span id="post-reading">7 min read</span>
+    <span>8 sections</span>
+  </div>
+  <div class="article-region__title">
+    <h1 id="post-title">How I Use MemPalace to Make Local Agents Better</h1>
+    <p id="post-summary">How I set up MemPalace as a practical tool for local agents: small taxonomy, verify-first retrieval, agent diaries, AAAK wake-up context, and why protocol matters more than storage.</p>
+    <div id="post-actions" class="article-region__actions">
+      <button id="share-post-button" type="button">Share</button>
+      <button id="bookmark-post-button" type="button">Bookmark</button>
+      <a href="/blog/rss.xml">RSS</a>
 
-<div class="lg:col-span-5 relative aspect-square bg-surface-container-low p-8 overflow-hidden group">
-<div class="absolute inset-0 pointer-events-none">
-<img id="post-hero-image" class="w-full h-full object-contain grayscale bg-surface-container-lowest" src="/blog/images/mempalace-local-agents-hero.svg" alt="Blueprint-style diagram showing MemPalace workflow for local agents with wake-up, verify, taxonomy, and diary layers." loading="eager" decoding="async"/>
-</div>
-<div class="relative h-full flex flex-col justify-between border border-outline-variant/30 p-6 z-10">
-<div class="flex justify-between items-start">
-<span class="font-label text-xs">[state_machine_v4.svg]</span>
-<span class="material-symbols-outlined text-tertiary">schema</span>
-</div>
-<div class="space-y-4">
-<div class="h-1 w-2/3 bg-tertiary/20"></div>
-<div class="flex gap-2">
-<div class="w-4 h-4 border border-tertiary"></div>
-<div class="w-4 h-4 bg-tertiary"></div>
-<div class="w-4 h-4 border border-tertiary"></div>
-</div>
-<div class="h-px w-full bg-outline-variant/50"></div>
-<div class="flex justify-end">
-<span class="font-label text-[10px] uppercase">λ.dispatch(Action.Initialize)</span>
-</div>
-</div>
-</div>
-</div>
+    </div>
+  </div>
 
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-<aside class="lg:col-span-3 hidden lg:block space-y-12">
-<div class="pt-4 border-t border-outline-variant/20">
-<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[author_identity]</h4>
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
-<span class="material-symbols-outlined text-on-surface">account_tree</span>
-</div>
-<div>
-<p id="post-author-name" class="text-sm font-bold">Andrew Concepcion</p>
-<p id="post-author-role" class="text-xs text-secondary">[technical]</p>
-</div>
-</div>
-</div>
-<div class="pt-4 border-t border-outline-variant/20">
-<h4 class="font-label text-xs font-bold uppercase mb-4 text-primary">[tags]</h4>
-<div id="post-tags" class="flex flex-wrap gap-2"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ai-workflow</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#mempalace</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#local-agents</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#memory-systems</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#mcp</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#technical</span></div>
-</div>
-<section class="p-6 bg-surface-container-low space-y-4">
-<h4 class="font-label text-xs uppercase tracking-widest text-outline">Abstract</h4>
-<p id="sidebar-abstract" class="text-sm leading-relaxed text-on-surface-variant">How I set up MemPalace as a practical tool for local agents: small taxonomy, verify-first retrieval, agent diaries, AAAK wake-up context, and why protocol matters more than storage.</p>
-</section>
-</aside>
-<div id="post-body" class="lg:col-span-7 space-y-10 text-lg text-on-surface leading-loose font-body"><p>
+<figure class="article-region__hero article-region__hero--technical">
+  <img id="post-hero-image" src="/blog/images/mempalace-local-agents-hero.svg" alt="Blueprint-style diagram showing MemPalace workflow for local agents with wake-up, verify, taxonomy, and diary layers." loading="eager" decoding="async"/>
+  <figcaption>A local memory protocol is more useful than a vague promise of persistence.</figcaption>
+</figure>
+
+  <div class="article-region__topic-field">
+    <span>Authored by <strong id="post-author-name">Andrew Concepcion</strong></span>
+    <span id="post-author-role">SYSTEMS DEBRIEF</span>
+    <div id="post-tags"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#ai-workflow</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#mempalace</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#local-agents</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#memory-systems</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#mcp</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#technical</span></div>
+  </div>
+</header>
+
+<details class="article-trajectory article-trajectory--mobile" data-trajectory-details>
+  <summary class="article-trajectory__summary">
+    <span>[systems debrief]</span>
+    <span>8 sections</span>
+  </summary>
+  <nav aria-label="Systems debrief sections">
+    <ol class="article-trajectory__list">
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-01-i-use-it-as-a-tool-not-a-theory" data-trajectory-link data-section-id="debrief-01-i-use-it-as-a-tool-not-a-theory">
+        <span class="article-trajectory__index">01</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">01. I Use It as a Tool, Not a Theory</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-02-my-setup-is-intentionally-small" data-trajectory-link data-section-id="debrief-02-my-setup-is-intentionally-small">
+        <span class="article-trajectory__index">02</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">02. My Setup Is Intentionally Small</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-03-the-protocol-matters-more-than-the-storage" data-trajectory-link data-section-id="debrief-03-the-protocol-matters-more-than-the-storage">
+        <span class="article-trajectory__index">03</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">03. The Protocol Matters More Than the Storage</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-04-why-it-helps-local-agents-more-than-hosted-ones" data-trajectory-link data-section-id="debrief-04-why-it-helps-local-agents-more-than-hosted-ones">
+        <span class="article-trajectory__index">04</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">04. Why It Helps Local Agents More Than Hosted Ones</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-05-aaak-is-useful-because-it-is-still-readable" data-trajectory-link data-section-id="debrief-05-aaak-is-useful-because-it-is-still-readable">
+        <span class="article-trajectory__index">05</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">05. AAAK Is Useful Because It Is Still Readable</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-06-the-agent-diary-changed-my-expectations" data-trajectory-link data-section-id="debrief-06-the-agent-diary-changed-my-expectations">
+        <span class="article-trajectory__index">06</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">06. The Agent Diary Changed My Expectations</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-07-what-i-would-not-do" data-trajectory-link data-section-id="debrief-07-what-i-would-not-do">
+        <span class="article-trajectory__index">07</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">07. What I Would Not Do</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-08-why-i-keep-using-it" data-trajectory-link data-section-id="debrief-08-why-i-keep-using-it">
+        <span class="article-trajectory__index">08</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">08. Why I Keep Using It</span>
+      </a>
+    </li>
+    </ol>
+  </nav>
+</details>
+<div class="article-debrief__layout article-region__reading">
+  <aside class="article-debrief__sidebar article-region__rail">
+
+<nav class="article-trajectory article-trajectory--desktop" aria-label="Systems debrief sections" data-article-trajectory>
+  <p class="article-trajectory__eyebrow">[systems debrief]</p>
+  <ol class="article-trajectory__list">
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-01-i-use-it-as-a-tool-not-a-theory" data-trajectory-link data-section-id="debrief-01-i-use-it-as-a-tool-not-a-theory">
+        <span class="article-trajectory__index">01</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">01. I Use It as a Tool, Not a Theory</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-02-my-setup-is-intentionally-small" data-trajectory-link data-section-id="debrief-02-my-setup-is-intentionally-small">
+        <span class="article-trajectory__index">02</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">02. My Setup Is Intentionally Small</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-03-the-protocol-matters-more-than-the-storage" data-trajectory-link data-section-id="debrief-03-the-protocol-matters-more-than-the-storage">
+        <span class="article-trajectory__index">03</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">03. The Protocol Matters More Than the Storage</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-04-why-it-helps-local-agents-more-than-hosted-ones" data-trajectory-link data-section-id="debrief-04-why-it-helps-local-agents-more-than-hosted-ones">
+        <span class="article-trajectory__index">04</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">04. Why It Helps Local Agents More Than Hosted Ones</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-05-aaak-is-useful-because-it-is-still-readable" data-trajectory-link data-section-id="debrief-05-aaak-is-useful-because-it-is-still-readable">
+        <span class="article-trajectory__index">05</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">05. AAAK Is Useful Because It Is Still Readable</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-06-the-agent-diary-changed-my-expectations" data-trajectory-link data-section-id="debrief-06-the-agent-diary-changed-my-expectations">
+        <span class="article-trajectory__index">06</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">06. The Agent Diary Changed My Expectations</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-07-what-i-would-not-do" data-trajectory-link data-section-id="debrief-07-what-i-would-not-do">
+        <span class="article-trajectory__index">07</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">07. What I Would Not Do</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-08-why-i-keep-using-it" data-trajectory-link data-section-id="debrief-08-why-i-keep-using-it">
+        <span class="article-trajectory__index">08</span>
+        <span class="article-trajectory__phase">[system]</span>
+        <span class="article-trajectory__title">08. Why I Keep Using It</span>
+      </a>
+    </li>
+  </ol>
+</nav>
+    <p class="article-region__reading-signal">
+      <span>SYSTEMS DEBRIEF</span>
+      <span>Published source</span>
+      <span>8 authored sections</span>
+    </p>
+  </aside>
+  <div id="post-body" class="article-debrief__body article-region__body" data-debrief-body><p>
   I do not think of <strong>MemPalace</strong> as a clever memory benchmark or a library feature. I use it as a <strong>tool in the loop</strong>
   between me and my local agents. That distinction matters. A memory system is only useful if it changes behavior at the moment
   an agent is about to answer, summarize, or make a decision.
@@ -280,7 +369,7 @@
   no longer starts from zero.
 </p>
 
-<h2 class="font-headline text-4xl font-bold leading-tight">01. I Use It as a Tool, Not a Theory</h2>
+<h2 class="font-headline text-4xl font-bold leading-tight" id="debrief-01-i-use-it-as-a-tool-not-a-theory" data-debrief-heading data-debrief-phase="system">01. I Use It as a Tool, Not a Theory</h2>
 <p>
   There are two easy ways to misuse memory systems. The first is to treat them like magic and expect the model to suddenly become wise.
   The second is to treat them like passive storage and assume retrieval will happen on its own. Both fail.
@@ -295,7 +384,7 @@
   That is what makes local agents noticeably better.
 </p>
 
-<h2 class="font-headline text-4xl font-bold leading-tight">02. My Setup Is Intentionally Small</h2>
+<h2 class="font-headline text-4xl font-bold leading-tight" id="debrief-02-my-setup-is-intentionally-small" data-debrief-heading data-debrief-phase="system">02. My Setup Is Intentionally Small</h2>
 <p>
   I am not trying to model my whole life in one giant ontology. I use a small amount of structure that is stable enough for repeated work.
   On this site, for example, I keep a repo-level MemPalace config with a single wing and four practical rooms:
@@ -326,7 +415,7 @@ mempalace mine ~/chats --mode convos</pre></div>
   The other gives them the reasoning, tradeoffs, and dead ends that usually disappear once a session ends.
 </p>
 
-<h2 class="font-headline text-4xl font-bold leading-tight">03. The Protocol Matters More Than the Storage</h2>
+<h2 class="font-headline text-4xl font-bold leading-tight" id="debrief-03-the-protocol-matters-more-than-the-storage" data-debrief-heading data-debrief-phase="system">03. The Protocol Matters More Than the Storage</h2>
 <p>
   The single best thing in MemPalace is not a storage format. It is the protocol attached to the tool.
 </p>
@@ -347,7 +436,7 @@ mempalace mine ~/chats --mode convos</pre></div>
   I would rather have a model say “let me check” and hit the palace than confidently stitch together an answer from half-remembered context.
 </p>
 
-<h2 class="font-headline text-4xl font-bold leading-tight">04. Why It Helps Local Agents More Than Hosted Ones</h2>
+<h2 class="font-headline text-4xl font-bold leading-tight" id="debrief-04-why-it-helps-local-agents-more-than-hosted-ones" data-debrief-heading data-debrief-phase="system">04. Why It Helps Local Agents More Than Hosted Ones</h2>
 <p>
   Strong models can mask bad memory discipline by producing plausible answers from incomplete context. Smaller local models make the weakness easier to notice,
   but the failure belongs to the workflow in both cases: retrieval must be deliberate, and remembered context must still be verified.
@@ -366,7 +455,7 @@ mempalace mine ~/chats --mode convos</pre></div>
   Not human history. Not magical history. Just enough grounded continuity to avoid repeating mistakes.
 </p>
 
-<h2 class="font-headline text-4xl font-bold leading-tight">05. AAAK Is Useful Because It Is Still Readable</h2>
+<h2 class="font-headline text-4xl font-bold leading-tight" id="debrief-05-aaak-is-useful-because-it-is-still-readable" data-debrief-heading data-debrief-phase="system">05. AAAK Is Useful Because It Is Still Readable</h2>
 <p>
   I like AAAK for one specific reason: it is compressed without becoming opaque. I do not need a custom binary decoder or a model-specific plugin.
   It stays text-shaped. The agent can read it, I can read it, and the compression layer still looks like a memory artifact rather than a black box.
@@ -379,7 +468,7 @@ mempalace mine ~/chats --mode convos</pre></div>
   That balance matters to me. If memory becomes unreadable, I stop trusting it. If it stays human-legible, I can inspect the system when the agent starts behaving strangely.
 </p>
 
-<h2 class="font-headline text-4xl font-bold leading-tight">06. The Agent Diary Changed My Expectations</h2>
+<h2 class="font-headline text-4xl font-bold leading-tight" id="debrief-06-the-agent-diary-changed-my-expectations" data-debrief-heading data-debrief-phase="system">06. The Agent Diary Changed My Expectations</h2>
 <p>
   The diary feature looks small on paper, but it is the part that most changed how I work. Each agent gets its own wing and diary room. That means I can treat an agent less like a disposable prompt executor and more like an operator with a trail of observations.
 </p>
@@ -397,7 +486,7 @@ mempalace mine ~/chats --mode convos</pre></div>
   to avoid relitigating the same context on every run.
 </p>
 
-<h2 class="font-headline text-4xl font-bold leading-tight">07. What I Would Not Do</h2>
+<h2 class="font-headline text-4xl font-bold leading-tight" id="debrief-07-what-i-would-not-do" data-debrief-heading data-debrief-phase="system">07. What I Would Not Do</h2>
 <p>
   I would not let any memory system become a silent source of truth. Memory tools drift. Facts expire. Bad entries compound if the agent is allowed
   to write loose claims without later verification.
@@ -411,7 +500,7 @@ mempalace mine ~/chats --mode convos</pre></div>
   The best structure is the one the agent can reliably reuse under pressure.
 </p>
 
-<h2 class="font-headline text-4xl font-bold leading-tight">08. Why I Keep Using It</h2>
+<h2 class="font-headline text-4xl font-bold leading-tight" id="debrief-08-why-i-keep-using-it" data-debrief-heading data-debrief-phase="system">08. Why I Keep Using It</h2>
 <p>
   I keep using MemPalace because it makes local agents feel less disposable. The gain is not that the model suddenly knows everything.
   The gain is that the system starts preserving <strong>continuity</strong> across real work: architecture discussions, content edits, debugging sessions,
@@ -425,24 +514,18 @@ mempalace mine ~/chats --mode convos</pre></div>
   a little more careful, a little less repetitive, and a lot less forgetful.
 </p></div>
 </div>
-<div class="mt-24 pt-12 border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20">
-<a id="prev-link" class="bg-background p-10 group hover:bg-surface-container-low transition-colors" href="/blog/2026-04-07-one-rust-core-across-android-and-ios.html">
-<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[prev_entry]</span>
-<h5 id="prev-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Deep Dive: One Rust Core Across Android and iOS</h5>
-<div class="mt-6 flex items-center gap-2 text-tertiary">
-<span class="material-symbols-outlined">arrow_back</span>
-<span class="font-label text-xs">read_entry</span>
-</div>
-</a>
-<a id="next-link" class="bg-background p-10 text-right group hover:bg-surface-container-low transition-colors" href="/blog/2026-04-30-agents-that-leave-receipts.html">
-<span class="font-label text-[10px] text-outline uppercase tracking-widest mb-4 block">[next_entry]</span>
-<h5 id="next-title" class="font-headline text-2xl font-bold group-hover:text-tertiary transition-colors">Agents That Leave Receipts</h5>
-<div class="mt-6 flex items-center justify-end gap-2 text-tertiary">
-<span class="font-label text-xs">read_entry</span>
-<span class="material-symbols-outlined">arrow_forward</span>
-</div>
-</a>
-</div>
+<nav class="article-region__adjacent" aria-label="Adjacent entries">
+  <a id="prev-link" href="/blog/2026-04-07-one-rust-core-across-android-and-ios.html">
+    <span>[previous entry]</span>
+    <h2 id="prev-title">Deep Dive: One Rust Core Across Android and iOS</h2>
+    <small>← read entry</small>
+  </a>
+  <a id="next-link" href="/blog/2026-04-30-agents-that-leave-receipts.html">
+    <span>[next entry]</span>
+    <h2 id="next-title">Agents That Leave Receipts</h2>
+    <small>read entry →</small>
+  </a>
+</nav>
 </article>
 </main>
 <footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
@@ -456,6 +539,8 @@ mempalace mine ~/chats --mode convos</pre></div>
     <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
   </div>
 </footer>
+<script src="/assets/js/article-debrief.js?v=20260807-regions1"></script>
+<script src="/assets/js/universe-field-map.js?v=20260807"></script>
 <script>
   (() => {
     const FORCE_ACTIVE_ROUTE = "/blog/";

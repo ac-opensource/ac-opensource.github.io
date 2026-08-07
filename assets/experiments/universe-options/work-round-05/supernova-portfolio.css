@@ -1,0 +1,343 @@
+:root {
+  --supernova-blue: #2864c7;
+  --supernova-blue-soft: #687fc4;
+  --supernova-teal: #168c86;
+  --supernova-amber: #e98b27;
+  --supernova-orange: #df642c;
+  --supernova-paper: #faf9f4;
+}
+
+.work-supernova-theme {
+  background-color: var(--supernova-paper);
+  background-image:
+    radial-gradient(ellipse at 80% 4%, rgba(40, 100, 199, 0.11), transparent 29rem),
+    radial-gradient(ellipse at 66% 18%, rgba(104, 127, 196, 0.07), transparent 24rem),
+    radial-gradient(ellipse at 91% 42%, rgba(233, 139, 39, 0.07), transparent 25rem),
+    radial-gradient(ellipse at 16% 57%, rgba(22, 140, 134, 0.045), transparent 28rem),
+    linear-gradient(rgba(91, 105, 96, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 105, 96, 0.035) 1px, transparent 1px);
+  background-size: auto, auto, auto, auto, 32px 32px, 32px 32px;
+}
+
+.work-supernova-theme .neural-global-bg {
+  opacity: 0.48;
+}
+
+.work-supernova-geometry {
+  position: fixed;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.work-supernova-geometry__shape {
+  position: absolute;
+  top: var(--gy);
+  left: var(--gx);
+  width: var(--gs);
+  height: var(--gs);
+  color: rgba(40, 100, 199, 0.18);
+  opacity: 0.68;
+  transform: translate(-50%, -50%) rotate(var(--gr));
+  animation: workGeometryDrift 14s var(--gd) ease-in-out infinite alternate;
+}
+
+.work-supernova-geometry__shape--ring {
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.work-supernova-geometry__shape--square,
+.work-supernova-geometry__shape--diamond {
+  border: 1px solid currentColor;
+}
+
+.work-supernova-geometry__shape--diamond {
+  transform: translate(-50%, -50%) rotate(calc(var(--gr) + 45deg));
+}
+
+.work-supernova-geometry__shape--triangle {
+  height: calc(var(--gs) * 0.88);
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%, 50% 0, 50% 8%, 9% 94%, 91% 94%, 50% 8%);
+}
+
+.work-supernova-geometry__shape--line {
+  height: 1px;
+  background: currentColor;
+}
+
+.work-supernova-geometry__shape--cross::before,
+.work-supernova-geometry__shape--cross::after {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  content: "";
+}
+
+.work-supernova-geometry__shape--cross::after {
+  transform: rotate(90deg);
+}
+
+.work-supernova-theme #site-topbar,
+.work-supernova-theme .work-page,
+.work-supernova-theme #site-footer {
+  position: relative;
+  z-index: 2;
+}
+
+.work-supernova-theme #site-topbar {
+  background: rgba(250, 249, 244, 0.88);
+}
+
+.work-supernova-theme .work-hero {
+  isolation: isolate;
+  overflow: visible;
+}
+
+.work-supernova-canvas {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  max-width: none;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.work-supernova-theme .work-hero__copy,
+.work-supernova-theme .work-hero__art,
+.work-supernova-theme .work-signals {
+  position: relative;
+  z-index: 2;
+}
+
+.work-supernova-theme .work-hero::after {
+  right: -7rem;
+  bottom: -10rem;
+  width: 36rem;
+  height: 36rem;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.86) 0 2%, rgba(233, 139, 39, 0.15) 8%, rgba(40, 100, 199, 0.09) 24%, transparent 64%);
+  animation: workHeroAfterglow 8s ease-in-out infinite;
+}
+
+.work-supernova-theme .work-hero__art {
+  isolation: isolate;
+}
+
+.work-supernova-theme .work-hero__art::before {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 53%;
+  width: 112%;
+  aspect-ratio: 1;
+  border-radius: 43% 57% 61% 39% / 58% 42% 58% 42%;
+  background:
+    conic-gradient(
+      from 18deg,
+      transparent 0 4%,
+      rgba(40, 100, 199, 0.19) 5% 11%,
+      transparent 13% 22%,
+      rgba(104, 127, 196, 0.11) 25% 31%,
+      transparent 33% 41%,
+      rgba(22, 140, 134, 0.13) 44% 49%,
+      transparent 51% 60%,
+      rgba(233, 139, 39, 0.2) 63% 70%,
+      transparent 72% 81%,
+      rgba(223, 100, 44, 0.12) 84% 89%,
+      transparent 92%
+    );
+  content: "";
+  filter: blur(7px) saturate(1.2);
+  transform: translate(-50%, -50%);
+  animation: workSupernovaBloom 9s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.work-supernova-theme .work-hero__art::after {
+  position: absolute;
+  z-index: 1;
+  top: 51%;
+  left: 51%;
+  width: 2.8rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 16%, #fff4ce 25%, #f3b95e 44%, rgba(233, 139, 39, 0.42) 61%, transparent 73%);
+  box-shadow:
+    0 0 0.8rem rgba(255, 255, 255, 0.92),
+    0 0 2.2rem rgba(233, 139, 39, 0.56),
+    0 0 5rem rgba(40, 100, 199, 0.34);
+  content: "";
+  transform: translate(-50%, -50%);
+  animation: workSupernovaCore 4.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.work-supernova-theme .work-pipeline {
+  position: relative;
+  z-index: 2;
+}
+
+.work-supernova-theme .work-pipeline__halo {
+  fill: rgba(40, 100, 199, 0.065);
+  stroke: rgba(40, 100, 199, 0.12);
+  stroke-width: 1;
+}
+
+.work-supernova-theme .work-pipeline__flow {
+  stroke: var(--supernova-blue);
+  filter: drop-shadow(0 0 6px rgba(40, 100, 199, 0.44));
+}
+
+.work-supernova-theme .work-pipeline__flow--delay-one {
+  stroke: var(--supernova-teal);
+}
+
+.work-supernova-theme .work-pipeline__flow--delay-two {
+  stroke: var(--supernova-amber);
+}
+
+.work-supernova-theme .work-pipeline__node--core rect {
+  stroke: rgba(40, 100, 199, 0.64);
+  fill: rgba(255, 255, 252, 0.91);
+}
+
+.work-supernova-theme .work-pipeline__node--release rect {
+  stroke: rgba(22, 140, 134, 0.62);
+  fill: rgba(22, 140, 134, 0.08);
+}
+
+.work-supernova-theme .work-eyebrow {
+  color: var(--supernova-blue);
+}
+
+.work-supernova-theme .work-eyebrow--bitcoin {
+  color: var(--supernova-amber);
+}
+
+.work-supernova-theme .work-case,
+.work-supernova-theme .work-archive-card,
+.work-supernova-theme .work-public-card {
+  border-color: rgba(75, 93, 82, 0.18);
+}
+
+.work-supernova-theme .work-case:not(.work-case--bitcoin) {
+  background-color: rgba(255, 255, 252, 0.82);
+  box-shadow:
+    0 18px 48px rgba(39, 54, 45, 0.065),
+    0 0 0 1px rgba(40, 100, 199, 0.025),
+    inset 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.work-supernova-theme .work-case:not(.work-case--bitcoin):hover,
+.work-supernova-theme .work-case:not(.work-case--bitcoin):focus-within {
+  border-color: rgba(40, 100, 199, 0.34);
+  box-shadow: 0 28px 68px rgba(39, 54, 45, 0.11), 0 0 3rem rgba(40, 100, 199, 0.055);
+}
+
+.work-supernova-theme .work-case--bitcoin {
+  background:
+    radial-gradient(circle at 83% 44%, rgba(233, 139, 39, 0.22), transparent 27rem),
+    radial-gradient(circle at 92% 34%, rgba(40, 100, 199, 0.16), transparent 35rem),
+    linear-gradient(145deg, #121719 0%, #20221f 58%, #111511 100%);
+}
+
+.work-supernova-theme .work-case--bitcoin::before {
+  position: absolute;
+  right: -12%;
+  bottom: -30%;
+  width: 68%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(233, 139, 39, 0.2);
+  border-radius: 50%;
+  box-shadow: 0 0 5rem rgba(40, 100, 199, 0.08);
+  content: "";
+  pointer-events: none;
+}
+
+.work-supernova-theme .work-case--itvx {
+  box-shadow: 0 18px 48px rgba(104, 127, 196, 0.1), inset 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.work-supernova-theme .work-case--ocbc {
+  box-shadow: 0 18px 48px rgba(40, 100, 199, 0.09), inset 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.work-supernova-theme .work-case--openpay {
+  box-shadow: 0 18px 48px rgba(22, 140, 134, 0.085), inset 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.work-supernova-theme .work-case--mystc {
+  box-shadow: 0 18px 48px rgba(233, 139, 39, 0.09), inset 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.work-supernova-theme .work-section__head {
+  border-color: rgba(75, 93, 82, 0.2);
+}
+
+.work-supernova-theme .work-chip {
+  border-color: rgba(40, 100, 199, 0.15);
+}
+
+.work-supernova-theme .work-archive-card,
+.work-supernova-theme .work-public-card {
+  background-image:
+    radial-gradient(circle at 92% 9%, rgba(40, 100, 199, 0.055), transparent 42%),
+    radial-gradient(circle at 9% 94%, rgba(233, 139, 39, 0.035), transparent 38%);
+}
+
+.work-supernova-theme .work-cta {
+  background:
+    radial-gradient(circle at 82% 38%, rgba(40, 100, 199, 0.22), transparent 21rem),
+    radial-gradient(circle at 15% 74%, rgba(233, 139, 39, 0.12), transparent 19rem),
+    linear-gradient(135deg, #132025, #122d39);
+}
+
+@keyframes workGeometryDrift {
+  from { opacity: 0.28; translate: 0 0; }
+  to { opacity: 0.78; translate: 7px -9px; }
+}
+
+@keyframes workHeroAfterglow {
+  0%, 100% { opacity: 0.7; transform: scale(0.94); }
+  22% { opacity: 1; transform: scale(1.06); }
+  63% { opacity: 0.82; transform: scale(1.01); }
+}
+
+@keyframes workSupernovaBloom {
+  0%, 100% { opacity: 0.56; transform: translate(-50%, -50%) rotate(-5deg) scale(0.9, 0.82); }
+  18% { opacity: 1; transform: translate(-50%, -50%) rotate(0deg) scale(1.04, 0.94); }
+  58% { opacity: 0.76; transform: translate(-50%, -50%) rotate(5deg) scale(1.13, 1.02); }
+}
+
+@keyframes workSupernovaCore {
+  0%, 100% { opacity: 0.82; transform: translate(-50%, -50%) scale(0.76); }
+  9% { opacity: 1; transform: translate(-50%, -50%) scale(1.32); }
+  19% { transform: translate(-50%, -50%) scale(0.95); }
+  52% { opacity: 0.91; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+@media (max-width: 768px) {
+  .work-supernova-theme .work-hero__art::before {
+    width: 108%;
+  }
+
+  .work-supernova-geometry__shape:nth-child(3n) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-supernova-theme *,
+  .work-supernova-theme *::before,
+  .work-supernova-theme *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
