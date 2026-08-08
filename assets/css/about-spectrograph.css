@@ -2787,7 +2787,7 @@ a.is-stellar-source {
   .stellar-tree__branch-dataset,
   .stellar-tree__branch-count { font-size: 0.43rem; }
   .stellar-spectrum__node.stellar-tree__signal .stellar-spectrum__node-label {
-    display: none;
+    display: block;
     max-width: 7.5rem;
     border: 1px solid rgba(31, 92, 186, 0.2);
     padding: 0.3rem 0.4rem;
