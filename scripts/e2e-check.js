@@ -777,6 +777,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     spatialPage.on('pageerror', (error) => failures.push(`Homepage ${viewport.width}x${viewport.height} pageerror: ${error.message}`));
     await spatialPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
     await spatialPage.locator('[data-synthesis]').waitFor();
+    await spatialPage.waitForFunction(
+      () => window.BigBangLoader?.snapshot().phase === 'complete',
+      null,
+      { timeout: 5000 }
+    );
     await spatialPage.evaluate(() => document.fonts?.ready);
 
     const overview = await spatialPage.evaluate(() => {
