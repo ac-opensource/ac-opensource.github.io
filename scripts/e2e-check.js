@@ -242,8 +242,40 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     }
   }
 
+  async function installBigBangLoadHold(targetPage) {
+    const baseOrigin = new URL(BASE_URL).origin;
+    await targetPage.route('**/*', async (route) => {
+      const request = route.request();
+      const requestUrl = new URL(request.url());
+      const isLoadHold = requestUrl.origin === baseOrigin
+        && requestUrl.pathname === '/assets/images/favicon.svg'
+        && requestUrl.searchParams.get('big-bang-e2e-hold') === '1';
+
+      if (isLoadHold) {
+        const response = await route.fetch();
+        await new Promise((resolve) => setTimeout(resolve, 550));
+        await route.fulfill({ response });
+        return;
+      }
+
+      if (request.resourceType() === 'document' && requestUrl.origin === baseOrigin) {
+        const response = await route.fetch();
+        const html = await response.text();
+        const body = html.replace(
+          /(<body\b[^>]*>)/i,
+          '$1<img src="/assets/images/favicon.svg?big-bang-e2e-hold=1" alt="" aria-hidden="true" width="1" height="1" style="position:absolute;opacity:0;pointer-events:none"/>'
+        );
+        await route.fulfill({ response, body });
+        return;
+      }
+
+      await route.continue();
+    });
+  }
+
   const bigBangContext = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   const bigBangPage = await bigBangContext.newPage();
+  await installBigBangLoadHold(bigBangPage);
   bigBangPage.on('pageerror', (error) => failures.push(`Big Bang loader pageerror: ${error.message}`));
   await bigBangPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
   await bigBangPage.locator('[data-big-bang-loader]').waitFor({ state: 'attached', timeout: 3000 });
@@ -400,6 +432,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   const mobileBigBangContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const mobileBigBangPage = await mobileBigBangContext.newPage();
+  await installBigBangLoadHold(mobileBigBangPage);
   mobileBigBangPage.on('pageerror', (error) => failures.push(`Mobile Big Bang loader pageerror: ${error.message}`));
   await mobileBigBangPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
   await mobileBigBangPage.locator('[data-big-bang-loader]').waitFor({ state: 'attached', timeout: 3000 });
