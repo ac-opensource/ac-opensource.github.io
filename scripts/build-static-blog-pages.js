@@ -536,6 +536,7 @@ function buildStaticPostHtml({ post, previous, next }) {
 <link rel="canonical" href="${escapeHtml(canonicalUrl)}"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
+<meta property="og:locale" content="en_US"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="${escapeHtml(canonicalUrl)}"/>
 <meta property="og:title" content="${escapeHtml(title)} | Andrew Concepcion"/>

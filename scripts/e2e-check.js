@@ -6,8 +6,21 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:4173';
 const CHECK_EXTERNAL_LINKS = process.env.CHECK_EXTERNAL_LINKS === '1';
 const siteRoot = path.resolve(__dirname, '..', process.env.SITE_ROOT || '.');
 const postsManifestPath = path.join(siteRoot, 'blog', 'posts.json');
-const homepageSocialImagePath = path.join(siteRoot, 'assets', 'images', 'og', 'home-orbital-dashboard-hero.png');
 const homepageSocialImageUrl = 'https://ac-opensource.github.io/assets/images/og/home-orbital-dashboard-hero.png';
+const socialPreviewContracts = [
+  { path: '/', canonicalUrl: 'https://ac-opensource.github.io/', image: 'home-orbital-dashboard-hero.png' },
+  { path: '/work.html', canonicalUrl: 'https://ac-opensource.github.io/work.html', image: 'work-delivery-system.png' },
+  { path: '/blog/', canonicalUrl: 'https://ac-opensource.github.io/blog/', image: 'logs-spiral-galaxy.png' },
+  { path: '/about.html', canonicalUrl: 'https://ac-opensource.github.io/about.html', image: 'about-stellar-tree.png' },
+  { path: '/contact.html', canonicalUrl: 'https://ac-opensource.github.io/contact.html', image: 'contact-payload-integration.png' },
+  { path: '/resume.html', canonicalUrl: 'https://ac-opensource.github.io/resume.html', image: 'resume-flight-recorder.png' },
+  { path: '/signals.html', canonicalUrl: 'https://ac-opensource.github.io/signals.html', image: 'signals-registry.png' },
+  { path: '/skills-graph.html', canonicalUrl: 'https://ac-opensource.github.io/about.html#profile-map', image: 'about-stellar-tree.png' },
+].map((contract) => ({
+  ...contract,
+  imagePath: path.join(siteRoot, 'assets', 'images', 'og', contract.image),
+  imageUrl: `https://ac-opensource.github.io/assets/images/og/${contract.image}`,
+}));
 let STATIC_BLOG_POST_PATH = '/blog/post.html';
 let GENERATED_BLOG_POST_PATHS = [];
 
@@ -93,20 +106,76 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     if (!condition) failures.push(message);
   }
 
-  if (!fs.existsSync(homepageSocialImagePath)) {
-    failures.push('Homepage social preview image is missing');
-  } else {
-    const socialImage = fs.readFileSync(homepageSocialImagePath);
-    const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  for (const socialImagePath of new Set(socialPreviewContracts.map(({ imagePath }) => imagePath))) {
+    if (!fs.existsSync(socialImagePath)) {
+      failures.push(`Social preview image is missing: ${path.relative(siteRoot, socialImagePath)}`);
+      continue;
+    }
+    const socialImage = fs.readFileSync(socialImagePath);
+    const relativeSocialImagePath = path.relative(siteRoot, socialImagePath);
     await assert(
       socialImage.subarray(0, pngSignature.length).equals(pngSignature),
-      'Homepage social preview must be a true PNG image'
+      `${relativeSocialImagePath}: social preview must be a true PNG image`
     );
     await assert(
       socialImage.length >= 24
         && socialImage.readUInt32BE(16) === 1200
         && socialImage.readUInt32BE(20) === 630,
-      'Homepage social preview must be exactly 1200x630'
+      `${relativeSocialImagePath}: social preview must be exactly 1200x630`
+    );
+  }
+
+  const readMetaContent = (html, attribute, value) => {
+    const escapedValue = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const tag = (html.match(/<meta\b[^>]*>/gi) || []).find((candidate) =>
+      new RegExp(`${attribute}\\s*=\\s*["']${escapedValue}["']`, 'i').test(candidate)
+    );
+    return tag?.match(/\bcontent\s*=\s*"([^"]*)"/i)?.[1]
+      || tag?.match(/\bcontent\s*=\s*'([^']*)'/i)?.[1]
+      || '';
+  };
+
+  for (const contract of socialPreviewContracts) {
+    const response = await api.get(contract.path);
+    const html = await response.text();
+    const metadata = {
+      locale: readMetaContent(html, 'property', 'og:locale'),
+      siteName: readMetaContent(html, 'property', 'og:site_name'),
+      type: readMetaContent(html, 'property', 'og:type'),
+      url: readMetaContent(html, 'property', 'og:url'),
+      title: readMetaContent(html, 'property', 'og:title'),
+      description: readMetaContent(html, 'property', 'og:description'),
+      image: readMetaContent(html, 'property', 'og:image'),
+      imageType: readMetaContent(html, 'property', 'og:image:type'),
+      imageWidth: readMetaContent(html, 'property', 'og:image:width'),
+      imageHeight: readMetaContent(html, 'property', 'og:image:height'),
+      imageAlt: readMetaContent(html, 'property', 'og:image:alt'),
+      twitterCard: readMetaContent(html, 'name', 'twitter:card'),
+      twitterTitle: readMetaContent(html, 'name', 'twitter:title'),
+      twitterDescription: readMetaContent(html, 'name', 'twitter:description'),
+      twitterImage: readMetaContent(html, 'name', 'twitter:image'),
+      twitterAlt: readMetaContent(html, 'name', 'twitter:image:alt'),
+    };
+    await assert(
+      response.ok()
+        && metadata.locale === 'en_US'
+        && metadata.siteName === 'Andrew Concepcion'
+        && metadata.type === 'website'
+        && metadata.url === contract.canonicalUrl
+        && Boolean(metadata.title)
+        && Boolean(metadata.description)
+        && metadata.image === contract.imageUrl
+        && metadata.imageType === 'image/png'
+        && metadata.imageWidth === '1200'
+        && metadata.imageHeight === '630'
+        && Boolean(metadata.imageAlt)
+        && metadata.twitterCard === 'summary_large_image'
+        && metadata.twitterTitle === metadata.title
+        && metadata.twitterDescription === metadata.description
+        && metadata.twitterImage === contract.imageUrl
+        && metadata.twitterAlt === metadata.imageAlt,
+      `${contract.path}: incomplete or stale social metadata: ${JSON.stringify(metadata)}`
     );
   }
 
@@ -2018,7 +2087,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       ) > 0.02,
     `Mobile lock or Front selection disables idle animation: ${JSON.stringify({ mobileLockedFrontBefore, mobileLockedFrontAfter })}`
   );
-  await mobilePage.locator('[data-node-id="android"]').click();
+  // The authored idle rotation intentionally keeps every node moving. Force the
+  // pointer click so Playwright does not wait forever for a stable bounding box.
+  await mobilePage.locator('[data-node-id="android"]').click({ force: true });
   const mobilePopup = await mobilePage.evaluate(() => {
     const popup = document.querySelector('[data-stellar-readout]');
     const url = new URL(location.href);

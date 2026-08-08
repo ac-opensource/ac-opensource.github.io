@@ -233,6 +233,81 @@ function canonicalFromHtml(html) {
   return null;
 }
 
+function metaContent(html, attribute, value) {
+  const escapedValue = value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const tag = (String(html).match(/<meta\b[^>]*>/gi) || []).find((candidate) =>
+    new RegExp(`${attribute}\\s*=\\s*["']${escapedValue}["']`, "i").test(candidate)
+  );
+  return tag?.match(/\bcontent\s*=\s*"([^"]*)"/i)?.[1]
+    || tag?.match(/\bcontent\s*=\s*'([^']*)'/i)?.[1]
+    || "";
+}
+
+function assertSocialMetadata(distDir) {
+  const generatedPosts = fs
+    .readdirSync(path.join(distDir, "blog"), { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".html") && entry.name !== "index.html")
+    .map((entry) => path.posix.join("blog", entry.name));
+  const canonicalPages = [...publication.publicPages, "blog/index.html", ...generatedPosts];
+
+  for (const relativePath of canonicalPages) {
+    const html = fs.readFileSync(path.join(distDir, relativePath), "utf8");
+    const canonical = canonicalFromHtml(html);
+    const expectedType = relativePath.startsWith("blog/") && relativePath !== "blog/index.html"
+      ? "article"
+      : "website";
+    const metadata = {
+      locale: metaContent(html, "property", "og:locale"),
+      siteName: metaContent(html, "property", "og:site_name"),
+      type: metaContent(html, "property", "og:type"),
+      url: metaContent(html, "property", "og:url"),
+      title: metaContent(html, "property", "og:title"),
+      description: metaContent(html, "property", "og:description"),
+      image: metaContent(html, "property", "og:image"),
+      imageType: metaContent(html, "property", "og:image:type"),
+      imageWidth: metaContent(html, "property", "og:image:width"),
+      imageHeight: metaContent(html, "property", "og:image:height"),
+      imageAlt: metaContent(html, "property", "og:image:alt"),
+      twitterCard: metaContent(html, "name", "twitter:card"),
+      twitterTitle: metaContent(html, "name", "twitter:title"),
+      twitterDescription: metaContent(html, "name", "twitter:description"),
+      twitterImage: metaContent(html, "name", "twitter:image"),
+      twitterAlt: metaContent(html, "name", "twitter:image:alt")
+    };
+
+    if (
+      metadata.locale !== "en_US" ||
+      metadata.siteName !== "Andrew Concepcion" ||
+      metadata.type !== expectedType ||
+      metadata.url !== canonical ||
+      !metadata.title ||
+      !metadata.description ||
+      !metadata.image ||
+      !metadata.imageAlt ||
+      metadata.twitterCard !== "summary_large_image" ||
+      metadata.twitterTitle !== metadata.title ||
+      metadata.twitterDescription !== metadata.description ||
+      metadata.twitterImage !== metadata.image ||
+      metadata.twitterAlt !== metadata.imageAlt
+    ) {
+      throw new Error(`${relativePath} has incomplete or inconsistent Open Graph/Twitter metadata: ${JSON.stringify(metadata)}`);
+    }
+
+    if (expectedType === "website" && (
+      metadata.imageType !== "image/png" ||
+      metadata.imageWidth !== "1200" ||
+      metadata.imageHeight !== "630"
+    )) {
+      throw new Error(`${relativePath} social preview must declare a 1200x630 PNG.`);
+    }
+
+    const imageUrl = new URL(metadata.image, `${SITE_ORIGIN}/`);
+    if (imageUrl.origin === SITE_ORIGIN && !fs.existsSync(referenceTarget(distDir, imageUrl.pathname))) {
+      throw new Error(`${relativePath} social preview does not exist in publication output: ${imageUrl.pathname}`);
+    }
+  }
+}
+
 function isNoindexHtml(html) {
   const tags = String(html).match(/<meta\b[^>]*>/gi) || [];
   return tags.some((tag) =>
@@ -468,6 +543,7 @@ function verifyDist({ distDir = DEFAULT_DIST_DIR, dbPath } = {}) {
   assertGoogleSiteVerification(resolvedDist);
   assertReferencesResolve(resolvedDist, files);
   assertSitemapAndCanonicals(resolvedDist, files);
+  assertSocialMetadata(resolvedDist);
 
   return { fileCount: files.length, postCount };
 }
@@ -497,6 +573,7 @@ module.exports = {
   assertNoPublishedExif,
   assertPublishedPosts,
   assertSitemapAndCanonicals,
+  assertSocialMetadata,
   verifyDist,
   walkFiles
 };
