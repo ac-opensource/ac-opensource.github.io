@@ -2,6 +2,13 @@
   "use strict";
 
   const root = document.documentElement;
+  const FULL_SEQUENCE_MS = 820;
+  const SESSION_KEY = "ac.bigBangPortfolioPlayed.v1";
+
+  // The bootstrap is the session gate. Bail out before any geometry work on
+  // repeat Portfolio visits or on routes that never opted into the loader.
+  if (root.dataset.bigBang !== "pending") return;
+
   const phaseTimers = [];
   const state = {
     active: false,
@@ -18,6 +25,7 @@
     profile: null,
     readyAt: 0,
     readyDelayMs: null,
+    releaseScheduled: false,
     revealAt: 0,
     revealStarted: false,
     startedAt: 0
@@ -206,6 +214,15 @@
 
   function clearPhaseTimers() {
     while (phaseTimers.length) window.clearTimeout(phaseTimers.pop());
+  }
+
+  function rememberSessionPlayback() {
+    try {
+      window.sessionStorage.setItem(SESSION_KEY, "1");
+    } catch (error) {
+      // Storage can be unavailable in hardened browsing modes. The animation
+      // still completes normally; a later visit may replay it.
+    }
   }
 
   function schedule(callback, delay) {
@@ -766,12 +783,14 @@
     state.active = false;
     state.landmarks = [];
     state.particleCount = 0;
+    state.releaseScheduled = false;
     state.revealStarted = false;
     clearLandmarkState();
     root.dataset.bigBang = "complete";
     delete root.dataset.bigBangSkip;
     root.style.removeProperty("--big-bang-origin-x");
     root.style.removeProperty("--big-bang-origin-y");
+    rememberSessionPlayback();
     emit("complete", reason);
     if (moveFocus) moveFocusToContent();
   }
@@ -813,6 +832,18 @@
     if (!state.active || state.revealStarted || !state.overlay) return;
     state.pageReady = true;
     if (!state.readyAt) state.readyAt = performance.now();
+    const remainingSequenceMs = Math.max(0, FULL_SEQUENCE_MS - (performance.now() - state.startedAt));
+    if (remainingSequenceMs > 0) {
+      if (state.releaseScheduled) return;
+      state.releaseScheduled = true;
+      schedule(function () {
+        state.releaseScheduled = false;
+        if (!state.active || !state.pageReady || state.revealStarted) return;
+        primeForReveal();
+        reveal(reason);
+      }, remainingSequenceMs);
+      return;
+    }
     primeForReveal();
     reveal(reason);
   }
@@ -834,6 +865,7 @@
     state.particleCount = 0;
     state.readyAt = state.pageReady ? performance.now() : 0;
     state.readyDelayMs = null;
+    state.releaseScheduled = false;
     state.revealAt = 0;
     state.revealStarted = false;
     state.startedAt = performance.now();
@@ -907,7 +939,8 @@
       return {
         active: state.active,
         context: state.profile?.id || contextName(),
-        activation: "default",
+        activation: "portfolio-session",
+        fullSequenceMs: FULL_SEQUENCE_MS,
         landmarkCount: state.landmarkCount,
         origin: state.origin ? {
           selector: state.origin.selector,
@@ -917,6 +950,7 @@
         particleCount: state.particleCount,
         phase: state.phase,
         readyDelayMs: state.readyDelayMs,
+        revealElapsedMs: state.revealAt ? Math.round(state.revealAt - state.startedAt) : null,
         rootState: root.dataset.bigBang || "inactive"
       };
     }
