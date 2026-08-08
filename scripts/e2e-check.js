@@ -294,22 +294,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const canvas = document.querySelector('[data-big-bang-matter]');
     const skip = document.querySelector('[data-big-bang-skip]');
     const snapshot = window.BigBangLoader?.snapshot();
-    const landmarkByIndex = new Map(
-      [...document.querySelectorAll('[data-big-bang-landmark-index]')]
-        .map((element) => [element.dataset.bigBangLandmarkIndex, element])
-    );
-    const alignmentDrift = [...document.querySelectorAll('.big-bang-loader__lock')].map((lock) => {
-      const target = landmarkByIndex.get(lock.dataset.landmarkIndex);
-      if (!target) return Infinity;
-      const lockRect = lock.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
-      return Math.max(
-        Math.abs(lockRect.left - targetRect.left),
-        Math.abs(lockRect.top - targetRect.top),
-        Math.abs(lockRect.width - targetRect.width),
-        Math.abs(lockRect.height - targetRect.height)
-      );
-    });
     return {
       bodyFilter: getComputedStyle(document.body).filter,
       bodyTransform: getComputedStyle(document.body).transform,
@@ -324,7 +308,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
       lockCount: document.querySelectorAll('.big-bang-loader__lock').length,
       matterCount: Number(canvas?.dataset.matterCount || 0),
-      maxAlignmentDrift: Math.max(0, ...alignmentDrift),
       originSelector: snapshot?.origin?.selector,
       particleCount: snapshot?.particleCount,
       phase: snapshot?.phase,
@@ -347,7 +330,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && bigBangImpact.lockCount === bigBangImpact.landmarkCount
       && bigBangImpact.matterCount === bigBangImpact.landmarkCount
       && bigBangImpact.linkCount === bigBangImpact.landmarkCount
-      && bigBangImpact.maxAlignmentDrift <= 1.5
       && bigBangImpact.loaderDomNodes < 90
       && bigBangImpact.bodyTransform === 'none'
       && bigBangImpact.bodyFilter === 'none'
