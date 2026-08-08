@@ -13,23 +13,30 @@ const { DEFAULT_DB_PATH, openDatabase } = require("./lib/blog-db");
 
 function main() {
   const loaderFixture = "<!doctype html><html><head><title>Fixture</title></head><body>Ready</body></html>";
-  const loaderEnhanced = injectBigBangLoader(loaderFixture, "index.html");
+  const loaderEnhanced = injectBigBangLoader(loaderFixture, "work.html");
   if (!loaderEnhanced.includes('data-big-bang-bootstrap')
-    || !loaderEnhanced.includes('/assets/css/big-bang-loader.css?v=20260808-6')
-    || !loaderEnhanced.includes('/assets/js/big-bang-loader.js?v=20260808-6')
+    || !loaderEnhanced.includes('/assets/css/big-bang-loader.css?v=20260808-7')
+    || !loaderEnhanced.includes('/assets/js/big-bang-loader.js?v=20260808-7')
     || !loaderEnhanced.includes('root.dataset.bigBang="pending"')
+    || !loaderEnhanced.includes('sessionStorage.getItem("ac.bigBangPortfolioPlayed.v1")')
     || loaderEnhanced.includes('window.location.search')) {
-    throw new Error("The default Big Bang loader assets or activation bootstrap are incomplete.");
+    throw new Error("The Portfolio session Big Bang assets or activation bootstrap are incomplete.");
   }
-  if (injectBigBangLoader(loaderEnhanced, "index.html") !== loaderEnhanced) {
+  if (injectBigBangLoader(loaderEnhanced, "work.html") !== loaderEnhanced) {
     throw new Error("The Big Bang loader injection is not idempotent.");
   }
-  if (injectBigBangLoader(loaderFixture, "experiments/fixture.html") !== loaderFixture) {
-    throw new Error("The Big Bang loader leaked into the experiment archive.");
-  }
-  const redirectFixture = loaderFixture.replace("<title>", '<meta http-equiv="refresh" content="0; url=/"><title>');
-  if (injectBigBangLoader(redirectFixture, "redirect.html") !== redirectFixture) {
-    throw new Error("The Big Bang loader delayed an immediate redirect route.");
+  for (const route of [
+    "index.html",
+    "about.html",
+    "blog/index.html",
+    "blog/fixture-article.html",
+    "contact/index.html",
+    "experiments/fixture.html",
+    "redirect.html"
+  ]) {
+    if (injectBigBangLoader(loaderFixture, route) !== loaderFixture) {
+      throw new Error(`The Portfolio Big Bang loader leaked into ${route}.`);
+    }
   }
 
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ac-blog-build-test-"));

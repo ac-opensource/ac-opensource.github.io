@@ -171,24 +171,26 @@ function injectUniverseSoundscape(html, relativePath) {
 
 function injectBigBangLoader(html, relativePath) {
   const normalizedPath = relativePath.split(path.sep).join("/");
-  if (normalizedPath.startsWith("experiments/") || /http-equiv=["']refresh["']/i.test(html)) return html;
+  if (normalizedPath !== "work.html") return html;
   if (!html.includes("</head>")) {
     throw new Error(`Cannot add the Big Bang page loader to ${relativePath}: missing </head>.`);
   }
   if (html.includes("data-big-bang-bootstrap")) return html;
 
   const bootstrap = [
-    '<link href="/assets/css/big-bang-loader.css?v=20260808-6" rel="stylesheet"/>',
+    '<link href="/assets/css/big-bang-loader.css?v=20260808-7" rel="stylesheet"/>',
     '<script data-big-bang-bootstrap>(function(){',
     'if(window.matchMedia&&(',
     'window.matchMedia("(prefers-reduced-motion: reduce)").matches||',
     'window.matchMedia("(forced-colors: active)").matches))return;',
+    'var seen=false;try{seen=window.sessionStorage.getItem("ac.bigBangPortfolioPlayed.v1")==="1";}catch(error){}',
+    'if(seen)return;',
     'var root=document.documentElement;root.dataset.bigBang="pending";',
     'window.__bigBangLoaderGuard=window.setTimeout(function(){',
     'if(root.dataset.bigBang==="pending")delete root.dataset.bigBang;',
     '},4000);',
     '}());</script>',
-    '<script src="/assets/js/big-bang-loader.js?v=20260808-6" defer></script>'
+    '<script src="/assets/js/big-bang-loader.js?v=20260808-7" defer></script>'
   ].join("");
 
   return html.replace("</head>", `${bootstrap}\n</head>`);
