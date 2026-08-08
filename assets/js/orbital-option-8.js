@@ -128,39 +128,42 @@
     return value - Math.floor(value);
   };
 
-  nodes.forEach((node, nodeIndex) => {
-    node.setAttribute("aria-grabbed", "false");
-    const wake = document.createElement("span");
-    wake.className = "comet-wake";
-    wake.setAttribute("aria-hidden", "true");
-    for (let line = 0; line < 3; line += 1) wake.append(document.createElement("i"));
-    for (let particleIndex = 0; particleIndex < 22; particleIndex += 1) {
-      const particle = document.createElement("b");
-      const dust = particleIndex % 5 === 1 || particleIndex % 5 === 4;
-      const duration = (dust ? 1.6 : 1.08) + cometParticleSample(nodeIndex, particleIndex, 1) * (dust ? .9 : .68);
-      const distance = (dust ? 52 : 72) + cometParticleSample(nodeIndex, particleIndex, 2) * (dust ? 54 : 58);
-      const size = (dust ? 1.05 : .82) + cometParticleSample(nodeIndex, particleIndex, 3) * (dust ? 2.3 : 1.82);
-      const trail = (dust ? 5 : 7) + cometParticleSample(nodeIndex, particleIndex, 4) * (dust ? 9 : 12);
-      const vertical = (cometParticleSample(nodeIndex, particleIndex, 5) - .5) * (dust ? 9 : 5.5);
-      const jitter = (cometParticleSample(nodeIndex, particleIndex, 6) - .5) * (dust ? 5 : 2.5);
-      const paletteIndex = dust
-        ? 3 + (particleIndex % 2)
-        : particleIndex % 3;
-      particle.className = `comet-particle comet-particle--${dust ? "dust" : "ion"}`;
-      particle.style.setProperty("--particle-rgb", cometParticlePalette[paletteIndex]);
-      particle.style.setProperty("--particle-delay", `${(-duration * cometParticleSample(nodeIndex, particleIndex, 7)).toFixed(3)}s`);
-      particle.style.setProperty("--particle-duration", `${duration.toFixed(3)}s`);
-      particle.style.setProperty("--particle-distance", `${distance.toFixed(2)}px`);
-      particle.style.setProperty("--particle-size", `${size.toFixed(2)}px`);
-      particle.style.setProperty("--particle-mobile-size", `${Math.max(.7, size * .82).toFixed(2)}px`);
-      particle.style.setProperty("--particle-trail", `${trail.toFixed(2)}px`);
-      particle.style.setProperty("--particle-y", `${vertical.toFixed(2)}px`);
-      particle.style.setProperty("--particle-jitter", `${jitter.toFixed(2)}px`);
-      particle.style.setProperty("--particle-alpha", (.54 + cometParticleSample(nodeIndex, particleIndex, 8) * .46).toFixed(3));
-      wake.append(particle);
-    }
-    node.append(wake);
-  });
+  nodes.forEach((node) => node.setAttribute("aria-grabbed", "false"));
+
+  // Only one body can be the active comet. Reuse one wake instead of keeping
+  // six filtered particle systems in the scene, which avoids unnecessary
+  // style/compositing work while preserving the exact visible tail.
+  const cometWake = document.createElement("span");
+  const cometParticleSeed = keys.indexOf("projects");
+  cometWake.className = "comet-wake";
+  cometWake.setAttribute("aria-hidden", "true");
+  for (let line = 0; line < 3; line += 1) cometWake.append(document.createElement("i"));
+  for (let particleIndex = 0; particleIndex < 22; particleIndex += 1) {
+    const particle = document.createElement("b");
+    const dust = particleIndex % 5 === 1 || particleIndex % 5 === 4;
+    const duration = (dust ? 1.6 : 1.08) + cometParticleSample(cometParticleSeed, particleIndex, 1) * (dust ? .9 : .68);
+    const distance = (dust ? 52 : 72) + cometParticleSample(cometParticleSeed, particleIndex, 2) * (dust ? 54 : 58);
+    const size = (dust ? 1.05 : .82) + cometParticleSample(cometParticleSeed, particleIndex, 3) * (dust ? 2.3 : 1.82);
+    const trail = (dust ? 5 : 7) + cometParticleSample(cometParticleSeed, particleIndex, 4) * (dust ? 9 : 12);
+    const vertical = (cometParticleSample(cometParticleSeed, particleIndex, 5) - .5) * (dust ? 9 : 5.5);
+    const jitter = (cometParticleSample(cometParticleSeed, particleIndex, 6) - .5) * (dust ? 5 : 2.5);
+    const paletteIndex = dust
+      ? 3 + (particleIndex % 2)
+      : particleIndex % 3;
+    particle.className = `comet-particle comet-particle--${dust ? "dust" : "ion"}`;
+    particle.style.setProperty("--particle-rgb", cometParticlePalette[paletteIndex]);
+    particle.style.setProperty("--particle-delay", `${(-duration * cometParticleSample(cometParticleSeed, particleIndex, 7)).toFixed(3)}s`);
+    particle.style.setProperty("--particle-duration", `${duration.toFixed(3)}s`);
+    particle.style.setProperty("--particle-distance", `${distance.toFixed(2)}px`);
+    particle.style.setProperty("--particle-size", `${size.toFixed(2)}px`);
+    particle.style.setProperty("--particle-mobile-size", `${Math.max(.7, size * .82).toFixed(2)}px`);
+    particle.style.setProperty("--particle-trail", `${trail.toFixed(2)}px`);
+    particle.style.setProperty("--particle-y", `${vertical.toFixed(2)}px`);
+    particle.style.setProperty("--particle-jitter", `${jitter.toFixed(2)}px`);
+    particle.style.setProperty("--particle-alpha", (.54 + cometParticleSample(cometParticleSeed, particleIndex, 8) * .46).toFixed(3));
+    cometWake.append(particle);
+  }
+  nodes[0].append(cometWake);
 
   // Threads has the broadest regular path, so it can spend longer beyond the
   // camera edge than the other nodes. IntersectionObserver keeps that check
@@ -391,6 +394,7 @@
   };
 
   const syncCometWake = (node, point, previousPoint = null, orbitDirection = 1) => {
+    if (cometWake.parentElement !== node) node.append(cometWake);
     const focusX = state.width * .04;
     const focusY = state.height * .02;
     const radialX = point.x - focusX;

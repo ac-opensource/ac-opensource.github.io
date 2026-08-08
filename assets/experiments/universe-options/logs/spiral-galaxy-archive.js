@@ -30,6 +30,7 @@
   if (Object.values(elements).some((element) => !element)) return;
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const mobileLayout = window.matchMedia("(max-width: 760px)");
   const categoryColors = Object.freeze({
     hobby: "#5887c9",
     reflection: "#7187b2",
@@ -1118,6 +1119,21 @@
       writeUrl();
       window.clearTimeout(searchTimer);
       searchTimer = window.setTimeout(render, reducedMotion.matches ? 0 : 420);
+    });
+    elements.tuner.addEventListener("submit", (event) => {
+      event.preventDefault();
+      window.clearTimeout(searchTimer);
+      state.query = elements.search.value.slice(0, 160);
+      writeUrl();
+      render();
+      if (!mobileLayout.matches) return;
+      elements.search.blur();
+      window.setTimeout(() => {
+        elements.core.scrollIntoView({
+          behavior: reducedMotion.matches ? "auto" : "smooth",
+          block: "center"
+        });
+      }, reducedMotion.matches ? 0 : 40);
     });
     elements.tuner.addEventListener("reset", () => window.setTimeout(() => {
       window.clearTimeout(searchTimer);

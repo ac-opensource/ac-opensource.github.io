@@ -820,6 +820,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         resetDisabled: document.querySelector('[data-orbit-reset]')?.disabled,
         glitterAnimations: glitters.map((glitter) => getComputedStyle(glitter).animationName),
         glitterCount: glitters.length,
+        documentGlitterCount: document.querySelectorAll('.comet-particle').length,
         glitterColorCount: new Set(glitters.map((glitter) => getComputedStyle(glitter).color)).size,
         glitterMaximumSize: Math.max(...glitters.map((glitter) => Number.parseFloat(getComputedStyle(glitter).width))),
         glitterTrails: glitters.filter((glitter) => Number.parseFloat(getComputedStyle(glitter, '::before').width) >= 5).length,
@@ -846,7 +847,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await assert(flung.fling?.period >= 18 && flung.fling?.period <= 34, 'Desktop comet is not faster than the regular 178–360 second orbits');
     await assert(flung.resetDisabled === false && flung.wakeOpacity > 0, 'Desktop fling does not expose its wake and reset control');
     await assert(
-      flung.tailAngleError <= 1 && flung.glitterCount === 22 && flung.glitterVisible
+      flung.tailAngleError <= 1 && flung.glitterCount === 22 && flung.documentGlitterCount === 22 && flung.glitterVisible
         && flung.glitterColorCount === 5 && flung.glitterMaximumSize <= 3.6
         && flung.glitterTrails === flung.glitterCount && flung.tailThickness <= 20
         && flung.glitterAnimations.every((name) => ['comet-ion-eject', 'comet-dust-eject'].includes(name)),
@@ -2619,6 +2620,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await page.waitForTimeout(540);
   const searchCount = await page.locator('#blog-feed article:not([hidden])').count();
   await assert(searchCount > 0, `Search returned zero results for token: ${searchToken}`);
+  await page.locator('#galaxy-search').press('Enter');
+  await assert(
+    await page.locator('#galaxy-search').inputValue() === searchToken
+      && new URL(page.url()).searchParams.get('q') === searchToken
+      && await page.locator('#blog-feed article:not([hidden])').count() === searchCount,
+    'Pressing Enter cleared or changed the committed Logs search'
+  );
 
   await page.fill('#galaxy-search', '___unlikely___term___');
   await page.waitForTimeout(540);
@@ -2627,6 +2635,50 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await page.fill('#galaxy-search', '');
   await page.locator('#galaxy-categories button[data-category="all"]').click();
   await page.waitForTimeout(540);
+
+  await mobilePage.goto(BASE_URL + '/blog/', { waitUntil: 'networkidle' });
+  await mobilePage.waitForSelector('#galaxy-field[data-ready="true"]', { timeout: 15000 });
+  const mobileLogsLayout = await mobilePage.evaluate(() => {
+    const map = document.querySelector('.universe-route-map');
+    const mapBounds = map.getBoundingClientRect();
+    const tuner = document.querySelector('#galaxy-tuner').getBoundingClientRect();
+    const field = document.querySelector('#galaxy-field').getBoundingClientRect();
+    return {
+      fieldGap: field.top - tuner.bottom,
+      mapBottom: innerHeight - mapBounds.bottom,
+      mapMode: map.dataset.universeRouteMapMode || null,
+      mapParent: map.parentElement?.tagName,
+      mapPosition: getComputedStyle(map).position,
+    };
+  });
+  await assert(
+    mobileLogsLayout.fieldGap <= 8
+      && mobileLogsLayout.mapBottom <= 2
+      && mobileLogsLayout.mapMode === null
+      && mobileLogsLayout.mapParent === 'BODY'
+      && mobileLogsLayout.mapPosition === 'fixed',
+    `Mobile Logs does not keep search adjacent to the galaxy with floating navigation: ${JSON.stringify(mobileLogsLayout)}`
+  );
+  await mobilePage.fill('#galaxy-search', 'privacy');
+  await mobilePage.locator('#galaxy-search').press('Enter');
+  await mobilePage.waitForFunction(() => document.querySelector('.galaxy-hero')?.dataset.merger === 'remnant');
+  await mobilePage.waitForTimeout(900);
+  const mobileEnterState = await mobilePage.evaluate(() => {
+    const core = document.querySelector('.galaxy-core__horizon').getBoundingClientRect();
+    return {
+      coreCenterDistance: Math.abs((core.top + core.bottom) / 2 - innerHeight / 2),
+      query: new URL(location.href).searchParams.get('q'),
+      scrollY,
+      value: document.querySelector('#galaxy-search').value,
+    };
+  });
+  await assert(
+    mobileEnterState.value === 'privacy'
+      && mobileEnterState.query === 'privacy'
+      && mobileEnterState.scrollY > 0
+      && mobileEnterState.coreCenterDistance < 90,
+    `Mobile Logs Enter did not retain search and scroll to the galaxy: ${JSON.stringify(mobileEnterState)}`
+  );
 
   // Blog post behavior
   await page.locator('#blog-feed article a').first().click();

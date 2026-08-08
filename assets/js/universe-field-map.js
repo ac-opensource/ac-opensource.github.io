@@ -50,13 +50,23 @@
   });
 
   const integratedHost = document.querySelector("[data-universe-route-map-host]");
-  if (integratedHost) {
-    nav.dataset.universeRouteMapMode = "integrated";
-    integratedHost.append(nav);
-    document.body.classList.add("has-integrated-universe-route-map");
-  } else {
-    document.body.append(nav);
-  }
+  const mobileFloatingQuery = integratedHost?.dataset.universeRouteMapMobile === "floating"
+    ? window.matchMedia("(max-width: 760px)")
+    : null;
+  const mountRouteMap = () => {
+    const integrated = Boolean(integratedHost) && !mobileFloatingQuery?.matches;
+    if (integrated) {
+      nav.dataset.universeRouteMapMode = "integrated";
+      integratedHost.append(nav);
+      document.body.classList.add("has-integrated-universe-route-map");
+    } else {
+      delete nav.dataset.universeRouteMapMode;
+      document.body.append(nav);
+      document.body.classList.remove("has-integrated-universe-route-map");
+    }
+  };
+  mountRouteMap();
+  mobileFloatingQuery?.addEventListener?.("change", mountRouteMap);
   document.body.classList.add("has-universe-route-map");
 
   window.addEventListener("hashchange", () => {
