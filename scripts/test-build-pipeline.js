@@ -8,9 +8,30 @@ const {
   decorateArticleBody,
   trajectoryVariant
 } = require("./build-static-blog-pages");
+const { injectBigBangLoader } = require("./build-site");
 const { DEFAULT_DB_PATH, openDatabase } = require("./lib/blog-db");
 
 function main() {
+  const loaderFixture = "<!doctype html><html><head><title>Fixture</title></head><body>Ready</body></html>";
+  const loaderEnhanced = injectBigBangLoader(loaderFixture, "index.html");
+  if (!loaderEnhanced.includes('data-big-bang-bootstrap')
+    || !loaderEnhanced.includes('/assets/css/big-bang-loader.css?v=20260808-6')
+    || !loaderEnhanced.includes('/assets/js/big-bang-loader.js?v=20260808-6')
+    || !loaderEnhanced.includes('root.dataset.bigBang="pending"')
+    || loaderEnhanced.includes('window.location.search')) {
+    throw new Error("The default Big Bang loader assets or activation bootstrap are incomplete.");
+  }
+  if (injectBigBangLoader(loaderEnhanced, "index.html") !== loaderEnhanced) {
+    throw new Error("The Big Bang loader injection is not idempotent.");
+  }
+  if (injectBigBangLoader(loaderFixture, "experiments/fixture.html") !== loaderFixture) {
+    throw new Error("The Big Bang loader leaked into the experiment archive.");
+  }
+  const redirectFixture = loaderFixture.replace("<title>", '<meta http-equiv="refresh" content="0; url=/"><title>');
+  if (injectBigBangLoader(redirectFixture, "redirect.html") !== redirectFixture) {
+    throw new Error("The Big Bang loader delayed an immediate redirect route.");
+  }
+
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ac-blog-build-test-"));
   const outputRoot = path.join(tempRoot, "site");
   const databasePath = path.join(tempRoot, "blog.sqlite");

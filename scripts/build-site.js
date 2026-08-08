@@ -169,11 +169,39 @@ function injectUniverseSoundscape(html, relativePath) {
   return enhanced;
 }
 
+function injectBigBangLoader(html, relativePath) {
+  const normalizedPath = relativePath.split(path.sep).join("/");
+  if (normalizedPath.startsWith("experiments/") || /http-equiv=["']refresh["']/i.test(html)) return html;
+  if (!html.includes("</head>")) {
+    throw new Error(`Cannot add the Big Bang page loader to ${relativePath}: missing </head>.`);
+  }
+  if (html.includes("data-big-bang-bootstrap")) return html;
+
+  const bootstrap = [
+    '<link href="/assets/css/big-bang-loader.css?v=20260808-6" rel="stylesheet"/>',
+    '<script data-big-bang-bootstrap>(function(){',
+    'if(window.matchMedia&&(',
+    'window.matchMedia("(prefers-reduced-motion: reduce)").matches||',
+    'window.matchMedia("(forced-colors: active)").matches))return;',
+    'var root=document.documentElement;root.dataset.bigBang="pending";',
+    'window.__bigBangLoaderGuard=window.setTimeout(function(){',
+    'if(root.dataset.bigBang==="pending")delete root.dataset.bigBang;',
+    '},4000);',
+    '}());</script>',
+    '<script src="/assets/js/big-bang-loader.js?v=20260808-6" defer></script>'
+  ].join("");
+
+  return html.replace("</head>", `${bootstrap}\n</head>`);
+}
+
 function compileTailwind(stagingRoot) {
   for (const htmlPath of walkHtmlFiles(stagingRoot)) {
     const relativePath = path.relative(stagingRoot, htmlPath);
-    const transformed = injectUniverseSoundscape(
-      replaceTailwindRuntime(fs.readFileSync(htmlPath, "utf8"), relativePath),
+    const transformed = injectBigBangLoader(
+      injectUniverseSoundscape(
+        replaceTailwindRuntime(fs.readFileSync(htmlPath, "utf8"), relativePath),
+        relativePath
+      ),
       relativePath
     );
     fs.writeFileSync(htmlPath, transformed, "utf8");
@@ -306,6 +334,7 @@ module.exports = {
   assertReplaceableOutput,
   buildSite,
   compileTailwind,
+  injectBigBangLoader,
   injectUniverseSoundscape,
   populateStagingDirectory
 };
