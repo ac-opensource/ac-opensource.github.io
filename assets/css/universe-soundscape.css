@@ -1,0 +1,100 @@
+.universe-sound-toggle {
+  position: fixed;
+  z-index: 120;
+  right: max(0.8rem, env(safe-area-inset-right));
+  bottom: max(0.8rem, env(safe-area-inset-bottom));
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.68rem;
+  border: 1px solid rgba(102, 112, 120, 0.38);
+  border: 1px solid color-mix(in srgb, #667078 38%, transparent);
+  border-radius: 999px;
+  background: rgba(250, 249, 244, 0.94);
+  background: color-mix(in srgb, #faf9f4 91%, transparent);
+  box-shadow: 0 8px 24px rgba(30, 42, 52, 0.1);
+  color: #4f5960;
+  cursor: pointer;
+  font: 650 0.58rem/1 "Space Grotesk", ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.universe-sound-toggle:hover,
+.universe-sound-toggle:focus-visible,
+.universe-sound-toggle[aria-pressed="true"] {
+  border-color: color-mix(in srgb, #1f5cba 62%, transparent);
+  color: #1f5cba;
+}
+
+.universe-sound-toggle:focus-visible {
+  outline: 2px solid #1f5cba;
+  outline-offset: 3px;
+}
+
+.universe-sound-toggle__wave {
+  display: inline-flex;
+  height: 0.75rem;
+  align-items: center;
+  gap: 2px;
+}
+
+.universe-sound-toggle__wave i {
+  width: 1px;
+  height: 28%;
+  background: currentColor;
+  transform-origin: center;
+  transition: height 160ms ease;
+}
+
+.universe-sound-toggle__wave i:nth-child(2) { height: 72%; }
+.universe-sound-toggle__wave i:nth-child(3) { height: 45%; }
+
+.universe-sound-toggle[aria-pressed="true"] .universe-sound-toggle__wave i {
+  animation: universe-sound-meter 820ms ease-in-out infinite alternate;
+}
+
+.universe-sound-toggle[aria-pressed="true"] .universe-sound-toggle__wave i:nth-child(2) { animation-delay: -300ms; }
+.universe-sound-toggle[aria-pressed="true"] .universe-sound-toggle__wave i:nth-child(3) { animation-delay: -560ms; }
+
+[data-about-theme="dark"] .universe-sound-toggle {
+  border-color: rgba(148, 185, 229, 0.34);
+  background: rgba(3, 16, 38, 0.83);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.34);
+  color: #9eb1c8;
+}
+
+[data-about-theme="dark"] .universe-sound-toggle:hover,
+[data-about-theme="dark"] .universe-sound-toggle:focus-visible,
+[data-about-theme="dark"] .universe-sound-toggle[aria-pressed="true"] {
+  color: #7fc8ff;
+}
+
+@keyframes universe-sound-meter {
+  from { height: 24%; }
+  to { height: 94%; }
+}
+
+@media (max-width: 700px) {
+  .universe-sound-toggle {
+    right: max(0.55rem, env(safe-area-inset-right));
+    bottom: max(0.55rem, env(safe-area-inset-bottom));
+    min-height: 1.9rem;
+    padding: 0.45rem 0.58rem;
+    font-size: 0.53rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .universe-sound-toggle__wave i {
+    animation: none !important;
+    transition: none;
+  }
+}
+
+@media print {
+  .universe-sound-toggle { display: none !important; }
+}

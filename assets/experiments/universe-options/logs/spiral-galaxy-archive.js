@@ -67,7 +67,15 @@
     height: 0,
     impactParticles: [],
     lastFrame: 0,
-    merger: { duration: 0, from: 0, progress: 0, startedAt: 0, target: 0 },
+    merger: {
+      duration: 0,
+      from: 0,
+      progress: 0,
+      soundCue: "",
+      soundThreshold: 0,
+      startedAt: 0,
+      target: 0
+    },
     mergerOffset: { x: 0, y: 0 },
     parallax: { x: 0, y: 0, targetX: 0, targetY: 0 },
     particles: [],
@@ -435,11 +443,12 @@
     context.restore();
   }
 
-  function setMergerTarget(target) {
+  function setMergerTarget(target, { sound = false } = {}) {
     const merger = canvasState.merger;
     if (reducedMotion.matches) {
       merger.from = target;
       merger.progress = target;
+      merger.soundCue = "";
       merger.startedAt = 0;
       merger.target = target;
       elements.hero.classList.remove("is-merging");
@@ -450,6 +459,10 @@
     merger.target = target;
     merger.startedAt = performance.now();
     merger.duration = (target > merger.from ? 3200 : 2200) * Math.max(0.42, Math.abs(target - merger.from));
+    merger.soundCue = sound
+      ? (target > merger.from ? "galaxy-collision" : "galaxy-release")
+      : "";
+    merger.soundThreshold = target > merger.from ? 0.775 : 0.58;
     elements.hero.classList.add("is-merging");
   }
 
@@ -462,13 +475,30 @@
       return merger.progress;
     }
     if (!merger.startedAt || !merger.duration) return merger.progress;
+    const previousProgress = merger.progress;
     const elapsed = Math.max(0, time - merger.startedAt);
     const raw = Math.min(1, elapsed / merger.duration);
     const eased = (1 - Math.cos(raw * Math.PI)) / 2;
     merger.progress = merger.from + (merger.target - merger.from) * eased;
+    const crossedSoundThreshold = merger.soundCue && (
+      merger.target > merger.from
+        ? previousProgress < merger.soundThreshold && merger.progress >= merger.soundThreshold
+        : previousProgress > merger.soundThreshold && merger.progress <= merger.soundThreshold
+    );
+    if (crossedSoundThreshold) {
+      document.dispatchEvent(new CustomEvent("galaxy:animation-cue", {
+        detail: {
+          cue: merger.soundCue,
+          direction: merger.target > merger.from ? "collision" : "release",
+          progress: merger.progress
+        }
+      }));
+      merger.soundCue = "";
+    }
     elements.hero.classList.toggle("is-merging", raw < 1);
     if (raw >= 1) {
       merger.progress = merger.target;
+      merger.soundCue = "";
       merger.startedAt = 0;
     }
     return merger.progress;
@@ -979,7 +1009,7 @@
     focusTimer = window.setTimeout(positionFocus, 180);
   }
 
-  function render() {
+  function render({ soundMerger = false } = {}) {
     const visible = posts.filter(matches);
     const visibleSlugs = new Set(visible.map((post) => post.slug));
     if (state.selected && !visibleSlugs.has(state.selected)) state.selected = "";
@@ -1031,7 +1061,7 @@
       : "[no published entry matches that subject]";
     elements.empty.hidden = visible.length !== 0;
     elements.hero.dataset.merger = filtered ? "remnant" : "archive";
-    setMergerTarget(filtered ? 1 : 0);
+    setMergerTarget(filtered ? 1 : 0, { sound: soundMerger });
     if (reducedMotion.matches) drawGalaxy(performance.now());
     renderFocus();
     window.clearTimeout(choreographyTimer);
@@ -1118,14 +1148,14 @@
       state.query = elements.search.value.slice(0, 160);
       writeUrl();
       window.clearTimeout(searchTimer);
-      searchTimer = window.setTimeout(render, reducedMotion.matches ? 0 : 420);
+      searchTimer = window.setTimeout(() => render({ soundMerger: true }), reducedMotion.matches ? 0 : 420);
     });
     elements.tuner.addEventListener("submit", (event) => {
       event.preventDefault();
       window.clearTimeout(searchTimer);
       state.query = elements.search.value.slice(0, 160);
       writeUrl();
-      render();
+      render({ soundMerger: true });
       if (!mobileLayout.matches) return;
       elements.search.blur();
       window.setTimeout(() => {
@@ -1139,7 +1169,7 @@
       window.clearTimeout(searchTimer);
       state.query = "";
       writeUrl();
-      render();
+      render({ soundMerger: true });
       elements.search.focus();
     }));
     elements.categories.addEventListener("click", (event) => {
@@ -1147,7 +1177,7 @@
       if (!button || button.dataset.category === state.category) return;
       state.category = button.dataset.category;
       writeUrl("pushState");
-      render();
+      render({ soundMerger: true });
     });
     elements.list.addEventListener("click", (event) => {
       const share = event.target.closest("button[data-share-slug]");
