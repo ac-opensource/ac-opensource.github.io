@@ -1997,6 +1997,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const lockIcon = lock.querySelector('.stellar-tree__lock-icon--closed').getBoundingClientRect();
     const resetIcon = document.querySelector('.stellar-tree__reset > [aria-hidden="true"]').getBoundingClientRect();
     const themeIcon = document.querySelector('.about-theme-toggle > [aria-hidden="true"]').getBoundingClientRect();
+    const nodeLabels = [...document.querySelectorAll('.stellar-spectrum__node-label')];
     return {
       branches: document.querySelectorAll('[data-band-trigger]').length,
       canvasCoversScene: canvas.left <= 0 && canvas.right >= document.documentElement.clientWidth
@@ -2023,6 +2024,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         - Math.min(...routeMapLinks.map((link) => link.top)),
       touchAction: getComputedStyle(document.querySelector('.stellar-tree__canvas')).touchAction,
       nodes: document.querySelectorAll('[data-node-id]').length,
+      visibleNodeLabels: nodeLabels.filter((label) => getComputedStyle(label).display !== 'none').length,
       rootBottomMargin: stage.bottom - rootMarker.bottom,
       scrollWidth: document.documentElement.scrollWidth,
       sourcePanelDisplay: getComputedStyle(sourcePanel).display,
@@ -2039,6 +2041,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && mobileSpectrum.minimumControlHeight >= 44
       && mobileSpectrum.branches === 8
       && mobileSpectrum.nodes === 31
+      && mobileSpectrum.visibleNodeLabels === mobileSpectrum.nodes
       && mobileSpectrum.stacked
       && mobileSpectrum.canvasCoversScene
       && mobileSpectrum.rootBottomMargin >= 24
