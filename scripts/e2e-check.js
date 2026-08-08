@@ -253,6 +253,25 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const hasFooter = await page.locator('#site-footer').count();
     await assert(hasTopbar > 0, `${route.path}: missing #site-topbar`);
     await assert(isSpatialHome ? hasFooter === 0 : hasFooter > 0, `${route.path}: unexpected footer state`);
+    const desktopSoundControl = await page.evaluate(() => {
+      const button = document.querySelector('[data-universe-sound-toggle]');
+      const bounds = button?.getBoundingClientRect();
+      return {
+        count: document.querySelectorAll('[data-universe-sound-toggle]').length,
+        documentState: document.documentElement.dataset.universeSound,
+        label: button?.textContent?.trim(),
+        pressed: button?.getAttribute('aria-pressed'),
+        visible: Boolean(bounds && bounds.width > 0 && bounds.height > 0),
+      };
+    });
+    await assert(
+      desktopSoundControl.count === 1
+        && desktopSoundControl.documentState === 'off'
+        && desktopSoundControl.label === '[sound: off]'
+        && desktopSoundControl.pressed === 'false'
+        && desktopSoundControl.visible,
+      `${route.path}: contextual sound control is missing or not safely opt-in: ${JSON.stringify(desktopSoundControl)}`
+    );
     const desktopPortfolioLabels = await page.locator(
       '#site-nav a[href="/work.html"], #site-footer a[href="/work.html"]'
     ).allTextContents();
@@ -308,6 +327,21 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const mobResp = await mobilePage.goto(url, { waitUntil: 'domcontentloaded' });
     await mobilePage.waitForTimeout(200);
     await assert(mobResp && mobResp.status() >= 200 && mobResp.status() < 400, `Mobile route ${route.path} failed`);
+    const mobileSoundControl = await mobilePage.evaluate(() => {
+      const button = document.querySelector('[data-universe-sound-toggle]');
+      const bounds = button?.getBoundingClientRect();
+      return {
+        count: document.querySelectorAll('[data-universe-sound-toggle]').length,
+        insideViewport: Boolean(bounds && bounds.left >= 0 && bounds.right <= innerWidth && bounds.bottom <= innerHeight),
+        pressed: button?.getAttribute('aria-pressed'),
+      };
+    });
+    await assert(
+      mobileSoundControl.count === 1
+        && mobileSoundControl.insideViewport
+        && mobileSoundControl.pressed === 'false',
+      `${route.path}: mobile sound control is missing or clipped: ${JSON.stringify(mobileSoundControl)}`
+    );
     const mobilePortfolioLabels = await mobilePage.locator(
       '#site-nav-mobile a[href="/work.html"], #site-footer a[href="/work.html"]'
     ).allTextContents();
@@ -368,6 +402,82 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       await mobilePage.screenshot({ path: path.join(mobileDir, `${route.name}.png`), fullPage: true });
     }
   }
+
+  const soundContext = await browser.newContext({ viewport: { width: 1280, height: 850 } });
+  const soundPage = await soundContext.newPage();
+  soundPage.on('pageerror', (error) => failures.push(`Soundscape pageerror: ${error.message}`));
+  await soundPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  await soundPage.evaluate(() => {
+    window.__universeSoundCues = [];
+    document.addEventListener('universe-sound:cue', (event) => window.__universeSoundCues.push(event.detail));
+  });
+  const soundBefore = await soundPage.evaluate(() => window.UniverseSound?.snapshot());
+  await assert(
+    soundBefore?.enabled === false && soundBefore?.contextState === 'uninitialized' && soundBefore?.context === 'work',
+    `Soundscape creates audio before opt-in or resolves the wrong Work context: ${JSON.stringify(soundBefore)}`
+  );
+  await soundPage.locator('[data-universe-sound-toggle]').click();
+  await soundPage.locator('[data-universe-sound-toggle][aria-pressed="true"]').waitFor();
+  await soundPage.locator('a.work-button[href="#production-work"]').click();
+  await soundPage.waitForFunction(() => window.__universeSoundCues.some((cue) => cue.context === 'work' && cue.cue === 'open' && cue.audible));
+  const workSound = await soundPage.evaluate(() => ({
+    cues: window.__universeSoundCues,
+    preference: localStorage.getItem('ac_universe_sound_v1'),
+    snapshot: window.UniverseSound.snapshot(),
+  }));
+  await assert(
+    workSound.preference === 'on'
+      && workSound.snapshot.enabled
+      && workSound.cues.some((cue) => cue.context === 'work' && cue.cue === 'open' && cue.audible),
+    `Work interactions do not emit the low supernova sound family: ${JSON.stringify(workSound)}`
+  );
+
+  await soundPage.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
+  await soundPage.locator('[data-node-id]').first().waitFor({ timeout: 15000 });
+  await soundPage.evaluate(() => {
+    window.__universeSoundCues = [];
+    document.addEventListener('universe-sound:cue', (event) => window.__universeSoundCues.push(event.detail));
+  });
+  const persistedSound = await soundPage.locator('[data-universe-sound-toggle]').getAttribute('aria-pressed');
+  await soundPage.locator('[data-node-id]').first().click();
+  await soundPage.waitForFunction(() => window.__universeSoundCues.some((cue) => cue.context === 'about' && cue.cue === 'open' && cue.audible));
+  await soundPage.locator('.stellar-tree__popup-close').click();
+  await soundPage.locator('[data-universe-sound-toggle]').click();
+  await soundPage.locator('[data-about-theme-toggle]').click();
+  await soundPage.waitForFunction(() => window.__universeSoundCues.some((cue) => cue.context === 'about' && cue.cue === 'toggle' && cue.enabled === false && cue.audible === false));
+  const aboutSound = await soundPage.evaluate(() => ({
+    cues: window.__universeSoundCues,
+    preference: localStorage.getItem('ac_universe_sound_v1'),
+    snapshot: window.UniverseSound.snapshot(),
+  }));
+  await assert(
+    persistedSound === 'true'
+      && aboutSound.preference === 'off'
+      && aboutSound.cues.some((cue) => cue.context === 'about' && cue.cue === 'open' && cue.audible)
+      && aboutSound.cues.some((cue) => cue.context === 'about' && cue.cue === 'toggle' && !cue.audible),
+    `About spectral cues or persistent mute behavior regressed: ${JSON.stringify(aboutSound)}`
+  );
+
+  await soundPage.goto(BASE_URL + '/signals.html', { waitUntil: 'domcontentloaded' });
+  await soundPage.evaluate(() => {
+    window.__universeSoundCues = [];
+    document.addEventListener('universe-sound:cue', (event) => window.__universeSoundCues.push(event.detail));
+  });
+  const signalsBefore = await soundPage.evaluate(() => ({
+    controlCount: document.querySelectorAll('[data-universe-sound-toggle]').length,
+    snapshot: window.UniverseSound?.snapshot(),
+  }));
+  await soundPage.locator('[data-universe-sound-toggle]').click();
+  await soundPage.waitForFunction(() => window.__universeSoundCues.some((cue) => cue.context === 'signals' && cue.audible));
+  const signalsAfter = await soundPage.evaluate(() => window.__universeSoundCues);
+  await assert(
+    signalsBefore.controlCount === 1
+      && signalsBefore.snapshot?.context === 'signals'
+      && signalsBefore.snapshot?.enabled === false
+      && signalsAfter.some((cue) => cue.context === 'signals' && cue.audible),
+    `Signals registry does not receive its telemetry sound family: ${JSON.stringify({ signalsBefore, signalsAfter })}`
+  );
+  await soundContext.close();
 
   const readOrbitCoordinates = (targetPage) => targetPage.evaluate(() => (
     [...document.querySelectorAll('[data-orbit-object]')].map((element) => ({
@@ -824,6 +934,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   flingPage.on('pageerror', (error) => failures.push(`Fling homepage pageerror: ${error.message}`));
   await flingPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
   await flingPage.locator('[data-synthesis]').waitFor();
+  await flingPage.locator('[data-universe-sound-toggle]').click();
+  await flingPage.locator('[data-universe-sound-toggle][aria-pressed="true"]').waitFor();
   await flingPage.evaluate(() => {
     window.__orbitalTestCues = [];
     window.__orbitalTestFling = null;
@@ -2682,10 +2794,30 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const categoryCount = await categoryButtons.count();
   await assert(categoryCount > 1, 'Category filters were not rendered from SQLite categories');
   if (categoryCount > 1) {
+    if (await page.locator('[data-universe-sound-toggle]').getAttribute('aria-pressed') !== 'true') {
+      await page.locator('[data-universe-sound-toggle]').click();
+    }
+    await page.evaluate(() => {
+      window.__galaxyAnimationCues = [];
+      window.__galaxySoundCues = [];
+      document.addEventListener('galaxy:animation-cue', (event) => window.__galaxyAnimationCues.push(event.detail));
+      document.addEventListener('universe-sound:cue', (event) => window.__galaxySoundCues.push(event.detail));
+    });
     await categoryButtons.nth(1).click();
-    await page.waitForTimeout(540);
+    await page.waitForFunction(() => window.__galaxyAnimationCues.some((cue) => cue.cue === 'galaxy-collision'), null, { timeout: 5000 });
     const filteredCount = await page.locator('#blog-feed article:not([hidden])').count();
     await assert(filteredCount > 0, 'Category filter returned zero posts unexpectedly');
+    const collisionCue = await page.evaluate(() => ({
+      animation: window.__galaxyAnimationCues.find((cue) => cue.cue === 'galaxy-collision'),
+      sound: window.__galaxySoundCues.find((cue) => cue.cue === 'galaxy-collision'),
+    }));
+    await assert(
+      collisionCue.animation?.direction === 'collision'
+        && collisionCue.animation?.progress >= 0.775
+        && collisionCue.sound?.context === 'logs'
+        && collisionCue.sound?.audible,
+      `Logs collision sound is not synchronized to the visual impact: ${JSON.stringify(collisionCue)}`
+    );
   }
 
   const firstTitle = await page.locator('#blog-feed article:not([hidden]) h3').first().textContent();
@@ -2708,7 +2840,18 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(zeroStateVisible > 0, 'Search zero-state message did not render');
   await page.fill('#galaxy-search', '');
   await page.locator('#galaxy-categories button[data-category="all"]').click();
-  await page.waitForTimeout(540);
+  await page.waitForFunction(() => window.__galaxyAnimationCues.some((cue) => cue.cue === 'galaxy-release'), null, { timeout: 4000 });
+  const releaseCue = await page.evaluate(() => ({
+    animation: window.__galaxyAnimationCues.find((cue) => cue.cue === 'galaxy-release'),
+    sound: window.__galaxySoundCues.find((cue) => cue.cue === 'galaxy-release'),
+  }));
+  await assert(
+    releaseCue.animation?.direction === 'release'
+      && releaseCue.animation?.progress <= 0.58
+      && releaseCue.sound?.context === 'logs'
+      && releaseCue.sound?.audible,
+    `Logs separation sound is not synchronized to the visual release: ${JSON.stringify(releaseCue)}`
+  );
 
   await mobilePage.goto(BASE_URL + '/blog/', { waitUntil: 'networkidle' });
   await mobilePage.waitForSelector('#galaxy-field[data-ready="true"]', { timeout: 15000 });

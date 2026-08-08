@@ -220,6 +220,10 @@
   };
 
   const ensureAudio = async () => {
+    if (window.UniverseSound && !window.UniverseSound.enabled()) {
+      root.dataset.audioState = "muted";
+      return null;
+    }
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) {
       root.dataset.audioState = "unsupported";
@@ -245,17 +249,21 @@
     return source;
   };
 
-  const tone = (context, { frequency, endFrequency = frequency, duration, offset = 0, gain = .03, type = "sine" }) => {
+  const tone = (context, { frequency, endFrequency = frequency, duration, offset = 0, gain = .03, type = "sine", cutoff = 900 }) => {
     const start = context.currentTime + offset;
     const oscillator = trackSource(context.createOscillator());
+    const filter = context.createBiquadFilter();
     const envelope = context.createGain();
     oscillator.type = type;
     oscillator.frequency.setValueAtTime(frequency, start);
     oscillator.frequency.exponentialRampToValueAtTime(Math.max(20, endFrequency), start + duration);
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(cutoff, start);
+    filter.Q.value = .45;
     envelope.gain.setValueAtTime(.0001, start);
     envelope.gain.exponentialRampToValueAtTime(gain, start + Math.min(.035, duration / 4));
     envelope.gain.exponentialRampToValueAtTime(.0001, start + duration);
-    oscillator.connect(envelope).connect(context.destination);
+    oscillator.connect(filter).connect(envelope).connect(context.destination);
     oscillator.start(start);
     oscillator.stop(start + duration + .02);
   };
@@ -266,25 +274,25 @@
     window.dispatchEvent(new CustomEvent("orbital:sound", { detail: { cue } }));
 
     if (cue === "select") {
-      tone(context, { frequency: 520, endFrequency: 690, duration: .1, gain: .07, type: "triangle" });
-      tone(context, { frequency: 780, endFrequency: 860, duration: .08, offset: .085, gain: .05, type: "triangle" });
+      tone(context, { frequency: 220, endFrequency: 290, duration: .1, gain: .065, type: "triangle", cutoff: 650 });
+      tone(context, { frequency: 330, endFrequency: 360, duration: .08, offset: .085, gain: .04, type: "triangle", cutoff: 720 });
     } else if (cue === "focus") {
-      tone(context, { frequency: 196, endFrequency: 220, duration: .32, gain: .055 });
-      tone(context, { frequency: 392, endFrequency: 440, duration: .36, offset: .04, gain: .035, type: "triangle" });
+      tone(context, { frequency: 98, endFrequency: 110, duration: .32, gain: .055, cutoff: 420 });
+      tone(context, { frequency: 196, endFrequency: 220, duration: .36, offset: .04, gain: .03, type: "triangle", cutoff: 560 });
     } else if (cue === "dismiss") {
-      tone(context, { frequency: 360, endFrequency: 150, duration: .2, gain: .055, type: "triangle" });
+      tone(context, { frequency: 220, endFrequency: 90, duration: .2, gain: .05, type: "triangle", cutoff: 520 });
     } else if (cue === "view") {
-      tone(context, { frequency: 520, endFrequency: 610, duration: .08, gain: .05, type: "square" });
-      tone(context, { frequency: 690, endFrequency: 780, duration: .08, offset: .09, gain: .035, type: "square" });
+      tone(context, { frequency: 180, endFrequency: 220, duration: .08, gain: .045, type: "triangle", cutoff: 560 });
+      tone(context, { frequency: 260, endFrequency: 300, duration: .08, offset: .09, gain: .03, type: "triangle", cutoff: 640 });
     } else if (cue === "motion") {
-      tone(context, { frequency: state.paused ? 310 : 470, duration: .09, gain: .045, type: "triangle" });
+      tone(context, { frequency: state.paused ? 150 : 210, duration: .09, gain: .042, type: "triangle", cutoff: 540 });
     } else if (cue === "fling") {
-      tone(context, { frequency: 180, endFrequency: 760, duration: .28, gain: .06, type: "triangle" });
-      tone(context, { frequency: 920, endFrequency: 540, duration: .18, offset: .12, gain: .035 });
+      tone(context, { frequency: 78, endFrequency: 320, duration: .28, gain: .06, type: "triangle", cutoff: 620 });
+      tone(context, { frequency: 360, endFrequency: 220, duration: .18, offset: .12, gain: .03, type: "triangle", cutoff: 680 });
     } else if (cue === "reset") {
-      tone(context, { frequency: 620, endFrequency: 330, duration: .2, gain: .045, type: "triangle" });
+      tone(context, { frequency: 300, endFrequency: 165, duration: .2, gain: .042, type: "triangle", cutoff: 620 });
     } else if (cue === "satellite") {
-      tone(context, { frequency: 680, endFrequency: 920, duration: .13, gain: .05 });
+      tone(context, { frequency: 240, endFrequency: 330, duration: .13, gain: .045, type: "triangle", cutoff: 680 });
     }
   };
 
@@ -1301,6 +1309,15 @@
   };
 
   window.addEventListener("popstate", restoreFromLocation);
+  document.addEventListener("universe-sound:change", (event) => {
+    const enabled = Boolean(event.detail?.enabled);
+    if (!enabled) {
+      root.dataset.audioState = "muted";
+      state.audioContext?.suspend().catch(() => {});
+      return;
+    }
+    root.dataset.audioState = state.audioContext?.state || "awaiting-gesture";
+  });
   window.addEventListener("resize", () => {
     cancelNodeDrag();
     state.compact = compactQuery.matches;

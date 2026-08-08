@@ -146,10 +146,36 @@ function replaceTailwindRuntime(html, relativePath) {
   );
 }
 
+function injectUniverseSoundscape(html, relativePath) {
+  const normalizedPath = relativePath.split(path.sep).join("/");
+  if (normalizedPath.startsWith("experiments/")) return html;
+  if (!html.includes("</head>")) {
+    throw new Error(`Cannot add the universe soundscape to ${relativePath}: missing </head>.`);
+  }
+
+  let enhanced = html;
+  if (!enhanced.includes('href="/assets/css/universe-soundscape.css')) {
+    enhanced = enhanced.replace(
+      "</head>",
+      '<link href="/assets/css/universe-soundscape.css?v=20260808-2" rel="stylesheet"/>\n</head>'
+    );
+  }
+  if (!enhanced.includes('src="/assets/js/universe-soundscape.js')) {
+    enhanced = enhanced.replace(
+      "</head>",
+      '<script src="/assets/js/universe-soundscape.js?v=20260808-2" defer></script>\n</head>'
+    );
+  }
+  return enhanced;
+}
+
 function compileTailwind(stagingRoot) {
   for (const htmlPath of walkHtmlFiles(stagingRoot)) {
     const relativePath = path.relative(stagingRoot, htmlPath);
-    const transformed = replaceTailwindRuntime(fs.readFileSync(htmlPath, "utf8"), relativePath);
+    const transformed = injectUniverseSoundscape(
+      replaceTailwindRuntime(fs.readFileSync(htmlPath, "utf8"), relativePath),
+      relativePath
+    );
     fs.writeFileSync(htmlPath, transformed, "utf8");
   }
 
@@ -280,5 +306,6 @@ module.exports = {
   assertReplaceableOutput,
   buildSite,
   compileTailwind,
+  injectUniverseSoundscape,
   populateStagingDirectory
 };
