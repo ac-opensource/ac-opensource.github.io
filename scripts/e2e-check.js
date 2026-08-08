@@ -242,6 +242,251 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     }
   }
 
+  async function installBigBangLoadHold(targetPage) {
+    const baseOrigin = new URL(BASE_URL).origin;
+    await targetPage.route('**/*', async (route) => {
+      const request = route.request();
+      const requestUrl = new URL(request.url());
+      const isLoadHold = requestUrl.origin === baseOrigin
+        && requestUrl.pathname === '/assets/images/favicon.svg'
+        && requestUrl.searchParams.get('big-bang-e2e-hold') === '1';
+
+      if (isLoadHold) {
+        const response = await route.fetch();
+        await new Promise((resolve) => setTimeout(resolve, 550));
+        await route.fulfill({ response });
+        return;
+      }
+
+      if (request.resourceType() === 'document' && requestUrl.origin === baseOrigin) {
+        const response = await route.fetch();
+        const html = await response.text();
+        const body = html.replace(
+          /(<body\b[^>]*>)/i,
+          '$1<img src="/assets/images/favicon.svg?big-bang-e2e-hold=1" alt="" aria-hidden="true" width="1" height="1" style="position:absolute;opacity:0;pointer-events:none"/>'
+        );
+        await route.fulfill({ response, body });
+        return;
+      }
+
+      await route.continue();
+    });
+  }
+
+  const bigBangContext = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  const bigBangPage = await bigBangContext.newPage();
+  await installBigBangLoadHold(bigBangPage);
+  bigBangPage.on('pageerror', (error) => failures.push(`Big Bang loader pageerror: ${error.message}`));
+  await bigBangPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
+  await bigBangPage.locator('[data-big-bang-loader]').waitFor({ state: 'attached', timeout: 3000 });
+  const bigBangImpact = await bigBangPage.evaluate(() => {
+    const canvas = document.querySelector('[data-big-bang-matter]');
+    const skip = document.querySelector('[data-big-bang-skip]');
+    const snapshot = window.BigBangLoader?.snapshot();
+    const landmarkByIndex = new Map(
+      [...document.querySelectorAll('[data-big-bang-landmark-index]')]
+        .map((element) => [element.dataset.bigBangLandmarkIndex, element])
+    );
+    const alignmentDrift = [...document.querySelectorAll('.big-bang-loader__lock')].map((lock) => {
+      const target = landmarkByIndex.get(lock.dataset.landmarkIndex);
+      if (!target) return Infinity;
+      const lockRect = lock.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      return Math.max(
+        Math.abs(lockRect.left - targetRect.left),
+        Math.abs(lockRect.top - targetRect.top),
+        Math.abs(lockRect.width - targetRect.width),
+        Math.abs(lockRect.height - targetRect.height)
+      );
+    });
+    return {
+      bodyFilter: getComputedStyle(document.body).filter,
+      bodyTransform: getComputedStyle(document.body).transform,
+      canvasCount: document.querySelectorAll('[data-big-bang-matter]').length,
+      context: snapshot?.context,
+      activation: snapshot?.activation,
+      landmarkCount: snapshot?.landmarkCount,
+      landmarkDomCount: document.querySelectorAll('[data-big-bang-landmark]').length,
+      linkCount: Number(canvas?.dataset.linkCount || 0),
+      loaderDomNodes: document.querySelectorAll('[data-big-bang-loader] *').length,
+      loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
+      lockCount: document.querySelectorAll('.big-bang-loader__lock').length,
+      matterCount: Number(canvas?.dataset.matterCount || 0),
+      maxAlignmentDrift: Math.max(0, ...alignmentDrift),
+      originSelector: snapshot?.origin?.selector,
+      particleCount: snapshot?.particleCount,
+      phase: snapshot?.phase,
+      rootState: document.documentElement.dataset.bigBang,
+      skipVisible: Boolean(skip && skip.getBoundingClientRect().width > 0 && getComputedStyle(skip).opacity !== '0'),
+      urlSearch: window.location.search,
+    };
+  });
+  await assert(
+    bigBangImpact.loaderCount === 1
+      && bigBangImpact.canvasCount === 1
+      && bigBangImpact.particleCount === 96
+      && bigBangImpact.activation === 'default'
+      && bigBangImpact.context === 'dashboard'
+      && bigBangImpact.originSelector === '.field-origin'
+      && bigBangImpact.landmarkCount >= 12
+      && bigBangImpact.landmarkDomCount === bigBangImpact.landmarkCount
+      && bigBangImpact.lockCount === bigBangImpact.landmarkCount
+      && bigBangImpact.matterCount === bigBangImpact.landmarkCount
+      && bigBangImpact.linkCount === bigBangImpact.landmarkCount
+      && bigBangImpact.maxAlignmentDrift <= 1.5
+      && bigBangImpact.loaderDomNodes < 90
+      && bigBangImpact.bodyTransform === 'none'
+      && bigBangImpact.bodyFilter === 'none'
+      && ['running', 'revealing'].includes(bigBangImpact.rootState)
+      && bigBangImpact.skipVisible
+      && bigBangImpact.urlSearch === '',
+    `Big Bang impact phase is incomplete: ${JSON.stringify(bigBangImpact)}`
+  );
+  await bigBangPage.keyboard.press('Escape');
+  await bigBangPage.waitForFunction(() => (
+    window.BigBangLoader?.snapshot().phase === 'complete'
+      && !document.querySelector('[data-big-bang-loader]')
+  ), null, { timeout: 2000 });
+  const bigBangResolved = await bigBangPage.evaluate(() => ({
+    bodyOpacity: getComputedStyle(document.body).opacity,
+    replayCount: document.querySelectorAll('[data-big-bang-replay]').length,
+    rootState: document.documentElement.dataset.bigBang,
+  }));
+  await assert(
+    bigBangResolved.rootState === 'complete'
+      && bigBangResolved.replayCount === 0
+      && Number(bigBangResolved.bodyOpacity) >= 0.99,
+    `Big Bang skip did not restore the page cleanly: ${JSON.stringify(bigBangResolved)}`
+  );
+
+  const routeAwareBigBangCases = [
+    { path: '/work.html', context: 'work' },
+    { path: '/blog/', context: 'logs' },
+    { path: '/about.html', context: 'about' },
+  ];
+  for (const scenario of routeAwareBigBangCases) {
+    await bigBangPage.goto(BASE_URL + scenario.path, { waitUntil: 'domcontentloaded' });
+    await bigBangPage.locator('[data-big-bang-loader]').waitFor({ state: 'attached', timeout: 3000 });
+    const routeAwareMatter = await bigBangPage.evaluate(() => {
+      const snapshot = window.BigBangLoader?.snapshot();
+      const canvas = document.querySelector('[data-big-bang-matter]');
+      return {
+        context: snapshot?.context,
+        landmarkCount: snapshot?.landmarkCount,
+        linkCount: Number(canvas?.dataset.linkCount || 0),
+        lockCount: document.querySelectorAll('.big-bang-loader__lock').length,
+        matterCount: Number(canvas?.dataset.matterCount || 0),
+        originSelector: snapshot?.origin?.selector,
+        surfaceContext: document.querySelector('[data-big-bang-loader]')?.dataset.context,
+      };
+    });
+    await assert(
+      routeAwareMatter.context === scenario.context
+        && routeAwareMatter.surfaceContext === scenario.context
+        && routeAwareMatter.originSelector !== 'viewport-fallback'
+        && routeAwareMatter.landmarkCount >= 7
+        && routeAwareMatter.lockCount === routeAwareMatter.landmarkCount
+        && routeAwareMatter.matterCount === routeAwareMatter.landmarkCount
+        && routeAwareMatter.linkCount === routeAwareMatter.landmarkCount,
+      `${scenario.context}: Big Bang matter is disconnected from live route geometry: ${JSON.stringify(routeAwareMatter)}`
+    );
+    await bigBangPage.waitForFunction(() => window.BigBangLoader?.snapshot().phase === 'reveal', null, { timeout: 5000 });
+    const handoffAlignment = await bigBangPage.evaluate(() => {
+      const landmarkByIndex = new Map(
+        [...document.querySelectorAll('[data-big-bang-landmark-index]')]
+          .map((element) => [element.dataset.bigBangLandmarkIndex, element])
+      );
+      const drift = [...document.querySelectorAll('.big-bang-loader__lock')].map((lock) => {
+        const target = landmarkByIndex.get(lock.dataset.landmarkIndex);
+        if (!target) return Infinity;
+        const lockRect = lock.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        return Math.max(
+          Math.abs(lockRect.left - targetRect.left),
+          Math.abs(lockRect.top - targetRect.top),
+          Math.abs(lockRect.width - targetRect.width),
+          Math.abs(lockRect.height - targetRect.height)
+        );
+      });
+      return {
+        bodyFilter: getComputedStyle(document.body).filter,
+        bodyTransform: getComputedStyle(document.body).transform,
+        maxDrift: Math.max(0, ...drift),
+      };
+    });
+    await assert(
+      handoffAlignment.maxDrift <= 1
+        && handoffAlignment.bodyTransform === 'none'
+        && handoffAlignment.bodyFilter === 'none',
+      `${scenario.context}: Big Bang handoff is not pixel-aligned to the live page: ${JSON.stringify(handoffAlignment)}`
+    );
+    await bigBangPage.waitForFunction(() => window.BigBangLoader?.snapshot().phase === 'complete', null, { timeout: 5000 });
+    const loadDrivenResult = await bigBangPage.evaluate(() => window.BigBangLoader.snapshot());
+    await assert(
+      Number.isFinite(loadDrivenResult.readyDelayMs) && loadDrivenResult.readyDelayMs <= 80,
+      `${scenario.context}: Big Bang artificially delayed a ready page: ${JSON.stringify(loadDrivenResult)}`
+    );
+  }
+
+  await bigBangContext.close();
+
+  const mobileBigBangContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const mobileBigBangPage = await mobileBigBangContext.newPage();
+  await installBigBangLoadHold(mobileBigBangPage);
+  mobileBigBangPage.on('pageerror', (error) => failures.push(`Mobile Big Bang loader pageerror: ${error.message}`));
+  await mobileBigBangPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
+  await mobileBigBangPage.locator('[data-big-bang-loader]').waitFor({ state: 'attached', timeout: 3000 });
+  const mobileBigBang = await mobileBigBangPage.evaluate(() => {
+    const canvas = document.querySelector('[data-big-bang-matter]');
+    return {
+      loaderDomNodes: document.querySelectorAll('[data-big-bang-loader] *').length,
+      particleCount: Number(canvas?.dataset.particleCount || 0),
+      snapshot: window.BigBangLoader?.snapshot(),
+    };
+  });
+  await assert(
+    mobileBigBang.particleCount === 64
+      && mobileBigBang.loaderDomNodes < 75
+      && mobileBigBang.snapshot?.context === 'dashboard',
+    `Mobile Big Bang renderer is incomplete or too DOM-heavy: ${JSON.stringify(mobileBigBang)}`
+  );
+  await mobileBigBangPage.waitForFunction(() => window.BigBangLoader?.snapshot().phase === 'complete', null, { timeout: 5000 });
+  const mobileBigBangComplete = await mobileBigBangPage.evaluate(() => window.BigBangLoader.snapshot());
+  await assert(
+    Number.isFinite(mobileBigBangComplete.readyDelayMs) && mobileBigBangComplete.readyDelayMs <= 80,
+    `Mobile Big Bang artificially delayed a ready page: ${JSON.stringify(mobileBigBangComplete)}`
+  );
+  await mobileBigBangContext.close();
+
+  const reducedBigBangContext = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1280, height: 850 } });
+  const reducedBigBangPage = await reducedBigBangContext.newPage();
+  await reducedBigBangPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
+  const reducedBigBang = await reducedBigBangPage.evaluate(() => ({
+    bodyOpacity: getComputedStyle(document.body).opacity,
+    loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
+    rootState: window.BigBangLoader?.snapshot().rootState,
+  }));
+  await assert(
+    reducedBigBang.loaderCount === 0
+      && reducedBigBang.rootState === 'inactive'
+      && Number(reducedBigBang.bodyOpacity) >= 0.99,
+    `Reduced-motion visitors still receive the Big Bang sequence: ${JSON.stringify(reducedBigBang)}`
+  );
+  await reducedBigBangContext.close();
+
+  const noJavaScriptBigBangContext = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1280, height: 850 } });
+  const noJavaScriptBigBangPage = await noJavaScriptBigBangContext.newPage();
+  await noJavaScriptBigBangPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
+  const noJavaScriptBigBang = await noJavaScriptBigBangPage.evaluate(() => ({
+    bodyOpacity: getComputedStyle(document.body).opacity,
+    loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
+  }));
+  await assert(
+    noJavaScriptBigBang.loaderCount === 0 && Number(noJavaScriptBigBang.bodyOpacity) >= 0.99,
+    `No-JavaScript visitors are blocked by the Big Bang loader: ${JSON.stringify(noJavaScriptBigBang)}`
+  );
+  await noJavaScriptBigBangContext.close();
+
   for (const route of routes) {
     const url = BASE_URL + route.path;
     const isSpatialHome = route.path === '/';
@@ -532,6 +777,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     spatialPage.on('pageerror', (error) => failures.push(`Homepage ${viewport.width}x${viewport.height} pageerror: ${error.message}`));
     await spatialPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
     await spatialPage.locator('[data-synthesis]').waitFor();
+    await spatialPage.waitForFunction(
+      () => window.BigBangLoader?.snapshot().phase === 'complete',
+      null,
+      { timeout: 5000 }
+    );
     await spatialPage.evaluate(() => document.fonts?.ready);
 
     const overview = await spatialPage.evaluate(() => {
@@ -2271,6 +2521,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const touchAboutPage = await touchAboutContext.newPage();
   await touchAboutPage.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
   await touchAboutPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
+  await touchAboutPage.waitForFunction(
+    () => window.BigBangLoader?.snapshot().phase === 'complete',
+    null,
+    { timeout: 5000 }
+  );
   const lockedTouchSurface = await touchAboutPage.evaluate(() => {
     const stage = document.querySelector('#stellar-spectrum-panel');
     const stageTop = stage.getBoundingClientRect().top + scrollY;
