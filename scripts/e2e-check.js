@@ -116,6 +116,22 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     );
   }
 
+  async function expandUniverseRouteMap(targetPage) {
+    const toggle = targetPage.locator('[data-universe-map-toggle]');
+    if (await toggle.count() === 0) return;
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
+      await toggle.click();
+      await targetPage.waitForFunction(() => (
+        document.querySelector('[data-universe-route-map]')?.dataset.mapExpanded === 'true'
+      ));
+      await targetPage.waitForTimeout(280);
+      await targetPage.evaluate(() => {
+        document.querySelector('[data-universe-route-map]')
+          ?.dispatchEvent(new PointerEvent('pointerleave'));
+      });
+    }
+  }
+
   const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
   for (const socialImagePath of new Set(socialPreviewContracts.map(({ imagePath }) => imagePath))) {
     if (!fs.existsSync(socialImagePath)) {
@@ -408,6 +424,83 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   await bigBangContext.close();
 
+  const integratedBigBangContext = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  const integratedBigBangPage = await integratedBigBangContext.newPage();
+  integratedBigBangPage.on('pageerror', (error) => failures.push(`Integrated Big Bang pageerror: ${error.message}`));
+  await integratedBigBangPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
+  const integratedNavigationStarted = Date.now();
+  await Promise.all([
+    integratedBigBangPage.waitForURL('**/work.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    integratedBigBangPage.locator('#site-nav a[href="/work.html"]').click(),
+  ]);
+  const integratedNavigationElapsed = Date.now() - integratedNavigationStarted;
+  await integratedBigBangPage.waitForFunction(() => {
+    const animation = document.getAnimations({ subtree: true })
+      .find((candidate) => candidate.animationName === 'universe-search-sky');
+    const duration = Number(animation?.effect?.getComputedTiming().duration);
+    return duration > 0 && Number(animation.currentTime) / duration >= 0.3;
+  }, null, { timeout: 2500 });
+  const integratedBigBang = await integratedBigBangPage.evaluate((sessionKey) => {
+    const root = document.documentElement;
+    const visualStyle = getComputedStyle(root, '::view-transition-new(universe-target-visual)');
+    const visualMatrix = visualStyle.transform === 'none' ? new DOMMatrix() : new DOMMatrix(visualStyle.transform);
+    const supernova = document.querySelector('[data-universe-work-supernova]');
+    return {
+      copyOpacity: Number(getComputedStyle(root, '::view-transition-new(root)').opacity),
+      loaderApi: Boolean(window.BigBangLoader),
+      loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
+      rootState: root.dataset.bigBang || 'inactive',
+      sessionValue: window.sessionStorage.getItem(sessionKey),
+      supernovaAnimation: getComputedStyle(root, '::view-transition-new(universe-work-supernova)').animationName,
+      supernovaBackground: supernova ? getComputedStyle(supernova).backgroundImage : null,
+      supernovaName: supernova ? getComputedStyle(supernova).viewTransitionName : null,
+      visualAnimation: visualStyle.animationName,
+      visualOpacity: Number(visualStyle.opacity),
+      visualTravel: Math.hypot(visualMatrix.m41, visualMatrix.m42, visualMatrix.m43),
+    };
+  }, BIG_BANG_SESSION_KEY);
+  await assert(
+    integratedNavigationElapsed < 1800
+      && integratedBigBang.loaderCount === 0
+      && !integratedBigBang.loaderApi
+      && integratedBigBang.rootState === 'inactive'
+      && integratedBigBang.sessionValue === '1'
+      && integratedBigBang.visualAnimation === 'universe-work-visual-genesis'
+      && integratedBigBang.visualOpacity >= 0.75
+      && integratedBigBang.visualTravel > 18
+      && integratedBigBang.supernovaAnimation === 'universe-work-supernova-acquire'
+      && integratedBigBang.supernovaBackground.includes('repeating-conic-gradient')
+      && integratedBigBang.supernovaName === 'universe-work-supernova'
+      && integratedBigBang.copyOpacity <= 0.02,
+    `Sky navigation to Work does not integrate the Big Bang with target acquisition: ${JSON.stringify({
+      integratedNavigationElapsed,
+      integratedBigBang,
+    })}`
+  );
+  await integratedBigBangPage.waitForFunction(
+    () => window.UniversePerspective?.snapshot().ready === 'ready',
+    null,
+    { timeout: 3500 }
+  );
+  const integratedBigBangSettled = await integratedBigBangPage.evaluate((sessionKey) => ({
+    loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
+    perspective: window.UniversePerspective?.snapshot(),
+    sessionValue: window.sessionStorage.getItem(sessionKey),
+    supernovaOpacity: getComputedStyle(document.querySelector('[data-universe-work-supernova]')).opacity,
+    transitionAnimations: document.getAnimations({ subtree: true })
+      .filter((animation) => animation.effect?.pseudoElement?.startsWith('::view-transition')).length,
+  }), BIG_BANG_SESSION_KEY);
+  await assert(
+    integratedBigBangSettled.loaderCount === 0
+      && integratedBigBangSettled.sessionValue === '1'
+      && integratedBigBangSettled.perspective?.pendingCleanup === 0
+      && integratedBigBangSettled.perspective?.activeTransition === false
+      && integratedBigBangSettled.supernovaOpacity === '0'
+      && integratedBigBangSettled.transitionAnimations === 0,
+    `Integrated Work Big Bang leaves loader or compositor work behind: ${JSON.stringify(integratedBigBangSettled)}`
+  );
+  await integratedBigBangContext.close();
+
   const mobileBigBangContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const mobileBigBangPage = await mobileBigBangContext.newPage();
   mobileBigBangPage.on('pageerror', (error) => failures.push(`Mobile Big Bang loader pageerror: ${error.message}`));
@@ -506,6 +599,73 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const hasFooter = await page.locator('#site-footer').count();
     await assert(hasTopbar > 0, `${route.path}: missing #site-topbar`);
     await assert(isSpatialHome ? hasFooter === 0 : hasFooter > 0, `${route.path}: unexpected footer state`);
+    const desktopPerspective = await page.evaluate(() => {
+      const headerNav = document.querySelector('#site-nav');
+      const routeMap = document.querySelector('[data-universe-route-map]');
+      const routeMapBounds = routeMap?.getBoundingClientRect();
+      return {
+        headerLinks: headerNav?.querySelectorAll(':scope > a').length || 0,
+        headerTelescopeArtifacts: document.querySelectorAll(
+          '#site-nav [data-telescope-target], #site-nav-mobile [data-telescope-target], .universe-telescope-nav__instrument'
+        ).length,
+        perspective: window.UniversePerspective?.snapshot(),
+        routeMap: window.UniverseRouteMap?.snapshot() || null,
+        routeMapActive: routeMap?.querySelectorAll('[aria-current="location"]').length || 0,
+        routeMapMounts: routeMap?.querySelectorAll('.universe-route-map__mount').length || 0,
+        routeMapScopes: routeMap?.querySelectorAll('.universe-route-map__telescope').length || 0,
+        routeMapTargets: routeMap?.querySelectorAll('a[data-map-id]').length || 0,
+        routeMapExpanded: routeMap?.dataset.mapExpanded,
+        routeMapFieldHidden: routeMap?.querySelector('[data-universe-map-field]')?.getAttribute('aria-hidden'),
+        routeMapHeight: routeMapBounds?.height || 0,
+        routeMapMode: routeMap?.dataset.universeRouteMapMode,
+        routeMapParent: routeMap?.parentElement?.tagName,
+        routeMapPosition: routeMap ? getComputedStyle(routeMap).position : null,
+        routeMapToggleExpanded: routeMap?.querySelector('[data-universe-map-toggle]')?.getAttribute('aria-expanded'),
+        routeMapWidth: routeMapBounds?.width || 0,
+        depthFieldCount: document.querySelectorAll('[data-universe-depth-field]').length,
+        syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
+        depthPlaneCount: document.querySelectorAll('[data-universe-depth-plane]').length,
+        transientNebulaCount: document.querySelectorAll('[data-universe-target-nebula]').length,
+        workSupernovaCount: document.querySelectorAll('[data-universe-work-supernova]').length,
+        artificialViewportCount: document.querySelectorAll('[data-universe-transit], .universe-transit__aperture').length,
+        stylesheet: Boolean(document.querySelector('link[data-universe-perspective-styles]')),
+      };
+    });
+    await assert(
+      desktopPerspective.headerLinks === 5
+        && desktopPerspective.headerTelescopeArtifacts === 0
+        && desktopPerspective.perspective?.model === 'observer-camera-3d'
+        && desktopPerspective.perspective?.ready === 'ready'
+        && desktopPerspective.perspective?.depthPlanes === 3
+        && desktopPerspective.perspective?.stylesheet
+        && desktopPerspective.stylesheet
+        && desktopPerspective.depthFieldCount === 1
+        && desktopPerspective.syntheticCloudCount === 0
+        && desktopPerspective.depthPlaneCount === 3
+        && desktopPerspective.transientNebulaCount === 0
+        && desktopPerspective.workSupernovaCount === 1
+        && desktopPerspective.artificialViewportCount === 0
+        && (isSpatialHome
+          ? desktopPerspective.routeMap === null
+            && desktopPerspective.routeMapTargets === 0
+          : desktopPerspective.routeMap?.targetCount === 7
+            && desktopPerspective.routeMap?.expanded === false
+            && desktopPerspective.routeMapActive === 1
+            && desktopPerspective.routeMapMounts === 1
+            && desktopPerspective.routeMapScopes === 1
+            && desktopPerspective.routeMapTargets === 7
+            && desktopPerspective.routeMapExpanded === 'false'
+            && desktopPerspective.routeMapFieldHidden === 'true'
+            && desktopPerspective.routeMapMode === 'floating'
+            && desktopPerspective.routeMapParent === 'BODY'
+            && desktopPerspective.routeMapPosition === 'fixed'
+            && desktopPerspective.routeMapToggleExpanded === 'false'
+            && desktopPerspective.routeMapWidth >= 43
+            && desktopPerspective.routeMapWidth <= 45
+            && desktopPerspective.routeMapHeight >= 43
+            && desktopPerspective.routeMapHeight <= 45),
+      `${route.path}: shared field-of-view navigation contract failed: ${JSON.stringify(desktopPerspective)}`
+    );
     const desktopPortfolioLabels = await page.locator(
       '#site-nav a[href="/work.html"], #site-footer a[href="/work.html"]'
     ).allTextContents();
@@ -562,6 +722,53 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await waitForBigBangComplete(mobilePage);
     await mobilePage.waitForTimeout(200);
     await assert(mobResp && mobResp.status() >= 200 && mobResp.status() < 400, `Mobile route ${route.path} failed`);
+    const mobilePerspective = await mobilePage.evaluate(() => {
+      const headerNav = document.querySelector('#site-nav-mobile');
+      const routeMap = document.querySelector('[data-universe-route-map]');
+      const routeMapBounds = routeMap?.getBoundingClientRect();
+      return {
+        headerLinks: headerNav?.querySelectorAll(':scope > a').length || 0,
+        headerTelescopeArtifacts: document.querySelectorAll(
+          '#site-nav [data-telescope-target], #site-nav-mobile [data-telescope-target], .universe-telescope-nav__instrument'
+        ).length,
+        routeMapInViewport: !routeMapBounds || (
+          routeMapBounds.left >= -1
+            && routeMapBounds.right <= innerWidth + 1
+            && routeMapBounds.top >= -1
+            && routeMapBounds.bottom <= innerHeight + 1
+        ),
+        routeMapExpanded: routeMap?.dataset.mapExpanded,
+        routeMapFieldHidden: routeMap?.querySelector('[data-universe-map-field]')?.getAttribute('aria-hidden'),
+        routeMapHeight: routeMapBounds?.height || 0,
+        routeMapMode: routeMap?.dataset.universeRouteMapMode,
+        routeMapMounts: routeMap?.querySelectorAll('.universe-route-map__mount').length || 0,
+        routeMapParent: routeMap?.parentElement?.tagName,
+        routeMapPosition: routeMap ? getComputedStyle(routeMap).position : null,
+        routeMapScopes: routeMap?.querySelectorAll('.universe-route-map__telescope').length || 0,
+        routeMapTargets: routeMap?.querySelectorAll('a[data-map-id]').length || 0,
+        routeMapWidth: routeMapBounds?.width || 0,
+      };
+    });
+    await assert(
+      mobilePerspective.headerLinks === 5
+        && mobilePerspective.headerTelescopeArtifacts === 0
+        && mobilePerspective.routeMapInViewport
+        && (isSpatialHome
+          ? mobilePerspective.routeMapTargets === 0
+          : mobilePerspective.routeMapExpanded === 'false'
+            && mobilePerspective.routeMapFieldHidden === 'true'
+            && mobilePerspective.routeMapMode === 'floating'
+            && mobilePerspective.routeMapMounts === 1
+            && mobilePerspective.routeMapParent === 'BODY'
+            && mobilePerspective.routeMapPosition === 'fixed'
+            && mobilePerspective.routeMapScopes === 1
+            && mobilePerspective.routeMapTargets === 7
+            && mobilePerspective.routeMapWidth >= 43
+            && mobilePerspective.routeMapWidth <= 45
+            && mobilePerspective.routeMapHeight >= 43
+            && mobilePerspective.routeMapHeight <= 45),
+      `${route.path}: mobile field-of-view navigation contract failed: ${JSON.stringify(mobilePerspective)}`
+    );
     const mobilePortfolioLabels = await mobilePage.locator(
       '#site-nav-mobile a[href="/work.html"], #site-footer a[href="/work.html"]'
     ).allTextContents();
@@ -1656,10 +1863,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const topbar = bounds('#site-topbar');
     const canvas = document.querySelector('.stellar-tree__canvas');
     const canvasBounds = canvas.getBoundingClientRect();
+    const viewport = document.querySelector('.stellar-tree__viewport');
     const nodeIds = [...document.querySelectorAll('[data-node-id]')].map((node) => node.dataset.nodeId);
     const bodyText = document.body.textContent || '';
     const visibleControlSelector = 'button[data-tree-projection], [data-tree-interaction-toggle], [data-tree-zoom-range], [data-tree-reset], [data-about-theme-toggle]';
-    const backgrounds = ['html', 'body', '#site-topbar', '#main-content', '.stellar-tree__viewport', '#site-footer']
+    const backgrounds = ['html', 'body', '#site-topbar', '#main-content', '#site-footer']
       .map((selector) => getComputedStyle(document.querySelector(selector)).backgroundColor);
     return {
       adjacent: hero.right <= stage.left + 2,
@@ -1675,6 +1883,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
           && canvasBounds.bottom >= opening.bottom - 1,
         height: canvasBounds.height,
         hidden: canvas.getAttribute('aria-hidden'),
+        inTargetVisual: document.querySelector('#stellar-spectrum-panel').contains(canvas),
         overdrawsStage: canvasBounds.left < stage.left
           && canvasBounds.right > stage.right
           && canvasBounds.top < stage.top
@@ -1718,6 +1927,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         system: parseFloat(getComputedStyle(document.querySelector('.stellar-systems-ledger__groups li')).fontSize),
       },
       uniqueNodes: new Set(nodeIds).size,
+      syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
+      viewportBackground: getComputedStyle(viewport).backgroundColor,
+      viewportBackgroundImage: getComputedStyle(viewport).backgroundImage,
       alignedOpening: Math.abs(hero.top - stage.top) <= 2,
       verticalOverlap: Math.max(0, Math.min(hero.bottom, stage.bottom) - Math.max(hero.top, stage.top)),
     };
@@ -1744,6 +1956,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && desktopSpectrum.canvas.backingWidth > 0
       && desktopSpectrum.canvas.backingHeight > 0
       && desktopSpectrum.canvas.hidden === 'true'
+      && desktopSpectrum.canvas.inTargetVisual
       && desktopSpectrum.canvas.coversOpening
       && desktopSpectrum.cameraFinite,
     `Desktop About nebula is missing or overflows: ${JSON.stringify(desktopSpectrum)}`
@@ -1765,8 +1978,16 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `About retained removed controls/copy or lost accessible names: ${JSON.stringify(desktopSpectrum)}`
   );
   await assert(
-    desktopSpectrum.backgrounds.every((color) => color === 'rgb(2, 8, 23)'),
-    `Dark About is not one continuous surface: ${JSON.stringify(desktopSpectrum.backgrounds)}`
+    desktopSpectrum.backgrounds.every((color) => color === 'rgb(2, 8, 23)')
+      && desktopSpectrum.viewportBackground === 'rgba(0, 0, 0, 0)'
+      && desktopSpectrum.viewportBackgroundImage === 'none'
+      && desktopSpectrum.syntheticCloudCount === 0,
+    `About reintroduced a synthetic CSS cloud behind the procedural nebula: ${JSON.stringify({
+      backgrounds: desktopSpectrum.backgrounds,
+      syntheticCloudCount: desktopSpectrum.syntheticCloudCount,
+      viewportBackground: desktopSpectrum.viewportBackground,
+      viewportBackgroundImage: desktopSpectrum.viewportBackgroundImage,
+    })}`
   );
   await assert(
     desktopSpectrum.typography.assessment >= 32 && desktopSpectrum.typography.assessment <= 44
@@ -2233,6 +2454,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   await mobilePage.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
   await mobilePage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
+  await expandUniverseRouteMap(mobilePage);
   const mobileSpectrum = await mobilePage.evaluate(() => {
     const hero = document.querySelector('#present-origin').getBoundingClientRect();
     const stage = document.querySelector('#stellar-spectrum-panel').getBoundingClientRect();
@@ -2240,6 +2462,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const toolbar = document.querySelector('.stellar-tree__toolbar').getBoundingClientRect();
     const rootMarker = document.querySelector('.stellar-tree__root').getBoundingClientRect();
     const canvas = document.querySelector('.stellar-tree__canvas').getBoundingClientRect();
+    const viewport = document.querySelector('.stellar-tree__viewport');
     const controls = [...document.querySelectorAll(
       'button[data-tree-projection], [data-tree-interaction-toggle], [data-tree-reset], [data-about-theme-toggle], [data-tree-zoom-range], [data-band-trigger], [data-node-id]'
     )].filter((element) => !element.hidden && getComputedStyle(element).display !== 'none');
@@ -2248,7 +2471,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const routeMap = document.querySelector('[data-universe-route-map]');
     const routeMapBounds = routeMap.getBoundingClientRect();
     const routeMapLinks = [...routeMap.querySelectorAll('a')].map((link) => link.getBoundingClientRect());
-    const profileMap = document.querySelector('#profile-map').getBoundingClientRect();
+    const routeMapParts = [...routeMap.querySelectorAll(
+      '.universe-route-map__toggle, .universe-route-map__readout, .universe-route-map__sky, .universe-route-map__sightline, .universe-route-map__telescope, .universe-route-map__mount, a'
+    )].map((part) => part.getBoundingClientRect());
+    const routeMapBackdrop = getComputedStyle(routeMap, '::before');
+    const routeMapMount = routeMap.querySelector('.universe-route-map__mount');
+    const routeMapMountBounds = routeMapMount.getBoundingClientRect();
+    const routeMapLeg = getComputedStyle(routeMapMount, '::before');
+    const targetCenters = routeMapLinks.map((link) => link.left + (link.width / 2));
     const lockIcon = lock.querySelector('.stellar-tree__lock-icon--closed').getBoundingClientRect();
     const resetIcon = document.querySelector('.stellar-tree__reset > [aria-hidden="true"]').getBoundingClientRect();
     const themeIcon = document.querySelector('.about-theme-toggle > [aria-hidden="true"]').getBoundingClientRect();
@@ -2268,13 +2498,27 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       resetIconSize: Math.min(resetIcon.width, resetIcon.height),
       themeIconSize: Math.min(themeIcon.width, themeIcon.height),
       pointerEvents: getComputedStyle(document.querySelector('.stellar-tree__canvas')).pointerEvents,
-      routeMapContained: routeMapBounds.left >= profileMap.left - 1
-        && routeMapBounds.right <= profileMap.right + 1
-        && routeMapBounds.top >= stage.bottom - 1
-        && routeMapBounds.bottom <= profileMap.bottom + 1,
+      routeMapBottomGap: innerHeight - routeMapBounds.bottom,
+      routeMapContentsContained: routeMapParts.every((part) => (
+        part.left >= routeMapBounds.left - 1
+          && part.right <= routeMapBounds.right + 1
+          && part.top >= routeMapBounds.top - 1
+          && part.bottom <= routeMapBounds.bottom + 1
+      )),
+      routeMapBackdropVisible: routeMapBackdrop.display !== 'none'
+        && routeMapBackdrop.backgroundColor !== 'rgba(0, 0, 0, 0)',
+      routeMapHeight: routeMapBounds.height,
+      routeMapExpanded: routeMap.dataset.mapExpanded,
+      routeMapLegContained: routeMapMountBounds.top
+        + Number.parseFloat(routeMapLeg.top)
+        + Number.parseFloat(routeMapLeg.height) <= routeMapBounds.bottom + 1,
+      routeMapMountLeftmost: routeMapMountBounds.left + (routeMapMountBounds.width / 2) < Math.min(...targetCenters),
       routeMapMode: routeMap.dataset.universeRouteMapMode,
-      routeMapParent: routeMap.parentElement?.id,
+      routeMapParent: routeMap.parentElement?.tagName,
       routeMapPosition: getComputedStyle(routeMap).position,
+      routeMapProductionHref: routeMap.querySelector('[data-map-id="projects"]')?.getAttribute('href'),
+      routeMapProductionLabel: routeMap.querySelector('[data-map-id="projects"] strong')?.textContent?.trim(),
+      routeMapWidth: routeMapBounds.width,
       routeMapVerticalSpread: Math.max(...routeMapLinks.map((link) => link.top))
         - Math.min(...routeMapLinks.map((link) => link.top)),
       touchAction: getComputedStyle(document.querySelector('.stellar-tree__canvas')).touchAction,
@@ -2285,10 +2529,12 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       sourcePanelDisplay: getComputedStyle(sourcePanel).display,
       sourcePanelOpen: sourcePanel.dataset.panelOpen,
       stacked: stage.top >= hero.bottom - 1,
+      syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
       toolbarContained: toolbar.left >= stage.left && toolbar.right <= stage.right
         && toolbar.top >= stage.top && toolbar.bottom <= stage.bottom,
       toolbarLowerRight: toolbar.right >= stage.right - 64 && toolbar.bottom >= stage.bottom - 120,
       verticalControls: getComputedStyle(document.querySelector('.stellar-tree__camera')).flexDirection === 'column',
+      viewportBackgroundImage: getComputedStyle(viewport).backgroundImage,
     };
   });
   await assert(
@@ -2299,6 +2545,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && mobileSpectrum.visibleNodeLabels === mobileSpectrum.nodes
       && mobileSpectrum.stacked
       && mobileSpectrum.canvasCoversScene
+      && mobileSpectrum.syntheticCloudCount === 0
+      && mobileSpectrum.viewportBackgroundImage === 'none'
       && mobileSpectrum.rootBottomMargin >= 24
       && mobileSpectrum.toolbarContained
       && mobileSpectrum.toolbarLowerRight
@@ -2312,14 +2560,100 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && mobileSpectrum.themeIconSize >= 20
       && mobileSpectrum.pointerEvents === 'none'
       && mobileSpectrum.touchAction === 'pan-y'
-      && mobileSpectrum.routeMapMode === 'integrated'
-      && mobileSpectrum.routeMapParent === 'profile-map'
-      && mobileSpectrum.routeMapPosition === 'absolute'
-      && mobileSpectrum.routeMapContained
-      && mobileSpectrum.routeMapVerticalSpread > 70
+      && mobileSpectrum.routeMapMode === 'floating'
+      && mobileSpectrum.routeMapParent === 'BODY'
+      && mobileSpectrum.routeMapPosition === 'fixed'
+      && mobileSpectrum.routeMapExpanded === 'true'
+      && mobileSpectrum.routeMapContentsContained
+      && mobileSpectrum.routeMapBackdropVisible
+      && mobileSpectrum.routeMapWidth <= 290
+      && mobileSpectrum.routeMapHeight <= 126
+      && mobileSpectrum.routeMapBottomGap >= 10
+      && mobileSpectrum.routeMapBottomGap <= 14
+      && mobileSpectrum.routeMapLegContained
+      && mobileSpectrum.routeMapMountLeftmost
+      && mobileSpectrum.routeMapProductionHref === '/work.html#production-work'
+      && mobileSpectrum.routeMapProductionLabel === 'Production'
+      && mobileSpectrum.routeMapVerticalSpread > 45
       && mobileSpectrum.sourcePanelOpen === 'false'
       && mobileSpectrum.sourcePanelDisplay === 'none',
     `Mobile About nebula containment/targets failed: ${JSON.stringify(mobileSpectrum)}`
+  );
+
+  const clippedMapContext = await browser.newContext({ viewport: { width: 728, height: 410 } });
+  const clippedMapPage = await clippedMapContext.newPage();
+  await clippedMapPage.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
+  await clippedMapPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
+  await expandUniverseRouteMap(clippedMapPage);
+  const clippedMap = await clippedMapPage.evaluate(() => {
+    const routeMap = document.querySelector('[data-universe-route-map]');
+    const map = routeMap.getBoundingClientRect();
+    const parts = [...routeMap.querySelectorAll(
+      '.universe-route-map__toggle, .universe-route-map__readout, .universe-route-map__sky, .universe-route-map__sightline, .universe-route-map__telescope, .universe-route-map__mount, a'
+    )].map((part) => part.getBoundingClientRect());
+    const mount = routeMap.querySelector('.universe-route-map__mount');
+    const mountBounds = mount.getBoundingClientRect();
+    const leg = getComputedStyle(mount, '::before');
+    const targetCenters = [...routeMap.querySelectorAll('a')].map((link) => {
+      const bounds = link.getBoundingClientRect();
+      return bounds.left + (bounds.width / 2);
+    });
+    return {
+      bottom: map.bottom,
+      contentsContained: parts.every((part) => (
+        part.left >= map.left - 1
+          && part.right <= map.right + 1
+          && part.top >= map.top - 1
+          && part.bottom <= map.bottom + 1
+      )),
+      height: map.height,
+      left: map.left,
+      legBottom: mountBounds.top + Number.parseFloat(leg.top) + Number.parseFloat(leg.height),
+      mountLeftmost: mountBounds.left + (mountBounds.width / 2) < Math.min(...targetCenters),
+      mode: routeMap.dataset.universeRouteMapMode,
+      parent: routeMap.parentElement?.tagName,
+      position: getComputedStyle(routeMap).position,
+      right: map.right,
+      top: map.top,
+      viewportHeight: innerHeight,
+      viewportWidth: innerWidth,
+      width: map.width,
+    };
+  });
+  await assert(
+    clippedMap.mode === 'floating'
+      && clippedMap.parent === 'BODY'
+      && clippedMap.position === 'fixed'
+      && clippedMap.width <= 290
+      && clippedMap.height <= 126
+      && clippedMap.left >= 0
+      && clippedMap.right <= clippedMap.viewportWidth
+      && clippedMap.top >= 0
+      && clippedMap.bottom <= clippedMap.viewportHeight + 1
+      && clippedMap.legBottom <= clippedMap.bottom + 1
+      && clippedMap.mountLeftmost
+      && clippedMap.contentsContained,
+    `The shared navigation clips or covers the About field at 728x410: ${JSON.stringify(clippedMap)}`
+  );
+  await clippedMapContext.close();
+
+  await mobilePage.locator('[data-universe-map-toggle]').click();
+  await mobilePage.waitForFunction(() => (
+    document.querySelector('[data-universe-route-map]')?.dataset.mapExpanded === 'false'
+  ));
+  const minimizedMobileMap = await mobilePage.evaluate(() => {
+    const map = document.querySelector('[data-universe-route-map]');
+    return {
+      expanded: map.dataset.mapExpanded,
+      fieldHidden: map.querySelector('[data-universe-map-field]').getAttribute('aria-hidden'),
+      toggleExpanded: map.querySelector('[data-universe-map-toggle]').getAttribute('aria-expanded'),
+    };
+  });
+  await assert(
+    minimizedMobileMap.expanded === 'false'
+      && minimizedMobileMap.fieldHidden === 'true'
+      && minimizedMobileMap.toggleExpanded === 'false',
+    `The floating sky map does not minimize cleanly: ${JSON.stringify(minimizedMobileMap)}`
   );
 
   await mobilePage.locator('button[data-tree-projection="front"]').click();
@@ -2596,17 +2930,23 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const themedAboutPage = await themedAboutContext.newPage();
   await themedAboutPage.goto(BASE_URL + '/about.html', { waitUntil: 'domcontentloaded' });
   await themedAboutPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
-  const readAboutTheme = () => themedAboutPage.evaluate(() => ({
-    backgrounds: ['html', 'body', '#site-topbar', '#main-content', '.stellar-tree__viewport', '#site-footer']
-      .map((selector) => getComputedStyle(document.querySelector(selector)).backgroundColor),
-    classDark: document.documentElement.classList.contains('dark'),
-    label: document.querySelector('[data-about-theme-toggle]').getAttribute('aria-label'),
-    pressed: document.querySelector('[data-about-theme-toggle]').getAttribute('aria-pressed'),
-    saved: localStorage.getItem('about-theme'),
-    theme: document.documentElement.dataset.aboutTheme,
-    transparentAssessment: [...document.querySelectorAll('.stellar-calibration-note, .stellar-calibration__card')]
-      .every((element) => getComputedStyle(element).backgroundColor === 'rgba(0, 0, 0, 0)'),
-  }));
+  const readAboutTheme = () => themedAboutPage.evaluate(() => {
+    const viewport = document.querySelector('.stellar-tree__viewport');
+    return {
+      backgrounds: ['html', 'body', '#site-topbar', '#main-content', '#site-footer']
+        .map((selector) => getComputedStyle(document.querySelector(selector)).backgroundColor),
+      classDark: document.documentElement.classList.contains('dark'),
+      label: document.querySelector('[data-about-theme-toggle]').getAttribute('aria-label'),
+      pressed: document.querySelector('[data-about-theme-toggle]').getAttribute('aria-pressed'),
+      saved: localStorage.getItem('about-theme'),
+      theme: document.documentElement.dataset.aboutTheme,
+      transparentAssessment: [...document.querySelectorAll('.stellar-calibration-note, .stellar-calibration__card')]
+        .every((element) => getComputedStyle(element).backgroundColor === 'rgba(0, 0, 0, 0)'),
+      syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
+      viewportBackground: getComputedStyle(viewport).backgroundColor,
+      viewportBackgroundImage: getComputedStyle(viewport).backgroundImage,
+    };
+  });
   const defaultTheme = await readAboutTheme();
   await assert(
     defaultTheme.theme === 'dark'
@@ -2614,6 +2954,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && defaultTheme.pressed === 'false'
       && defaultTheme.label === 'Use light theme'
       && defaultTheme.backgrounds.every((color) => color === 'rgb(2, 8, 23)')
+      && defaultTheme.viewportBackground === 'rgba(0, 0, 0, 0)'
+      && defaultTheme.viewportBackgroundImage === 'none'
+      && defaultTheme.syntheticCloudCount === 0
       && defaultTheme.transparentAssessment,
     `About does not default to one dark surface: ${JSON.stringify(defaultTheme)}`
   );
@@ -2626,6 +2969,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && lightTheme.label === 'Use dark theme'
       && lightTheme.saved === 'light'
       && lightTheme.backgrounds.every((color) => color === 'rgb(245, 247, 251)')
+      && lightTheme.viewportBackground === 'rgba(0, 0, 0, 0)'
+      && lightTheme.viewportBackgroundImage === 'none'
+      && lightTheme.syntheticCloudCount === 0
       && lightTheme.transparentAssessment,
     `About light theme is not one continuous surface: ${JSON.stringify(lightTheme)}`
   );
@@ -2643,6 +2989,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       .map((key) => document.querySelector('[data-stellar-spectrum]').dataset[key]),
     controls: [...document.querySelectorAll('[data-band-trigger], [data-node-id]')]
       .map((element) => [element.style.left, element.style.top]),
+    syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
   }));
   await reducedAboutPage.waitForTimeout(500);
   const reducedAboutAfter = await reducedAboutPage.evaluate(() => ({
@@ -2651,9 +2998,12 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     controls: [...document.querySelectorAll('[data-band-trigger], [data-node-id]')]
       .map((element) => [element.style.left, element.style.top]),
     scanning: document.querySelector('#stellar-spectrum-panel').classList.contains('is-scanning'),
+    syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
   }));
   await assert(
     JSON.stringify(reducedAboutBefore.camera) === JSON.stringify(reducedAboutAfter.camera)
+      && reducedAboutBefore.syntheticCloudCount === 0
+      && reducedAboutAfter.syntheticCloudCount === 0
       && JSON.stringify(reducedAboutBefore.controls) === JSON.stringify(reducedAboutAfter.controls)
       && !reducedAboutAfter.scanning,
     `Reduced-motion About moves while idle: ${JSON.stringify({ reducedAboutBefore, reducedAboutAfter })}`
@@ -2708,99 +3058,653 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await noJsAboutContext.close();
   }
 
-  const themeTransitionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
-  const themeTransitionPage = await themeTransitionContext.newPage();
-  await themeTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  await themeTransitionPage.evaluate(() => {
-    localStorage.removeItem('about-theme');
-    sessionStorage.clear();
-  });
-  await themeTransitionPage.reload({ waitUntil: 'domcontentloaded' });
-  await waitForBigBangComplete(themeTransitionPage);
-  const toAboutStarted = Date.now();
-  const toAboutTransition = await themeTransitionPage.evaluate(() => {
-    document.querySelector('#site-nav a[href="/about.html"]').click();
+  const perspectiveTransitionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const perspectiveTransitionPage = await perspectiveTransitionContext.newPage();
+  await perspectiveTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  await perspectiveTransitionPage.evaluate(() => sessionStorage.clear());
+  await perspectiveTransitionPage.reload({ waitUntil: 'domcontentloaded' });
+  await waitForBigBangComplete(perspectiveTransitionPage);
+  await expandUniverseRouteMap(perspectiveTransitionPage);
+
+  const workPerspective = await perspectiveTransitionPage.evaluate(() => {
+    const routeMap = document.querySelector('[data-universe-route-map]');
+    const headerNav = document.querySelector('#site-nav');
     return {
-      mode: document.documentElement.dataset.themeTransition,
-      overlay: Boolean(document.querySelector('.universe-theme-wash')),
-      path: location.pathname,
+      headerChildren: headerNav.children.length,
+      headerLabels: [...headerNav.querySelectorAll(':scope > a')].map((link) => link.textContent.trim()),
+      headerTelescopeArtifacts: document.querySelectorAll(
+        '#site-nav [data-telescope-target], #site-nav-mobile [data-telescope-target], .universe-telescope-nav__instrument'
+      ).length,
+      headerViewTransitionName: getComputedStyle(document.querySelector('#site-topbar')).viewTransitionName,
+      perspective: window.UniversePerspective?.snapshot(),
+      routeMap: window.UniverseRouteMap?.snapshot(),
+      depthFieldCount: document.querySelectorAll('[data-universe-depth-field]').length,
+      depthPlaneNames: [...document.querySelectorAll('[data-universe-depth-plane]')]
+        .map((plane) => getComputedStyle(plane).viewTransitionName),
+      depthPlaneFilters: [...document.querySelectorAll('[data-universe-depth-plane]')]
+        .map((plane) => getComputedStyle(plane).filter),
+      targetCueCount: document.querySelectorAll('[data-universe-target-cue]').length,
+      scopeAngle: routeMap.style.getPropertyValue('--scope-angle'),
+      barrelLength: Number.parseFloat(getComputedStyle(routeMap.querySelector('.universe-route-map__telescope')).width),
+      sightlineLength: Number.parseFloat(routeMap.style.getPropertyValue('--sightline-length')),
+      mapHeight: routeMap.getBoundingClientRect().height,
+      mapWidth: routeMap.getBoundingClientRect().width,
+      mapBackdropFilter: getComputedStyle(routeMap, '::before').backdropFilter,
+      readout: routeMap.querySelector('[data-universe-slew-label]')?.textContent,
+      stateLabel: routeMap.querySelector('[data-universe-slew-state-label]')?.textContent,
+      fullScreenInstrument: document.querySelectorAll('[data-universe-transit], .universe-transit__aperture').length,
+      viewTransitionName: getComputedStyle(routeMap).viewTransitionName,
     };
   });
   await assert(
-    toAboutTransition.path === '/work.html'
-      && toAboutTransition.mode === 'to-about'
-      && toAboutTransition.overlay,
-    `Light-to-About transition does not ease into the dark surface: ${JSON.stringify(toAboutTransition)}`
+    workPerspective.headerChildren === 5
+      && workPerspective.headerLabels.join('|') === '[dashboard]|[portfolio]|[logs]|[about]|[contact]'
+      && workPerspective.headerTelescopeArtifacts === 0
+      && workPerspective.headerViewTransitionName === 'universe-site-header'
+      && workPerspective.perspective?.current === 'work'
+      && workPerspective.perspective?.depth === 3.1
+      && workPerspective.perspective?.depthPlanes === 3
+      && workPerspective.perspective?.magnification === 2.4
+      && workPerspective.perspective?.model === 'observer-camera-3d'
+      && workPerspective.perspective?.searchModel === 'directional-guiding-scope'
+      && workPerspective.perspective?.ready === 'ready'
+      && workPerspective.routeMap?.current === 'work'
+      && workPerspective.routeMap?.depth === 3.1
+      && workPerspective.routeMap?.target === 'work'
+      && workPerspective.routeMap?.targetCount === 7
+      && workPerspective.depthFieldCount === 1
+      && workPerspective.depthPlaneNames.join('|') === 'universe-depth-far|universe-depth-middle|universe-depth-near'
+      && workPerspective.depthPlaneFilters.every((filter) => filter === 'none')
+      && workPerspective.targetCueCount === 1
+      && Boolean(workPerspective.scopeAngle)
+      && workPerspective.barrelLength >= 35
+      && workPerspective.barrelLength <= 38
+      && workPerspective.sightlineLength > workPerspective.barrelLength
+      && workPerspective.mapWidth <= 290
+      && workPerspective.mapHeight <= 126
+      && workPerspective.mapBackdropFilter === 'none'
+      && workPerspective.readout === 'WORK'
+      && workPerspective.stateLabel === 'LOCKED'
+      && workPerspective.fullScreenInstrument === 0
+      && workPerspective.viewTransitionName === 'universe-shared-navigation',
+    `Work does not expose the shared sky map and three-depth observer camera: ${JSON.stringify(workPerspective)}`
   );
-  await themeTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'commit' });
-  await assert(Date.now() - toAboutStarted < 500, 'Light-to-About navigation is artificially delayed');
-  const arrivedAboutHandle = await themeTransitionPage.waitForFunction(() => {
-    if (document.documentElement.dataset.themeTransition !== 'arrive-about') return false;
+
+  const trackingAngle = workPerspective.scopeAngle;
+  await perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="about"]').focus();
+  await perspectiveTransitionPage.waitForTimeout(40);
+  const aimedAbout = await perspectiveTransitionPage.evaluate(() => {
+    const routeMap = document.querySelector('[data-universe-route-map]');
     return {
-      overlay: Boolean(document.querySelector('.universe-theme-wash')),
+      angle: routeMap.style.getPropertyValue('--scope-angle'),
+      activeTargets: routeMap.querySelectorAll('[data-slew-active="true"]').length,
+      barrelLength: Number.parseFloat(getComputedStyle(routeMap.querySelector('.universe-route-map__telescope')).width),
+      label: routeMap.querySelector('[data-universe-slew-label]')?.textContent,
+      meta: routeMap.querySelector('[data-universe-slew-meta]')?.textContent,
+      sightlineLength: Number.parseFloat(routeMap.style.getPropertyValue('--sightline-length')),
+      state: routeMap.dataset.slewState,
+      stateLabel: routeMap.querySelector('[data-universe-slew-state-label]')?.textContent,
+      target: routeMap.dataset.slewTarget,
+    };
+  });
+  await assert(
+    aimedAbout.angle !== trackingAngle
+      && aimedAbout.activeTargets === 1
+      && Math.abs(aimedAbout.barrelLength - workPerspective.barrelLength) < 0.1
+      && aimedAbout.label === 'ABOUT'
+      && aimedAbout.meta.includes('Z 4.5')
+      && aimedAbout.meta.includes('MAG 1.6×')
+      && aimedAbout.state === 'aiming'
+      && aimedAbout.stateLabel === 'TARGET'
+      && Math.abs(aimedAbout.sightlineLength - workPerspective.sightlineLength) > 1
+      && aimedAbout.target === 'about',
+    `The shared Universe map does not point toward the keyboard-focused destination: ${JSON.stringify(aimedAbout)}`
+  );
+
+  const canceledDeparture = await perspectiveTransitionPage.evaluate(() => new Promise((resolve) => {
+    const anchor = document.querySelector('.universe-route-map a[data-map-id="about"]');
+    window.addEventListener('click', (event) => {
+      const snapshot = window.UniversePerspective?.snapshot();
+      const result = {
+        from: document.documentElement.dataset.universePerspectiveFrom,
+        fullScreenInstrument: document.querySelectorAll('[data-universe-transit], .universe-transit__aperture').length,
+        motion: document.documentElement.dataset.universeMotion,
+        perspectiveDuration: getComputedStyle(document.documentElement).getPropertyValue('--universe-perspective-duration').trim(),
+        targetCueAnimation: getComputedStyle(document.querySelector('[data-universe-target-cue]')).animationName,
+        targetCueOpacity: getComputedStyle(document.querySelector('[data-universe-target-cue]')).opacity,
+        targetCueViewTransitionName: getComputedStyle(document.querySelector('[data-universe-target-cue]')).viewTransitionName,
+        legacyPagePlaneMotion: ['oldX', 'oldY', 'newX', 'newY', 'oldScale', 'newScale']
+          .some((key) => Object.hasOwn(snapshot?.lastTravel || {}, key)),
+        perspective: snapshot,
+        stored: JSON.parse(sessionStorage.getItem('ac.universe-perspective.v1') || 'null'),
+        to: document.documentElement.dataset.universePerspectiveTo,
+      };
+      event.preventDefault();
+      resolve(result);
+    }, { once: true });
+    anchor.click();
+  }));
+  await assert(
+    canceledDeparture.from === 'work'
+      && canceledDeparture.to === 'about'
+      && canceledDeparture.motion === 'depart'
+      && canceledDeparture.perspective?.lastTravel?.motionModel === 'observer-camera-3d'
+      && canceledDeparture.perspective?.lastTravel?.searchModel === 'directional-guiding-scope'
+      && canceledDeparture.perspective?.lastTravel?.direction === 'southwest'
+      && canceledDeparture.perspective?.lastTravel?.depthDirection === 'farther'
+      && canceledDeparture.perspective?.lastTravel?.cameraX > 0
+      && canceledDeparture.perspective?.lastTravel?.cameraY < 0
+      && canceledDeparture.perspective?.lastTravel?.cameraZ < 0
+      && canceledDeparture.perspective?.lastTravel?.cameraScale > 1
+      && canceledDeparture.perspective?.lastTravel?.skyX > 20
+      && canceledDeparture.perspective?.lastTravel?.skyY < -30
+      && canceledDeparture.perspective?.lastTravel?.targetEntryX < -30
+      && canceledDeparture.perspective?.lastTravel?.targetEntryY > 50
+      && canceledDeparture.perspective?.lastTravel?.skyTone === 'twilight'
+      && canceledDeparture.perspective?.lastTravel?.skyFrom === '#faf9f4'
+      && canceledDeparture.perspective?.lastTravel?.skyTo === '#020817'
+      && Math.abs(canceledDeparture.perspective?.lastTravel?.nearX)
+        > Math.abs(canceledDeparture.perspective?.lastTravel?.middleX)
+      && Math.abs(canceledDeparture.perspective?.lastTravel?.middleX)
+        > Math.abs(canceledDeparture.perspective?.lastTravel?.farX)
+      && Math.abs(canceledDeparture.perspective?.lastTravel?.nearY)
+        > Math.abs(canceledDeparture.perspective?.lastTravel?.middleY)
+      && Math.abs(canceledDeparture.perspective?.lastTravel?.middleY)
+        > Math.abs(canceledDeparture.perspective?.lastTravel?.farY)
+      && canceledDeparture.perspective?.lastTravel?.toMagnification === 1.6
+      && canceledDeparture.perspective?.lastTravel?.duration >= 1350
+      && canceledDeparture.perspective?.lastTravel?.duration <= 1750
+      && canceledDeparture.perspective?.lastTravel?.searchStart === 0.22
+      && canceledDeparture.perspective?.lastTravel?.searchEnd === 0.68
+      && canceledDeparture.perspective?.lastTravel?.searchEnd
+        - canceledDeparture.perspective?.lastTravel?.searchStart >= 0.4
+      && canceledDeparture.perspectiveDuration === `${canceledDeparture.perspective?.lastTravel?.duration}ms`
+      && (canceledDeparture.perspective?.crossDocument
+        ? canceledDeparture.targetCueOpacity === '1'
+          && canceledDeparture.targetCueViewTransitionName === 'universe-target-cue'
+        : canceledDeparture.targetCueAnimation === 'universe-target-acquisition')
+      && canceledDeparture.stored?.from === 'work'
+      && canceledDeparture.stored?.to === 'about'
+      && canceledDeparture.stored?.version === 7
+      && !canceledDeparture.legacyPagePlaneMotion
+      && canceledDeparture.fullScreenInstrument === 0,
+    `Work-to-About departure does not move the observer through a layered 3D field: ${JSON.stringify(canceledDeparture)}`
+  );
+
+  await perspectiveTransitionPage.reload({ waitUntil: 'domcontentloaded' });
+  await waitForBigBangComplete(perspectiveTransitionPage);
+  await expandUniverseRouteMap(perspectiveTransitionPage);
+  const toAboutStarted = Date.now();
+  await Promise.all([
+    perspectiveTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="about"]').click(),
+  ]);
+  await assert(Date.now() - toAboutStarted < 1800, 'Perspective navigation adds an artificial showcase delay');
+  await perspectiveTransitionPage.waitForFunction(() => {
+    const animation = document.getAnimations({ subtree: true })
+      .find((candidate) => candidate.animationName === 'universe-search-sky');
+    const duration = Number(animation?.effect?.getComputedTiming().duration);
+    return duration > 0 && Number(animation.currentTime) / duration >= 0.37;
+  }, null, { timeout: 2200 });
+  const openSkyAbout = await perspectiveTransitionPage.evaluate(() => {
+    const root = document.documentElement;
+    const animation = document.getAnimations({ subtree: true })
+      .find((candidate) => candidate.animationName === 'universe-search-sky');
+    const canvas = document.querySelector('.stellar-tree__canvas');
+    const viewport = document.querySelector('.stellar-tree__viewport');
+    const readPseudo = (pseudo) => {
+      const style = getComputedStyle(root, pseudo);
+      const matrix = style.transform === 'none' ? null : new DOMMatrix(style.transform);
+      return {
+        opacity: Number(style.opacity),
+        x: matrix?.m41 || 0,
+        y: matrix?.m42 || 0,
+        z: matrix?.m43 || 0,
+      };
+    };
+    const duration = Number(animation?.effect?.getComputedTiming().duration);
+    return {
+      progress: duration > 0 ? Number(animation.currentTime) / duration : -1,
+      oldRoot: readPseudo('::view-transition-old(root)'),
+      newRoot: readPseudo('::view-transition-new(root)'),
+      visual: readPseudo('::view-transition-new(universe-target-visual)'),
+      far: readPseudo('::view-transition-group(universe-depth-far)'),
+      middle: readPseudo('::view-transition-group(universe-depth-middle)'),
+      near: readPseudo('::view-transition-group(universe-depth-near)'),
+      target: readPseudo('::view-transition-group(universe-target-cue)'),
+      sourceVisual: readPseudo('::view-transition-old(universe-source-visual)'),
+      aboutMask: getComputedStyle(root, '::view-transition-new(universe-target-visual)').maskImage,
+      canvasBackingHeight: canvas.height,
+      canvasBackingWidth: canvas.width,
+      canvasCount: document.querySelectorAll('.stellar-tree__canvas').length,
+      canvasInTargetVisual: document.querySelector('#stellar-spectrum-panel').contains(canvas),
+      syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
+      viewportBackground: getComputedStyle(viewport).backgroundColor,
+      viewportBackgroundImage: getComputedStyle(viewport).backgroundImage,
+      perspective: window.UniversePerspective?.snapshot(),
+    };
+  });
+  const farTravel = Math.hypot(openSkyAbout.far.x, openSkyAbout.far.y, openSkyAbout.far.z);
+  const middleTravel = Math.hypot(openSkyAbout.middle.x, openSkyAbout.middle.y, openSkyAbout.middle.z);
+  const nearTravel = Math.hypot(openSkyAbout.near.x, openSkyAbout.near.y, openSkyAbout.near.z);
+  await assert(
+    openSkyAbout.progress >= 0.37
+      && openSkyAbout.progress < 0.58
+      && openSkyAbout.oldRoot.opacity <= 0.02
+      && openSkyAbout.newRoot.opacity <= 0.02
+      && openSkyAbout.visual.opacity >= 0.16
+      && openSkyAbout.visual.opacity <= 0.72
+      && Math.hypot(openSkyAbout.visual.x, openSkyAbout.visual.y, openSkyAbout.visual.z) > 24
+      && openSkyAbout.sourceVisual.opacity < 0.5
+      && Math.hypot(openSkyAbout.sourceVisual.x, openSkyAbout.sourceVisual.y, openSkyAbout.sourceVisual.z) > 1
+      && openSkyAbout.aboutMask === 'none'
+      && openSkyAbout.canvasBackingHeight > 0
+      && openSkyAbout.canvasBackingWidth > 0
+      && openSkyAbout.canvasCount === 1
+      && openSkyAbout.canvasInTargetVisual
+      && openSkyAbout.syntheticCloudCount === 0
+      && openSkyAbout.viewportBackground === 'rgba(0, 0, 0, 0)'
+      && openSkyAbout.viewportBackgroundImage === 'none'
+      && farTravel > 8
+      && middleTravel > farTravel * 1.6
+      && nearTravel > middleTravel * 1.5
+      && openSkyAbout.target.x < -100
+      && openSkyAbout.target.y > 100
+      && openSkyAbout.perspective?.motion === 'arrive'
+      && openSkyAbout.perspective?.ready === 'arriving'
+      && openSkyAbout.perspective?.activeTransition === true,
+    `Work-to-About does not carry the incoming visual through negative sky with distinct 3D parallax: ${JSON.stringify({
+      ...openSkyAbout,
+      farTravel,
+      middleTravel,
+      nearTravel,
+    })}`
+  );
+
+  await perspectiveTransitionPage.waitForFunction(() => {
+    const animation = document.getAnimations({ subtree: true })
+      .find((candidate) => candidate.animationName === 'universe-search-sky');
+    const duration = Number(animation?.effect?.getComputedTiming().duration);
+    return duration > 0 && Number(animation.currentTime) / duration >= 0.58;
+  }, null, { timeout: 1000 });
+  const visualFirstAbout = await perspectiveTransitionPage.evaluate(() => {
+    const root = document.documentElement;
+    const animation = document.getAnimations({ subtree: true })
+      .find((candidate) => candidate.animationName === 'universe-search-sky');
+    const duration = Number(animation?.effect?.getComputedTiming().duration);
+    const visualStyle = getComputedStyle(root, '::view-transition-new(universe-target-visual)');
+    const visualMatrix = visualStyle.transform === 'none' ? null : new DOMMatrix(visualStyle.transform);
+    return {
+      enhanced: Boolean(document.querySelector('.stellar-spectrum--enhanced')),
+      progress: duration > 0 ? Number(animation.currentTime) / duration : -1,
+      pageOpacity: Number(getComputedStyle(root, '::view-transition-new(root)').opacity),
+      treeMotion: document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion || null,
+      visualOpacity: Number(visualStyle.opacity),
+      visualTravel: Math.hypot(
+        visualMatrix?.m41 || 0,
+        visualMatrix?.m42 || 0,
+        visualMatrix?.m43 || 0
+      ),
+    };
+  });
+  await assert(
+    visualFirstAbout.progress >= 0.58
+      && visualFirstAbout.progress < 0.72
+      && visualFirstAbout.enhanced === true
+      && visualFirstAbout.treeMotion === null
+      && visualFirstAbout.visualOpacity >= 0.78
+      && visualFirstAbout.visualTravel
+        < Math.hypot(openSkyAbout.visual.x, openSkyAbout.visual.y, openSkyAbout.visual.z)
+      && visualFirstAbout.pageOpacity <= 0.08
+      && visualFirstAbout.visualOpacity > visualFirstAbout.pageOpacity + 0.2,
+    `About copy appears before its animated target is acquired: ${JSON.stringify(visualFirstAbout)}`
+  );
+
+  const arrivedAboutHandle = await perspectiveTransitionPage.waitForFunction(() => {
+    const perspective = window.UniversePerspective?.snapshot();
+    const routeMap = window.UniverseRouteMap?.snapshot();
+    if (!perspective || !routeMap) return false;
+    return {
+      perspective,
+      routeMap,
       theme: document.documentElement.dataset.aboutTheme,
+      fullScreenInstrument: document.querySelectorAll('[data-universe-transit], .universe-transit__aperture').length,
+      visualTransitionName: getComputedStyle(document.querySelector('#stellar-spectrum-panel')).viewTransitionName,
     };
   });
   const arrivedAbout = await arrivedAboutHandle.jsonValue();
-  await assert(arrivedAbout.overlay && arrivedAbout.theme === 'dark',
-    `About arrival does not continue the dark gradient: ${JSON.stringify(arrivedAbout)}`);
-  await themeTransitionPage.waitForFunction(() => !document.querySelector('.universe-theme-wash'), { timeout: 1200 });
+  await assert(
+    arrivedAbout.perspective.current === 'about'
+      && arrivedAbout.perspective.lastTravel?.from === 'work'
+      && arrivedAbout.perspective.lastTravel?.to === 'about'
+      && arrivedAbout.perspective.lastTravel?.motionModel === 'observer-camera-3d'
+      && arrivedAbout.perspective.lastTravel?.searchModel === 'directional-guiding-scope'
+      && arrivedAbout.perspective.lastTravel?.fromDepth === 3.1
+      && arrivedAbout.perspective.lastTravel?.toDepth === 4.5
+      && arrivedAbout.perspective.lastTravel?.depthDirection === 'farther'
+      && arrivedAbout.perspective.lastTravel?.cameraZ < 0
+      && arrivedAbout.perspective.lastTravel?.cameraScale > 1
+      && arrivedAbout.perspective.depthPlanes === 3
+      && arrivedAbout.routeMap.current === 'about'
+      && arrivedAbout.routeMap.depth === 4.5
+      && arrivedAbout.routeMap.target === 'about'
+      && arrivedAbout.theme === 'dark'
+      && arrivedAbout.visualTransitionName === 'universe-target-visual'
+      && arrivedAbout.fullScreenInstrument === 0,
+    `About does not reacquire focus at its own depth in the shared field: ${JSON.stringify(arrivedAbout)}`
+  );
 
-  const fromAboutStarted = Date.now();
-  const fromAboutTransition = await themeTransitionPage.evaluate(() => {
-    document.querySelector('#site-nav a[href="/work.html"]').click();
+  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
+  await perspectiveTransitionPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 3000 });
+  const settledAbout = await perspectiveTransitionPage.evaluate(() => ({
+    canvasCount: document.querySelectorAll('.stellar-tree__canvas').length,
+    enhanced: Boolean(document.querySelector('.stellar-spectrum--enhanced')),
+    perspective: window.UniversePerspective?.snapshot(),
+    syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
+    viewTransitionAnimations: document.getAnimations({ subtree: true })
+      .filter((animation) => animation.effect?.pseudoElement?.startsWith('::view-transition'))
+      .map((animation) => ({
+        name: animation.animationName,
+        pseudo: animation.effect.pseudoElement,
+        state: animation.playState,
+      })),
+  }));
+  await assert(
+    settledAbout.perspective?.motion === null
+      && settledAbout.canvasCount === 1
+      && settledAbout.syntheticCloudCount === 0
+      && settledAbout.enhanced === true
+      && settledAbout.perspective?.ready === 'ready'
+      && settledAbout.perspective?.activeTransition === false
+      && settledAbout.perspective?.pendingCleanup === 0
+      && settledAbout.viewTransitionAnimations.length === 0,
+    `About reports settled while the browser is still crossfading transition snapshots: ${JSON.stringify(settledAbout)}`
+  );
+  await Promise.all([
+    perspectiveTransitionPage.waitForURL('**/work.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    perspectiveTransitionPage.locator('#site-nav a[href="/work.html"]').click(),
+  ]);
+  await perspectiveTransitionPage.waitForFunction(() => {
+    const animation = document.getAnimations({ subtree: true })
+      .find((candidate) => candidate.animationName === 'universe-search-sky');
+    const duration = Number(animation?.effect?.getComputedTiming().duration);
+    return duration > 0 && Number(animation.currentTime) / duration >= 0.35;
+  }, null, { timeout: 2200 });
+  const reverseSharedNavigation = await perspectiveTransitionPage.evaluate(() => {
+    const routeMap = document.querySelector('[data-universe-route-map]');
+    const liveBounds = routeMap.getBoundingClientRect();
+    const groupStyle = getComputedStyle(document.documentElement, '::view-transition-group(universe-shared-navigation)');
+    const groupMatrix = groupStyle.transform === 'none' ? new DOMMatrix() : new DOMMatrix(groupStyle.transform);
     return {
-      mode: document.documentElement.dataset.themeTransition,
-      overlay: Boolean(document.querySelector('.universe-theme-wash')),
-      path: location.pathname,
+      groupHeight: Number.parseFloat(groupStyle.height),
+      groupWidth: Number.parseFloat(groupStyle.width),
+      groupX: groupMatrix.m41,
+      groupY: groupMatrix.m42,
+      liveHeight: liveBounds.height,
+      liveWidth: liveBounds.width,
+      liveX: liveBounds.x,
+      liveY: liveBounds.y,
+      mode: routeMap.dataset.universeRouteMapMode || 'floating',
+      perspective: window.UniversePerspective?.snapshot(),
+      supernovaAnimation: getComputedStyle(document.documentElement, '::view-transition-new(universe-work-supernova)').animationName,
+      visualAnimation: getComputedStyle(document.documentElement, '::view-transition-new(universe-target-visual)').animationName,
     };
   });
   await assert(
-    fromAboutTransition.path === '/about.html'
-      && fromAboutTransition.mode === 'from-about'
-      && fromAboutTransition.overlay,
-    `About-to-light transition does not ease into the light surface: ${JSON.stringify(fromAboutTransition)}`
+    reverseSharedNavigation.mode === 'floating'
+      && reverseSharedNavigation.perspective?.lastTravel?.direction === 'northeast'
+      && reverseSharedNavigation.perspective?.lastTravel?.depthDirection === 'nearer'
+      && reverseSharedNavigation.supernovaAnimation === 'universe-work-supernova-acquire'
+      && reverseSharedNavigation.visualAnimation === 'universe-work-visual-genesis'
+      && Math.abs(reverseSharedNavigation.groupX - reverseSharedNavigation.liveX) <= 2
+      && Math.abs(reverseSharedNavigation.groupY - reverseSharedNavigation.liveY) <= 2
+      && Math.abs(reverseSharedNavigation.groupWidth - reverseSharedNavigation.liveWidth) <= 1
+      && Math.abs(reverseSharedNavigation.groupHeight - reverseSharedNavigation.liveHeight) <= 1,
+    `The shared map drifts away from its clickable viewport position during reverse travel: ${JSON.stringify(reverseSharedNavigation)}`
   );
-  await themeTransitionPage.waitForURL('**/work.html', { timeout: 5000, waitUntil: 'commit' });
-  await assert(Date.now() - fromAboutStarted < 500, 'About-to-light navigation is artificially delayed');
-  const arrivedLightHandle = await themeTransitionPage.waitForFunction(() => (
-    document.documentElement.dataset.themeTransition === 'arrive-light'
-      && Boolean(document.querySelector('.universe-theme-wash'))
-  ));
-  await assert(Boolean(await arrivedLightHandle.jsonValue()), 'Light arrival did not continue the route gradient');
-  await themeTransitionPage.waitForFunction(() => !document.querySelector('.universe-theme-wash'), { timeout: 1200 });
-
-  await themeTransitionPage.evaluate(() => localStorage.setItem('about-theme', 'light'));
-  const sameSurfaceStarted = Date.now();
-  await themeTransitionPage.evaluate(() => document.querySelector('#site-nav a[href="/about.html"]').click());
-  await themeTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' });
-  const sameSurfaceTransition = await themeTransitionPage.evaluate(() => ({
-    mode: document.documentElement.dataset.themeTransition || null,
-    overlay: Boolean(document.querySelector('.universe-theme-wash')),
-    theme: document.documentElement.dataset.aboutTheme,
-  }));
-  sameSurfaceTransition.elapsed = Date.now() - sameSurfaceStarted;
+  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
+  await expandUniverseRouteMap(perspectiveTransitionPage);
+  await Promise.all([
+    perspectiveTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="threads"]').click(),
+  ]);
+  await perspectiveTransitionPage.waitForFunction(() => {
+    const animation = document.getAnimations({ subtree: true })
+      .find((candidate) => candidate.animationName === 'universe-search-sky');
+    const duration = Number(animation?.effect?.getComputedTiming().duration);
+    return duration > 0 && Number(animation.currentTime) / duration >= 0.3;
+  }, null, { timeout: 2200 });
+  const arrivedLogs = await perspectiveTransitionPage.evaluate(() => {
+    const root = document.documentElement;
+    const targetStyle = getComputedStyle(root, '::view-transition-new(universe-target-visual)');
+    const sourceStyle = getComputedStyle(root, '::view-transition-old(universe-source-visual)');
+    const targetMatrix = targetStyle.transform === 'none' ? new DOMMatrix() : new DOMMatrix(targetStyle.transform);
+    return {
+      fieldHidden: document.querySelector('#galaxy-field').hidden,
+      perspective: window.UniversePerspective?.snapshot(),
+      sourceAnimation: sourceStyle.animationName,
+      targetAnimation: targetStyle.animationName,
+      targetOpacity: Number(targetStyle.opacity),
+      targetTravel: Math.hypot(targetMatrix.m41, targetMatrix.m42, targetMatrix.m43),
+      visualTransitionName: getComputedStyle(document.querySelector('#galaxy-field')).viewTransitionName,
+    };
+  });
   await assert(
-    sameSurfaceTransition.mode === null
-      && !sameSurfaceTransition.overlay
-      && sameSurfaceTransition.theme === 'light',
-    `A saved light About theme still creates a cross-theme transition: ${JSON.stringify(sameSurfaceTransition)}`
+    !arrivedLogs.fieldHidden
+      && arrivedLogs.perspective?.current === 'logs'
+      && arrivedLogs.perspective?.lastTravel?.from === 'work'
+      && arrivedLogs.perspective?.lastTravel?.to === 'logs'
+      && arrivedLogs.perspective?.lastTravel?.direction === 'southeast'
+      && arrivedLogs.perspective?.lastTravel?.depthDirection === 'farther'
+      && arrivedLogs.perspective?.lastTravel?.cameraX < 0
+      && arrivedLogs.perspective?.lastTravel?.cameraY < 0
+      && arrivedLogs.perspective?.lastTravel?.cameraZ < 0
+      && arrivedLogs.perspective?.lastTravel?.skyTone === 'light'
+      && arrivedLogs.perspective?.lastTravel?.skyFrom === '#faf9f4'
+      && arrivedLogs.perspective?.lastTravel?.skyTo === '#faf9f4'
+      && arrivedLogs.sourceAnimation === 'universe-visual-release'
+      && arrivedLogs.targetAnimation === 'universe-visual-acquire'
+      && arrivedLogs.targetOpacity > 0.1
+      && arrivedLogs.targetOpacity < 0.7
+      && arrivedLogs.targetTravel > 12
+      && arrivedLogs.visualTransitionName === 'universe-target-visual',
+    `Light-to-light routes do not preserve angular and depth travel through the shared sky: ${JSON.stringify(arrivedLogs)}`
   );
-  await themeTransitionContext.close();
+  await perspectiveTransitionPage.waitForFunction(
+    () => window.UniversePerspective?.snapshot().ready === 'ready',
+    null,
+    { timeout: 3200 }
+  );
+  const settledLogsMap = await perspectiveTransitionPage.evaluate(() => {
+    const map = document.querySelector('[data-universe-route-map]');
+    const bounds = map.getBoundingClientRect();
+    return {
+      bottomGap: innerHeight - bounds.bottom,
+      expanded: map.dataset.mapExpanded,
+      height: bounds.height,
+      left: bounds.left,
+      mode: map.dataset.universeRouteMapMode,
+      parent: map.parentElement?.tagName,
+      position: getComputedStyle(map).position,
+      width: bounds.width,
+    };
+  });
+  await assert(
+    settledLogsMap.expanded === 'false'
+      && settledLogsMap.mode === 'floating'
+      && settledLogsMap.parent === 'BODY'
+      && settledLogsMap.position === 'fixed'
+      && settledLogsMap.left >= 11
+      && settledLogsMap.left <= 13
+      && settledLogsMap.bottomGap >= 15
+      && settledLogsMap.bottomGap <= 17
+      && settledLogsMap.width >= 43
+      && settledLogsMap.width <= 45
+      && settledLogsMap.height >= 43
+      && settledLogsMap.height <= 45,
+    `Logs settles the shared map in a different position or state: ${JSON.stringify(settledLogsMap)}`
+  );
+  await perspectiveTransitionContext.close();
+
+  const retargetTransitionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  await retargetTransitionContext.addInitScript(() => {
+    window.sessionStorage.setItem('ac.bigBangPortfolioPlayed.v1', '1');
+  });
+  const retargetTransitionPage = await retargetTransitionContext.newPage();
+  await retargetTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  await waitForBigBangComplete(retargetTransitionPage);
+  await expandUniverseRouteMap(retargetTransitionPage);
+  await Promise.all([
+    retargetTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    retargetTransitionPage.locator('.universe-route-map a[data-map-id="about"]').click(),
+  ]);
+  await retargetTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().motion === 'arrive');
+  const inFlightPerspective = await retargetTransitionPage.evaluate(() => window.UniversePerspective?.snapshot());
+  const retargetPoint = await retargetTransitionPage.locator('.universe-route-map a[data-map-id="threads"]').evaluate((link) => {
+    const bounds = link.getBoundingClientRect();
+    return { x: bounds.left + (bounds.width / 2), y: bounds.top + (bounds.height / 2) };
+  });
+  const retargetStarted = Date.now();
+  const retargetNavigation = retargetTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' });
+  await retargetTransitionPage.mouse.click(retargetPoint.x, retargetPoint.y);
+  await retargetNavigation;
+  const retargetNavigationElapsed = Date.now() - retargetStarted;
+  await retargetTransitionPage.waitForFunction(
+    () => window.UniversePerspective?.snapshot().ready === 'ready',
+    null,
+    { timeout: 2500 }
+  );
+  const retargetedPerspective = await retargetTransitionPage.evaluate(() => {
+    return {
+      activeTransitionAnimations: document.getAnimations({ subtree: true })
+        .filter((animation) => animation.effect?.pseudoElement?.startsWith('::view-transition')).length,
+      perspective: window.UniversePerspective?.snapshot(),
+    };
+  });
+  await assert(
+    inFlightPerspective?.ready === 'arriving'
+      && inFlightPerspective?.retargetable === true
+      && retargetNavigationElapsed < 1800
+      && retargetedPerspective.perspective?.current === 'logs'
+      && retargetedPerspective.perspective?.lastTravel?.from === 'about'
+      && retargetedPerspective.perspective?.lastTravel?.to === 'logs'
+      && retargetedPerspective.perspective?.lastTravel?.retargeted === true
+      && retargetedPerspective.perspective?.lastTravel?.skyFrom === '#020817'
+      && retargetedPerspective.perspective?.lastTravel?.skyMiddle === '#020817'
+      && retargetedPerspective.perspective?.lastTravel?.skyTo === '#faf9f4'
+      && retargetedPerspective.perspective?.pendingCleanup === 0
+      && retargetedPerspective.perspective?.activeTransition === false
+      && retargetedPerspective.activeTransitionAnimations === 0,
+    `In-flight navigation does not immediately retarget and clean up its compositor state: ${JSON.stringify({
+      inFlightPerspective,
+      retargetNavigationElapsed,
+      retargetedPerspective,
+    })}`
+  );
+  await retargetTransitionContext.close();
 
   const reducedTransitionContext = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
   const reducedTransitionPage = await reducedTransitionContext.newPage();
   await reducedTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  await reducedTransitionPage.evaluate(() => {
-    localStorage.removeItem('about-theme');
-    document.querySelector('#site-nav a[href="/about.html"]').click();
-  });
-  await reducedTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' });
+  await expandUniverseRouteMap(reducedTransitionPage);
+  await Promise.all([
+    reducedTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    reducedTransitionPage.locator('.universe-route-map a[data-map-id="about"]').click(),
+  ]);
+  const reducedPerspective = await reducedTransitionPage.evaluate(() => ({
+    fullScreenInstrument: document.querySelectorAll('[data-universe-transit], .universe-transit__aperture').length,
+    headerTelescopeArtifacts: document.querySelectorAll('.universe-telescope-nav__instrument, [data-telescope-target]').length,
+    motion: document.documentElement.dataset.universeMotion || null,
+    perspective: window.UniversePerspective?.snapshot(),
+    routeMap: window.UniverseRouteMap?.snapshot(),
+    depthFieldDisplay: getComputedStyle(document.querySelector('[data-universe-depth-field]')).display,
+    depthPlaneCount: document.querySelectorAll('[data-universe-depth-plane]').length,
+    telescopeTransition: getComputedStyle(document.querySelector('.universe-route-map__telescope')).transitionDuration,
+  }));
   await assert(
-    await reducedTransitionPage.locator('.universe-theme-wash').count() === 0,
-    'Reduced-motion navigation still creates the cross-theme wash'
+    reducedPerspective.fullScreenInstrument === 0
+      && reducedPerspective.headerTelescopeArtifacts === 0
+      && reducedPerspective.motion === null
+      && reducedPerspective.perspective?.ready === 'ready'
+      && reducedPerspective.perspective?.model === 'observer-camera-3d'
+      && reducedPerspective.depthFieldDisplay === 'none'
+      && reducedPerspective.depthPlaneCount === 3
+      && reducedPerspective.routeMap?.targetCount === 7
+      && reducedPerspective.telescopeTransition === '0s',
+    `Reduced-motion navigation is not a static, usable sky map: ${JSON.stringify(reducedPerspective)}`
   );
   await reducedTransitionContext.close();
+
+  const priorityVisualCases = [
+    ['/', 'home', '[data-camera-window]'],
+    ['/work.html', 'work', '.work-hero__art'],
+    ['/work.html#production-work', 'projects', '.work-bitcoin-stage'],
+    ['/about.html', 'about', '#stellar-spectrum-panel'],
+    ['/about.html#profile-map', 'profile', '#stellar-spectrum-panel'],
+    ['/blog/', 'logs', '#galaxy-field'],
+    ['/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html', 'article', '.article-region__hero'],
+    ['/contact.html', 'contact', '[data-payload-visual]'],
+    ['/resume.html', 'resume', '.resume-dossier__identity > aside'],
+    ['/signals.html', 'signals', '.signals-hero__telemetry'],
+  ];
+  for (const [route, destination, selector] of priorityVisualCases) {
+    await page.goto(BASE_URL + route, { waitUntil: 'domcontentloaded' });
+    if (['about', 'profile'].includes(destination)) {
+      await page.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
+    }
+    const arrivalPriority = await page.evaluate(({ destinationKey, visualSelector }) => {
+      document.documentElement.dataset.universeCrossDocument = 'false';
+      document.documentElement.dataset.universeMotion = 'arrive';
+      document.documentElement.dataset.universePerspectiveTo = destinationKey;
+      const visual = document.querySelector(visualSelector);
+      const canvas = document.querySelector('.stellar-tree__canvas');
+      const supernova = document.querySelector('[data-universe-work-supernova]');
+      const viewport = document.querySelector('.stellar-tree__viewport');
+      const namedVisuals = [...document.querySelectorAll('main *')]
+        .filter((element) => getComputedStyle(element).viewTransitionName === 'universe-target-visual');
+      return {
+        animationName: visual ? getComputedStyle(visual).animationName : null,
+        canvasBackingHeight: canvas?.height || 0,
+        canvasBackingWidth: canvas?.width || 0,
+        canvasCount: document.querySelectorAll('.stellar-tree__canvas').length,
+        canvasInVisual: Boolean(canvas && visual?.contains(canvas)),
+        hidden: visual?.hidden || false,
+        maskImage: visual ? getComputedStyle(visual).maskImage : null,
+        namedVisuals: namedVisuals.length,
+        supernovaAnimationName: supernova ? getComputedStyle(supernova).animationName : null,
+        supernovaBackground: supernova ? getComputedStyle(supernova).backgroundImage : null,
+        supernovaTargetName: supernova ? getComputedStyle(supernova).viewTransitionName : null,
+        syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
+        targetName: visual ? getComputedStyle(visual).viewTransitionName : null,
+        viewportBackground: viewport ? getComputedStyle(viewport).backgroundColor : null,
+        viewportBackgroundImage: viewport ? getComputedStyle(viewport).backgroundImage : null,
+      };
+    }, { destinationKey: destination, visualSelector: selector });
+    await assert(
+      arrivalPriority.targetName === 'universe-target-visual'
+        && arrivalPriority.namedVisuals === 1
+        && arrivalPriority.animationName === (destination === 'work'
+          ? 'universe-work-visual-genesis'
+          : 'universe-visual-acquire')
+        && !arrivalPriority.hidden
+        && (destination !== 'work' || (
+          arrivalPriority.supernovaAnimationName === 'universe-work-supernova-acquire-live'
+            && arrivalPriority.supernovaBackground.includes('repeating-conic-gradient')
+            && arrivalPriority.supernovaTargetName === 'universe-work-supernova'
+        ))
+        && (!['about', 'profile'].includes(destination) || (
+          arrivalPriority.maskImage === 'none'
+            && arrivalPriority.canvasBackingHeight > 0
+            && arrivalPriority.canvasBackingWidth > 0
+            && arrivalPriority.canvasCount === 1
+            && arrivalPriority.canvasInVisual
+            && arrivalPriority.syntheticCloudCount === 0
+            && arrivalPriority.viewportBackground === 'rgba(0, 0, 0, 0)'
+            && arrivalPriority.viewportBackgroundImage === 'none'
+        )),
+      `Destination ${destination} does not prioritize exactly one signature visual before its text: ${JSON.stringify(arrivalPriority)}`
+    );
+  }
 
   // Nav clickthrough from home
   await page.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
@@ -2976,18 +3880,30 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const field = document.querySelector('#galaxy-field').getBoundingClientRect();
     return {
       fieldGap: field.top - tuner.bottom,
+      mapExpanded: map.dataset.mapExpanded,
+      mapHeight: mapBounds.height,
+      mapLeft: mapBounds.left,
       mapBottom: innerHeight - mapBounds.bottom,
       mapMode: map.dataset.universeRouteMapMode || null,
       mapParent: map.parentElement?.tagName,
       mapPosition: getComputedStyle(map).position,
+      mapWidth: mapBounds.width,
     };
   });
   await assert(
     mobileLogsLayout.fieldGap <= 8
-      && mobileLogsLayout.mapBottom <= 2
-      && mobileLogsLayout.mapMode === null
+      && mobileLogsLayout.mapBottom >= 10
+      && mobileLogsLayout.mapBottom <= 14
+      && mobileLogsLayout.mapExpanded === 'false'
+      && mobileLogsLayout.mapHeight >= 43
+      && mobileLogsLayout.mapHeight <= 45
+      && mobileLogsLayout.mapLeft >= 11
+      && mobileLogsLayout.mapLeft <= 13
+      && mobileLogsLayout.mapMode === 'floating'
       && mobileLogsLayout.mapParent === 'BODY'
-      && mobileLogsLayout.mapPosition === 'fixed',
+      && mobileLogsLayout.mapPosition === 'fixed'
+      && mobileLogsLayout.mapWidth >= 43
+      && mobileLogsLayout.mapWidth <= 45,
     `Mobile Logs does not keep search adjacent to the galaxy with floating navigation: ${JSON.stringify(mobileLogsLayout)}`
   );
   await mobilePage.fill('#galaxy-search', 'privacy');

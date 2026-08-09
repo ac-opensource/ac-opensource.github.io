@@ -155,19 +155,22 @@ function injectBigBangLoader(html, relativePath) {
   if (html.includes("data-big-bang-bootstrap")) return html;
 
   const bootstrap = [
-    '<link href="/assets/css/big-bang-loader.css?v=20260808-7" rel="stylesheet"/>',
+    '<link href="/assets/css/big-bang-loader.css?v=20260809-integrated1" rel="stylesheet"/>',
     '<script data-big-bang-bootstrap>(function(){',
+    'var root=document.documentElement;',
     'if(window.matchMedia&&(',
     'window.matchMedia("(prefers-reduced-motion: reduce)").matches||',
     'window.matchMedia("(forced-colors: active)").matches))return;',
+    'var integrated=root.dataset.universeMotion==="arrive"&&root.dataset.universePerspectiveTo==="work";',
+    'if(integrated){try{window.sessionStorage.setItem("ac.bigBangPortfolioPlayed.v1","1");}catch(error){}return;}',
     'var seen=false;try{seen=window.sessionStorage.getItem("ac.bigBangPortfolioPlayed.v1")==="1";}catch(error){}',
     'if(seen)return;',
-    'var root=document.documentElement;root.dataset.bigBang="pending";',
+    'root.dataset.bigBang="pending";',
     'window.__bigBangLoaderGuard=window.setTimeout(function(){',
     'if(root.dataset.bigBang==="pending")delete root.dataset.bigBang;',
     '},4000);',
     '}());</script>',
-    '<script src="/assets/js/big-bang-loader.js?v=20260808-7" defer></script>'
+    '<script src="/assets/js/big-bang-loader.js?v=20260809-integrated1" defer></script>'
   ].join("");
 
   return html.replace("</head>", `${bootstrap}\n</head>`);

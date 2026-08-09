@@ -117,8 +117,10 @@ async function checkRouteSignalHandoff({
   }
   await directContext.close();
 
-  // Only the two major-region CTAs carry the experiment. Modifier, auxiliary,
-  // download, new-context and ordinary top-nav activations stay native.
+  // Only the two major-region CTAs carry the signal experiment. Modifier,
+  // auxiliary, download and new-context activations stay native. Ordinary
+  // top navigation may start the observer-camera perspective handoff, but it must
+  // never acquire the route-signal token or visual emitter.
   const nativeContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   await installEventCapture(nativeContext);
   const nativePage = await nativeContext.newPage();
@@ -175,16 +177,27 @@ async function checkRouteSignalHandoff({
       const result = {
         annotated: anchor.hasAttribute("data-route-signal-link"),
         emitterVisible: !document.querySelector("[data-route-signal-emitter]").hidden,
-        preventedByHandoff: event.defaultPrevented,
-        storedSignal: sessionStorage.getItem("ac.route-signal.v1")
+        perspectiveMotion: document.documentElement.dataset.universeMotion || null,
+        perspectiveToken: JSON.parse(sessionStorage.getItem("ac.universe-perspective.v1") || "null"),
+        preventedByPerspectiveFallback: event.defaultPrevented,
+        storedSignal: sessionStorage.getItem("ac.route-signal.v1"),
+        telescopeArtifacts: document.querySelectorAll('.universe-telescope-nav__instrument, [data-telescope-target], [data-universe-transit]').length
       };
       event.preventDefault();
       resolve(result);
     }, { once: true });
     anchor.click();
   }));
-  await assert(!topNavState.annotated && !topNavState.preventedByHandoff && !topNavState.emitterVisible && topNavState.storedSignal === null,
-    `Signal handoff intercepted ordinary top navigation: ${JSON.stringify(topNavState)}`);
+  await assert(
+    !topNavState.annotated
+      && !topNavState.emitterVisible
+      && topNavState.storedSignal === null
+      && topNavState.perspectiveMotion === "depart"
+      && topNavState.perspectiveToken?.from === "home"
+      && topNavState.perspectiveToken?.to === "work"
+      && topNavState.telescopeArtifacts === 0,
+    `Top navigation crossed into the signal handoff or regained the rejected telescope overlay: ${JSON.stringify(topNavState)}`
+  );
   await nativeContext.close();
 
   const unavailableContext = await browser.newContext({ viewport: { width: 1024, height: 768 } });

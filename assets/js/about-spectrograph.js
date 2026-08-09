@@ -2013,7 +2013,11 @@
         new MutationObserver(() => applyHighlights()).observe(labJournal, { childList: true, subtree: true });
       }
       render();
-      startIdleRotation();
+      if (document.documentElement.dataset.universeMotion === "arrive") {
+        document.addEventListener("universe-perspective:settled", startIdleRotation, { once: true });
+      } else {
+        startIdleRotation();
+      }
     } catch (error) {
       statusElement.textContent = "[static profile available]";
       console.warn("Stellar spectrograph enhancement unavailable.", error);

@@ -1,24 +1,100 @@
 (function () {
   "use strict";
 
+  const root = document.documentElement;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const ABOUT_PATH = "/about.html";
-  const ARRIVAL_KEY = "universe-theme-arrival";
-  const DURATION = 240;
+  const ARRIVAL_KEY = "ac.universe-perspective.v1";
+  const MAX_ARRIVAL_AGE = 8000;
+  const FALLBACK_DEPARTURE_MS = 760;
+  const ARRIVAL_MS = 1550;
+  const STYLE_HREF = "/assets/css/universe-perspective-navigation.css?v=20260809-guide14";
+  const timers = new Set();
   let transitionInFlight = false;
-  let transitionMode = "";
-  let overlay = null;
-  let navigationTimer = 0;
-  let recoveryTimer = 0;
+  let activeViewTransition = null;
+  let travelGeneration = 0;
+  let arrivalGeneration = null;
+  let lastTravel = null;
 
-  function normalizedPath(pathname) {
-    const path = pathname.replace(/\/index\.html$/, "/");
-    return path === "/about/" ? ABOUT_PATH : path;
+  const DESTINATIONS = Object.freeze({
+    home: Object.freeze({ key: "home", label: "Dashboard", mapId: "home", x: 50, y: 52, depth: 1, magnification: 1 }),
+    about: Object.freeze({ key: "about", label: "About", mapId: "about", x: 12, y: 70, depth: 4.5, magnification: 1.6 }),
+    profile: Object.freeze({ key: "profile", label: "Skills", mapId: "profile", x: 25, y: 24, depth: 7.4, magnification: 3.2 }),
+    work: Object.freeze({ key: "work", label: "Portfolio", mapId: "work", x: 44, y: 15, depth: 3.1, magnification: 2.4 }),
+    projects: Object.freeze({ key: "projects", label: "Production apps", mapId: "projects", x: 71, y: 26, depth: 8.8, magnification: 5.6 }),
+    logs: Object.freeze({ key: "logs", label: "Logs", mapId: "threads", x: 87, y: 69, depth: 6.5, magnification: 2.8 }),
+    contact: Object.freeze({ key: "contact", label: "Contact", mapId: "contact", x: 59, y: 88, depth: 4, magnification: 1.8 }),
+    resume: Object.freeze({ key: "resume", label: "Resume", mapId: "work", x: 52, y: 20, depth: 6.2, magnification: 4.4 }),
+    signals: Object.freeze({ key: "signals", label: "Signals", mapId: "contact", x: 66, y: 82, depth: 6.9, magnification: 3.6 }),
+  });
+
+  function schedule(callback, delay) {
+    const timer = window.setTimeout(() => {
+      timers.delete(timer);
+      callback();
+    }, delay);
+    timers.add(timer);
+    return timer;
   }
 
-  function aboutTheme() {
-    const documentTheme = document.documentElement.dataset.aboutTheme;
-    if (["light", "dark"].includes(documentTheme)) return documentTheme;
+  function clearTimers() {
+    timers.forEach((timer) => window.clearTimeout(timer));
+    timers.clear();
+  }
+
+  function clamp(value, minimum, maximum) {
+    return Math.min(maximum, Math.max(minimum, value));
+  }
+
+  function normalizedPath(pathname) {
+    const path = String(pathname || "/").replace(/\/index\.html$/, "/");
+    return path === "/about/" ? "/about.html" : path;
+  }
+
+  function stableArticleOffset(pathname) {
+    let hash = 0;
+    for (const character of pathname) hash = ((hash * 31) + character.charCodeAt(0)) >>> 0;
+    return {
+      x: (hash % 11) - 5,
+      y: (Math.floor(hash / 11) % 9) - 4,
+    };
+  }
+
+  function articleDestination(pathname) {
+    const offset = stableArticleOffset(pathname);
+    return Object.freeze({
+      key: "article",
+      label: "Log detail",
+      mapId: "threads",
+      x: 87 + offset.x,
+      y: 62 + offset.y,
+      depth: 8.4 + ((offset.x + offset.y) * 0.08),
+      magnification: 6.4,
+    });
+  }
+
+  function destinationForLocation(pathname, hash = "") {
+    const path = normalizedPath(pathname);
+    if (path === "/" || path === "") return DESTINATIONS.home;
+    if (path === "/about.html") {
+      return hash === "#profile-map" || hash === "#profile-map-evidence"
+        ? DESTINATIONS.profile
+        : DESTINATIONS.about;
+    }
+    if (path === "/work.html") return hash === "#production-work" ? DESTINATIONS.projects : DESTINATIONS.work;
+    if (path === "/blog/") return DESTINATIONS.logs;
+    if (path.startsWith("/blog/") && path.endsWith(".html")) return articleDestination(path);
+    if (path === "/contact.html") return DESTINATIONS.contact;
+    if (path === "/resume.html") return DESTINATIONS.resume;
+    if (path === "/signals.html") return DESTINATIONS.signals;
+    return null;
+  }
+
+  function currentDestination() {
+    return destinationForLocation(window.location.pathname, window.location.hash) || DESTINATIONS.home;
+  }
+
+  function aboutSurface() {
+    if (["light", "dark"].includes(root.dataset.aboutTheme)) return root.dataset.aboutTheme;
     try {
       return window.localStorage.getItem("about-theme") === "light" ? "light" : "dark";
     } catch (_error) {
@@ -26,80 +102,273 @@
     }
   }
 
-  function surfaceFor(pathname) {
-    return normalizedPath(pathname) === ABOUT_PATH ? aboutTheme() : "light";
+  function surfaceForDestination(destination) {
+    return destination.key === "about" || destination.key === "profile" ? aboutSurface() : "light";
   }
 
-  function washFor(surface) {
-    if (surface === "dark") {
-      return "radial-gradient(circle at 68% 44%, #0b244b 0%, #041126 42%, #020817 78%)";
+  function skyPalette(source, destination) {
+    const fromSurface = surfaceForDestination(source);
+    const toSurface = surfaceForDestination(destination);
+    if (fromSurface === "light" && toSurface === "light") {
+      return {
+        tone: "light",
+        from: "#faf9f4",
+        middle: "#f3f4ef",
+        to: "#faf9f4",
+        targetCore: "rgba(31, 92, 186, 0.96)",
+        targetHalo: "rgba(31, 92, 186, 0.34)",
+        starFar: "rgba(54, 79, 105, 0.7)",
+        starMiddle: "rgba(31, 92, 186, 0.8)",
+        starNear: "rgba(18, 122, 121, 0.82)",
+      };
     }
-    return "radial-gradient(circle at 32% 42%, #ffffff 0%, #f5f7fb 48%, #faf9f4 82%)";
-  }
-
-  function syncTransitionAttribute() {
-    if (transitionMode) {
-      document.documentElement.dataset.themeTransition = transitionMode;
-      document.body?.setAttribute("data-theme-transition", transitionMode);
-    } else {
-      delete document.documentElement.dataset.themeTransition;
-      document.body?.removeAttribute("data-theme-transition");
+    if (fromSurface === "dark" && toSurface === "dark") {
+      return {
+        tone: "dark",
+        from: "#020817",
+        middle: "#020817",
+        to: "#020817",
+        targetCore: "rgba(237, 246, 255, 0.94)",
+        targetHalo: "rgba(126, 182, 255, 0.38)",
+        starFar: "rgba(183, 216, 255, 0.68)",
+        starMiddle: "rgba(126, 182, 255, 0.78)",
+        starNear: "rgba(121, 232, 222, 0.72)",
+      };
     }
+    return {
+      tone: "twilight",
+      from: fromSurface === "dark" ? "#020817" : "#faf9f4",
+      middle: fromSurface === "dark" ? "#020817" : "#faf9f4",
+      to: toSurface === "dark" ? "#020817" : "#faf9f4",
+      targetCore: "rgba(72, 137, 238, 0.98)",
+      targetHalo: "rgba(72, 137, 238, 0.38)",
+      starFar: "rgba(83, 119, 153, 0.72)",
+      starMiddle: "rgba(72, 137, 238, 0.82)",
+      starNear: "rgba(37, 151, 146, 0.82)",
+    };
   }
 
-  function cleanupTransition() {
-    window.clearTimeout(navigationTimer);
-    window.clearTimeout(recoveryTimer);
-    navigationTimer = 0;
-    recoveryTimer = 0;
+  function directionFor(deltaX, deltaY) {
+    if (Math.abs(deltaX) < 4 && Math.abs(deltaY) < 4) return "depth";
+    if (Math.abs(deltaX) >= Math.abs(deltaY) * 0.55 && Math.abs(deltaY) >= Math.abs(deltaX) * 0.55) {
+      return `${deltaY > 0 ? "south" : "north"}${deltaX > 0 ? "east" : "west"}`;
+    }
+    if (Math.abs(deltaX) >= Math.abs(deltaY)) return deltaX > 0 ? "east" : "west";
+    return deltaY > 0 ? "south" : "north";
+  }
+
+  function createTravel(source, destination, targetUrl) {
+    const deltaX = destination.x - source.x;
+    const deltaY = destination.y - source.y;
+    const deltaDepth = destination.depth - source.depth;
+    const angularDistance = Math.hypot(deltaX, deltaY);
+    const cameraX = clamp(deltaX * -0.09, -4.5, 4.5);
+    const cameraY = clamp(deltaY * -0.065, -3.5, 3.5);
+    const cameraZ = clamp(deltaDepth * -24, -150, 150);
+    const magnificationRatio = destination.magnification / source.magnification;
+    const magnificationShift = Math.abs(Math.log2(magnificationRatio));
+    const cameraScale = clamp(1.035 + (angularDistance * 0.0005) + (magnificationShift * 0.022), 1.04, 1.1);
+    const cameraTiltX = clamp(deltaY * 0.011, -0.62, 0.62);
+    const cameraTiltY = clamp(deltaX * -0.013, -0.78, 0.78);
+    const skyX = clamp(deltaX * -0.82, -58, 58);
+    const skyY = clamp(deltaY * -0.62, -46, 46);
+    const targetEntryDistance = clamp(58 + (angularDistance * 0.3), 60, 78);
+    const targetEntryX = angularDistance < 1 ? 0 : (deltaX / angularDistance) * targetEntryDistance;
+    const targetEntryY = angularDistance < 1 ? 0 : (deltaY / angularDistance) * targetEntryDistance;
+    const targetStartScale = clamp(1 / Math.sqrt(magnificationRatio), 0.46, 1.7);
+    const palette = skyPalette(source, destination);
+    const depthDirection = Math.abs(deltaDepth) < 0.25 ? "level" : deltaDepth > 0 ? "farther" : "nearer";
+    const duration = Math.round(clamp(
+      1180 + (angularDistance * 5) + (Math.abs(deltaDepth) * 30),
+      1350,
+      1750
+    ));
+    return {
+      version: 7,
+      motionModel: "observer-camera-3d",
+      searchModel: "directional-guiding-scope",
+      createdAt: Date.now(),
+      destinationUrl: `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`,
+      from: source.key,
+      fromLabel: source.label,
+      fromDepth: source.depth,
+      fromMagnification: source.magnification,
+      to: destination.key,
+      toLabel: destination.label,
+      toMapId: destination.mapId,
+      toDepth: destination.depth,
+      toMagnification: destination.magnification,
+      direction: directionFor(deltaX, deltaY),
+      depthDirection,
+      duration,
+      searchStart: 0.22,
+      searchEnd: 0.68,
+      cameraX,
+      cameraY,
+      cameraZ,
+      cameraScale,
+      cameraTiltX,
+      cameraTiltY,
+      skyX,
+      skyY,
+      farX: skyX * 0.28,
+      farY: skyY * 0.28,
+      middleX: skyX * 0.66,
+      middleY: skyY * 0.66,
+      nearX: skyX * 1.18,
+      nearY: skyY * 1.18,
+      targetEntryX,
+      targetEntryY,
+      targetStartScale,
+      skyTone: palette.tone,
+      skyFrom: palette.from,
+      skyMiddle: palette.middle,
+      skyTo: palette.to,
+      targetCore: palette.targetCore,
+      targetHalo: palette.targetHalo,
+      starFar: palette.starFar,
+      starMiddle: palette.starMiddle,
+      starNear: palette.starNear,
+      focusX: clamp(destination.x, 22, 78),
+      focusY: clamp(destination.y, 20, 80),
+    };
+  }
+
+  function installDepthField() {
+    if (!document.body || document.querySelector("[data-universe-depth-field]")) return;
+    const field = document.createElement("div");
+    field.className = "universe-depth-field";
+    field.dataset.universeDepthField = "";
+    field.dataset.tone = currentDestination().key === "about" ? "dark" : "light";
+    field.setAttribute("aria-hidden", "true");
+    field.innerHTML = `
+      <i class="universe-depth-field__plane universe-depth-field__plane--far" data-universe-depth-plane="far"></i>
+      <i class="universe-depth-field__plane universe-depth-field__plane--middle" data-universe-depth-plane="middle"></i>
+      <i class="universe-depth-field__plane universe-depth-field__plane--near" data-universe-depth-plane="near"></i>
+      <i class="universe-depth-field__supernova" data-universe-work-supernova></i>
+      <i class="universe-depth-field__target" data-universe-target-cue></i>
+    `;
+    document.body.prepend(field);
+  }
+
+  function ensureStylesheet() {
+    if (document.querySelector("link[data-universe-perspective-styles]")) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = STYLE_HREF;
+    link.dataset.universePerspectiveStyles = "";
+    document.head.append(link);
+  }
+
+  function crossDocumentTransitionsSupported() {
+    return "onpageswap" in window
+      && "onpagereveal" in window
+      && typeof window.CSS?.supports === "function"
+      && window.CSS.supports("view-transition-name: universe-page");
+  }
+
+  function applyTravel(travel) {
+    lastTravel = travel;
+    root.dataset.universeTravel = travel.direction;
+    root.dataset.universeDepthTravel = travel.depthDirection;
+    root.dataset.universePerspectiveFrom = travel.from;
+    root.dataset.universePerspectiveTo = travel.to;
+    root.style.setProperty("--universe-perspective-duration", `${travel.duration || ARRIVAL_MS}ms`);
+    root.style.setProperty("--universe-camera-x", `${travel.cameraX.toFixed(2)}vw`);
+    root.style.setProperty("--universe-camera-y", `${travel.cameraY.toFixed(2)}vh`);
+    root.style.setProperty("--universe-camera-z", `${travel.cameraZ.toFixed(2)}px`);
+    root.style.setProperty("--universe-camera-scale", travel.cameraScale.toFixed(4));
+    root.style.setProperty("--universe-camera-tilt-x", `${travel.cameraTiltX.toFixed(2)}deg`);
+    root.style.setProperty("--universe-camera-tilt-y", `${travel.cameraTiltY.toFixed(2)}deg`);
+    root.style.setProperty("--universe-focus-x", `${travel.focusX.toFixed(2)}%`);
+    root.style.setProperty("--universe-focus-y", `${travel.focusY.toFixed(2)}%`);
+    root.style.setProperty("--universe-target-entry-x", `${travel.targetEntryX.toFixed(2)}vw`);
+    root.style.setProperty("--universe-target-entry-y", `${travel.targetEntryY.toFixed(2)}vh`);
+    root.style.setProperty("--universe-target-start-scale", travel.targetStartScale.toFixed(4));
+    root.style.setProperty("--universe-source-exit-x", `${(travel.targetEntryX * -0.42).toFixed(2)}vw`);
+    root.style.setProperty("--universe-source-exit-y", `${(travel.targetEntryY * -0.42).toFixed(2)}vh`);
+    root.style.setProperty("--universe-source-exit-z", `${(travel.cameraZ * -0.28).toFixed(2)}px`);
+    root.style.setProperty("--universe-source-tilt-x", `${(travel.cameraTiltX * -0.5).toFixed(2)}deg`);
+    root.style.setProperty("--universe-source-tilt-y", `${(travel.cameraTiltY * -0.5).toFixed(2)}deg`);
+    root.style.setProperty("--universe-sky-from", travel.skyFrom);
+    root.style.setProperty("--universe-sky-middle", travel.skyMiddle);
+    root.style.setProperty("--universe-sky-to", travel.skyTo);
+    root.style.setProperty("--universe-target-core", travel.targetCore);
+    root.style.setProperty("--universe-target-halo", travel.targetHalo);
+    root.style.setProperty("--universe-slew-star-far", travel.starFar);
+    root.style.setProperty("--universe-slew-star-middle", travel.starMiddle);
+    root.style.setProperty("--universe-slew-star-near", travel.starNear);
+    root.style.setProperty("--universe-observer-x", `${(travel.cameraX * 0.18).toFixed(2)}vw`);
+    root.style.setProperty("--universe-observer-y", `${(travel.cameraY * 0.18).toFixed(2)}vh`);
+    root.style.setProperty("--universe-observer-z", `${(travel.cameraZ * 0.22).toFixed(2)}px`);
+    root.style.setProperty("--universe-far-x", `${travel.farX.toFixed(2)}vw`);
+    root.style.setProperty("--universe-far-y", `${travel.farY.toFixed(2)}vh`);
+    root.style.setProperty("--universe-far-z", `${(travel.cameraZ * 0.18).toFixed(2)}px`);
+    root.style.setProperty("--universe-middle-x", `${travel.middleX.toFixed(2)}vw`);
+    root.style.setProperty("--universe-middle-y", `${travel.middleY.toFixed(2)}vh`);
+    root.style.setProperty("--universe-middle-z", `${(travel.cameraZ * 0.52).toFixed(2)}px`);
+    root.style.setProperty("--universe-near-x", `${travel.nearX.toFixed(2)}vw`);
+    root.style.setProperty("--universe-near-y", `${travel.nearY.toFixed(2)}vh`);
+    root.style.setProperty("--universe-near-z", `${travel.cameraZ.toFixed(2)}px`);
+  }
+
+  function clearTravelState({ keepLast = true, generation = null } = {}) {
+    if (generation !== null && generation !== travelGeneration) return;
+    clearTimers();
     transitionInFlight = false;
-    transitionMode = "";
-    overlay?.remove();
-    overlay = null;
-    syncTransitionAttribute();
-  }
-
-  function createOverlay(surface, { arrival = false } = {}) {
-    overlay?.remove();
-    overlay = document.createElement("div");
-    overlay.className = "universe-theme-wash";
-    overlay.setAttribute("aria-hidden", "true");
-    Object.assign(overlay.style, {
-      position: "fixed",
-      zIndex: "2147483646",
-      inset: "0",
-      opacity: arrival ? "1" : "0",
-      pointerEvents: arrival ? "none" : "auto",
-      background: washFor(surface),
-      transition: `opacity ${DURATION}ms cubic-bezier(.22,.7,.22,1)`,
-    });
-    document.documentElement.append(overlay);
-    syncTransitionAttribute();
-    window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
-      if (overlay) overlay.style.opacity = arrival ? "0" : "1";
+    activeViewTransition = null;
+    root.dataset.universePerspective = "ready";
+    delete root.dataset.universeMotion;
+    delete root.dataset.universeTravel;
+    delete root.dataset.universeDepthTravel;
+    delete root.dataset.universePerspectiveFrom;
+    delete root.dataset.universePerspectiveTo;
+    if (!keepLast) lastTravel = null;
+    document.dispatchEvent(new CustomEvent("universe-perspective:settled", {
+      detail: { generation: travelGeneration },
     }));
   }
 
-  function rememberArrival(pathname, surface) {
+  function skipActiveTransition() {
+    const transition = activeViewTransition;
+    activeViewTransition = null;
+    if (!transition) return;
     try {
-      window.sessionStorage.setItem(ARRIVAL_KEY, JSON.stringify({
-        expires: Date.now() + 7000,
-        path: normalizedPath(pathname),
-        surface,
-      }));
+      transition.skipTransition();
     } catch (_error) {
-      // The outgoing wash still softens the route change when storage is unavailable.
+      // The transition may already be settling. The new navigation still wins.
+    }
+  }
+
+  function storeArrival(travel) {
+    try {
+      window.sessionStorage.setItem(ARRIVAL_KEY, JSON.stringify(travel));
+      return true;
+    } catch (_error) {
+      return false;
     }
   }
 
   function takeArrival() {
+    let serialized = null;
     try {
-      const stored = window.sessionStorage.getItem(ARRIVAL_KEY);
-      if (!stored) return null;
+      serialized = window.sessionStorage.getItem(ARRIVAL_KEY);
       window.sessionStorage.removeItem(ARRIVAL_KEY);
-      const arrival = JSON.parse(stored);
-      if (!arrival || arrival.expires < Date.now() || arrival.path !== normalizedPath(window.location.pathname)) return null;
-      return arrival;
+    } catch (_error) {
+      return null;
+    }
+    if (!serialized) return null;
+    try {
+      const travel = JSON.parse(serialized);
+      const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      if (!travel
+        || travel.version !== 7
+        || travel.motionModel !== "observer-camera-3d"
+        || travel.searchModel !== "directional-guiding-scope"
+        || Date.now() - travel.createdAt > MAX_ARRIVAL_AGE
+        || travel.createdAt - Date.now() > 1000
+        || travel.destinationUrl !== currentUrl) return null;
+      return travel;
     } catch (_error) {
       return null;
     }
@@ -115,53 +384,175 @@
       && (!anchor.target || anchor.target === "_self");
   }
 
-  const arrival = takeArrival();
-  if (arrival && !reducedMotion.matches && arrival.surface === surfaceFor(window.location.pathname)) {
-    transitionInFlight = true;
-    transitionMode = arrival.surface === "dark" ? "arrive-about" : "arrive-light";
-    createOverlay(arrival.surface, { arrival: true });
-    recoveryTimer = window.setTimeout(cleanupTransition, DURATION + 80);
+  function inFlightAnchorAtPoint(event) {
+    if (!transitionInFlight || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return null;
+    const candidates = document.querySelectorAll([
+      "[data-universe-route-map] a[href]",
+      "#site-nav a[href]",
+      ".site-topbar a[href]",
+      ".signals-topbar a[href]",
+    ].join(","));
+    return [...candidates].find((candidate) => {
+      const style = window.getComputedStyle(candidate);
+      const bounds = candidate.getBoundingClientRect();
+      return style.display !== "none"
+        && style.visibility !== "hidden"
+        && style.pointerEvents !== "none"
+        && bounds.width > 0
+        && bounds.height > 0
+        && event.clientX >= bounds.left
+        && event.clientX <= bounds.right
+        && event.clientY >= bounds.top
+        && event.clientY <= bounds.bottom;
+    }) || null;
   }
 
-  document.addEventListener("DOMContentLoaded", syncTransitionAttribute, { once: true });
+  function announceDeparture(travel) {
+    document.dispatchEvent(new CustomEvent("universe-perspective:depart", {
+      detail: {
+        direction: travel.direction,
+        depthDirection: travel.depthDirection,
+        from: travel.from,
+        magnification: travel.toMagnification,
+        mapId: travel.toMapId,
+        retargeted: travel.retargeted,
+        to: travel.to,
+      },
+    }));
+  }
 
-  document.addEventListener("click", (event) => {
-    if (event.defaultPrevented || reducedMotion.matches) return;
-    const target = event.target instanceof Element ? event.target : null;
-    const anchor = target?.closest("a[href]");
-    if (!(anchor instanceof HTMLAnchorElement) || !plainActivation(event, anchor)) return;
-    if (transitionInFlight) {
-      event.preventDefault();
+  function beginDeparture(event, anchor, targetUrl, destination, { proxied = false } = {}) {
+    const retargeted = transitionInFlight;
+    const generation = ++travelGeneration;
+    if (retargeted) {
+      skipActiveTransition();
+      clearTimers();
+      transitionInFlight = false;
+    }
+
+    const travel = createTravel(currentDestination(), destination, targetUrl);
+    travel.retargeted = retargeted;
+    transitionInFlight = true;
+    applyTravel(travel);
+    storeArrival(travel);
+    root.dataset.universePerspective = "departing";
+    root.dataset.universeMotion = "depart";
+    announceDeparture(travel);
+
+    if (reducedMotion.matches) {
+      clearTravelState({ generation });
       return;
     }
-    if (anchor.hasAttribute("data-route-signal-link")) return;
 
-    const destination = new URL(anchor.href, window.location.href);
-    if (destination.origin !== window.location.origin) return;
-    const currentPath = normalizedPath(window.location.pathname);
-    const destinationPath = normalizedPath(destination.pathname);
-    if (currentPath === destinationPath) return;
-
-    const currentSurface = surfaceFor(currentPath);
-    const destinationSurface = surfaceFor(destinationPath);
-    if (currentSurface === destinationSurface) return;
+    if (root.dataset.universeCrossDocument === "true") {
+      event.preventDefault();
+      window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+        if (generation !== travelGeneration) return;
+        try {
+          window.location.assign(targetUrl.href);
+        } catch (_error) {
+          clearTravelState({ keepLast: false, generation });
+        }
+      }));
+      return;
+    }
 
     event.preventDefault();
-    transitionInFlight = true;
-    transitionMode = destinationSurface === "dark" ? "to-about" : "from-about";
-    rememberArrival(destinationPath, destinationSurface);
-    createOverlay(destinationSurface);
-    navigationTimer = window.setTimeout(() => {
+    const departureDelay = Math.round((travel.duration || FALLBACK_DEPARTURE_MS) * 0.56);
+    schedule(() => {
       try {
-        window.location.assign(destination.href);
+        window.location.assign(targetUrl.href);
       } catch (_error) {
-        cleanupTransition();
+        clearTravelState({ keepLast: false, generation });
       }
-    }, 0);
-    recoveryTimer = window.setTimeout(cleanupTransition, DURATION + 1200);
+    }, departureDelay);
+    schedule(() => clearTravelState({ generation }), departureDelay + 1200);
+  }
+
+  ensureStylesheet();
+  if (document.body) installDepthField();
+  else document.addEventListener("DOMContentLoaded", installDepthField, { once: true });
+  const crossDocument = crossDocumentTransitionsSupported();
+  root.dataset.universeCrossDocument = crossDocument ? "true" : "false";
+  root.dataset.universePerspective = "ready";
+
+  const arrival = takeArrival();
+  if (arrival && !reducedMotion.matches) {
+    arrivalGeneration = ++travelGeneration;
+    transitionInFlight = true;
+    applyTravel(arrival);
+    root.dataset.universePerspective = "arriving";
+    root.dataset.universeMotion = "arrive";
+    if (!crossDocument) {
+      schedule(() => clearTravelState({ generation: arrivalGeneration }), (arrival.duration || ARRIVAL_MS) + 120);
+    }
+  }
+
+  window.addEventListener("pageswap", (event) => {
+    if (event.viewTransition) activeViewTransition = event.viewTransition;
+  });
+
+  window.addEventListener("pagereveal", (event) => {
+    if (!arrival || reducedMotion.matches) return;
+    if (!event.viewTransition) {
+      schedule(() => clearTravelState({ generation: arrivalGeneration }), (arrival.duration || ARRIVAL_MS) + 120);
+      return;
+    }
+    const transition = event.viewTransition;
+    activeViewTransition = transition;
+    transition.finished.finally(() => {
+      if (activeViewTransition === transition) activeViewTransition = null;
+      clearTravelState({ generation: arrivalGeneration });
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (event.defaultPrevented) return;
+    const target = event.target instanceof Element ? event.target : null;
+    const directAnchor = target?.closest("a[href]");
+    const anchor = directAnchor instanceof HTMLAnchorElement ? directAnchor : inFlightAnchorAtPoint(event);
+    if (!(anchor instanceof HTMLAnchorElement) || !plainActivation(event, anchor)) return;
+    if (anchor.hasAttribute("data-route-signal-link")) return;
+
+    let targetUrl;
+    try {
+      targetUrl = new URL(anchor.href, window.location.href);
+    } catch (_error) {
+      return;
+    }
+    if (targetUrl.origin !== window.location.origin) return;
+    if (`${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}` === `${window.location.pathname}${window.location.search}${window.location.hash}`) return;
+
+    const destination = destinationForLocation(targetUrl.pathname, targetUrl.hash);
+    if (!destination) return;
+    if (normalizedPath(targetUrl.pathname) === normalizedPath(window.location.pathname)) return;
+    beginDeparture(event, anchor, targetUrl, destination, { proxied: anchor !== directAnchor });
   }, true);
 
   window.addEventListener("pageshow", (event) => {
-    if (event.persisted) cleanupTransition();
+    if (event.persisted) clearTravelState({ keepLast: false });
+  });
+
+  window.UniversePerspective = Object.freeze({
+    snapshot() {
+      const current = currentDestination();
+      return Object.freeze({
+        current: current.key,
+        currentMapId: current.mapId,
+        depth: current.depth,
+        depthPlanes: document.querySelectorAll("[data-universe-depth-plane]").length,
+        magnification: current.magnification,
+        model: "observer-camera-3d",
+        searchModel: "directional-guiding-scope",
+        crossDocument,
+        lastTravel: lastTravel ? Object.freeze({ ...lastTravel }) : null,
+        motion: root.dataset.universeMotion || null,
+        activeTransition: Boolean(activeViewTransition),
+        pendingCleanup: timers.size,
+        ready: root.dataset.universePerspective || "pending",
+        retargetable: true,
+        stylesheet: Boolean(document.querySelector("link[data-universe-perspective-styles]")),
+      });
+    },
   });
 })();

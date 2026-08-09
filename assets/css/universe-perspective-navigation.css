@@ -1,0 +1,847 @@
+:root {
+  --universe-camera-x: 0vw;
+  --universe-camera-y: 0vh;
+  --universe-camera-z: 0px;
+  --universe-camera-scale: 1.04;
+  --universe-camera-tilt-x: 0deg;
+  --universe-camera-tilt-y: 0deg;
+  --universe-focus-x: 50%;
+  --universe-focus-y: 46%;
+  --universe-target-entry-x: 0vw;
+  --universe-target-entry-y: 0vh;
+  --universe-target-start-scale: 0.7;
+  --universe-source-exit-x: 0vw;
+  --universe-source-exit-y: 0vh;
+  --universe-source-exit-z: 0px;
+  --universe-source-tilt-x: 0deg;
+  --universe-source-tilt-y: 0deg;
+  --universe-sky-from: #020817;
+  --universe-sky-middle: #071a34;
+  --universe-sky-to: #020817;
+  --universe-target-core: rgba(237, 246, 255, 0.94);
+  --universe-target-halo: rgba(126, 182, 255, 0.38);
+  --universe-slew-star-far: rgba(183, 216, 255, 0.56);
+  --universe-slew-star-middle: rgba(126, 182, 255, 0.68);
+  --universe-slew-star-near: rgba(121, 232, 222, 0.62);
+  --universe-observer-x: 0vw;
+  --universe-observer-y: 0vh;
+  --universe-observer-z: 0px;
+  --universe-far-x: 0vw;
+  --universe-far-y: 0vh;
+  --universe-far-z: 0px;
+  --universe-middle-x: 0vw;
+  --universe-middle-y: 0vh;
+  --universe-middle-z: 0px;
+  --universe-near-x: 0vw;
+  --universe-near-y: 0vh;
+  --universe-near-z: 0px;
+  --universe-perspective-duration: 1550ms;
+  --universe-perspective-ease: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+.universe-depth-field {
+  --universe-star-far: var(--universe-slew-star-far);
+  --universe-star-middle: var(--universe-slew-star-middle);
+  --universe-star-near: var(--universe-slew-star-near);
+  position: fixed;
+  z-index: 47;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout paint style;
+  transform-style: preserve-3d;
+}
+
+html[data-universe-motion]::view-transition {
+  background-color: var(--universe-sky-from);
+  background-image:
+    radial-gradient(circle, var(--universe-slew-star-far) 0 0.75px, transparent 1.25px),
+    radial-gradient(circle, var(--universe-slew-star-middle) 0 0.95px, transparent 1.55px);
+  background-position: 2rem 4rem, 11rem 8rem;
+  background-size: 17rem 14rem, 29rem 23rem;
+  pointer-events: none;
+  animation: universe-search-sky var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+}
+
+.universe-depth-field__plane {
+  position: absolute;
+  inset: -12vmax;
+  display: block;
+  opacity: 0;
+  background-repeat: repeat;
+  backface-visibility: hidden;
+  transform-origin: var(--universe-focus-x) var(--universe-focus-y);
+}
+
+.universe-depth-field__plane--far {
+  background-image:
+    radial-gradient(circle, var(--universe-star-far) 0 0.8px, transparent 1.3px),
+    radial-gradient(circle, var(--universe-star-far) 0 0.65px, transparent 1.1px);
+  background-position: 3.8rem 8.4rem, 14.2rem 2.9rem;
+  background-size: 15rem 12rem, 21rem 17rem;
+  view-transition-name: universe-depth-far;
+}
+
+.universe-depth-field__plane--middle {
+  background-image:
+    radial-gradient(circle, var(--universe-star-middle) 0 1.2px, transparent 1.9px),
+    radial-gradient(circle, var(--universe-star-middle) 0 0.95px, transparent 1.55px);
+  background-position: 8.6rem 13.4rem, 22.8rem 5.2rem;
+  background-size: 25rem 21rem, 34rem 28rem;
+  view-transition-name: universe-depth-middle;
+}
+
+.universe-depth-field__plane--near {
+  background-image:
+    radial-gradient(circle, var(--universe-star-near) 0 1.7px, transparent 2.7px),
+    radial-gradient(circle, var(--universe-star-near) 0 1.35px, transparent 2.2px);
+  background-position: 17rem 28rem, 51rem 12rem;
+  background-size: 48rem 40rem, 66rem 54rem;
+  view-transition-name: universe-depth-near;
+}
+
+html[data-universe-motion] .universe-depth-field__plane--far { opacity: 0.54; }
+html[data-universe-motion] .universe-depth-field__plane--middle { opacity: 0.42; }
+html[data-universe-motion] .universe-depth-field__plane--near { opacity: 0.3; }
+
+.universe-depth-field__target {
+  position: absolute;
+  top: var(--universe-focus-y);
+  left: var(--universe-focus-x);
+  display: block;
+  width: 0.44rem;
+  height: 0.44rem;
+  border: 1px solid var(--universe-target-core);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--universe-star-middle) 78%, white);
+  box-shadow:
+    0 0 0 0.16rem color-mix(in srgb, var(--universe-target-halo) 68%, transparent),
+    0 0 0.72rem color-mix(in srgb, var(--universe-star-middle) 78%, transparent),
+    0 0 1.8rem color-mix(in srgb, var(--universe-star-far) 54%, transparent);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.45);
+  view-transition-name: universe-target-cue;
+}
+
+.universe-depth-field__supernova {
+  position: absolute;
+  top: var(--universe-focus-y);
+  left: var(--universe-focus-x);
+  display: block;
+  width: clamp(7.5rem, 13vw, 11rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #fff 0 2%, #fff7d6 2.8%, rgba(233, 139, 39, 0.96) 5%, rgba(223, 100, 44, 0.58) 10%, rgba(40, 100, 199, 0.28) 20%, transparent 48%),
+    repeating-conic-gradient(from 7deg, rgba(233, 139, 39, 0.46) 0 0.55deg, transparent 0.9deg 7.5deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0 8%, rgba(0, 0, 0, 0.94) 23%, rgba(0, 0, 0, 0.38) 48%, transparent 72%);
+  mask-image: radial-gradient(circle, #000 0 8%, rgba(0, 0, 0, 0.94) 23%, rgba(0, 0, 0, 0.38) 48%, transparent 72%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.03);
+  transform-origin: center;
+}
+
+.universe-depth-field__supernova::before,
+.universe-depth-field__supernova::after {
+  position: absolute;
+  inset: 24%;
+  border: 1px solid rgba(233, 139, 39, 0.72);
+  border-radius: 50%;
+  content: "";
+  transform: scale(1.8);
+}
+
+.universe-depth-field__supernova::after {
+  inset: 15%;
+  border-color: rgba(40, 100, 199, 0.42);
+  transform: scale(2.5) rotate(19deg);
+}
+
+html[data-universe-motion] .universe-depth-field__plane,
+html[data-universe-motion] .universe-depth-field__target,
+html[data-universe-motion] .universe-depth-field__supernova {
+  will-change: opacity, transform;
+}
+
+.universe-depth-field__target::before,
+.universe-depth-field__target::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.universe-depth-field__target::before {
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 1px solid color-mix(in srgb, var(--universe-target-core) 46%, transparent);
+}
+
+.universe-depth-field__target::after {
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px dotted color-mix(in srgb, var(--universe-target-core) 26%, transparent);
+}
+
+html[data-universe-motion] .universe-depth-field__target {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+::view-transition-image-pair(root),
+::view-transition-image-pair(universe-depth-far),
+::view-transition-image-pair(universe-depth-middle),
+::view-transition-image-pair(universe-depth-near),
+::view-transition-image-pair(universe-target-cue) {
+  isolation: auto;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+::view-transition-group(root) {
+  animation-duration: var(--universe-perspective-duration);
+  animation-timing-function: var(--universe-perspective-ease);
+  transform-origin: var(--universe-focus-x) var(--universe-focus-y);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  height: 100%;
+  overflow: clip;
+  mix-blend-mode: normal;
+  backface-visibility: hidden;
+}
+
+html[data-universe-motion]::view-transition-old(root) {
+  animation: universe-field-release var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+}
+
+html[data-universe-motion]::view-transition-new(root) {
+  animation: universe-field-acquire var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+}
+
+html[data-universe-motion="arrive"][data-universe-perspective-to="home"] [data-camera-window],
+html[data-universe-motion="arrive"][data-universe-perspective-to="work"] .work-hero__art,
+html[data-universe-motion="arrive"][data-universe-perspective-to="projects"] .work-bitcoin-stage,
+html[data-universe-motion="arrive"][data-universe-perspective-to="about"] #stellar-spectrum-panel,
+html[data-universe-motion="arrive"][data-universe-perspective-to="profile"] #stellar-spectrum-panel,
+html[data-universe-motion="arrive"][data-universe-perspective-to="logs"] #galaxy-field,
+html[data-universe-motion="arrive"][data-universe-perspective-to="article"] .article-region__hero,
+html[data-universe-motion="arrive"][data-universe-perspective-to="contact"] [data-payload-visual],
+html[data-universe-motion="arrive"][data-universe-perspective-to="resume"] .resume-dossier__identity > aside,
+html[data-universe-motion="arrive"][data-universe-perspective-to="signals"] .signals-hero__telemetry {
+  view-transition-name: universe-target-visual;
+}
+
+html[data-universe-motion="arrive"][data-universe-perspective-to="work"] .universe-depth-field__supernova {
+  opacity: 1;
+  view-transition-name: universe-work-supernova;
+}
+
+html[data-universe-motion="depart"][data-universe-perspective-from="home"] [data-camera-window],
+html[data-universe-motion="depart"][data-universe-perspective-from="work"] .work-hero__art,
+html[data-universe-motion="depart"][data-universe-perspective-from="projects"] .work-bitcoin-stage,
+html[data-universe-motion="depart"][data-universe-perspective-from="about"] #stellar-spectrum-panel,
+html[data-universe-motion="depart"][data-universe-perspective-from="profile"] #stellar-spectrum-panel,
+html[data-universe-motion="depart"][data-universe-perspective-from="logs"] #galaxy-field,
+html[data-universe-motion="depart"][data-universe-perspective-from="article"] .article-region__hero,
+html[data-universe-motion="depart"][data-universe-perspective-from="contact"] [data-payload-visual],
+html[data-universe-motion="depart"][data-universe-perspective-from="resume"] .resume-dossier__identity > aside,
+html[data-universe-motion="depart"][data-universe-perspective-from="signals"] .signals-hero__telemetry {
+  view-transition-name: universe-source-visual;
+}
+
+::view-transition-group(universe-target-visual) {
+  z-index: 9997;
+  overflow: visible;
+  animation-duration: var(--universe-perspective-duration);
+  animation-timing-function: var(--universe-perspective-ease);
+  transform-origin: center;
+}
+
+::view-transition-image-pair(universe-target-visual) {
+  overflow: visible;
+  isolation: auto;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+::view-transition-old(universe-target-visual),
+::view-transition-new(universe-source-visual) {
+  display: none;
+}
+
+html[data-universe-motion]::view-transition-new(universe-target-visual) {
+  animation: universe-visual-acquire var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+  transform-origin: center;
+}
+
+html[data-universe-motion][data-universe-perspective-to="work"]::view-transition-new(universe-target-visual) {
+  animation-name: universe-work-visual-genesis;
+}
+
+::view-transition-group(universe-source-visual) {
+  z-index: 9996;
+  overflow: visible;
+  animation-duration: var(--universe-perspective-duration);
+  animation-timing-function: var(--universe-perspective-ease);
+  transform-origin: center;
+}
+
+::view-transition-image-pair(universe-source-visual) {
+  overflow: visible;
+  isolation: auto;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+html[data-universe-motion]::view-transition-old(universe-source-visual) {
+  animation: universe-visual-release var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+  transform-origin: center;
+}
+
+::view-transition-old(universe-work-supernova) {
+  display: none;
+}
+
+::view-transition-group(universe-work-supernova) {
+  z-index: 9998;
+  overflow: visible;
+  animation-duration: var(--universe-perspective-duration);
+  animation-timing-function: var(--universe-perspective-ease);
+  transform-origin: center;
+}
+
+::view-transition-image-pair(universe-work-supernova) {
+  overflow: visible;
+  isolation: auto;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+html[data-universe-motion][data-universe-perspective-to="work"]::view-transition-new(universe-work-supernova) {
+  animation: universe-work-supernova-acquire var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+}
+
+::view-transition-group(universe-depth-far),
+::view-transition-group(universe-depth-middle),
+::view-transition-group(universe-depth-near),
+::view-transition-group(universe-target-cue) {
+  z-index: 9998;
+  animation-duration: var(--universe-perspective-duration);
+  animation-timing-function: var(--universe-perspective-ease);
+  transform-origin: var(--universe-focus-x) var(--universe-focus-y);
+}
+
+html[data-universe-motion]::view-transition-group(universe-depth-far) {
+  animation-name: universe-camera-depth-far;
+}
+
+html[data-universe-motion]::view-transition-group(universe-depth-middle) {
+  animation-name: universe-camera-depth-middle;
+}
+
+html[data-universe-motion]::view-transition-group(universe-depth-near) {
+  animation-name: universe-camera-depth-near;
+}
+
+html[data-universe-motion]::view-transition-group(universe-target-cue) {
+  z-index: 9999;
+  animation-name: universe-target-acquisition;
+}
+
+::view-transition-old(universe-depth-far),
+::view-transition-new(universe-depth-far),
+::view-transition-old(universe-depth-middle),
+::view-transition-new(universe-depth-middle),
+::view-transition-old(universe-depth-near),
+::view-transition-new(universe-depth-near),
+::view-transition-old(universe-target-cue),
+::view-transition-new(universe-target-cue) {
+  mix-blend-mode: normal;
+}
+
+::view-transition-group(universe-shared-navigation) {
+  z-index: 10000;
+  animation-duration: var(--universe-perspective-duration);
+  animation-timing-function: var(--universe-perspective-ease);
+}
+
+#site-topbar,
+.site-topbar,
+.signals-topbar {
+  view-transition-name: universe-site-header;
+}
+
+::view-transition-group(universe-site-header) {
+  z-index: 10001;
+  animation-duration: var(--universe-perspective-duration);
+  animation-timing-function: var(--universe-perspective-ease);
+}
+
+::view-transition-old(universe-site-header),
+::view-transition-new(universe-site-header),
+::view-transition-old(universe-shared-navigation),
+::view-transition-new(universe-shared-navigation) {
+  mix-blend-mode: normal;
+}
+
+html[data-universe-motion]::view-transition-group(root),
+html[data-universe-motion]::view-transition-old(root),
+html[data-universe-motion]::view-transition-new(root),
+html[data-universe-motion]::view-transition-group(universe-site-header),
+html[data-universe-motion]::view-transition-old(universe-site-header),
+html[data-universe-motion]::view-transition-new(universe-site-header),
+html[data-universe-motion]::view-transition-group(universe-shared-navigation),
+html[data-universe-motion]::view-transition-old(universe-shared-navigation),
+html[data-universe-motion]::view-transition-new(universe-shared-navigation) {
+  pointer-events: none;
+}
+
+html[data-universe-motion]::view-transition-old(universe-site-header),
+html[data-universe-motion]::view-transition-old(universe-shared-navigation) {
+  animation: universe-hud-release var(--universe-perspective-duration) linear both;
+}
+
+html[data-universe-motion]::view-transition-new(universe-site-header),
+html[data-universe-motion]::view-transition-new(universe-shared-navigation) {
+  animation: universe-hud-acquire var(--universe-perspective-duration) linear both;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion] {
+  overflow: hidden;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion="depart"] body {
+  transform-origin: var(--universe-focus-x) var(--universe-focus-y);
+  animation: universe-camera-fallback-depart var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+  will-change: filter, opacity, transform;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion="arrive"] body {
+  transform-origin: var(--universe-focus-x) var(--universe-focus-y);
+  animation: universe-camera-fallback-arrive var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+  will-change: filter, opacity, transform;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="home"] [data-camera-window],
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="work"] .work-hero__art,
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="projects"] .work-bitcoin-stage,
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="about"] #stellar-spectrum-panel,
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="profile"] #stellar-spectrum-panel,
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="logs"] #galaxy-field,
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="article"] .article-region__hero,
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="contact"] [data-payload-visual],
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="resume"] .resume-dossier__identity > aside,
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="signals"] .signals-hero__telemetry {
+  animation: universe-visual-acquire var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+  transform-origin: center;
+  will-change: opacity, transform;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="work"] .work-hero__art {
+  animation-name: universe-work-visual-genesis;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="work"] .universe-depth-field__supernova {
+  animation: universe-work-supernova-acquire-live var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion] .universe-depth-field__plane--far {
+  animation: universe-camera-depth-far var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion] .universe-depth-field__plane--middle {
+  animation: universe-camera-depth-middle var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion] .universe-depth-field__plane--near {
+  animation: universe-camera-depth-near var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion] .universe-depth-field__target {
+  animation: universe-target-acquisition-fallback var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+}
+
+@keyframes universe-field-release {
+  0%, 8% {
+    opacity: 1;
+  }
+  15% {
+    opacity: 0.72;
+  }
+  20%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes universe-field-acquire {
+  0%, 74% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 0.22;
+  }
+  87%, 100% {
+    opacity: 1;
+  }
+}
+
+@keyframes universe-camera-depth-far {
+  0%, 6% {
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1);
+  }
+  68%, 100% {
+    transform: perspective(1400px) translate3d(var(--universe-far-x), var(--universe-far-y), var(--universe-far-z)) scale(1.012);
+  }
+}
+
+@keyframes universe-camera-depth-middle {
+  0%, 6% {
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1);
+  }
+  68%, 100% {
+    transform: perspective(1400px) translate3d(var(--universe-middle-x), var(--universe-middle-y), var(--universe-middle-z)) scale(1.035);
+  }
+}
+
+@keyframes universe-camera-depth-near {
+  0%, 6% {
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1);
+  }
+  68%, 100% {
+    transform: perspective(1400px) translate3d(var(--universe-near-x), var(--universe-near-y), var(--universe-near-z)) scale(1.07);
+  }
+}
+
+@keyframes universe-search-sky {
+  0%, 6% {
+    background-color: var(--universe-sky-from);
+  }
+  56% {
+    background-color: var(--universe-sky-middle);
+  }
+  68%, 100% {
+    background-color: var(--universe-sky-to);
+  }
+}
+
+@keyframes universe-visual-acquire {
+  0%, 10% {
+    opacity: 0;
+    transform:
+      perspective(1400px)
+      translate3d(
+        var(--universe-target-entry-x),
+        var(--universe-target-entry-y),
+        var(--universe-camera-z)
+      )
+      scale(var(--universe-target-start-scale))
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+  20% {
+    opacity: 0.12;
+  }
+  38% {
+    opacity: 0.42;
+  }
+  54% {
+    opacity: 0.78;
+  }
+  68%, 100% {
+    opacity: 1;
+    transform:
+      perspective(1400px)
+      translate3d(0, 0, 0)
+      scale(1)
+      rotateX(0)
+      rotateY(0);
+  }
+}
+
+@keyframes universe-visual-release {
+  0%, 8% {
+    opacity: 1;
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0);
+  }
+  26% {
+    opacity: 0.48;
+  }
+  46%, 100% {
+    opacity: 0;
+    transform:
+      perspective(1400px)
+      translate3d(
+        var(--universe-source-exit-x),
+        var(--universe-source-exit-y),
+        var(--universe-source-exit-z)
+      )
+      scale(0.9)
+      rotateX(var(--universe-source-tilt-x))
+      rotateY(var(--universe-source-tilt-y));
+  }
+}
+
+@keyframes universe-work-visual-genesis {
+  0%, 10% {
+    opacity: 0;
+    transform:
+      perspective(1400px)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z))
+      scale(0.025)
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+  19% {
+    opacity: 0.9;
+    transform:
+      perspective(1400px)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z))
+      scale(0.055)
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+  36% {
+    opacity: 1;
+    transform:
+      perspective(1400px)
+      translate3d(
+        var(--universe-target-entry-x),
+        var(--universe-target-entry-y),
+        var(--universe-camera-z)
+      )
+      scale(0.34)
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+  56% {
+    opacity: 1;
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1.08) rotateX(0) rotateY(0);
+  }
+  68%, 100% {
+    opacity: 1;
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0);
+  }
+}
+
+@keyframes universe-work-supernova-acquire {
+  0%, 10% {
+    opacity: 0;
+    transform: translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z)) scale(0.03);
+  }
+  19% {
+    opacity: 0.4;
+    transform: translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z)) scale(0.08);
+  }
+  30% {
+    opacity: 1;
+    transform: translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z)) scale(0.32);
+  }
+  48% {
+    opacity: 0.82;
+    transform: translate3d(0, 0, 0) scale(2.35);
+  }
+  62% {
+    opacity: 0.18;
+    transform: translate3d(0, 0, 0) scale(4.4);
+  }
+  68%, 100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(5.2);
+  }
+}
+
+@keyframes universe-work-supernova-acquire-live {
+  0%, 10% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z))
+      scale(0.03);
+  }
+  19% {
+    opacity: 0.4;
+    transform:
+      translate(-50%, -50%)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z))
+      scale(0.08);
+  }
+  30% {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z))
+      scale(0.32);
+  }
+  48% {
+    opacity: 0.82;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(2.35);
+  }
+  62% {
+    opacity: 0.18;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(4.4);
+  }
+  68%, 100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(5.2);
+  }
+}
+
+@keyframes universe-target-acquisition {
+  0%, 16% {
+    opacity: 0;
+    transform: translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), 0) scale(var(--universe-target-start-scale));
+  }
+  30% {
+    opacity: 0.18;
+  }
+  60% {
+    opacity: 0.72;
+  }
+  68% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  78% {
+    opacity: 0.46;
+  }
+  88%, 100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes universe-target-acquisition-fallback {
+  0%, 16% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), 0)
+      scale(var(--universe-target-start-scale));
+  }
+  30% {
+    opacity: 0.18;
+  }
+  60% {
+    opacity: 0.72;
+  }
+  68% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(1);
+  }
+  78% {
+    opacity: 0.46;
+  }
+  88%, 100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes universe-hud-release {
+  0%, 72% { opacity: 1; }
+  79%, 100% { opacity: 0; }
+}
+
+@keyframes universe-hud-acquire {
+  0%, 72% { opacity: 0; }
+  79%, 100% { opacity: 1; }
+}
+
+@keyframes universe-camera-fallback-depart {
+  from {
+    opacity: 1;
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0);
+  }
+  to {
+    opacity: 0.05;
+    transform:
+      perspective(1400px)
+      translate3d(var(--universe-observer-x), var(--universe-observer-y), var(--universe-observer-z))
+      scale(var(--universe-camera-scale))
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+}
+
+@keyframes universe-camera-fallback-arrive {
+  from {
+    opacity: 0.05;
+    transform:
+      perspective(1400px)
+      translate3d(var(--universe-observer-x), var(--universe-observer-y), var(--universe-observer-z))
+      scale(var(--universe-camera-scale))
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (forced-colors: active) {
+  .universe-depth-field {
+    display: none !important;
+  }
+
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(universe-depth-far),
+  ::view-transition-old(universe-depth-far),
+  ::view-transition-new(universe-depth-far),
+  ::view-transition-group(universe-depth-middle),
+  ::view-transition-old(universe-depth-middle),
+  ::view-transition-new(universe-depth-middle),
+  ::view-transition-group(universe-depth-near),
+  ::view-transition-old(universe-depth-near),
+  ::view-transition-new(universe-depth-near),
+  ::view-transition-group(universe-target-cue),
+  ::view-transition-old(universe-target-cue),
+  ::view-transition-new(universe-target-cue),
+  ::view-transition-group(universe-target-visual),
+  ::view-transition-old(universe-target-visual),
+  ::view-transition-new(universe-target-visual),
+  ::view-transition-group(universe-source-visual),
+  ::view-transition-old(universe-source-visual),
+  ::view-transition-new(universe-source-visual),
+  ::view-transition-group(universe-work-supernova),
+  ::view-transition-old(universe-work-supernova),
+  ::view-transition-new(universe-work-supernova),
+  ::view-transition-group(universe-shared-navigation),
+  ::view-transition-old(universe-shared-navigation),
+  ::view-transition-new(universe-shared-navigation),
+  ::view-transition-group(universe-site-header),
+  ::view-transition-old(universe-site-header),
+  ::view-transition-new(universe-site-header),
+  html[data-universe-motion] body {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
+
+@media print {
+  .universe-depth-field {
+    display: none !important;
+  }
+
+  html,
+  body {
+    animation: none !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
