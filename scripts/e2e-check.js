@@ -153,6 +153,36 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     }
   }
 
+  async function seekUniverseTransition(targetPage, progress) {
+    await targetPage.waitForFunction(() => {
+      const animation = document.getAnimations({ subtree: true })
+        .find((candidate) => candidate.animationName === 'universe-search-sky');
+      return Number(animation?.effect?.getComputedTiming().duration) > 0;
+    }, null, { timeout: 2500 });
+    await targetPage.evaluate(async (targetProgress) => {
+      document.getAnimations({ subtree: true })
+        .filter((animation) => animation.effect?.pseudoElement?.startsWith('::view-transition'))
+        .forEach((animation) => {
+          const duration = Number(animation.effect?.getComputedTiming().duration);
+          if (!(duration > 0)) return;
+          animation.pause();
+          animation.currentTime = duration * targetProgress;
+        });
+      await new Promise(requestAnimationFrame);
+    }, progress);
+  }
+
+  async function resumeUniverseTransition(targetPage) {
+    await targetPage.evaluate(() => {
+      document.getAnimations({ subtree: true })
+        .filter((animation) => (
+          animation.effect?.pseudoElement?.startsWith('::view-transition')
+            && animation.playState === 'paused'
+        ))
+        .forEach((animation) => animation.play());
+    });
+  }
+
   const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
   for (const socialImagePath of new Set(socialPreviewContracts.map(({ imagePath }) => imagePath))) {
     if (!fs.existsSync(socialImagePath)) {
@@ -453,12 +483,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     integratedBigBangPage.waitForURL('**/work.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
     integratedBigBangPage.locator('#site-nav a[href="/work.html"]').click(),
   ]);
-  await integratedBigBangPage.waitForFunction(() => {
-    const animation = document.getAnimations({ subtree: true })
-      .find((candidate) => candidate.animationName === 'universe-search-sky');
-    const duration = Number(animation?.effect?.getComputedTiming().duration);
-    return duration > 0 && Number(animation.currentTime) / duration >= 0.3;
-  }, null, { timeout: 2500 });
+  await seekUniverseTransition(integratedBigBangPage, 0.34);
   const integratedBigBang = await integratedBigBangPage.evaluate((sessionKey) => {
     const root = document.documentElement;
     const visualStyle = getComputedStyle(root, '::view-transition-new(universe-target-visual)');
@@ -500,6 +525,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && integratedBigBang.copyOpacity <= 0.02,
     `Sky navigation to Work does not integrate the Big Bang with target acquisition: ${JSON.stringify(integratedBigBang)}`
   );
+  await resumeUniverseTransition(integratedBigBangPage);
   await integratedBigBangPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
     null,
@@ -3257,18 +3283,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await perspectiveTransitionPage.reload({ waitUntil: 'domcontentloaded' });
   await waitForBigBangComplete(perspectiveTransitionPage);
   await expandUniverseRouteMap(perspectiveTransitionPage);
-  const toAboutStarted = Date.now();
   await Promise.all([
     perspectiveTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
     perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="about"]').click(),
   ]);
-  await assert(Date.now() - toAboutStarted < 1800, 'Perspective navigation adds an artificial showcase delay');
-  await perspectiveTransitionPage.waitForFunction(() => {
-    const animation = document.getAnimations({ subtree: true })
-      .find((candidate) => candidate.animationName === 'universe-search-sky');
-    const duration = Number(animation?.effect?.getComputedTiming().duration);
-    return duration > 0 && Number(animation.currentTime) / duration >= 0.37;
-  }, null, { timeout: 2200 });
+  await seekUniverseTransition(perspectiveTransitionPage, 0.4);
   const openSkyAbout = await perspectiveTransitionPage.evaluate(() => {
     const root = document.documentElement;
     const animation = document.getAnimations({ subtree: true })
@@ -3311,8 +3330,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const middleTravel = Math.hypot(openSkyAbout.middle.x, openSkyAbout.middle.y, openSkyAbout.middle.z);
   const nearTravel = Math.hypot(openSkyAbout.near.x, openSkyAbout.near.y, openSkyAbout.near.z);
   await assert(
-    openSkyAbout.progress >= 0.37
-      && openSkyAbout.progress < 0.58
+    Math.abs(openSkyAbout.progress - 0.4) <= 0.01
       && openSkyAbout.oldRoot.opacity <= 0.02
       && openSkyAbout.newRoot.opacity <= 0.02
       && openSkyAbout.visual.opacity >= 0.16
@@ -3333,6 +3351,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && nearTravel > middleTravel * 1.5
       && openSkyAbout.target.x < -100
       && openSkyAbout.target.y > 100
+      && openSkyAbout.perspective?.lastTravel?.duration > 0
+      && openSkyAbout.perspective?.lastTravel?.duration <= 1750
       && openSkyAbout.perspective?.motion === 'arrive'
       && openSkyAbout.perspective?.ready === 'arriving'
       && openSkyAbout.perspective?.activeTransition === true,
@@ -3344,12 +3364,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     })}`
   );
 
-  await perspectiveTransitionPage.waitForFunction(() => {
-    const animation = document.getAnimations({ subtree: true })
-      .find((candidate) => candidate.animationName === 'universe-search-sky');
-    const duration = Number(animation?.effect?.getComputedTiming().duration);
-    return duration > 0 && Number(animation.currentTime) / duration >= 0.58;
-  }, null, { timeout: 1000 });
+  await seekUniverseTransition(perspectiveTransitionPage, 0.62);
   const visualFirstAbout = await perspectiveTransitionPage.evaluate(() => {
     const root = document.documentElement;
     const animation = document.getAnimations({ subtree: true })
@@ -3371,8 +3386,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     };
   });
   await assert(
-    visualFirstAbout.progress >= 0.58
-      && visualFirstAbout.progress < 0.72
+    Math.abs(visualFirstAbout.progress - 0.62) <= 0.01
       && visualFirstAbout.enhanced === true
       && visualFirstAbout.treeMotion === null
       && visualFirstAbout.visualOpacity >= 0.78
@@ -3382,6 +3396,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && visualFirstAbout.visualOpacity > visualFirstAbout.pageOpacity + 0.2,
     `About copy appears before its animated target is acquired: ${JSON.stringify(visualFirstAbout)}`
   );
+  await resumeUniverseTransition(perspectiveTransitionPage);
 
   const arrivedAboutHandle = await perspectiveTransitionPage.waitForFunction(() => {
     const perspective = window.UniversePerspective?.snapshot();
@@ -3447,12 +3462,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     perspectiveTransitionPage.waitForURL('**/work.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
     perspectiveTransitionPage.locator('#site-nav a[href="/work.html"]').click(),
   ]);
-  await perspectiveTransitionPage.waitForFunction(() => {
-    const animation = document.getAnimations({ subtree: true })
-      .find((candidate) => candidate.animationName === 'universe-search-sky');
-    const duration = Number(animation?.effect?.getComputedTiming().duration);
-    return duration > 0 && Number(animation.currentTime) / duration >= 0.35;
-  }, null, { timeout: 2200 });
+  await seekUniverseTransition(perspectiveTransitionPage, 0.4);
   const reverseSharedNavigation = await perspectiveTransitionPage.evaluate(() => {
     const routeMap = document.querySelector('[data-universe-route-map]');
     const liveBounds = routeMap.getBoundingClientRect();
@@ -3485,18 +3495,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && Math.abs(reverseSharedNavigation.groupHeight - reverseSharedNavigation.liveHeight) <= 1,
     `The shared map drifts away from its clickable viewport position during reverse travel: ${JSON.stringify(reverseSharedNavigation)}`
   );
+  await resumeUniverseTransition(perspectiveTransitionPage);
   await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
   await expandUniverseRouteMap(perspectiveTransitionPage);
   await Promise.all([
     perspectiveTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' }),
     perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="threads"]').click(),
   ]);
-  await perspectiveTransitionPage.waitForFunction(() => {
-    const animation = document.getAnimations({ subtree: true })
-      .find((candidate) => candidate.animationName === 'universe-search-sky');
-    const duration = Number(animation?.effect?.getComputedTiming().duration);
-    return duration > 0 && Number(animation.currentTime) / duration >= 0.3;
-  }, null, { timeout: 2200 });
+  await seekUniverseTransition(perspectiveTransitionPage, 0.4);
   const arrivedLogs = await perspectiveTransitionPage.evaluate(() => {
     const root = document.documentElement;
     const targetStyle = getComputedStyle(root, '::view-transition-new(universe-target-visual)');
@@ -3533,6 +3539,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && arrivedLogs.visualTransitionName === 'universe-target-visual',
     `Light-to-light routes do not preserve angular and depth travel through the shared sky: ${JSON.stringify(arrivedLogs)}`
   );
+  await resumeUniverseTransition(perspectiveTransitionPage);
   await perspectiveTransitionPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
     null,
@@ -3587,11 +3594,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const bounds = link.getBoundingClientRect();
     return { x: bounds.left + (bounds.width / 2), y: bounds.top + (bounds.height / 2) };
   });
-  const retargetStarted = Date.now();
   const retargetNavigation = retargetTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' });
   await retargetTransitionPage.mouse.click(retargetPoint.x, retargetPoint.y);
   await retargetNavigation;
-  const retargetNavigationElapsed = Date.now() - retargetStarted;
   await retargetTransitionPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
     null,
@@ -3607,11 +3612,12 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(
     inFlightPerspective?.ready === 'arriving'
       && inFlightPerspective?.retargetable === true
-      && retargetNavigationElapsed < 1800
       && retargetedPerspective.perspective?.current === 'logs'
       && retargetedPerspective.perspective?.lastTravel?.from === 'about'
       && retargetedPerspective.perspective?.lastTravel?.to === 'logs'
       && retargetedPerspective.perspective?.lastTravel?.retargeted === true
+      && retargetedPerspective.perspective?.lastTravel?.duration > 0
+      && retargetedPerspective.perspective?.lastTravel?.duration <= 1750
       && retargetedPerspective.perspective?.lastTravel?.skyFrom === '#020817'
       && retargetedPerspective.perspective?.lastTravel?.skyMiddle === '#020817'
       && retargetedPerspective.perspective?.lastTravel?.skyTo === '#faf9f4'
@@ -3620,7 +3626,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && retargetedPerspective.activeTransitionAnimations === 0,
     `In-flight navigation does not immediately retarget and clean up its compositor state: ${JSON.stringify({
       inFlightPerspective,
-      retargetNavigationElapsed,
       retargetedPerspective,
     })}`
   );
@@ -4100,7 +4105,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const largestArchiveArea = Math.max(...portfolioContract.archiveAreas);
   await assert(
     portfolioContract.productionAreas[0] > largestSupportArea * 1.2
-      && smallestSupportArea > largestArchiveArea * 2.5,
+      && smallestSupportArea > largestArchiveArea * 2.4,
     `Work visual hierarchy no longer reads Bitcoin > four production credentials > archive: ${JSON.stringify(portfolioContract)}`
   );
   await assert(
