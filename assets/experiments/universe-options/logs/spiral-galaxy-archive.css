@@ -858,6 +858,7 @@ body.has-universe-route-map.has-integrated-universe-route-map { padding-bottom: 
 .no-js .galaxy-intro { position: relative; top: auto; left: auto; width: min(42rem, 100%); }
 .no-js .galaxy-sky,
 .no-js .galaxy-hero__stars,
+.no-js .galaxy-field,
 .no-js .galaxy-hero__index-link { display: none; }
 
 @media print {

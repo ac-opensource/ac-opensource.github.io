@@ -15,9 +15,10 @@ function main() {
   const loaderFixture = "<!doctype html><html><head><title>Fixture</title></head><body>Ready</body></html>";
   const loaderEnhanced = injectBigBangLoader(loaderFixture, "work.html");
   if (!loaderEnhanced.includes('data-big-bang-bootstrap')
-    || !loaderEnhanced.includes('/assets/css/big-bang-loader.css?v=20260808-7')
-    || !loaderEnhanced.includes('/assets/js/big-bang-loader.js?v=20260808-7')
+    || !loaderEnhanced.includes('/assets/css/big-bang-loader.css?v=20260809-integrated1')
+    || !loaderEnhanced.includes('/assets/js/big-bang-loader.js?v=20260809-integrated1')
     || !loaderEnhanced.includes('root.dataset.bigBang="pending"')
+    || !loaderEnhanced.includes('root.dataset.universePerspectiveTo==="work"')
     || !loaderEnhanced.includes('sessionStorage.getItem("ac.bigBangPortfolioPlayed.v1")')
     || loaderEnhanced.includes('window.location.search')) {
     throw new Error("The Portfolio session Big Bang assets or activation bootstrap are incomplete.");
@@ -72,9 +73,10 @@ function main() {
     }
     if (!firstPostPage.includes('/assets/css/article-debrief.css?v=20260807-regions2')
       || !firstPostPage.includes('/assets/js/article-debrief.js?v=20260807-regions1')
-      || !firstPostPage.includes('/assets/css/universe-field-map.css?v=20260807')
-      || !firstPostPage.includes('/assets/js/universe-theme-transition.js?v=20260807-fast2')
-      || !firstPostPage.includes('/assets/js/universe-field-map.js?v=20260807')) {
+      || !firstPostPage.includes('/assets/css/universe-field-map.css?v=20260809-guide9')
+      || !firstPostPage.includes('/assets/css/universe-perspective-navigation.css?v=20260809-guide14')
+      || !firstPostPage.includes('/assets/js/universe-theme-transition.js?v=20260809-guide14')
+      || !firstPostPage.includes('/assets/js/universe-field-map.js?v=20260809-guide9')) {
       throw new Error("Generated articles are missing their region and shared navigation assets.");
     }
 

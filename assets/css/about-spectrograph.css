@@ -40,15 +40,10 @@ body[data-universe-region="about"] {
   --universe-blue-soft: rgba(126, 182, 255, 0.15);
 }
 
-body[data-universe-region="about"] .universe-route-map::before { background: transparent; }
 body[data-universe-region="about"] .universe-route-map a::before { background: var(--about-base); }
 
 .about-universe:has(.stellar-spectrum__readout:not([hidden])) {
   z-index: 49;
-}
-
-@media (max-width: 760px) {
-  body[data-universe-region="about"] .universe-route-map { background: var(--about-base); }
 }
 
 #site-topbar {
@@ -2198,7 +2193,7 @@ a.is-stellar-source {
   overflow: hidden;
   border: 0;
   outline: 0;
-  background: #020817;
+  background: transparent;
   box-shadow: none;
   isolation: isolate;
 }
@@ -2206,6 +2201,7 @@ a.is-stellar-source {
 .stellar-tree__canvas,
 .stellar-tree__controls-layer {
   position: absolute;
+  z-index: 1;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -3024,7 +3020,7 @@ body[data-universe-region="about"] :is(#site-nav, #site-nav-mobile) .site-nav-li
   --stellar-overscan-top: max(44rem, 85vh);
   --stellar-overscan-bottom: max(44rem, 85vh);
   overflow: visible;
-  background: var(--about-base) !important;
+  background: transparent !important;
 }
 
 .about-opening .stellar-atlas,
@@ -3618,6 +3614,13 @@ html[data-about-theme="light"] .stellar-tree__root.is-open { color: var(--stella
   .about-opening .stellar-atlas .stellar-tree__viewport {
     min-height: 46rem;
     height: 46rem;
+  }
+
+  .about-opening .stellar-atlas[data-universe-route-map-host] {
+    position: relative;
+    height: auto;
+    min-height: 54.5rem;
+    padding-bottom: 8.5rem !important;
   }
 }
 

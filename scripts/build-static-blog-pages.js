@@ -556,8 +556,9 @@ ${articleTagsMeta}
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <link href="/assets/css/article-debrief.css?v=20260807-regions2" rel="stylesheet"/>
-<link href="/assets/css/universe-field-map.css?v=20260807" rel="stylesheet"/>
-<script src="/assets/js/universe-theme-transition.js?v=20260807-fast2"></script>
+<link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet"/>
+<link href="/assets/css/universe-perspective-navigation.css?v=20260809-guide14" rel="stylesheet" data-universe-perspective-styles/>
+<script src="/assets/js/universe-theme-transition.js?v=20260809-guide14"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -758,7 +759,7 @@ ${trajectoryHtml.mobile}
   </div>
 </footer>
 <script src="/assets/js/article-debrief.js?v=20260807-regions1"></script>
-<script src="/assets/js/universe-field-map.js?v=20260807"></script>
+<script src="/assets/js/universe-field-map.js?v=20260809-guide9"></script>
 <script>
   (() => {
     const FORCE_ACTIVE_ROUTE = ${JSON.stringify(navForceRoute)};
