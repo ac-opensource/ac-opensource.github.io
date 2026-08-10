@@ -124,11 +124,26 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       await targetPage.waitForFunction(() => (
         document.querySelector('[data-universe-route-map]')?.dataset.mapExpanded === 'true'
       ));
-      await targetPage.waitForTimeout(280);
+      await targetPage.waitForFunction(() => {
+        const map = document.querySelector('[data-universe-route-map]');
+        if (!map || map.dataset.mapExpanded !== 'true') return false;
+        const bounds = map.getBoundingClientRect();
+        return bounds.width >= 280 && bounds.height >= 120;
+      }, null, { timeout: 2000 });
       await targetPage.evaluate(() => {
         document.querySelector('[data-universe-route-map]')
           ?.dispatchEvent(new PointerEvent('pointerleave'));
       });
+      await targetPage.waitForFunction(() => {
+        const map = document.querySelector('[data-universe-route-map]');
+        const telescope = map?.querySelector('.universe-route-map__telescope');
+        if (!map || !telescope) return false;
+        const barrelLength = Number.parseFloat(getComputedStyle(telescope).width);
+        const sightlineLength = Number.parseFloat(map.style.getPropertyValue('--sightline-length'));
+        return Number.isFinite(barrelLength)
+          && Number.isFinite(sightlineLength)
+          && sightlineLength > barrelLength;
+      }, null, { timeout: 2000 });
     }
   }
 
