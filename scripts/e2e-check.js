@@ -3928,9 +3928,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
 
   // Blog post behavior
-  await page.locator('#blog-feed article a').first().click();
-  await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(250);
+  const firstBlogEntryLink = page.locator('#blog-feed article:not([hidden]) h3 a[href$=".html"]').first();
+  await Promise.all([
+    page.waitForURL('**/blog/*.html', { waitUntil: 'domcontentloaded', timeout: 5000 }),
+    firstBlogEntryLink.click(),
+  ]);
   const blogPostPathname = new URL(page.url()).pathname;
   await assert(
     blogPostPathname.startsWith('/blog/') && blogPostPathname.endsWith('.html') && blogPostPathname !== '/blog/index.html',
