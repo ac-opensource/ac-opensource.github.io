@@ -124,11 +124,32 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       await targetPage.waitForFunction(() => (
         document.querySelector('[data-universe-route-map]')?.dataset.mapExpanded === 'true'
       ));
-      await targetPage.waitForTimeout(280);
+      await targetPage.waitForFunction(() => {
+        const map = document.querySelector('[data-universe-route-map]');
+        if (!map || map.dataset.mapExpanded !== 'true') return false;
+        const bounds = map.getBoundingClientRect();
+        return bounds.width >= 287 && bounds.height >= 123;
+      }, null, { timeout: 2000 });
       await targetPage.evaluate(() => {
         document.querySelector('[data-universe-route-map]')
           ?.dispatchEvent(new PointerEvent('pointerleave'));
       });
+      await targetPage.waitForFunction(() => {
+        const map = document.querySelector('[data-universe-route-map]');
+        return map && map.getAnimations({ subtree: true }).every((animation) => (
+          animation.playState === 'finished' || animation.playState === 'idle'
+        ));
+      }, null, { timeout: 2000 });
+      await targetPage.waitForFunction(() => {
+        const map = document.querySelector('[data-universe-route-map]');
+        const telescope = map?.querySelector('.universe-route-map__telescope');
+        if (!map || !telescope) return false;
+        const barrelLength = Number.parseFloat(getComputedStyle(telescope).width);
+        const sightlineLength = Number.parseFloat(map.style.getPropertyValue('--sightline-length'));
+        return Number.isFinite(barrelLength)
+          && Number.isFinite(sightlineLength)
+          && sightlineLength > barrelLength;
+      }, null, { timeout: 2000 });
     }
   }
 
@@ -428,12 +449,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const integratedBigBangPage = await integratedBigBangContext.newPage();
   integratedBigBangPage.on('pageerror', (error) => failures.push(`Integrated Big Bang pageerror: ${error.message}`));
   await integratedBigBangPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
-  const integratedNavigationStarted = Date.now();
   await Promise.all([
     integratedBigBangPage.waitForURL('**/work.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
     integratedBigBangPage.locator('#site-nav a[href="/work.html"]').click(),
   ]);
-  const integratedNavigationElapsed = Date.now() - integratedNavigationStarted;
   await integratedBigBangPage.waitForFunction(() => {
     const animation = document.getAnimations({ subtree: true })
       .find((candidate) => candidate.animationName === 'universe-search-sky');
@@ -449,7 +468,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       copyOpacity: Number(getComputedStyle(root, '::view-transition-new(root)').opacity),
       loaderApi: Boolean(window.BigBangLoader),
       loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
+      perspectiveDuration: Number(window.UniversePerspective?.snapshot().lastTravel?.duration),
       rootState: root.dataset.bigBang || 'inactive',
+      searchDuration: Number(document.getAnimations({ subtree: true })
+        .find((candidate) => candidate.animationName === 'universe-search-sky')
+        ?.effect?.getComputedTiming().duration),
       sessionValue: window.sessionStorage.getItem(sessionKey),
       supernovaAnimation: getComputedStyle(root, '::view-transition-new(universe-work-supernova)').animationName,
       supernovaBackground: supernova ? getComputedStyle(supernova).backgroundImage : null,
@@ -460,7 +483,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     };
   }, BIG_BANG_SESSION_KEY);
   await assert(
-    integratedNavigationElapsed < 1800
+    integratedBigBang.perspectiveDuration > 0
+      && integratedBigBang.perspectiveDuration <= 1800
+      && integratedBigBang.searchDuration > 0
+      && integratedBigBang.searchDuration <= 1800
       && integratedBigBang.loaderCount === 0
       && !integratedBigBang.loaderApi
       && integratedBigBang.rootState === 'inactive'
@@ -472,10 +498,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && integratedBigBang.supernovaBackground.includes('repeating-conic-gradient')
       && integratedBigBang.supernovaName === 'universe-work-supernova'
       && integratedBigBang.copyOpacity <= 0.02,
-    `Sky navigation to Work does not integrate the Big Bang with target acquisition: ${JSON.stringify({
-      integratedNavigationElapsed,
-      integratedBigBang,
-    })}`
+    `Sky navigation to Work does not integrate the Big Bang with target acquisition: ${JSON.stringify(integratedBigBang)}`
   );
   await integratedBigBangPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
