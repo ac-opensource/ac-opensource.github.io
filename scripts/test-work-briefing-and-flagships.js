@@ -55,6 +55,7 @@ function verifySources() {
   const work = read("work.html");
   const briefing = read("assets/js/work-briefing.js");
   const css = read("assets/css/work-portfolio.css");
+  const neuralCss = read("assets/css/neural-background.css");
   const { db } = openDatabase(undefined, { readonly: true });
 
   try {
@@ -118,6 +119,10 @@ function verifySources() {
       "The briefing section must support focus for its own fragment destination.");
     assert(css.includes(".work-briefing__presets") && css.includes(".work-briefing__panel[hidden]"), "Briefing layout or state styles are missing.");
     assert(css.includes(".work-briefing__share[hidden]"), "Briefing share controls lack a no-JavaScript hidden state.");
+    assert(neuralCss.includes("transition-duration: 0s !important;"),
+      "Reduced motion must disable global transitions instead of shortening them into active animations.");
+    assert(!neuralCss.includes("transition-duration: 0.01ms !important;"),
+      "The global reduced-motion stylesheet still creates micro-transitions.");
     assert(css.includes("@keyframes workBriefingRouteSweep") && css.includes("@keyframes workBriefingPanelDock"),
       "Briefing arrival lacks its route sweep and spatial panel motion.");
     assert(briefing.includes('briefing.dataset.briefMotion = "reduced"'),
@@ -294,8 +299,28 @@ async function verifyBrowser() {
     await reducedPage.waitForFunction(() => document.querySelector("[data-work-briefing]")?.dataset.briefMotion === "reduced");
     assert.strictEqual(await reducedPage.evaluate(() => document.activeElement?.id), "briefing",
       "Reduced-motion CTA did not move focus to the labeled briefing section.");
-    assert.strictEqual(await reducedPage.evaluate(() => document.querySelector("[data-work-briefing]").getAnimations({ subtree: true }).length), 0,
-      "Reduced-motion CTA started an animation.");
+    const reducedArrival = await reducedPage.evaluate(() => {
+      const section = document.querySelector("[data-work-briefing]");
+      const targets = [
+        section,
+        document.getElementById("briefing-title"),
+        section.querySelector("[data-brief-panel]:not([hidden]) h3")
+      ];
+      return {
+        animations: section.getAnimations({ subtree: true }).map((animation) => ({
+          animationName: animation.animationName || "",
+          duration: animation.effect?.getComputedTiming?.().duration,
+          playState: animation.playState,
+          target: animation.effect?.target?.id || animation.effect?.target?.className || "",
+          transitionProperty: animation.transitionProperty || ""
+        })),
+        transitionDurations: targets.map((target) => getComputedStyle(target).transitionDuration)
+      };
+    });
+    assert.deepStrictEqual(reducedArrival.animations, [],
+      `Reduced-motion CTA started an animation: ${JSON.stringify(reducedArrival.animations)}`);
+    assert(reducedArrival.transitionDurations.every((duration) => duration === "0s"),
+      `Reduced-motion briefing transitions are not disabled: ${JSON.stringify(reducedArrival.transitionDurations)}`);
 
     await reducedPage.goto(`${origin}/work.html?brief=agent-first-delivery#briefing`, { waitUntil: "domcontentloaded" });
     await reducedPage.waitForFunction(() => document.querySelector("[data-work-briefing]")?.dataset.briefMotion === "reduced");
