@@ -192,8 +192,8 @@ function injectContactRuntimeHtml(html, rawConfig) {
   rendered = rendered.replace(
     /(<p\b[^>]*\bdata-noscript-contact\b[^>]*>)[\s\S]*?(<\/p>)/i,
     "$1" + (configured
-      ? "JavaScript is required for verified record storage. Use LinkedIn below if scripting is unavailable; this form does not submit or open an email client."
-      : "The personal record endpoint is not connected in this build. Use LinkedIn below; this form does not open an email client or claim a stored message.") + "$2"
+      ? "JavaScript is required for a matched storage receipt. Use the direct email link below instead; this form does not submit, open an email client, or claim a stored message."
+      : "The personal record endpoint is not connected in this build. Use the direct email link below instead; this form does not submit, open an email client, or claim a stored message.") + "$2"
   );
   return rendered;
 }

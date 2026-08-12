@@ -25,6 +25,33 @@
 <meta name="twitter:description" content="More than 10 years of production engineering across Android, iOS, backend, and agent-first delivery—grounded by family, photography, astronomy, and curiosity."/>
 <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/about-stellar-tree.png"/>
 <meta name="twitter:image:alt" content="Andrew Concepcion's About page with a dark stellar tree connecting engineering practice, interests, and experience"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "ProfilePage",
+      "@id": "https://ac-opensource.github.io/about.html#profile-page",
+      "url": "https://ac-opensource.github.io/about.html",
+      "name": "About Andrew Concepcion",
+      "description": "Profile of Andrew Concepcion, an AI-native software engineer working across Android, iOS, backend systems, and agent-first product delivery.",
+      "mainEntity": { "@id": "https://ac-opensource.github.io/#person" },
+      "isPartOf": { "@id": "https://ac-opensource.github.io/#website" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://ac-opensource.github.io/#person",
+      "name": "Andrew Concepcion",
+      "url": "https://ac-opensource.github.io/",
+      "jobTitle": "AI-Native Software Engineer",
+      "sameAs": [
+        "https://github.com/ac-opensource",
+        "https://www.linkedin.com/in/aarconcepcion"
+      ]
+    }
+  ]
+}
+</script>
 <script>
   (() => {
     try {
@@ -42,8 +69,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet"/>
 <link href="/assets/css/about-spectrograph.css?v=20260809-native-nebula1" rel="stylesheet"/>
-<link href="/assets/css/universe-perspective-navigation.css?v=20260809-guide14" rel="stylesheet" data-universe-perspective-styles/>
-<script src="/assets/js/universe-theme-transition.js?v=20260809-guide14"></script>
+<link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles/>
+<script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -138,7 +165,7 @@
       <a data-route="/about.html" href="/about.html" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[about]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
-    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
+    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]" data-site-search-slot><a class="site-search-link" href="/search.html" data-site-search-link aria-label="Search published evidence" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></div>
   </div>
   <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
     <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
@@ -227,6 +254,7 @@
   <summary><span>[SOURCE INDEX]</span> Sources and map key</summary>
   <div class="profile-map-evidence__body">
     <p>My engineering record is grounded in shipped roles, public projects, and published technical writing. Personal entries document family travel, photography, astronomy, reflection, fitness, and small ventures. The source trail below keeps each statement tied to the public evidence behind it.</p>
+    <p><strong>Evidence key:</strong> A public product listing confirms a product’s public presence, not my implementation claim. A first-person project note records my account; a public repository exposes source; and a merged contribution links accepted upstream work. “Source implementation private” means the underlying code is not publicly inspectable.</p>
     <div class="profile-map-evidence__table-wrap">
       <table>
         <caption class="sr-only">Sources for Andrew Concepcion’s engineering skills and personal interests</caption>
@@ -568,7 +596,7 @@
     <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
   </div>
 </footer>
-<script src="/assets/js/about-spectrograph.js?v=20260809-about-split45"></script>
+<script src="/assets/js/about-spectrograph.js?v=20260812-motion1"></script>
 <script>
   (() => {
     const labJournalRoot = document.getElementById("about-lab-journal");

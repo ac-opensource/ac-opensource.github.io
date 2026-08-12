@@ -772,11 +772,28 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await mobilePage.waitForTimeout(200);
     await assert(mobResp && mobResp.status() >= 200 && mobResp.status() < 400, `Mobile route ${route.path} failed`);
     const mobilePerspective = await mobilePage.evaluate(() => {
+      const header = document.querySelector('#site-topbar');
+      const headerInner = document.querySelector('#site-topbar > div');
       const headerNav = document.querySelector('#site-nav-mobile');
+      const headerStatus = document.querySelector('#site-topbar > div > :last-child:not(nav)');
+      const headerBounds = header?.getBoundingClientRect();
+      const headerInnerBounds = headerInner?.getBoundingClientRect();
+      const headerNavBounds = headerNav?.getBoundingClientRect();
       const routeMap = document.querySelector('[data-universe-route-map]');
       const routeMapBounds = routeMap?.getBoundingClientRect();
       return {
+        headerHeight: headerBounds?.height || 0,
+        headerInnerHeight: headerInnerBounds?.height || 0,
         headerLinks: headerNav?.querySelectorAll(':scope > a').length || 0,
+        headerLinkTargets: [...(headerNav?.querySelectorAll(':scope > a') || [])].map((link) => {
+          const bounds = link.getBoundingClientRect();
+          return { height: bounds.height, width: bounds.width };
+        }),
+        headerNavHeight: headerNavBounds?.height || 0,
+        headerStatus: headerStatus?.textContent?.trim() || '',
+        headerSearchHref: headerStatus?.querySelector('[data-site-search-link]')?.getAttribute('href') || '',
+        headerSearchSlots: document.querySelectorAll('#site-topbar [data-site-search-slot]').length,
+        floatingSiteTools: document.querySelectorAll('.site-tools, [data-site-tools-capabilities]').length,
         headerTelescopeArtifacts: document.querySelectorAll(
           '#site-nav [data-telescope-target], #site-nav-mobile [data-telescope-target], .universe-telescope-nav__instrument'
         ).length,
@@ -800,6 +817,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     });
     await assert(
       mobilePerspective.headerLinks === 5
+        && Math.abs(mobilePerspective.headerHeight - 113) <= 0.5
+        && Math.abs(mobilePerspective.headerInnerHeight - 52) <= 0.5
+        && Math.abs(mobilePerspective.headerNavHeight - 60) <= 0.5
+        && mobilePerspective.headerLinkTargets.every(({ height, width }) => height >= 44 && width >= 44)
+        && mobilePerspective.headerStatus === '[search /]'
+        && mobilePerspective.headerSearchHref === '/search.html'
+        && mobilePerspective.headerSearchSlots === 1
+        && mobilePerspective.floatingSiteTools === 0
         && mobilePerspective.headerTelescopeArtifacts === 0
         && mobilePerspective.routeMapInViewport
         && (isSpatialHome
@@ -816,7 +841,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
             && mobilePerspective.routeMapWidth <= 45
             && mobilePerspective.routeMapHeight >= 43
             && mobilePerspective.routeMapHeight <= 45),
-      `${route.path}: mobile field-of-view navigation contract failed: ${JSON.stringify(mobilePerspective)}`
+      `${route.path}: mobile header and field-of-view navigation contract failed: ${JSON.stringify(mobilePerspective)}`
     );
     const mobilePortfolioLabels = await mobilePage.locator(
       '#site-nav-mobile a[href="/work.html"], #site-footer a[href="/work.html"]'
@@ -829,7 +854,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const routeMobileChromeFontSizes = await mobilePage.evaluate(() => {
       const selectors = {
         brand: '#site-topbar > div > a:first-child',
-        status: '#site-topbar > div > div:last-child',
+        status: '#site-topbar > div > :last-child:not(nav)',
         navigation: '#site-nav-mobile'
       };
       return Object.fromEntries(
@@ -840,8 +865,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       );
     });
     await assert(
-      await mobilePage.locator('#site-topbar > div > div:last-child').isVisible(),
-      `${route.path}: mobile status indicator is hidden`
+      await mobilePage.locator('#site-topbar [data-site-search-slot]').isVisible(),
+      `${route.path}: mobile header Search is hidden`
     );
     await assert(
       Object.values(routeMobileChromeFontSizes).every(Boolean),
@@ -934,6 +959,26 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await spatialPage.locator('[data-synthesis]').waitFor();
     await waitForBigBangComplete(spatialPage);
     await spatialPage.evaluate(() => document.fonts?.ready);
+
+    const deferredProjectLogos = await spatialPage.evaluate(() => {
+      const logos = [...document.querySelectorAll('[data-facet-detail="projects"] .project-app-logo img')];
+      const requested = performance.getEntriesByType('resource')
+        .map((entry) => entry.name)
+        .filter((url) => /\/assets\/images\/work\/ic_[^/]+\.(?:png|svg|webp)(?:\?|$)/.test(url));
+      return {
+        deferredSources: logos.filter((image) => image.hasAttribute('data-src')).length,
+        eagerSources: logos.filter((image) => image.hasAttribute('src')).length,
+        logoCount: logos.length,
+        requested,
+      };
+    });
+    await assert(
+      deferredProjectLogos.logoCount === 12
+        && deferredProjectLogos.deferredSources === 12
+        && deferredProjectLogos.eagerSources === 0
+        && deferredProjectLogos.requested.length === 0,
+      `Homepage eagerly loads hidden project logos at ${viewport.width}x${viewport.height}: ${JSON.stringify(deferredProjectLogos)}`
+    );
 
     const overview = await spatialPage.evaluate(() => {
       const rect = (element) => {
@@ -2816,11 +2861,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     };
   });
   const lockedScrollPoint = await touchAboutPage.evaluate(() => {
-    const stage = document.querySelector('#stellar-spectrum-panel').getBoundingClientRect();
-    for (let y = Math.max(80, stage.top + 80); y < Math.min(innerHeight - 80, stage.bottom - 80); y += 40) {
+    const stageElement = document.querySelector('#stellar-spectrum-panel');
+    const stage = stageElement.getBoundingClientRect();
+    const headerBottom = document.querySelector('#site-topbar')?.getBoundingClientRect().bottom || 0;
+    for (let y = Math.max(80, headerBottom + 20, stage.top + 80); y < Math.min(innerHeight - 80, stage.bottom - 80); y += 40) {
       for (let x = Math.max(40, stage.left + 40); x < Math.min(innerWidth - 70, stage.right - 70); x += 40) {
         const target = document.elementFromPoint(x, y);
-        if (target && !target.closest('button, a, input, summary')) return { x, y };
+        if (target && stageElement.contains(target) && !target.closest('button, a, input, summary')) return { x, y };
       }
     }
     return null;
@@ -2828,13 +2875,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(Boolean(lockedScrollPoint), 'Locked mobile About has no pass-through scroll surface');
   const cdp = await touchAboutContext.newCDPSession(touchAboutPage);
   if (lockedScrollPoint) {
-    const start = { id: 1, x: lockedScrollPoint.x, y: lockedScrollPoint.y };
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [start] });
-    await cdp.send('Input.dispatchTouchEvent', {
-      type: 'touchMove',
-      touchPoints: [{ ...start, y: Math.max(40, start.y - 180) }],
+    await cdp.send('Input.synthesizeScrollGesture', {
+      x: lockedScrollPoint.x,
+      y: lockedScrollPoint.y,
+      yDistance: -180,
+      gestureSourceType: 'touch',
+      preventFling: true,
+      speed: 800,
     });
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   }
   await touchAboutPage.waitForTimeout(220);
   const lockedScrollAfter = await touchAboutPage.evaluate(() => ({
@@ -3971,6 +4019,38 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(loadedTitle.length > 0, 'Blog post title is empty');
   await assert((await page.locator('#share-post-button').count()) > 0, 'Blog post share button is missing');
   await assert((await page.locator('#bookmark-post-button').count()) > 0, 'Blog post bookmark button is missing');
+  const articleActionGeometry = await page.locator('#post-actions').evaluate((actions) =>
+    [...actions.querySelectorAll('button:not([hidden]), a')].map((control) => {
+      const controlRect = control.getBoundingClientRect();
+      const textRange = document.createRange();
+      textRange.selectNodeContents(control);
+      const textRect = textRange.getBoundingClientRect();
+      const style = getComputedStyle(control);
+      return {
+        label: control.textContent.trim(),
+        width: controlRect.width,
+        height: controlRect.height,
+        centerDelta: Math.abs(
+          (controlRect.top + controlRect.bottom) / 2 - (textRect.top + textRect.bottom) / 2
+        ),
+        display: style.display,
+        alignItems: style.alignItems,
+        justifyContent: style.justifyContent,
+      };
+    })
+  );
+  await assert(
+    articleActionGeometry.length >= 3
+      && articleActionGeometry.every((control) =>
+        control.width >= 44
+        && control.height >= 44
+        && control.centerDelta <= 1.5
+        && control.display === 'flex'
+        && control.alignItems === 'center'
+        && control.justifyContent === 'center'
+      ),
+    `Blog post actions are not consistently centered 44px targets: ${JSON.stringify(articleActionGeometry)}`
+  );
 
   const bodyText = ((await page.locator('#post-body').textContent()) || '').trim();
   const bodyLooksLoaded = bodyText.length > 20 && !bodyText.includes('No body content available');

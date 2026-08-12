@@ -79,7 +79,7 @@ for (const invalidSignal of [
 
 const sharedIncludes = [
   '/assets/css/route-signal-handoff.css?v=20260806-t3',
-  '/assets/js/route-signal-handoff.js?v=20260806-t3'
+  '/assets/js/route-signal-handoff.js?v=20260812-motion1'
 ];
 const index = source("index.html");
 const work = source("work.html");

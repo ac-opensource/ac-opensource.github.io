@@ -30,8 +30,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link href="/assets/css/resume-dossier.css?v=20260807-flight-recorder" rel="stylesheet"/>
   <link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet"/>
-  <link href="/assets/css/universe-perspective-navigation.css?v=20260809-guide14" rel="stylesheet" data-universe-perspective-styles/>
-  <script src="/assets/js/universe-theme-transition.js?v=20260809-guide14"></script>
+  <link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles/>
+  <script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -154,7 +154,7 @@
         <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
         <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
       </nav>
-      <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: resume_ready]</div>
+      <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]" data-site-search-slot><a class="site-search-link" href="/search.html" data-site-search-link aria-label="Search published evidence" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></div>
     </div>
     <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
@@ -185,7 +185,7 @@
         </div>
       </article>
 
-      <aside class="print-card bg-surface-container-highest border border-outline-variant/20 p-8 md:p-10">
+      <aside class="print-card bg-surface-container-highest border border-outline-variant/20 p-8 md:p-10" data-search-exclude>
         <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-5">[operator_registry]</div>
         <div class="space-y-5 text-sm">
           <div class="border-b border-outline-variant/20 pb-4">
@@ -324,6 +324,7 @@
       <div class="mb-6 border-l-4 border-tertiary pl-6">
         <div class="font-label text-tertiary text-sm tracking-widest mb-2">[chronological_flight_record]</div>
         <h2 class="font-headline text-4xl font-bold tracking-tighter text-on-background">Experience recorder</h2>
+        <p class="mt-3 max-w-4xl text-sm leading-relaxed text-secondary"><strong class="text-on-background">Evidence key:</strong> A public product listing confirms public availability; a first-person project note is my account of the work; and “Source implementation private” means the underlying code is not publicly inspectable.</p>
       </div>
       <div class="resume-role-list space-y-6">
         <article id="experience-bitcoin" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break" data-record="01" data-signals="android architecture leadership reliability cross-platform ai-assisted-delivery">
@@ -336,8 +337,8 @@
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2024 — Present</div>
           </div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">Verified public product</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
             <li data-signals="android architecture leadership cross-platform">Led the foundation and first end-to-end Android implementation of a multichain rewards platform, then built reward-backed crypto market predictions and moved their service layer into shared Rust through UniFFI.</li>
@@ -356,8 +357,8 @@
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2023 — Jun 2024</div>
           </div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en" target="_blank" rel="noreferrer">Verified public product</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
             <li data-signals="android">Built a recommendations panel that appears during playback, coordinating its animations with player-control and button movement across phone and tablet layouts.</li>
@@ -379,9 +380,9 @@
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2021 — Jun 2023</div>
           </div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-ocbc-banking-experience.html">Verified public project note · OCBC</a>
-            <a class="resume-evidence-source" href="/blog/case-study-openpay-bnpl-experience.html">Verified public project note · OpenPay</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="/blog/case-study-ocbc-banking-experience.html">First-person project note · OCBC</a>
+            <a class="resume-evidence-source" href="/blog/case-study-openpay-bnpl-experience.html">First-person project note · OpenPay</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
             <li data-signals="android fintech">Built and launched OCBC Business mobile banking flows spanning onboarding, account dashboards, transfers, and digital account opening.</li>
@@ -400,8 +401,8 @@
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">May 2020 — Jun 2021</div>
           </div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-mystc-scale-and-reliability.html">Verified public project note · MySTC</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="/blog/case-study-mystc-scale-and-reliability.html">First-person project note · MySTC</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
             <li data-signals="android leadership">Led an offshore team of five senior Android engineers on MySTC, serving 10M+ installs across multilingual customer journeys.</li>
@@ -420,8 +421,8 @@
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2018 — May 2020</div>
           </div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-owto-ride-hailing-platform.html">Verified public project note · OWTO</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="/blog/case-study-owto-ride-hailing-platform.html">First-person project note · OWTO</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
             <li data-signals="android leadership cross-platform">Led cross-functional delivery across Android, iOS, and backend for a ride-hailing platform that grew to 500K+ downloads.</li>
@@ -440,8 +441,8 @@
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2016 — Jun 2018</div>
           </div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-popslide-engagement-and-monetization.html">Verified public project note · PopSlide</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="/blog/case-study-popslide-engagement-and-monetization.html">First-person project note · PopSlide</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
             <li data-signals="android leadership">Led Android development for a rewards app with 1M+ downloads across Southeast Asia.</li>
@@ -460,8 +461,8 @@
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">May 2014 — Jun 2016</div>
           </div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-websafety-parental-controls.html">Verified public project note · WebSafety</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="/blog/case-study-websafety-parental-controls.html">First-person project note · WebSafety</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
             <li data-signals="android cross-platform">Delivered end-to-end features for WebSafety across Android, iOS, web, and backend systems.</li>
@@ -483,8 +484,8 @@
           <p class="text-secondary leading-relaxed">Self-custody systems across multichain rewards, market predictions, Bitcoin transaction replacement, staking and liquidity pools, swaps, recurring-buy reminders, wallet migration, and shared Rust through UniFFI.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[self_custody]</div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">Verified public product</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
         </article>
         <article id="resume-project-itvx" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="android reliability">
@@ -492,8 +493,8 @@
           <p class="text-secondary leading-relaxed">Playback feature work on ITVX at Candyspace: in-player recommendations, independently delivered preview timeline scrubbing, tablet support, stronger error tracking, security fixes, and a Simple XML-to-Jackson migration.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[streaming]</div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en" target="_blank" rel="noreferrer">Verified public product</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
         </article>
         <article id="resume-project-ocbc" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="android fintech reliability">
@@ -501,8 +502,8 @@
           <p class="text-secondary leading-relaxed">Mobile banking delivery for a major Singaporean bank, including onboarding, account dashboards, transfers, digital account opening, and guarded third-party SDK integration.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[fintech]</div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-ocbc-banking-experience.html">Verified public project note · OCBC</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="/blog/case-study-ocbc-banking-experience.html">First-person project note · OCBC</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
         </article>
         <article id="resume-project-openpay" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="android fintech reliability">
@@ -510,8 +511,8 @@
           <p class="text-secondary leading-relaxed">Fintech checkout, spending-limit, performance, and partner-integration work with an emphasis on reliable payment completion and release hardening.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[payments]</div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-openpay-bnpl-experience.html">Verified public project note · OpenPay</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="/blog/case-study-openpay-bnpl-experience.html">First-person project note · OpenPay</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
         </article>
         <article id="resume-project-mystc" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="android architecture leadership reliability">
@@ -519,8 +520,8 @@
           <p class="text-secondary leading-relaxed">Telecom-scale Android product serving 10M+ installs, where I led a team of five senior engineers and drove modular, multilingual stability improvements.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[telecom_scale]</div>
           <div class="resume-evidence-boundary" aria-label="Evidence boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-mystc-scale-and-reliability.html">Verified public project note · MySTC</a>
-            <span class="resume-evidence-private">Implementation · private</span>
+            <a class="resume-evidence-source" href="/blog/case-study-mystc-scale-and-reliability.html">First-person project note · MySTC</a>
+            <span class="resume-evidence-private">Source implementation private</span>
           </div>
         </article>
       </div>
@@ -538,7 +539,7 @@
       <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
     </div>
   </footer>
-  <script src="/assets/js/resume-dossier.js?v=20260807-flight-recorder"></script>
+  <script src="/assets/js/resume-dossier.js?v=20260812-motion1"></script>
   <script src="/assets/js/universe-field-map.js?v=20260809-guide9"></script>
 </body>
 </html>

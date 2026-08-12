@@ -2,6 +2,7 @@
   "use strict";
 
   const BOOKMARKS_KEY = "ac.blog.bookmarks.v1";
+  const LEGACY_BOOKMARKS_KEYS = Object.freeze(["ac_blog_bookmarks_v1"]);
 
   const elements = {
     canvas: document.getElementById("galaxy-sky"),
@@ -46,9 +47,10 @@
     radiusY: 0.43,
     twist: 5.65
   });
-  const state = { category: "all", query: "", selected: "" };
+  const state = { category: "all", query: "", savedOnly: false, selected: "" };
   const nodeElements = new Map();
   const entryElements = new Map();
+  const observedEntryImages = new WeakSet();
   let bookmarks = new Set();
   let posts = [];
   let lastSelectedNode = null;
@@ -66,6 +68,7 @@
     field: { centerX: 0, centerY: 0, radiusX: 0, radiusY: 0 },
     height: 0,
     impactParticles: [],
+    intersectsViewport: true,
     lastFrame: 0,
     merger: { duration: 0, from: 0, progress: 0, startedAt: 0, target: 0 },
     mergerOffset: { x: 0, y: 0 },
@@ -83,17 +86,40 @@
   const timestamp = (value) => Number.isFinite(Date.parse(value)) ? Date.parse(value) : 0;
 
   function loadBookmarks() {
+    const merged = new Set();
+    let shouldMigrate = false;
     try {
-      const value = JSON.parse(localStorage.getItem(BOOKMARKS_KEY) || "[]");
-      return new Set(Array.isArray(value) ? value.map(String) : []);
+      [BOOKMARKS_KEY, ...LEGACY_BOOKMARKS_KEYS].forEach((key) => {
+        const raw = localStorage.getItem(key);
+        if (!raw) return;
+        if (key !== BOOKMARKS_KEY) shouldMigrate = true;
+        let value;
+        try {
+          value = JSON.parse(raw);
+        } catch (_error) {
+          return;
+        }
+        if (Array.isArray(value)) {
+          value
+            .map((slug) => String(slug || "").trim())
+            .filter(Boolean)
+            .forEach((slug) => merged.add(slug));
+        }
+      });
+      if (shouldMigrate) {
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify([...merged].sort()));
+        LEGACY_BOOKMARKS_KEYS.forEach((key) => localStorage.removeItem(key));
+      }
     } catch (_error) {
-      return new Set();
+      // Valid bookmark values collected before storage became unavailable remain usable.
     }
+    return merged;
   }
 
   function saveBookmarks() {
     try {
-      localStorage.setItem(BOOKMARKS_KEY, JSON.stringify([...bookmarks]));
+      localStorage.setItem(BOOKMARKS_KEY, JSON.stringify([...bookmarks].sort()));
+      LEGACY_BOOKMARKS_KEYS.forEach((key) => localStorage.removeItem(key));
     } catch (_error) {
       // Bookmark state remains available for this tab when storage is unavailable.
     }
@@ -150,6 +176,7 @@
 
   function matches(post) {
     if (state.category !== "all" && post.category !== state.category) return false;
+    if (state.savedOnly && !bookmarks.has(post.slug)) return false;
     const needle = normalize(state.query);
     if (!needle) return true;
     return normalize([post.title, post.summary, post.category, ...(post.topics || [])].join(" ")).includes(needle);
@@ -163,6 +190,7 @@
     return {
       category: availableCategories.has(category) ? category : "all",
       query: String(parameters.get("q") || "").slice(0, 160),
+      savedOnly: parameters.get("saved") === "1",
       selected: posts.some((post) => post.slug === selected) ? selected : ""
     };
   }
@@ -174,6 +202,8 @@
     else url.searchParams.delete("q");
     if (state.category !== "all") url.searchParams.set("category", state.category);
     else url.searchParams.delete("category");
+    if (state.savedOnly) url.searchParams.set("saved", "1");
+    else url.searchParams.delete("saved");
     if (state.selected) url.searchParams.set("target", state.selected);
     else url.searchParams.delete("target");
     window.history[mode]({ galaxy: { ...state } }, "", url);
@@ -268,7 +298,7 @@
       radiusY: fieldRect.height * geometry.radiusY
     };
     buildCanvasScene();
-    drawGalaxy(performance.now());
+    drawGalaxyIfVisible();
     resolveLabelCollisions();
     positionFocus();
   }
@@ -632,18 +662,57 @@
     drawMergerEvent(context, centerX, centerY, radiusX, radiusY, mergerProgress);
   }
 
-  function animateGalaxy(time) {
-    canvasState.animationFrame = window.requestAnimationFrame(animateGalaxy);
-    if (document.hidden || time - canvasState.lastFrame < 15) return;
-    canvasState.lastFrame = time;
+  function drawGalaxyIfVisible(time = performance.now()) {
+    if (!canvasState.intersectsViewport || document.hidden) return;
     drawGalaxy(time);
   }
 
-  function startGalaxy() {
+  function animateGalaxy(time) {
+    canvasState.animationFrame = 0;
+    if (!shouldAnimateGalaxy()) return;
+    if (time - canvasState.lastFrame >= 15) {
+      canvasState.lastFrame = time;
+      drawGalaxy(time);
+    }
+    canvasState.animationFrame = window.requestAnimationFrame(animateGalaxy);
+  }
+
+  function shouldAnimateGalaxy() {
+    return canvasState.intersectsViewport && !document.hidden && !reducedMotion.matches;
+  }
+
+  function stopGalaxy() {
     window.cancelAnimationFrame(canvasState.animationFrame);
+    canvasState.animationFrame = 0;
+  }
+
+  function syncGalaxyActivity({ drawStaticFrame = true } = {}) {
+    stopGalaxy();
+    const active = shouldAnimateGalaxy();
+    elements.hero.dataset.galaxyActivity = active ? "running" : "paused";
+    if (drawStaticFrame) drawGalaxyIfVisible();
+    if (active) canvasState.animationFrame = window.requestAnimationFrame(animateGalaxy);
+  }
+
+  function startGalaxy() {
+    stopGalaxy();
     canvasState.startedAt = performance.now();
+    canvasState.lastFrame = 0;
     resizeCanvas();
-    if (!reducedMotion.matches) canvasState.animationFrame = window.requestAnimationFrame(animateGalaxy);
+    syncGalaxyActivity({ drawStaticFrame: false });
+  }
+
+  function observeGalaxyVisibility() {
+    const heroRect = elements.hero.getBoundingClientRect();
+    canvasState.intersectsViewport = heroRect.bottom > 0 && heroRect.top < window.innerHeight;
+    if (!("IntersectionObserver" in window)) return;
+    const observer = new IntersectionObserver((entries) => {
+      const intersectsViewport = Boolean(entries[0]?.isIntersecting);
+      if (intersectsViewport === canvasState.intersectsViewport) return;
+      canvasState.intersectsViewport = intersectsViewport;
+      syncGalaxyActivity();
+    });
+    observer.observe(elements.hero);
   }
 
   function nodePosition(index, total) {
@@ -831,14 +900,54 @@
     elements.nodes.append(node);
   }
 
-  function createEntry(post) {
-    const entry = document.createElement("article");
-    const source = heroSource(post);
-    entry.className = `galaxy-entry${source ? " has-media" : ""}`;
+  function createEntryActions(post) {
+    const actions = document.createElement("p");
+    actions.className = "galaxy-entry__actions";
+    const read = text("a", "", "Read entry");
+    read.href = articleUrl(post);
+    const share = text("button", "", "Share");
+    share.type = "button";
+    share.dataset.shareSlug = post.slug;
+    const bookmark = text("button", "", bookmarks.has(post.slug) ? "Bookmarked" : "Bookmark");
+    bookmark.type = "button";
+    bookmark.dataset.bookmarkSlug = post.slug;
+    bookmark.setAttribute("aria-pressed", String(bookmarks.has(post.slug)));
+    actions.append(read, share, bookmark);
+    return actions;
+  }
+
+  function enhanceEntry(entry, post) {
     entry.dataset.slug = post.slug;
     entry.dataset.blogSlug = post.slug;
     entry.dataset.blogSelected = "false";
     entry.style.setProperty("--entry-color", categoryColors[post.category] || categoryColors.technical);
+
+    const body = entry.querySelector(".galaxy-entry__body");
+    if (body && !body.querySelector(".galaxy-entry__actions")) body.append(createEntryActions(post));
+
+    const media = entry.querySelector(".galaxy-entry__media");
+    const image = media?.querySelector("img");
+    entry.classList.toggle("has-media", Boolean(image));
+    entry.dataset.hasMedia = String(Boolean(image));
+    if (image && !observedEntryImages.has(image)) {
+      const removeBrokenMedia = () => {
+        media.remove();
+        entry.classList.remove("has-media");
+        entry.dataset.hasMedia = "false";
+      };
+      image.addEventListener("error", removeBrokenMedia, { once: true });
+      observedEntryImages.add(image);
+      if (image.complete && image.currentSrc && image.naturalWidth === 0) removeBrokenMedia();
+    }
+
+    entryElements.set(post.slug, entry);
+    return entry;
+  }
+
+  function createEntry(post) {
+    const entry = document.createElement("article");
+    const source = heroSource(post);
+    entry.className = "galaxy-entry";
 
     const meta = text("p", "galaxy-entry__meta", displayCategory(post.category));
     const date = text("time", "", post.date);
@@ -857,22 +966,9 @@
       const topics = document.createElement("p");
       topics.className = "galaxy-entry__topics";
       topics.setAttribute("aria-label", "Topics");
-      post.topics.slice(0, 7).forEach((topic) => topics.append(text("span", "", topic)));
+      post.topics.forEach((topic) => topics.append(text("span", "", topic)));
       body.append(topics);
     }
-    const actions = document.createElement("p");
-    actions.className = "galaxy-entry__actions";
-    const read = text("a", "", "Read entry");
-    read.href = articleUrl(post);
-    const share = text("button", "", "Share");
-    share.type = "button";
-    share.dataset.shareSlug = post.slug;
-    const bookmark = text("button", "", bookmarks.has(post.slug) ? "Bookmarked" : "Bookmark");
-    bookmark.type = "button";
-    bookmark.dataset.bookmarkSlug = post.slug;
-    bookmark.setAttribute("aria-pressed", String(bookmarks.has(post.slug)));
-    actions.append(read, share, bookmark);
-    body.append(actions);
     entry.append(meta, body);
 
     if (source) {
@@ -885,16 +981,33 @@
       image.alt = post.heroAlt || "";
       image.loading = "lazy";
       image.decoding = "async";
-      image.addEventListener("error", () => {
-        media.remove();
-        entry.classList.remove("has-media");
-      }, { once: true });
       media.append(image);
       entry.append(media);
     }
 
-    entryElements.set(post.slug, entry);
-    elements.list.append(entry);
+    return enhanceEntry(entry, post);
+  }
+
+  function syncEntries() {
+    entryElements.clear();
+    const existingEntries = new Map();
+    [...elements.list.querySelectorAll(":scope > article")].forEach((entry) => {
+      const slug = String(entry.dataset.blogSlug || entry.dataset.slug || "").trim();
+      if (slug && !existingEntries.has(slug)) existingEntries.set(slug, entry);
+    });
+
+    const orderedEntries = posts.map((post) => {
+      const existing = existingEntries.get(post.slug);
+      return existing ? enhanceEntry(existing, post) : createEntry(post);
+    });
+    const expectedEntries = new Set(orderedEntries);
+    [...elements.list.children].forEach((child) => {
+      if (!expectedEntries.has(child)) child.remove();
+    });
+    orderedEntries.forEach((entry, index) => {
+      const current = elements.list.children[index];
+      if (current !== entry) elements.list.insertBefore(entry, current || null);
+    });
   }
 
   function createCategories() {
@@ -910,6 +1023,45 @@
       button.setAttribute("aria-pressed", String(category === state.category));
       elements.categories.append(button);
     });
+
+    const savedButton = document.createElement("button");
+    savedButton.type = "button";
+    savedButton.dataset.savedFilter = "";
+    savedButton.style.setProperty("--node-color", categoryColors.technical);
+    savedButton.append(
+      text("span", "galaxy-saved-filter__label", "saved reading"),
+      text("span", "galaxy-saved-filter__count", "0")
+    );
+    elements.categories.append(savedButton);
+    elements.categories.setAttribute("aria-label", "Filter writing by category or saved status");
+    elements.savedFilter = savedButton;
+
+    const savedStatus = text("output", "galaxy-saved-status", "0 saved entries");
+    savedStatus.id = "galaxy-saved-count";
+    savedStatus.setAttribute("aria-live", "polite");
+    elements.categories.after(savedStatus);
+    elements.savedStatus = savedStatus;
+  }
+
+  function updateBookmarkControls() {
+    elements.list.querySelectorAll("button[data-bookmark-slug]").forEach((button) => {
+      const bookmarked = bookmarks.has(button.dataset.bookmarkSlug);
+      button.setAttribute("aria-pressed", String(bookmarked));
+      button.textContent = bookmarked ? "Bookmarked" : "Bookmark";
+    });
+  }
+
+  function updateSavedFilter() {
+    const savedCount = posts.filter((post) => bookmarks.has(post.slug)).length;
+    const noun = savedCount === 1 ? "entry" : "entries";
+    elements.savedFilter?.setAttribute("aria-pressed", String(state.savedOnly));
+    elements.savedFilter?.setAttribute(
+      "aria-label",
+      `${state.savedOnly ? "Show all writing" : "Show only saved reading"}; ${savedCount} saved ${noun}`
+    );
+    const visibleCount = elements.savedFilter?.querySelector(".galaxy-saved-filter__count");
+    if (visibleCount) visibleCount.textContent = String(savedCount);
+    if (elements.savedStatus) elements.savedStatus.textContent = `${savedCount} saved ${noun}`;
   }
 
   function positionFocus() {
@@ -963,7 +1115,7 @@
     });
     if (!post) {
       elements.focus.hidden = true;
-      drawGalaxy(performance.now());
+      drawGalaxyIfVisible();
       return;
     }
     elements.focusMeta.textContent = `${post.date} · ${displayCategory(post.category)} · ${post.readingTime || "reading time unavailable"}`;
@@ -973,7 +1125,7 @@
     elements.focusTopics.hidden = !(post.topics || []).length;
     elements.focusLink.href = articleUrl(post);
     elements.focus.hidden = false;
-    drawGalaxy(performance.now());
+    drawGalaxyIfVisible();
     positionFocus();
     requestAnimationFrame(positionFocus);
     focusTimer = window.setTimeout(positionFocus, 180);
@@ -982,8 +1134,22 @@
   function render() {
     const visible = posts.filter(matches);
     const visibleSlugs = new Set(visible.map((post) => post.slug));
-    if (state.selected && !visibleSlugs.has(state.selected)) state.selected = "";
-    const filtered = state.category !== "all" || Boolean(normalize(state.query));
+    const activeEntry = document.activeElement instanceof Element
+      ? document.activeElement.closest(".galaxy-entry")
+      : null;
+    const activeSlug = String(activeEntry?.dataset.slug || "");
+    const previouslyVisibleSlugs = posts
+      .map((post) => post.slug)
+      .filter((slug) => !entryElements.get(slug)?.hidden);
+    const activeVisibleIndex = previouslyVisibleSlugs.indexOf(activeSlug);
+    const needsSavedFocusHandoff = state.savedOnly
+      && activeVisibleIndex >= 0
+      && !visibleSlugs.has(activeSlug);
+    if (state.selected && !visibleSlugs.has(state.selected)) {
+      state.selected = "";
+      writeUrl("replaceState");
+    }
+    const filtered = state.category !== "all" || state.savedOnly || Boolean(normalize(state.query));
     const wasFiltered = elements.hero.dataset.merger === "remnant";
     const canChoreograph = hasRendered && !reducedMotion.matches && typeof Element.prototype.animate === "function";
     const fieldRect = canChoreograph ? elements.field.getBoundingClientRect() : null;
@@ -1022,17 +1188,30 @@
       }
     });
     entryElements.forEach((entry, slug) => { entry.hidden = !visibleSlugs.has(slug); });
+    let savedFocusTarget = null;
+    if (needsSavedFocusHandoff) {
+      const nextSlug = visible[activeVisibleIndex]?.slug || visible[activeVisibleIndex - 1]?.slug || "";
+      savedFocusTarget = nextSlug
+        ? entryElements.get(nextSlug)?.querySelector("button[data-bookmark-slug]")
+        : null;
+      if (!savedFocusTarget) savedFocusTarget = elements.savedFilter;
+    }
     elements.categories.querySelectorAll("button[data-category]").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.category === state.category));
     });
+    updateSavedFilter();
     elements.count.textContent = `${visible.length} ${visible.length === 1 ? "entry" : "entries"}`;
     elements.status.textContent = visible.length
-      ? `[${visible.length} published ${visible.length === 1 ? "entry" : "entries"} · engineering, systems, and life]`
-      : "[no published entry matches that subject]";
+      ? `[${visible.length} ${state.savedOnly ? "saved " : ""}published ${visible.length === 1 ? "entry" : "entries"} · engineering, systems, and life]`
+      : `[no ${state.savedOnly ? "saved " : ""}published entry matches these filters]`;
+    elements.empty.textContent = state.savedOnly
+      ? (posts.some((post) => bookmarks.has(post.slug)) ? "No saved reading matches these filters." : "No saved reading yet. Bookmark an entry to add it to this constellation.")
+      : "No writing matches that subject yet.";
     elements.empty.hidden = visible.length !== 0;
+    savedFocusTarget?.focus({ preventScroll: true });
     elements.hero.dataset.merger = filtered ? "remnant" : "archive";
     setMergerTarget(filtered ? 1 : 0);
-    if (reducedMotion.matches) drawGalaxy(performance.now());
+    if (reducedMotion.matches) drawGalaxyIfVisible();
     renderFocus();
     window.clearTimeout(choreographyTimer);
     if (canChoreograph) {
@@ -1093,14 +1272,14 @@
     window.setTimeout(() => { button.textContent = original; }, 1800);
   }
 
-  function toggleBookmark(slug, button) {
+  function toggleBookmark(slug) {
     if (!posts.some((post) => post.slug === slug)) return;
     if (bookmarks.has(slug)) bookmarks.delete(slug);
     else bookmarks.add(slug);
-    const bookmarked = bookmarks.has(slug);
     saveBookmarks();
-    button.setAttribute("aria-pressed", String(bookmarked));
-    button.textContent = bookmarked ? "Bookmarked" : "Bookmark";
+    updateBookmarkControls();
+    updateSavedFilter();
+    if (state.savedOnly) render();
   }
 
   function bindEvents() {
@@ -1143,6 +1322,13 @@
       elements.search.focus();
     }));
     elements.categories.addEventListener("click", (event) => {
+      const savedFilter = event.target.closest("button[data-saved-filter]");
+      if (savedFilter) {
+        state.savedOnly = !state.savedOnly;
+        writeUrl("pushState");
+        render();
+        return;
+      }
       const button = event.target.closest("button[data-category]");
       if (!button || button.dataset.category === state.category) return;
       state.category = button.dataset.category;
@@ -1156,7 +1342,7 @@
         return;
       }
       const bookmark = event.target.closest("button[data-bookmark-slug]");
-      if (bookmark) toggleBookmark(bookmark.dataset.bookmarkSlug, bookmark);
+      if (bookmark) toggleBookmark(bookmark.dataset.bookmarkSlug);
     });
     elements.nodes.addEventListener("click", (event) => {
       const node = event.target.closest("button[data-slug]");
@@ -1188,15 +1374,23 @@
       event.preventDefault();
     });
     window.addEventListener("resize", resizeCanvas, { passive: true });
+    document.addEventListener("visibilitychange", syncGalaxyActivity);
     window.addEventListener("popstate", () => {
       const next = readUrlState();
       state.category = next.category;
       state.query = next.query;
+      state.savedOnly = next.savedOnly;
       state.selected = next.selected;
       elements.search.value = state.query;
       render();
     });
-    reducedMotion.addEventListener?.("change", startGalaxy);
+    window.addEventListener("storage", (event) => {
+      if (event.key !== BOOKMARKS_KEY && !LEGACY_BOOKMARKS_KEYS.includes(event.key)) return;
+      bookmarks = loadBookmarks();
+      updateBookmarkControls();
+      render();
+    });
+    reducedMotion.addEventListener?.("change", syncGalaxyActivity);
   }
 
   async function loadPosts() {
@@ -1229,12 +1423,11 @@
       return;
     }
 
-    elements.list.replaceChildren();
     bookmarks = loadBookmarks();
     posts.forEach((post, index) => {
       createNode(post, index);
-      createEntry(post);
     });
+    syncEntries();
     createCategories();
 
     const years = posts.map((post) => Number(String(post.date).slice(0, 4))).filter(Number.isFinite);
@@ -1247,11 +1440,13 @@
     const initial = readUrlState();
     state.category = initial.category;
     state.query = initial.query;
+    state.savedOnly = initial.savedOnly;
     state.selected = initial.selected;
     elements.search.value = state.query;
     writeUrl();
     bindEvents();
     render();
+    observeGalaxyVisibility();
     startGalaxy();
     requestAnimationFrame(resolveLabelCollisions);
   }

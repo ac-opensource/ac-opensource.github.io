@@ -46,10 +46,11 @@
     ["profile", "Skills + interests"],
     ["work", "Work"],
     ["projects", "Highlighted projects"],
-    ["threads", "Current threads"],
+    ["threads", "Current work radar"],
     ["contact", "Contact"],
   ]);
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const motionIsReduced = () => reducedMotionQuery.matches;
   const shortQuery = window.matchMedia("(orientation: landscape) and (max-height: 560px) and (max-width: 1000px)");
   const phoneQuery = window.matchMedia("(max-width: 767px)");
   // Compact describes the available geometry only. It scales the same orbital
@@ -58,6 +59,13 @@
   const nodeByKey = new Map(nodes.map((node) => [node.dataset.orbitObject, node]));
   const trackByKey = new Map(tracks.map((track) => [track.dataset.track, track]));
   const detailByKey = new Map(details.map((detail) => [detail.dataset.facetDetail, detail]));
+  const projectLogoImages = [...(detailByKey.get("projects")?.querySelectorAll("img[data-src]") || [])];
+
+  const hydrateProjectLogos = () => {
+    projectLogoImages.forEach((image) => {
+      if (!image.src && image.dataset.src) image.src = image.dataset.src;
+    });
+  };
 
   // Each track has its own eccentricity, center and tilt. The paths stay purely
   // parametric so no collision response can introduce visible jumps or edge parking.
@@ -103,7 +111,7 @@
     resetTimers: new Map(),
     suppressClick: null,
     overviewScrollY: 0,
-    reduced: reducedMotionQuery.matches,
+    reduced: motionIsReduced(),
     phone: phoneQuery.matches,
     compact: compactQuery.matches,
     short: shortQuery.matches,
@@ -185,7 +193,15 @@
   const validKey = (key) => keys.includes(key);
   const keyFromHash = () => {
     const match = window.location.hash.match(/^#facet-([a-z-]+)$/);
-    return match && validKey(match[1]) ? match[1] : null;
+    if (match && validKey(match[1])) return match[1];
+    let id = window.location.hash.slice(1);
+    try {
+      id = decodeURIComponent(id);
+    } catch (_error) {
+      // Use the literal fragment when it is not valid URI-encoded text.
+    }
+    const detailKey = document.getElementById(id)?.closest("[data-facet-detail]")?.dataset.facetDetail;
+    return validKey(detailKey) ? detailKey : null;
   };
 
   const setPhase = (phase) => {
@@ -596,6 +612,7 @@
   };
 
   const syncSelection = () => {
+    if (state.selected === "projects") hydrateProjectLogos();
     nodes.forEach((node) => {
       const selected = node.dataset.orbitObject === state.selected;
       node.classList.toggle("is-selected", selected);
@@ -625,7 +642,7 @@
         profile: "Platforms, craft, and interests.",
         work: "Production record, leadership, and delivery.",
         projects: "Bitcoin.com Wallet and selected shipped systems.",
-        threads: "Agents, privacy, and observation.",
+        threads: "Dated portfolio, agent-delivery, and memory-system work.",
         contact: "Complex systems and thoughtful collaboration."
       };
       facetStatus.textContent = `${labels.get(state.selected)} · ${summaries[state.selected]}`;
@@ -1316,14 +1333,15 @@
     if (document.hidden) cancelNodeDrag();
     startFrame();
   });
-  reducedMotionQuery.addEventListener?.("change", (event) => {
+  const syncReducedMotion = () => {
     cancelNodeDrag();
-    state.reduced = event.matches;
+    state.reduced = motionIsReduced();
     if (state.reduced && state.cometKey) {
       resetCustomOrbit(state.cometKey, { sound: false, immediate: true });
     }
     syncMotion();
-  });
+  };
+  reducedMotionQuery.addEventListener?.("change", syncReducedMotion);
   compactQuery.addEventListener?.("change", (event) => {
     cancelNodeDrag();
     state.compact = event.matches;

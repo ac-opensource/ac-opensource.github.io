@@ -8,7 +8,15 @@ module.exports = Object.freeze({
     "contact.html",
     "signals.html",
     "resume.html",
-    "skills-graph.html"
+    "skills-graph.html",
+    "search.html"
+  ],
+  searchablePages: [
+    "index.html",
+    "about.html",
+    "work.html",
+    "resume.html",
+    "signals.html"
   ],
   optionalPublicRootFiles: ["404.html", "favicon.ico", "llms.txt"],
   publicDownloads: ["resume_concepcion_andrew.pdf"],
@@ -20,6 +28,7 @@ module.exports = Object.freeze({
   ],
   requiredPublicDataFiles: [
     "assets/data/contact-runtime.json",
+    "assets/data/current-work.json",
     "assets/data/signals.json"
   ],
   publicExperimentFiles: universeOptions.files,

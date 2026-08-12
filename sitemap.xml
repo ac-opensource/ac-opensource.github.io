@@ -16,8 +16,19 @@
     <loc>https://ac-opensource.github.io/resume.html</loc>
   </url>
   <url>
+    <loc>https://ac-opensource.github.io/search.html</loc>
+  </url>
+  <url>
     <loc>https://ac-opensource.github.io/blog/</loc>
-    <lastmod>2026-08-06</lastmod>
+    <lastmod>2026-08-12</lastmod>
+  </url>
+  <url>
+    <loc>https://ac-opensource.github.io/blog/case-study-bitcoin-wallet-multichain-android-systems.html</loc>
+    <lastmod>2026-08-12</lastmod>
+  </url>
+  <url>
+    <loc>https://ac-opensource.github.io/blog/case-study-itvx-playback-at-candyspace.html</loc>
+    <lastmod>2026-08-12</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html</loc>
@@ -81,7 +92,7 @@
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-08-12</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/2024-11-21-quiet-systems-reflection.html</loc>
@@ -89,7 +100,7 @@
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html</loc>
-    <lastmod>2026-07-25</lastmod>
+    <lastmod>2026-08-12</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/2024-09-14-film-photography-gallery.html</loc>
@@ -97,15 +108,15 @@
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html</loc>
-    <lastmod>2026-07-25</lastmod>
+    <lastmod>2026-08-12</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-08-12</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-08-12</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html</loc>
@@ -113,14 +124,14 @@
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-08-12</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-08-12</lastmod>
   </url>
   <url>
     <loc>https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html</loc>
-    <lastmod>2026-07-25</lastmod>
+    <lastmod>2026-08-12</lastmod>
   </url>
 </urlset>

@@ -599,6 +599,7 @@ function testCheckedInBoundaries() {
   assert.match(contactHtml, /does not open an email client or claim a stored message/);
   assert.doesNotMatch(contactHtml, /action="mailto:/);
   assert.match(contactHtml, /data-contact-submit disabled/);
+  assert.match(contactHtml, /href="mailto:aarconcepcion@gmail\.com\?subject=Portfolio%20enquiry"/);
   const configuredContact = injectContactRuntimeHtml(contactHtml, {
     version: 1,
     enabled: true,
@@ -609,9 +610,12 @@ function testCheckedInBoundaries() {
   });
   assert.match(configuredContact, /action="\/contact\.html#contact-form"/);
   assert.match(configuredContact.match(/<button\b[^>]*data-contact-submit[^>]*>/)[0], /\bdisabled\b/);
-  assert.match(configuredContact, /JavaScript is required for verified record storage/);
+  assert.match(configuredContact, /JavaScript is required for a matched storage receipt/);
   const signalsHtml = fs.readFileSync(path.join(ROOT, "signals.html"), "utf8");
   assert.match(signalsHtml, /id="signal-detail" data-signal-detail/);
+  assert.match(signalsHtml, /href="\/contact\.html\?intent=public&amp;target=portfolio"/);
+  assert.match(signalsHtml, /Propose a portfolio quote for review/);
+  assert.doesNotMatch(signalsHtml, /Propose an approved portfolio quote/);
   const filterTargets = signalsHtml
     .match(/<select id="signal-target-filter"[\s\S]*?<\/select>/)[0]
     .matchAll(/<option value="([^"]*)"/g);

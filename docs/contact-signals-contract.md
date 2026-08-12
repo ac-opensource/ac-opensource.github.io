@@ -1,14 +1,14 @@
 # Contact records and Signals publication contract
 
-The production Contact page never opens an email client and never equates an animation, iframe load, or network attempt with persistence. A completion state appears only after a configured record service returns a contract-valid opaque receipt.
+The production Contact form never opens an email client and never equates an animation, iframe load, or network attempt with persistence. A completion state appears only after a configured record service returns a contract-valid opaque receipt. A separate, plainly labelled email link is available as an alternate contact route; using it is an email handoff, not a stored-record receipt.
 
-The checked-in `assets/data/contact-runtime.json` is public configuration, not a secret store. Its default state remains disabled with blank endpoints until the personal Sheet bridge is deployed and externally verified. In that state, the submit control is disabled and the page says that no record service is connected.
+The checked-in `assets/data/contact-runtime.json` is public configuration, not a secret store. It currently enables the externally verified personal Sheet bridge. A future disabled state must use blank endpoints; in that state, the submit control is disabled and the page says that no record service is connected.
 
 ## Runtime transports
 
 Version 1 runtime configuration has six exact fields: `version`, `enabled`, `transport`, `endpoint`, `publicFeedEndpoint`, and `requestTimeoutMs`.
 
-- `disabled`: blank endpoints and no submission. This is the checked-in state.
+- `disabled`: blank endpoints and no form submission.
 - `json_endpoint`: a CORS-aware JSON service used by the exact-loopback integration environment and retained as a provider-neutral future option.
 - `apps_script_iframe`: a normal POST into a hidden iframe backed by a private Google Sheet. The returned relay message is accepted only from the submitted iframe, from a Google Apps Script acknowledgement origin, and for the pending high-entropy request ID.
 
@@ -28,6 +28,8 @@ Production submissions use payload version 2. Private payloads contain exactly:
 
 Private contact requests require non-empty trimmed message text up to 4000 characters, including a brief message such as `Hi!`. Public review requests may leave that private message empty and instead add one `public` object containing a non-empty quote of up to 280 characters, one allowlisted local target, an explicit anonymous or named display choice, and consent set to true. The private message is never inferred to be the public quote. Public attribution is anonymous by default.
 
+The public invitation URL may preselect `intent=public` and one allowlisted `target`. It never pre-populates a quote, name, email address, consent, or private message; those remain deliberate visitor inputs.
+
 The record service may acknowledge only:
 
 - Private: matching version, opaque `receiptId`, private intent, and `confirmed` state.
@@ -39,7 +41,7 @@ The Apps Script relay posts the response on channel `ac-contact-v2` only after i
 
 ## No-JavaScript behavior
 
-The no-JavaScript control remains disabled and explains the alternate LinkedIn route, whether or not the record bridge is configured. Verified storage depends on the high-entropy browser idempotency key and authenticated acknowledgement relay, so the static fallback never posts, opens a mail client, or risks ambiguous duplicate rows.
+The no-JavaScript form control remains disabled and points to the separate direct-email route, whether or not the record bridge is configured. Verified storage depends on the high-entropy browser idempotency key and authenticated acknowledgement relay, so the static form fallback never posts, opens a mail client, or risks ambiguous duplicate rows.
 
 ## Private Sheet bridge
 
@@ -65,7 +67,7 @@ Contact storage does not automatically publish a Signal. Public feedback remains
 
 Pending, rejected, unknown, external-link, protocol-relative, duplicate-ID, duplicate-slot, private, and structurally inconsistent records fail the build or runtime contract. Removed records expose no quote, attribution, target, dates, private message, email, moderation notes, or rejection reason.
 
-The checked-in Signals feed remains intentionally empty and the page stays `noindex,follow` until an approved record exists.
+The checked-in Signals feed remains intentionally empty and the page stays `noindex,follow` until an explicitly consented record has completed human approval. Quotes must never be invented, inferred from a private message, or copied from another public surface without republication permission.
 
 ## Exact-loopback development
 

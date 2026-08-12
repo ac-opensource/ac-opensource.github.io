@@ -5,8 +5,24 @@
   <link>https://ac-opensource.github.io/blog/</link>
   <description>Engineering logs, essays, and field notes by Andrew Concepcion.</description>
   <language>en-us</language>
-  <lastBuildDate>Thu, 06 Aug 2026 05:43:54 GMT</lastBuildDate>
+  <lastBuildDate>Wed, 12 Aug 2026 11:22:21 GMT</lastBuildDate>
   <atom:link href="https://ac-opensource.github.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Bitcoin.com Wallet: Shipping Multichain Android Systems</title>
+    <link>https://ac-opensource.github.io/blog/case-study-bitcoin-wallet-multichain-android-systems.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-bitcoin-wallet-multichain-android-systems.html</guid>
+    <pubDate>Wed, 12 Aug 2026 00:00:00 GMT</pubDate>
+    <description>A public-safe account of my Android work across multichain rewards, transaction replacement, wallet migration, swaps, shared Rust, startup performance, and release reliability.</description>
+<category>Bitcoin.com Wallet</category><category>Android</category><category>Fintech</category><category>Multichain</category><category>Rust</category><category>work</category>
+  </item>
+  <item>
+    <title>ITVX at Candyspace: Playback Features Under Live Constraints</title>
+    <link>https://ac-opensource.github.io/blog/case-study-itvx-playback-at-candyspace.html</link>
+    <guid isPermaLink="true">https://ac-opensource.github.io/blog/case-study-itvx-playback-at-candyspace.html</guid>
+    <pubDate>Tue, 11 Aug 2026 00:00:00 GMT</pubDate>
+    <description>How I delivered ITVX Android player features at Candyspace across recommendations, timeline previews, phone and tablet motion, reliability, security, and XML parsing.</description>
+<category>Candyspace</category><category>ITVX</category><category>Android</category><category>Streaming</category><category>Media Playback</category><category>work</category>
+  </item>
   <item>
     <title>Rebuilding My Homepage as an Interactive Orbital System</title>
     <link>https://ac-opensource.github.io/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html</link>

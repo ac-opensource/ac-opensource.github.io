@@ -9,6 +9,7 @@
 <link rel="canonical" href="https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html"/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:site_name" content="Andrew Concepcion"/>
+<meta property="og:locale" content="en_US"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html"/>
 <meta property="og:title" content="OCBC Business: Android Banking Work | Andrew Concepcion"/>
@@ -31,9 +32,10 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="/assets/css/article-debrief.css?v=20260807-regions2" rel="stylesheet"/>
-<link href="/assets/css/universe-field-map.css?v=20260807" rel="stylesheet"/>
-<script src="/assets/js/universe-theme-transition.js?v=20260807-fast2"></script>
+<link href="/assets/css/article-debrief.css?v=20260812-actions2" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet"/>
+<link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles/>
+<script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -152,15 +154,17 @@
   "description": "I worked on OCBC Business for Android in Kotlin and XML, covering chart UI, identity-verification integration, network behavior, and focused unit tests.",
   "author": {
     "@type": "Person",
+    "@id": "https://ac-opensource.github.io/#person",
     "name": "Andrew Concepcion"
   },
   "publisher": {
     "@type": "Person",
+    "@id": "https://ac-opensource.github.io/#person",
     "name": "Andrew Concepcion",
     "url": "https://ac-opensource.github.io"
   },
   "datePublished": "2024-11-20",
-  "dateModified": "2026-07-25T00:00:00.000Z",
+  "dateModified": "2026-08-12T11:22:21.000Z",
   "image": "https://ac-opensource.github.io/assets/images/work/img_ocbc_business_cashflow.webp",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html"
 }</script>
@@ -177,7 +181,7 @@
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
-    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
+    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]" data-site-search-slot><a class="site-search-link" href="/search.html" data-site-search-link aria-label="Search published evidence" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></div>
   </div>
   <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
     <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
@@ -194,15 +198,15 @@
     <strong>DELIVERY DOSSIER</strong>
     <span id="post-category">portfolio</span>
     <time id="post-date" datetime="2024-11-20">2024-11-20</time>
-    <span id="post-reading">1 min read</span>
+    <span id="post-reading">2 min read</span>
     <span>2 sections</span>
   </div>
   <div class="article-region__title">
     <h1 id="post-title">OCBC Business: Android Banking Work</h1>
     <p id="post-summary">I worked on OCBC Business for Android in Kotlin and XML, covering chart UI, identity-verification integration, network behavior, and focused unit tests.</p>
     <div id="post-actions" class="article-region__actions">
-      <button id="share-post-button" type="button">Share</button>
-      <button id="bookmark-post-button" type="button">Bookmark</button>
+      <button id="share-post-button" type="button" hidden>Share</button>
+      <button id="bookmark-post-button" type="button" hidden>Bookmark</button>
       <a href="/blog/rss.xml">RSS</a>
       <a href="/work.html">Return to portfolio</a>
     </div>
@@ -315,7 +319,7 @@
   </div>
 </footer>
 <script src="/assets/js/article-debrief.js?v=20260807-regions1"></script>
-<script src="/assets/js/universe-field-map.js?v=20260807"></script>
+<script src="/assets/js/universe-field-map.js?v=20260809-guide9"></script>
 <script>
   (() => {
     const FORCE_ACTIVE_ROUTE = "/work.html";
@@ -338,7 +342,8 @@
       }
     });
 
-    const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
+    const BOOKMARKS_KEY = "ac.blog.bookmarks.v1";
+    const LEGACY_BOOKMARKS_KEYS = Object.freeze(["ac_blog_bookmarks_v1"]);
     const CURRENT_POST_SLUG = "case-study-ocbc-banking-experience";
     const CURRENT_POST_TITLE = "OCBC Business: Android Banking Work";
     const CURRENT_POST_URL = "/blog/case-study-ocbc-banking-experience.html";
@@ -346,19 +351,36 @@
     const bookmarkPostButton = document.getElementById("bookmark-post-button");
 
     function loadBookmarks() {
+      const merged = new Set();
+      let shouldMigrate = false;
       try {
-        const raw = localStorage.getItem(BOOKMARKS_KEY);
-        const parsed = raw ? JSON.parse(raw) : [];
-        if (!Array.isArray(parsed)) return new Set();
-        return new Set(parsed.map((value) => String(value || "").trim()).filter(Boolean));
+        [BOOKMARKS_KEY, ...LEGACY_BOOKMARKS_KEYS].forEach((key) => {
+          const raw = localStorage.getItem(key);
+          if (!raw) return;
+          if (key !== BOOKMARKS_KEY) shouldMigrate = true;
+          let parsed;
+          try {
+            parsed = JSON.parse(raw);
+          } catch (_error) {
+            return;
+          }
+          if (!Array.isArray(parsed)) return;
+          parsed
+            .map((value) => String(value || "").trim())
+            .filter(Boolean)
+            .forEach((value) => merged.add(value));
+        });
+        if (shouldMigrate) saveBookmarks(merged);
       } catch (_error) {
-        return new Set();
+        // Valid bookmark values collected before storage became unavailable remain usable.
       }
+      return merged;
     }
 
     function saveBookmarks(set) {
       try {
-        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(set)));
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(set).sort()));
+        LEGACY_BOOKMARKS_KEYS.forEach((key) => localStorage.removeItem(key));
       } catch (_error) {
         // Ignore write failures.
       }
@@ -372,6 +394,8 @@
       bookmarkPostButton.classList.toggle("bg-surface-container-highest", active);
       bookmarkPostButton.classList.toggle("border-outline-variant/20", !active);
       bookmarkPostButton.classList.toggle("text-secondary", !active);
+      bookmarkPostButton.setAttribute("aria-pressed", String(active));
+      bookmarkPostButton.setAttribute("aria-label", active ? "Remove from saved reading" : "Save for later reading");
     }
 
     async function shareCurrentPost() {
@@ -399,13 +423,15 @@
     }
 
     if (sharePostButton) {
+      sharePostButton.hidden = false;
       sharePostButton.addEventListener("click", () => {
         shareCurrentPost();
       });
     }
 
     if (bookmarkPostButton && CURRENT_POST_SLUG) {
-      const bookmarks = loadBookmarks();
+      bookmarkPostButton.hidden = false;
+      let bookmarks = loadBookmarks();
       setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
       bookmarkPostButton.addEventListener("click", () => {
         if (bookmarks.has(CURRENT_POST_SLUG)) {
@@ -414,6 +440,11 @@
           bookmarks.add(CURRENT_POST_SLUG);
         }
         saveBookmarks(bookmarks);
+        setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      });
+      window.addEventListener("storage", (event) => {
+        if (event.key !== BOOKMARKS_KEY && !LEGACY_BOOKMARKS_KEYS.includes(event.key)) return;
+        bookmarks = loadBookmarks();
         setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
       });
     }

@@ -321,6 +321,50 @@ button { color: inherit; }
 .galaxy-categories button[aria-pressed="true"]::before,
 .galaxy-categories button[aria-pressed="true"]::after { opacity: 1; }
 
+.galaxy-categories button[data-saved-filter] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  margin-left: 0.15rem;
+  color: var(--blue);
+}
+
+.galaxy-categories button[data-saved-filter]::before {
+  width: 1px;
+  height: 0.85rem;
+  margin-right: 0.55rem;
+  background: var(--line-strong);
+  content: "";
+  opacity: 1;
+}
+
+.galaxy-categories button[data-saved-filter]::after { content: ""; }
+
+.galaxy-saved-filter__count {
+  display: inline-grid;
+  min-width: 1.45rem;
+  min-height: 1.45rem;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: transparent;
+  line-height: 1;
+}
+
+.galaxy-categories button[data-saved-filter][aria-pressed="true"] .galaxy-saved-filter__count {
+  background: var(--blue);
+  color: var(--white);
+}
+
+.galaxy-saved-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .galaxy-field {
   position: absolute;
   z-index: 5;
