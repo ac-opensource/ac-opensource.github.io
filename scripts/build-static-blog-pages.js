@@ -10,10 +10,24 @@ const { resolvePublicImage } = require("./lib/public-images");
 
 const ROOT_DIR = path.join(__dirname, "..");
 const SITE_ORIGIN = String(process.env.SITE_ORIGIN || "https://ac-opensource.github.io").replace(/\/+$/, "");
+const PERSON_ID = `${SITE_ORIGIN}/#person`;
 const FALLBACK_HERO_IMAGE = "/blog/images/new-zealand-aurora.png";
 const GENERATED_PAGE_MARKER = "<!-- generated: scripts/build-static-blog-pages.js -->";
 const GENERATED_MANIFEST_NAME = path.join(".site-build", "generated-blog-pages.json");
 const GENERATOR_ID = "ac-opensource-static-blog-v1";
+const LLMS_TEMPLATE_PATH = path.join(ROOT_DIR, "llms.txt");
+const LLMS_SECTIONS = Object.freeze([
+  Object.freeze({
+    category: "work",
+    start: "<!-- BEGIN GENERATED: published-work -->",
+    end: "<!-- END GENERATED: published-work -->"
+  }),
+  Object.freeze({
+    category: "technical",
+    start: "<!-- BEGIN GENERATED: published-technical -->",
+    end: "<!-- END GENERATED: published-technical -->"
+  })
+]);
 const WORK_HERO_LAYOUT_BY_SLUG = Object.freeze({
   "case-study-ocbc-banking-experience": "gallery",
   "case-study-openpay-bnpl-experience": "cover"
@@ -509,10 +523,12 @@ function buildStaticPostHtml({ post, previous, next }) {
       description: summary,
       author: {
         "@type": "Person",
+        "@id": PERSON_ID,
         name: author
       },
       publisher: {
         "@type": "Person",
+        "@id": PERSON_ID,
         name: "Andrew Concepcion",
         url: SITE_ORIGIN
       },
@@ -555,10 +571,10 @@ ${articleTagsMeta}
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="/assets/css/article-debrief.css?v=20260807-regions2" rel="stylesheet"/>
+<link href="/assets/css/article-debrief.css?v=20260812-actions2" rel="stylesheet"/>
 <link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet"/>
-<link href="/assets/css/universe-perspective-navigation.css?v=20260809-guide14" rel="stylesheet" data-universe-perspective-styles/>
-<script src="/assets/js/universe-theme-transition.js?v=20260809-guide14"></script>
+<link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles/>
+<script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -684,7 +700,7 @@ ${articleTagsMeta}
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
-    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
+    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]" data-site-search-slot><a class="site-search-link" href="/search.html" data-site-search-link aria-label="Search published evidence" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></div>
   </div>
   <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
     <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
@@ -708,8 +724,8 @@ ${articleTagsMeta}
     <h1 id="post-title">${escapeHtml(title)}</h1>
     <p id="post-summary">${escapeHtml(summary)}</p>
     <div id="post-actions" class="article-region__actions">
-      <button id="share-post-button" type="button">Share</button>
-      <button id="bookmark-post-button" type="button">Bookmark</button>
+      <button id="share-post-button" type="button" hidden>Share</button>
+      <button id="bookmark-post-button" type="button" hidden>Bookmark</button>
       <a href="/blog/rss.xml">RSS</a>
       ${isWorkDeepDive ? '<a href="/work.html">Return to portfolio</a>' : ""}
     </div>
@@ -782,7 +798,8 @@ ${trajectoryHtml.mobile}
       }
     });
 
-    const BOOKMARKS_KEY = "ac_blog_bookmarks_v1";
+    const BOOKMARKS_KEY = "ac.blog.bookmarks.v1";
+    const LEGACY_BOOKMARKS_KEYS = Object.freeze(["ac_blog_bookmarks_v1"]);
     const CURRENT_POST_SLUG = ${JSON.stringify(String(post.slug || ""))};
     const CURRENT_POST_TITLE = ${JSON.stringify(title)};
     const CURRENT_POST_URL = ${JSON.stringify(canonicalPath)};
@@ -790,19 +807,36 @@ ${trajectoryHtml.mobile}
     const bookmarkPostButton = document.getElementById("bookmark-post-button");
 
     function loadBookmarks() {
+      const merged = new Set();
+      let shouldMigrate = false;
       try {
-        const raw = localStorage.getItem(BOOKMARKS_KEY);
-        const parsed = raw ? JSON.parse(raw) : [];
-        if (!Array.isArray(parsed)) return new Set();
-        return new Set(parsed.map((value) => String(value || "").trim()).filter(Boolean));
+        [BOOKMARKS_KEY, ...LEGACY_BOOKMARKS_KEYS].forEach((key) => {
+          const raw = localStorage.getItem(key);
+          if (!raw) return;
+          if (key !== BOOKMARKS_KEY) shouldMigrate = true;
+          let parsed;
+          try {
+            parsed = JSON.parse(raw);
+          } catch (_error) {
+            return;
+          }
+          if (!Array.isArray(parsed)) return;
+          parsed
+            .map((value) => String(value || "").trim())
+            .filter(Boolean)
+            .forEach((value) => merged.add(value));
+        });
+        if (shouldMigrate) saveBookmarks(merged);
       } catch (_error) {
-        return new Set();
+        // Valid bookmark values collected before storage became unavailable remain usable.
       }
+      return merged;
     }
 
     function saveBookmarks(set) {
       try {
-        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(set)));
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(set).sort()));
+        LEGACY_BOOKMARKS_KEYS.forEach((key) => localStorage.removeItem(key));
       } catch (_error) {
         // Ignore write failures.
       }
@@ -816,6 +850,8 @@ ${trajectoryHtml.mobile}
       bookmarkPostButton.classList.toggle("bg-surface-container-highest", active);
       bookmarkPostButton.classList.toggle("border-outline-variant/20", !active);
       bookmarkPostButton.classList.toggle("text-secondary", !active);
+      bookmarkPostButton.setAttribute("aria-pressed", String(active));
+      bookmarkPostButton.setAttribute("aria-label", active ? "Remove from saved reading" : "Save for later reading");
     }
 
     async function shareCurrentPost() {
@@ -843,13 +879,15 @@ ${trajectoryHtml.mobile}
     }
 
     if (sharePostButton) {
+      sharePostButton.hidden = false;
       sharePostButton.addEventListener("click", () => {
         shareCurrentPost();
       });
     }
 
     if (bookmarkPostButton && CURRENT_POST_SLUG) {
-      const bookmarks = loadBookmarks();
+      bookmarkPostButton.hidden = false;
+      let bookmarks = loadBookmarks();
       setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
       bookmarkPostButton.addEventListener("click", () => {
         if (bookmarks.has(CURRENT_POST_SLUG)) {
@@ -858,6 +896,11 @@ ${trajectoryHtml.mobile}
           bookmarks.add(CURRENT_POST_SLUG);
         }
         saveBookmarks(bookmarks);
+        setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      });
+      window.addEventListener("storage", (event) => {
+        if (event.key !== BOOKMARKS_KEY && !LEGACY_BOOKMARKS_KEYS.includes(event.key)) return;
+        bookmarks = loadBookmarks();
         setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
       });
     }
@@ -887,6 +930,7 @@ function writeSitemap(posts, outputRoot) {
     { path: "/about.html" },
     { path: "/contact.html" },
     { path: "/resume.html" },
+    { path: "/search.html" },
     { path: "/blog/", lastmod: latestPostDate },
     ...posts.map((post) => ({
       path: postPath(post.slug),
@@ -921,6 +965,58 @@ Allow: /
 Sitemap: ${SITE_ORIGIN}/sitemap.xml
 `;
   fs.writeFileSync(path.join(outputRoot, "robots.txt"), robots, "utf8");
+}
+
+function escapeMarkdownLabel(value) {
+  return String(value || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/([\[\]])/g, "\\$1");
+}
+
+function replaceMarkedSection(template, section, contents) {
+  const startIndex = template.indexOf(section.start);
+  const endIndex = template.indexOf(section.end);
+  if (
+    startIndex < 0 ||
+    endIndex < startIndex ||
+    template.lastIndexOf(section.start) !== startIndex ||
+    template.lastIndexOf(section.end) !== endIndex
+  ) {
+    throw new Error(`llms.txt must contain exactly one ordered ${section.category} generated section.`);
+  }
+
+  const contentStart = startIndex + section.start.length;
+  return `${template.slice(0, contentStart)}\n${contents}\n${template.slice(endIndex)}`;
+}
+
+function renderLlmsPost(post) {
+  const title = escapeMarkdownLabel(String(post.title || "").trim() || "Untitled");
+  const summary = String(post.summary || "").replace(/\s+/g, " ").trim();
+  const url = `${SITE_ORIGIN}${postPath(post.slug)}`;
+  return `- [${title}](${url})${summary ? `: ${summary}` : ""}`;
+}
+
+function renderLlmsTxt(template, posts) {
+  let rendered = String(template || "");
+  for (const section of LLMS_SECTIONS) {
+    const entries = posts
+      .filter(
+        (post) =>
+          post.status === "published" &&
+          String(post.category || "").trim().toLowerCase() === section.category
+      )
+      .map(renderLlmsPost)
+      .join("\n");
+    rendered = replaceMarkedSection(rendered, section, entries);
+  }
+  return `${rendered.trimEnd()}\n`;
+}
+
+function writeLlmsTxt(posts, outputRoot) {
+  const template = fs.readFileSync(LLMS_TEMPLATE_PATH, "utf8");
+  const outputPath = path.join(outputRoot, "llms.txt");
+  fs.writeFileSync(outputPath, renderLlmsTxt(template, posts), "utf8");
+  return outputPath;
 }
 
 function deterministicFeedDate(posts) {
@@ -1073,6 +1169,7 @@ function buildStaticBlog({ dbPath, outputRoot = ROOT_DIR, manifestPath } = {}) {
     writeSitemap(fullPosts, resolvedOutputRoot);
     writeRobots(resolvedOutputRoot);
     writeRssFeed(fullPosts, outputBlogDir);
+    writeLlmsTxt(fullPosts, resolvedOutputRoot);
 
     return {
       posts: fullPosts,
@@ -1110,6 +1207,8 @@ if (require.main === module) {
 module.exports = {
   GENERATED_PAGE_MARKER,
   GENERATOR_ID,
+  LLMS_SECTIONS,
+  PERSON_ID,
   articleMode,
   buildBlogIndexFallback,
   buildTrajectoryHtml,
@@ -1117,7 +1216,9 @@ module.exports = {
   buildStaticPostHtml,
   decorateArticleBody,
   pruneStaleGeneratedPages,
+  renderLlmsTxt,
   trajectoryPhase,
   trajectoryVariant,
-  writeBlogIndexFallback
+  writeBlogIndexFallback,
+  writeLlmsTxt
 };

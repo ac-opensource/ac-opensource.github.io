@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "updated": "2026-08-12",
+  "items": [
+    {
+      "date": "2026-08-06",
+      "label": "PORTFOLIO SYSTEMS",
+      "title": "Rebuilding the homepage as an orbital system.",
+      "description": "A documented pass through interaction design, implementation constraints, accessibility, and visual QA.",
+      "href": "/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html"
+    },
+    {
+      "date": "2026-04-30",
+      "label": "AGENT SYSTEMS",
+      "title": "Making agents leave receipts.",
+      "description": "A delivery practice built around durable context, explicit verification, and honest handoffs.",
+      "href": "/blog/2026-04-30-agents-that-leave-receipts.html"
+    },
+    {
+      "date": "2026-04-09",
+      "label": "MEMORY SYSTEMS",
+      "title": "Using MemPalace with local agents.",
+      "description": "A practical workflow for giving local coding agents searchable, durable project memory.",
+      "href": "/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html"
+    }
+  ]
+}

@@ -5,6 +5,11 @@ const { spawnSync } = require("child_process");
 const { buildStaticBlog } = require("./build-static-blog-pages");
 const { syncBlogManifest } = require("./sync-blog-from-db");
 const { rewritePublicImageUrls, shouldExcludeOriginal } = require("./lib/public-images");
+const {
+  buildPublishedSearchIndex,
+  injectSharedSiteTools,
+  renderCurrentWorkRadar
+} = require("./lib/public-discovery");
 const { renderPublication, syncSignalsSitemap } = require("./render-signals-page");
 const publication = require("./site-publication.config");
 
@@ -155,7 +160,7 @@ function injectBigBangLoader(html, relativePath) {
   if (html.includes("data-big-bang-bootstrap")) return html;
 
   const bootstrap = [
-    '<link href="/assets/css/big-bang-loader.css?v=20260809-integrated1" rel="stylesheet"/>',
+    '<link href="/assets/css/big-bang-loader.css?v=20260812-motion1" rel="stylesheet"/>',
     '<script data-big-bang-bootstrap>(function(){',
     'var root=document.documentElement;',
     'if(window.matchMedia&&(',
@@ -170,7 +175,7 @@ function injectBigBangLoader(html, relativePath) {
     'if(root.dataset.bigBang==="pending")delete root.dataset.bigBang;',
     '},4000);',
     '}());</script>',
-    '<script src="/assets/js/big-bang-loader.js?v=20260809-integrated1" defer></script>'
+    '<script src="/assets/js/big-bang-loader.js?v=20260812-motion1" defer></script>'
   ].join("");
 
   return html.replace("</head>", `${bootstrap}\n</head>`);
@@ -179,8 +184,11 @@ function injectBigBangLoader(html, relativePath) {
 function compileTailwind(stagingRoot) {
   for (const htmlPath of walkHtmlFiles(stagingRoot)) {
     const relativePath = path.relative(stagingRoot, htmlPath);
-    const transformed = injectBigBangLoader(
-      replaceTailwindRuntime(fs.readFileSync(htmlPath, "utf8"), relativePath),
+    const transformed = injectSharedSiteTools(
+      injectBigBangLoader(
+        replaceTailwindRuntime(fs.readFileSync(htmlPath, "utf8"), relativePath),
+        relativePath
+      ),
       relativePath
     );
     fs.writeFileSync(htmlPath, transformed, "utf8");
@@ -238,6 +246,15 @@ function populateStagingDirectory(stagingRoot, { dbPath } = {}) {
     copyFile(publicDataFile, stagingRoot);
   }
 
+  const currentWorkPath = path.join(ROOT_DIR, "assets", "data", "current-work.json");
+  const homepagePath = path.join(stagingRoot, "index.html");
+  const currentWork = JSON.parse(fs.readFileSync(currentWorkPath, "utf8"));
+  fs.writeFileSync(
+    homepagePath,
+    renderCurrentWorkRadar(fs.readFileSync(homepagePath, "utf8"), currentWork),
+    "utf8"
+  );
+
   const signalsPublication = renderPublication({ stagingRoot });
 
   const manifestPath = path.join(stagingRoot, GENERATED_MANIFEST_NAME);
@@ -251,6 +268,15 @@ function populateStagingDirectory(stagingRoot, { dbPath } = {}) {
     outputPath: path.join(stagingRoot, "blog", "posts.json")
   });
   syncSignalsSitemap(stagingRoot, signalsPublication);
+  buildPublishedSearchIndex({
+    stagingRoot,
+    htmlFiles: [
+      ...publication.searchablePages,
+      "blog/index.html",
+      ...buildResult.generatedFiles
+    ],
+    outputPath: path.join(stagingRoot, "assets", "data", "search-index.json")
+  });
 
   fs.unlinkSync(manifestPath);
   compileTailwind(stagingRoot);
@@ -314,5 +340,6 @@ module.exports = {
   buildSite,
   compileTailwind,
   injectBigBangLoader,
+  injectSharedSiteTools,
   populateStagingDirectory
 };

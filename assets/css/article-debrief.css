@@ -115,7 +115,11 @@ body[data-universe-region="article"] #site-topbar {
 
 .article-region__actions button,
 .article-region__actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 2.75rem;
+  min-width: 2.75rem;
   padding: 0;
   border: 0;
   background: transparent;
@@ -126,6 +130,10 @@ body[data-universe-region="article"] #site-topbar {
   text-transform: uppercase;
   box-shadow: inset 0 -1px 0 var(--article-line);
   cursor: pointer;
+}
+
+.article-region__actions [hidden] {
+  display: none;
 }
 
 .article-region__actions button:hover,

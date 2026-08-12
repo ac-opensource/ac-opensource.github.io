@@ -1,11 +1,26 @@
 const fs = require("fs");
+const http = require("http");
 const path = require("path");
 const { chromium } = require("playwright");
 const publication = require("./site-publication.config");
 
 const ROOT = path.join(__dirname, "..");
-const BASE_URL = process.env.OPTIONS_BASE_URL || "http://127.0.0.1:4180";
+const DIST_ROOT = path.join(ROOT, "dist");
+let BASE_URL = process.env.OPTIONS_BASE_URL || "";
 const GALLERY_PATH = "/experiments/universe-options/index.html";
+const MIME_TYPES = {
+  ".css": "text/css; charset=utf-8",
+  ".html": "text/html; charset=utf-8",
+  ".jpg": "image/jpeg",
+  ".js": "text/javascript; charset=utf-8",
+  ".json": "application/json",
+  ".pdf": "application/pdf",
+  ".png": "image/png",
+  ".svg": "image/svg+xml; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
+  ".webp": "image/webp",
+  ".xml": "application/xml; charset=utf-8"
+};
 const REGIONS = [
   "dashboard",
   "work",
@@ -74,6 +89,45 @@ const REQUIRED_PRODUCTION_COPY = {
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function createStaticServer() {
+  return http.createServer((request, response) => {
+    if (!request.url || !["GET", "HEAD"].includes(request.method || "")) {
+      response.writeHead(405, { Allow: "GET, HEAD" });
+      response.end();
+      return;
+    }
+
+    let filePath;
+    try {
+      const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
+      const relativePath = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
+      const withIndex = relativePath.endsWith("/") ? `${relativePath}index.html` : relativePath;
+      filePath = path.resolve(DIST_ROOT, withIndex);
+      const distRelative = path.relative(DIST_ROOT, filePath);
+      if (distRelative.startsWith("..") || path.isAbsolute(distRelative)) filePath = null;
+    } catch (_error) {
+      response.writeHead(400);
+      response.end("Bad request");
+      return;
+    }
+
+    if (!filePath || !fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+      response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      response.end("Not found");
+      return;
+    }
+
+    const stat = fs.statSync(filePath);
+    response.writeHead(200, {
+      "Cache-Control": "no-store",
+      "Content-Length": stat.size,
+      "Content-Type": MIME_TYPES[path.extname(filePath).toLowerCase()] || "application/octet-stream"
+    });
+    if (request.method === "HEAD") response.end();
+    else fs.createReadStream(filePath).pipe(response);
+  });
 }
 
 function localPath(href) {
@@ -192,7 +246,7 @@ async function smokeNoJavaScript(browser, routes) {
 
 async function verifySpiralGalaxyArchive(browser) {
   const route = "/experiments/universe-options/logs/05-spiral-galaxy-archive.html";
-  const expectedPosts = JSON.parse(fs.readFileSync(path.join(ROOT, "blog", "posts.json"), "utf8")).length;
+  const expectedPosts = JSON.parse(fs.readFileSync(path.join(DIST_ROOT, "blog", "posts.json"), "utf8")).length;
   const viewports = [
     { label: "desktop", width: 1440, height: 1000, reducedMotion: "no-preference" },
     { label: "narrow-tablet", width: 732, height: 922, reducedMotion: "no-preference" },
@@ -314,6 +368,69 @@ async function verifySpiralGalaxyArchive(browser) {
     }));
     assert(restored.state === "archive" && restored.ejected === 0,
       `Spiral Galaxy did not restore the complete archive after clearing search at ${viewport.label}.`);
+    await context.close();
+  }
+}
+
+async function verifySpiralGalaxyOffscreenPause(browser) {
+  const route = "/experiments/universe-options/logs/05-spiral-galaxy-archive.html";
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 720 },
+    reducedMotion: "no-preference"
+  });
+  await context.addInitScript(() => {
+    window.__galaxyCanvasFrames = 0;
+    const clearRect = CanvasRenderingContext2D.prototype.clearRect;
+    CanvasRenderingContext2D.prototype.clearRect = function (...args) {
+      if (this.canvas?.id === "galaxy-sky") window.__galaxyCanvasFrames += 1;
+      return clearRect.apply(this, args);
+    };
+  });
+
+  const page = await context.newPage();
+  try {
+    await page.goto(`${BASE_URL}${route}`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForSelector('#galaxy-field[data-ready="true"]', { timeout: 15000 });
+    await page.waitForFunction(() => (
+      document.querySelector(".galaxy-hero")?.dataset.galaxyActivity === "running"
+        && window.__galaxyCanvasFrames >= 3
+    ));
+
+    const runningStart = await page.evaluate(() => window.__galaxyCanvasFrames);
+    await page.waitForTimeout(180);
+    const runningEnd = await page.evaluate(() => window.__galaxyCanvasFrames);
+    assert(runningEnd > runningStart,
+      `Spiral Galaxy canvas did not advance while onscreen (${runningStart} → ${runningEnd}).`);
+
+    await page.evaluate(() => {
+      const index = document.querySelector("#galaxy-index");
+      window.scrollTo(0, Math.min(
+        document.documentElement.scrollHeight - window.innerHeight,
+        index.offsetTop + 160
+      ));
+    });
+    await page.waitForFunction(() => {
+      const hero = document.querySelector(".galaxy-hero");
+      return hero.getBoundingClientRect().bottom <= 0 && hero.dataset.galaxyActivity === "paused";
+    });
+    const pausedStart = await page.evaluate(() => window.__galaxyCanvasFrames);
+    await page.waitForTimeout(260);
+    const pausedEnd = await page.evaluate(() => window.__galaxyCanvasFrames);
+    assert(pausedEnd === pausedStart,
+      `Spiral Galaxy canvas kept drawing while offscreen (${pausedStart} → ${pausedEnd}).`);
+
+    await page.evaluate(() => document.querySelector(".galaxy-hero").scrollIntoView({ block: "start" }));
+    await page.waitForFunction(() => {
+      const hero = document.querySelector(".galaxy-hero");
+      const bounds = hero.getBoundingClientRect();
+      return bounds.bottom > 0 && bounds.top < innerHeight && hero.dataset.galaxyActivity === "running";
+    });
+    const resumedStart = await page.evaluate(() => window.__galaxyCanvasFrames);
+    await page.waitForTimeout(180);
+    const resumedEnd = await page.evaluate(() => window.__galaxyCanvasFrames);
+    assert(resumedEnd > resumedStart,
+      `Spiral Galaxy canvas did not resume after re-entry (${resumedStart} → ${resumedEnd}).`);
+  } finally {
     await context.close();
   }
 }
@@ -469,18 +586,37 @@ function verifyPublicationBoundary() {
 }
 
 async function main() {
+  let server = null;
+  if (!BASE_URL) {
+    assert(fs.existsSync(DIST_ROOT), "dist is missing; run npm run build before the option contract.");
+    server = createStaticServer();
+    await new Promise((resolve, reject) => {
+      server.once("error", reject);
+      server.listen(0, "127.0.0.1", resolve);
+    });
+    const address = server.address();
+    assert(typeof address === "object" && address?.port, "Option contract server did not allocate a port.");
+    BASE_URL = `http://127.0.0.1:${address.port}`;
+  }
+
   const browser = await chromium.launch({ headless: true });
   try {
     const options = await discoverOptions(browser);
     const routes = await smokeRoutes(browser, options);
     await smokeNoJavaScript(browser, routes);
     await verifySpiralGalaxyArchive(browser);
+    await verifySpiralGalaxyOffscreenPause(browser);
     await verifyRound04PortfolioHierarchy(browser);
     await verifyPayloadFeedbackOptionalPrivate(browser);
     verifyPublicationBoundary();
     console.log(`Universe option contract passed: ${options.length} primary directions, ${routes.length} unique routes, desktop/mobile/reduced-motion/no-JS, exact archive publication boundary clean.`);
   } finally {
     await browser.close();
+    if (server) {
+      await new Promise((resolve, reject) => {
+        server.close((error) => (error ? reject(error) : resolve()));
+      });
+    }
   }
 }
 

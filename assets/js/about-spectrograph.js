@@ -47,9 +47,9 @@
     }
   ];
   const MATURITY_LABELS = {
-    shipped: "Shipped work / public project",
-    published: "Published evidence",
-    "self-described": "Explicit public self-description"
+    shipped: "Project or repository evidence",
+    published: "First-person published note",
+    "self-described": "First-person public self-description"
   };
   const TREE_LAYOUT = {
     "engineering:surfaces": {
@@ -167,6 +167,19 @@
       month: "short",
       day: "numeric"
     }).format(parsed);
+  }
+
+  function sourceEvidenceType(source) {
+    const url = String(source?.url || "");
+    if (/github\.com\/[^/]+\/[^/]+\/pull\/\d+/i.test(url)) {
+      return /\bmerged\b/i.test(String(source?.label || "")) ? "Merged contribution" : "Public contribution";
+    }
+    if (/github\.com\//i.test(url)) return "Public repository";
+    if (/play\.google\.com\/store\/apps|apps\.apple\.com\//i.test(url)) return "Public product listing";
+    if (/^\/blog\/case-study-/i.test(url)) return "First-person project note";
+    if (/^\/blog\//i.test(url)) return "First-person published note";
+    if (source?.kind === "self-described") return "First-person public profile";
+    return "Public portfolio page";
   }
 
   function normalizeProfile(data) {
@@ -302,7 +315,7 @@
     if (!source) return element("span", "stellar-spectrum__source-empty", `Missing source: ${ref}`);
     const link = element("a", "stellar-spectrum__source-link", source.label);
     link.href = source.url;
-    const details = [MATURITY_LABELS[source.kind] || source.kind, sourceDate(source)].filter(Boolean);
+    const details = [sourceEvidenceType(source), sourceDate(source)].filter(Boolean);
     if (details.length) link.setAttribute("aria-label", `${source.label}; ${details.join("; ")}`);
     return link;
   }
@@ -361,8 +374,9 @@
           const item = element("li");
           item.dataset.sourceRef = ref;
           item.append(sourceLink(ref));
-          const date = profile.evidence[ref] && sourceDate(profile.evidence[ref]);
-          if (date) item.append(document.createTextNode(` · ${date}`));
+          const source = profile.evidence[ref];
+          const details = source ? [sourceEvidenceType(source), sourceDate(source)].filter(Boolean) : [];
+          if (details.length) item.append(document.createTextNode(` · ${details.join(" · ")}`));
           list.append(item);
         });
         section.append(list);
@@ -757,7 +771,7 @@
         root.dataset.treeMotion = motionState;
       }
     }
-    idleRotationFrame = window.requestAnimationFrame(runIdleRotation);
+    idleRotationFrame = reducedMotion.matches ? 0 : window.requestAnimationFrame(runIdleRotation);
   }
 
   function startIdleRotation() {
@@ -765,6 +779,18 @@
     idleRotationTimestamp = 0;
     cameraInteractionUntil = window.performance.now() + 350;
     idleRotationFrame = window.requestAnimationFrame(runIdleRotation);
+  }
+
+  function syncIdleRotationMotion() {
+    if (!reducedMotion.matches) {
+      startIdleRotation();
+      return;
+    }
+    window.cancelAnimationFrame(idleRotationFrame);
+    idleRotationFrame = 0;
+    idleRotationTimestamp = 0;
+    root.dataset.treeMotion = "reduced";
+    drawTreeScene();
   }
 
   function syncTreeInteractionControl() {
@@ -1986,6 +2012,7 @@
       bindTreeInteractionControl();
       bindProjectionControls();
       bindReducedMotionZoom();
+      reducedMotion.addEventListener?.("change", syncIdleRotationMotion);
       bindCameraKeyboard();
       bindThemeControl();
       bindEscapeControl();

@@ -28,14 +28,15 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
   <link href="/assets/css/neural-background.css" rel="stylesheet"/>
-  <link href="/assets/css/work-portfolio.css?v=20260807-compact2" rel="stylesheet"/>
+  <link href="/assets/css/work-portfolio.css?v=20260812-brief3" rel="stylesheet"/>
   <link href="/assets/experiments/universe-options/work-round-05/supernova-portfolio.css?v=20260807-default1" rel="stylesheet"/>
   <link href="/assets/css/route-signal-handoff.css?v=20260806-t3" rel="stylesheet"/>
   <link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet"/>
-  <link href="/assets/css/universe-perspective-navigation.css?v=20260809-guide14" rel="stylesheet" data-universe-perspective-styles/>
-  <script src="/assets/js/universe-theme-transition.js?v=20260809-guide14"></script>
-  <script src="/assets/js/route-signal-handoff.js?v=20260806-t3" defer></script>
-  <script src="/assets/experiments/universe-options/work-round-05/supernova-portfolio.js?v=20260807-default1" defer></script>
+  <link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles/>
+  <script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
+  <script src="/assets/js/route-signal-handoff.js?v=20260812-motion1" defer></script>
+  <script src="/assets/experiments/universe-options/work-round-05/supernova-portfolio.js?v=20260812-motion1" defer></script>
+  <script src="/assets/js/work-briefing.js?v=20260812-brief3" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -52,8 +53,8 @@
       "@type": "ItemList",
       "numberOfItems": 16,
       "itemListElement": [
-        {"@type":"ListItem","position":1,"name":"Bitcoin.com Wallet","url":"https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&hl=en"},
-        {"@type":"ListItem","position":2,"name":"ITVX","url":"https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&hl=en"},
+        {"@type":"ListItem","position":1,"name":"Bitcoin.com Wallet","url":"https://ac-opensource.github.io/blog/case-study-bitcoin-wallet-multichain-android-systems.html"},
+        {"@type":"ListItem","position":2,"name":"ITVX","url":"https://ac-opensource.github.io/blog/case-study-itvx-playback-at-candyspace.html"},
         {"@type":"ListItem","position":3,"name":"OCBC Business","url":"https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html"},
         {"@type":"ListItem","position":4,"name":"openpay","url":"https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html"},
         {"@type":"ListItem","position":5,"name":"MySTC","url":"https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html"},
@@ -105,7 +106,7 @@
         <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
         <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
       </nav>
-      <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">[status: online]</div>
+      <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]" data-site-search-slot><a class="site-search-link" href="/search.html" data-site-search-link aria-label="Search published evidence" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></div>
     </div>
     <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]" aria-label="Mobile navigation">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
@@ -134,6 +135,7 @@
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
           <a class="work-button work-button--quiet" href="/resume.html">View résumé</a>
+          <a class="work-button work-button--quiet" href="#briefing" data-briefing-arrival>90-second briefing</a>
         </div>
       </div>
 
@@ -224,7 +226,7 @@
       </header>
 
       <div class="work-case-grid">
-        <article class="work-case work-case--bitcoin" data-portfolio-entry>
+        <article id="project-bitcoin-wallet" class="work-case work-case--bitcoin" data-portfolio-entry>
           <div class="work-case__body">
             <span class="work-eyebrow work-eyebrow--bitcoin">Crypto · Self-custody</span>
             <h3 class="work-case__title work-case__title--brand">Bitcoin.com Wallet</h3>
@@ -235,6 +237,10 @@
             </div>
             <p class="work-case__fact"><a href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">Google Play lists 10M+ downloads</a> for the production wallet.</p>
             <div class="work-case__actions">
+              <a class="work-text-link work-text-link--bitcoin" data-work-deep-dive href="/blog/case-study-bitcoin-wallet-multichain-android-systems.html">
+                Read the Bitcoin.com delivery dossier
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
               <a class="work-button work-button--bitcoin" href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">
                 View Bitcoin.com Wallet
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -251,7 +257,7 @@
           </figure>
         </article>
 
-        <article class="work-case work-case--itvx" data-portfolio-entry>
+        <article id="project-itvx" class="work-case work-case--itvx" data-portfolio-entry>
           <div class="work-case__body">
             <span class="work-eyebrow">Streaming</span>
             <p class="work-case__role">Candyspace · Android · Media player team</p>
@@ -262,6 +268,10 @@
               <span class="work-chip">Android</span><span class="work-chip">Playback UI</span><span class="work-chip">Scrubbing previews</span><span class="work-chip">Tablet</span><span class="work-chip">Reliability</span>
             </div>
             <div class="work-case__actions">
+              <a class="work-text-link" data-work-deep-dive href="/blog/case-study-itvx-playback-at-candyspace.html">
+                Read the ITVX delivery dossier
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
               <a class="work-text-link" href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en" target="_blank" rel="noreferrer">
                 View ITVX on Google Play
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -337,10 +347,114 @@
       </div>
     </section>
 
+    <section id="briefing" class="work-briefing work-section" data-work-briefing data-active-brief="android-leadership" aria-labelledby="briefing-title" tabindex="-1">
+      <header class="work-briefing__head">
+        <div>
+          <span class="work-eyebrow">[02 / 90-second briefing]</span>
+          <h2 id="briefing-title" tabindex="-1">Choose the lens that matches the role you&rsquo;re hiring for.</h2>
+        </div>
+        <div class="work-briefing__intro">
+          <p>Choose a lens for a concise, evidence-linked version of my portfolio. Each selection has its own URL for sharing with a hiring team.</p>
+          <span>About 90 seconds · four role lenses</span>
+        </div>
+      </header>
+
+      <nav class="work-briefing__presets" aria-label="Role-based briefing presets" data-brief-presets>
+        <a class="is-active" data-brief-preset="android-leadership" href="/work.html?brief=android-leadership#briefing" aria-current="true">
+          <span>01</span><strong>Android leadership</strong><small>Lead and stay hands-on</small>
+        </a>
+        <a data-brief-preset="cross-platform-systems" href="/work.html?brief=cross-platform-systems#briefing">
+          <span>02</span><strong>Cross-platform systems</strong><small>Follow the whole delivery path</small>
+        </a>
+        <a data-brief-preset="fintech-reliability" href="/work.html?brief=fintech-reliability#briefing">
+          <span>03</span><strong>Fintech reliability</strong><small>Make critical state explicit</small>
+        </a>
+        <a data-brief-preset="agent-first-delivery" href="/work.html?brief=agent-first-delivery#briefing">
+          <span>04</span><strong>Agent-first delivery</strong><small>Move faster with receipts</small>
+        </a>
+      </nav>
+
+      <div class="work-briefing__panels">
+        <article id="brief-android-leadership" class="work-briefing__panel is-active" data-brief-panel="android-leadership" aria-labelledby="brief-android-leadership-title">
+          <header>
+            <span>[android leadership]</span>
+            <h3 id="brief-android-leadership-title">Direction from someone who still works the difficult path.</h3>
+            <p>I combine deep Android delivery with the planning, review, and release judgment needed to keep experienced teams moving together.</p>
+          </header>
+          <div class="work-briefing__beats">
+            <div><span>01 · Lead</span><h4>Set boundaries, then unblock.</h4><p>I led five senior Android engineers on MySTC, split parallel work, reviewed architecture, and stayed hands-on with performance, data sync, and release integration.</p></div>
+            <div><span>02 · Build</span><h4>Own complex Android systems.</h4><p>At Bitcoin.com I deliver across multichain wallet state, transactions, shared Rust, startup behavior, and releases—not only presentation code.</p></div>
+            <div><span>03 · Verify</span><h4>Separate every evidence level.</h4><p>I distinguish source correctness, tests, runtime behavior, service state, and the released artifact so the team knows what is actually proven.</p></div>
+          </div>
+          <footer>
+            <a class="work-text-link" href="/blog/case-study-bitcoin-wallet-multichain-android-systems.html">Read the flagship Android dossier <span aria-hidden="true">↗</span></a>
+            <a class="work-text-link" href="/blog/case-study-mystc-scale-and-reliability.html">See the team-lead example <span aria-hidden="true">↗</span></a>
+          </footer>
+        </article>
+
+        <article id="brief-cross-platform-systems" class="work-briefing__panel" data-brief-panel="cross-platform-systems" aria-labelledby="brief-cross-platform-systems-title">
+          <header>
+            <span>[cross-platform systems]</span>
+            <h3 id="brief-cross-platform-systems-title">Trace the product past the first client symptom.</h3>
+            <p>My deepest platform is Android, but I work across iOS, backend contracts, shared native code, and the release order connecting them.</p>
+          </header>
+          <div class="work-briefing__beats">
+            <div><span>01 · Follow</span><h4>Keep one user journey coherent.</h4><p>At OWTO I worked across Kotlin, Swift, Node.js, Postgres, GPS, payments, and booking APIs, planning client and backend changes as one delivery.</p></div>
+            <div><span>02 · Share</span><h4>Put common behavior in the right core.</h4><p>At Bitcoin.com I moved selected services into Rust through UniFFI while keeping lifecycle, interface state, and platform integrations native.</p></div>
+            <div><span>03 · Sequence</span><h4>Release dependencies deliberately.</h4><p>I check which contract, client, migration, or service must land first instead of asking each platform to guess around an unavailable state.</p></div>
+          </div>
+          <footer>
+            <a class="work-text-link" href="/blog/case-study-owto-ride-hailing-platform.html">Read the Android, iOS, and backend dossier <span aria-hidden="true">↗</span></a>
+            <a class="work-text-link" href="/blog/2026-04-07-one-rust-core-across-android-and-ios.html">Read the shared Rust deep dive <span aria-hidden="true">↗</span></a>
+          </footer>
+        </article>
+
+        <article id="brief-fintech-reliability" class="work-briefing__panel" data-brief-panel="fintech-reliability" aria-labelledby="brief-fintech-reliability-title">
+          <header>
+            <span>[fintech reliability]</span>
+            <h3 id="brief-fintech-reliability-title">Make money-facing state precise, recoverable, and honest.</h3>
+            <p>My fintech work spans self-custody transactions, business banking, identity integration, BNPL checkout, and partner-dependent payment state.</p>
+          </header>
+          <div class="work-briefing__beats">
+            <div><span>01 · Model</span><h4>Preserve identity and precision.</h4><p>Multichain assets, wallet migration, price inputs, and transaction replacement require explicit network and ownership context from service to screen.</p></div>
+            <div><span>02 · Integrate</span><h4>Respect lifecycle and partner edges.</h4><p>On OCBC Business I worked through identity SDK callbacks and concurrent account state; on openpay I hardened delayed and unexpected checkout responses.</p></div>
+            <div><span>03 · Communicate</span><h4>Never invent certainty.</h4><p>Loading, failure, migration, and network-confirmation states should say what happened and what can happen next without implying completion too early.</p></div>
+          </div>
+          <footer>
+            <a class="work-text-link" href="/blog/case-study-bitcoin-wallet-multichain-android-systems.html">Read the self-custody dossier <span aria-hidden="true">↗</span></a>
+            <a class="work-text-link" href="/blog/case-study-ocbc-banking-experience.html">Read the banking dossier <span aria-hidden="true">↗</span></a>
+          </footer>
+        </article>
+
+        <article id="brief-agent-first-delivery" class="work-briefing__panel" data-brief-panel="agent-first-delivery" aria-labelledby="brief-agent-first-delivery-title">
+          <header>
+            <span>[agent-first delivery]</span>
+            <h3 id="brief-agent-first-delivery-title">Use agents for leverage, and human judgment for the boundary.</h3>
+            <p>I use coding agents and automation to investigate, implement, and verify faster while keeping scope, evidence, and publication decisions explicit.</p>
+          </header>
+          <div class="work-briefing__beats">
+            <div><span>01 · Ground</span><h4>Start from the actual system.</h4><p>I give agents repository context, constraints, and evidence targets, then re-check their proposal against existing behavior and project conventions.</p></div>
+            <div><span>02 · Parallelize</span><h4>Split bounded work, not accountability.</h4><p>I use agents for independent research and verification lanes while retaining one human-owned integration path and a narrow publish scope.</p></div>
+            <div><span>03 · Prove</span><h4>Leave receipts a reviewer can follow.</h4><p>Build output, tests, runtime observations, screenshots, and accepted gaps remain distinct so speed does not turn into unearned confidence.</p></div>
+          </div>
+          <footer>
+            <a class="work-text-link" href="/blog/2026-04-30-agents-that-leave-receipts.html">Read Agents That Leave Receipts <span aria-hidden="true">↗</span></a>
+            <a class="work-text-link" href="#public-builds">Inspect the public builds <span aria-hidden="true">↓</span></a>
+          </footer>
+        </article>
+      </div>
+
+      <div class="work-briefing__share" data-brief-share hidden>
+        <button type="button" data-brief-copy>Copy this briefing link</button>
+        <span data-brief-status role="status" aria-live="polite">Android leadership briefing selected.</span>
+      </div>
+      <noscript><p class="work-briefing__noscript">JavaScript is off, so all four briefings are shown. Each evidence link still works.</p></noscript>
+    </section>
+
     <section id="more-work" class="work-section" aria-labelledby="archive-title">
       <header class="work-section__head">
         <div>
-          <span class="work-eyebrow">[02 / archive]</span>
+          <span class="work-eyebrow">[03 / archive]</span>
           <h2 id="archive-title">Other apps and platforms.</h2>
         </div>
         <p>I’ve also worked on payments, transport, rewards, safety, food delivery, network data, campus identity, and travel.</p>
@@ -418,7 +532,7 @@
     <section id="public-builds" class="work-section" aria-labelledby="public-title">
       <header class="work-section__head">
         <div>
-          <span class="work-eyebrow">[03 / public]</span>
+          <span class="work-eyebrow">[04 / public]</span>
           <h2 id="public-title">Recent work you can open.</h2>
         </div>
         <p>These are public repositories, so you can read the code and tests yourself.</p>

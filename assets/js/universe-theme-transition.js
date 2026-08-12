@@ -7,7 +7,7 @@
   const MAX_ARRIVAL_AGE = 8000;
   const FALLBACK_DEPARTURE_MS = 760;
   const ARRIVAL_MS = 1550;
-  const STYLE_HREF = "/assets/css/universe-perspective-navigation.css?v=20260809-guide14";
+  const STYLE_HREF = "/assets/css/universe-perspective-navigation.css?v=20260812-discovery1";
   const timers = new Set();
   let transitionInFlight = false;
   let activeViewTransition = null;
@@ -25,7 +25,12 @@
     contact: Object.freeze({ key: "contact", label: "Contact", mapId: "contact", x: 59, y: 88, depth: 4, magnification: 1.8 }),
     resume: Object.freeze({ key: "resume", label: "Resume", mapId: "work", x: 52, y: 20, depth: 6.2, magnification: 4.4 }),
     signals: Object.freeze({ key: "signals", label: "Signals", mapId: "contact", x: 66, y: 82, depth: 6.9, magnification: 3.6 }),
+    search: Object.freeze({ key: "search", label: "Evidence search", mapId: "threads", x: 80, y: 52, depth: 5.4, magnification: 3.8 }),
   });
+
+  function motionIsReduced() {
+    return reducedMotion.matches;
+  }
 
   function schedule(callback, delay) {
     const timer = window.setTimeout(() => {
@@ -86,6 +91,7 @@
     if (path === "/contact.html") return DESTINATIONS.contact;
     if (path === "/resume.html") return DESTINATIONS.resume;
     if (path === "/signals.html") return DESTINATIONS.signals;
+    if (path === "/search.html") return DESTINATIONS.search;
     return null;
   }
 
@@ -439,7 +445,7 @@
     root.dataset.universeMotion = "depart";
     announceDeparture(travel);
 
-    if (reducedMotion.matches) {
+    if (motionIsReduced()) {
       clearTravelState({ generation });
       return;
     }
@@ -477,7 +483,7 @@
   root.dataset.universePerspective = "ready";
 
   const arrival = takeArrival();
-  if (arrival && !reducedMotion.matches) {
+  if (arrival && !motionIsReduced()) {
     arrivalGeneration = ++travelGeneration;
     transitionInFlight = true;
     applyTravel(arrival);
@@ -493,7 +499,7 @@
   });
 
   window.addEventListener("pagereveal", (event) => {
-    if (!arrival || reducedMotion.matches) return;
+    if (!arrival || motionIsReduced()) return;
     if (!event.viewTransition) {
       schedule(() => clearTravelState({ generation: arrivalGeneration }), (arrival.duration || ARRIVAL_MS) + 120);
       return;
@@ -532,6 +538,14 @@
   window.addEventListener("pageshow", (event) => {
     if (event.persisted) clearTravelState({ keepLast: false });
   });
+
+  function settleForMotionPreference() {
+    if (!motionIsReduced()) return;
+    skipActiveTransition();
+    clearTravelState({ keepLast: false });
+  }
+
+  reducedMotion.addEventListener?.("change", settleForMotionPreference);
 
   window.UniversePerspective = Object.freeze({
     snapshot() {

@@ -1,0 +1,333 @@
+:root {
+  color-scheme: light;
+  --paper: #faf9f4;
+  --paper-deep: #f1f3ee;
+  --ink: #292f29;
+  --muted: #626a67;
+  --faint: #58615d;
+  --line: rgba(77, 101, 94, 0.25);
+  --blue: #2864c7;
+  --blue-soft: rgba(40, 100, 199, 0.12);
+  --display: "Space Grotesk", system-ui, sans-serif;
+  --sans: "Manrope", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow-x: clip;
+  background:
+    linear-gradient(rgba(77, 101, 94, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77, 101, 94, 0.055) 1px, transparent 1px),
+    radial-gradient(circle at 74% 42%, var(--blue-soft), transparent 28rem),
+    var(--paper);
+  background-size: 4.5rem 4.5rem, 4.5rem 4.5rem, auto, auto;
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+button,
+input { font: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 4px;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 20;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--ink);
+  color: #fff;
+  font: 700 0.68rem/1 var(--display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateY(-180%);
+}
+
+.skip-link:focus { transform: none; }
+
+.site-header,
+.site-footer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem clamp(1rem, 4vw, 4rem);
+  border-color: var(--line);
+  font-family: var(--display);
+  text-transform: uppercase;
+}
+
+.site-header {
+  min-height: 4.35rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(250, 249, 244, 0.84);
+  backdrop-filter: blur(18px);
+}
+
+.site-header__brand {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  text-decoration: none;
+}
+
+.site-header__status,
+.site-footer {
+  color: var(--faint);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.site-footer {
+  justify-content: center;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  background: rgba(241, 243, 238, 0.72);
+}
+
+.site-footer a { text-underline-offset: 0.2rem; }
+
+.lost-signal {
+  position: relative;
+  display: grid;
+  min-height: min(52rem, calc(100svh - 8.5rem));
+  place-items: center;
+  isolation: isolate;
+  padding: clamp(3.5rem, 8vw, 7.5rem) clamp(1.1rem, 5vw, 5rem);
+  overflow: hidden;
+}
+
+.lost-signal__sky {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 73%;
+  width: min(57vw, 49rem);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotate(-12deg);
+}
+
+.lost-signal__sky::before {
+  position: absolute;
+  inset: -20%;
+  opacity: 0.52;
+  background-image:
+    radial-gradient(circle at 12% 18%, var(--blue) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 34% 77%, var(--muted) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 68% 8%, var(--blue) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 91% 57%, var(--muted) 0 1px, transparent 1.5px);
+  background-size: 9rem 11rem, 13rem 14rem, 17rem 15rem, 19rem 21rem;
+  content: "";
+}
+
+.lost-signal__orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.lost-signal__orbit--outer { width: 92%; height: 42%; }
+.lost-signal__orbit--inner { width: 61%; height: 26%; }
+
+.lost-signal__probe {
+  position: absolute;
+  top: 31%;
+  right: 12%;
+  width: 0.72rem;
+  aspect-ratio: 1;
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 0.35rem rgba(40, 100, 199, 0.13), 0 0 2rem rgba(40, 100, 199, 0.46);
+  animation: probe-drift 7s ease-in-out infinite;
+}
+
+.lost-signal__pulse {
+  position: absolute;
+  top: 31%;
+  right: 12%;
+  width: 0.72rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--blue);
+  border-radius: 50%;
+  animation: signal-pulse 2.8s ease-out infinite;
+}
+
+.lost-signal__message {
+  width: min(72rem, 100%);
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--blue);
+  font: 600 0.66rem/1.2 var(--display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.lost-signal h1 {
+  max-width: 8ch;
+  margin: 0;
+  font: 500 clamp(4.1rem, 11vw, 9rem)/0.82 var(--display);
+  letter-spacing: -0.08em;
+}
+
+.lost-signal h1 em {
+  color: var(--blue);
+  font-style: normal;
+  font-weight: 400;
+}
+
+.lost-signal__lede {
+  max-width: 38rem;
+  margin: clamp(1.7rem, 4vw, 2.75rem) 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: clamp(0.92rem, 1.5vw, 1.08rem);
+  line-height: 1.75;
+}
+
+.lost-signal__search {
+  max-width: 38rem;
+  margin-top: 2rem;
+}
+
+.lost-signal__search label {
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--muted);
+  font: 600 0.58rem/1 var(--display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lost-signal__search div {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+}
+
+.lost-signal__search input {
+  min-width: 0;
+  flex: 1;
+  padding: 0.9rem 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+}
+
+.lost-signal__search input::placeholder { color: var(--faint); }
+
+.lost-signal__search button {
+  padding: 0 0 0 1rem;
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  cursor: pointer;
+  font: 600 0.58rem/1 var(--display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lost-signal__routes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 58rem;
+  margin-top: clamp(2.5rem, 6vw, 4.5rem);
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.lost-signal__routes a {
+  display: grid;
+  min-height: 7.5rem;
+  align-content: space-between;
+  gap: 0.55rem;
+  padding: 1rem;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: rgba(250, 249, 244, 0.68);
+  text-decoration: none;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.lost-signal__routes a:hover,
+.lost-signal__routes a:focus-visible {
+  background: var(--blue);
+  color: #fff;
+}
+
+.lost-signal__routes span,
+.lost-signal__routes small {
+  color: var(--faint);
+  font: 600 0.52rem/1.35 var(--display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lost-signal__routes a:hover :is(span, small),
+.lost-signal__routes a:focus-visible :is(span, small) { color: #fff; }
+
+.lost-signal__routes strong {
+  font: 500 clamp(1rem, 1.5vw, 1.25rem)/1.1 var(--display);
+}
+
+@keyframes probe-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-0.45rem, 0.3rem, 0); }
+}
+
+@keyframes signal-pulse {
+  0% { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0; transform: scale(7); }
+}
+
+@media (max-width: 760px) {
+  .site-header__status { font-size: 0.5rem; }
+  .lost-signal { align-items: start; padding-top: 5rem; }
+  .lost-signal__sky { top: 30%; left: 78%; width: 34rem; opacity: 0.58; }
+  .lost-signal__routes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lost-signal__routes a { min-height: 6.8rem; }
+}
+
+@media (max-width: 430px) {
+  .site-header { align-items: flex-start; }
+  .site-header__brand { max-width: 10rem; }
+  .lost-signal__search div { display: grid; }
+  .lost-signal__search button { min-height: 2.8rem; padding: 0; text-align: left; }
+  .lost-signal__routes { grid-template-columns: 1fr; }
+  .lost-signal__routes a { min-height: 5.7rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}

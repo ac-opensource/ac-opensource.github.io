@@ -6,6 +6,77 @@ const {
 
 const POSTS = [
   {
+    slug: "case-study-bitcoin-wallet-multichain-android-systems",
+    title: "Bitcoin.com Wallet: Shipping Multichain Android Systems",
+    published_date: "2026-08-12",
+    reading_time: "5 min read",
+    category: "work",
+    topics: ["Bitcoin.com Wallet", "Android", "Fintech", "Multichain", "Rust"],
+    summary:
+      "A public-safe account of my Android work across multichain rewards, transaction replacement, wallet migration, swaps, shared Rust, startup performance, and release reliability.",
+    hero_image: "/assets/images/work/img_bitcoin_wallet_1.webp",
+    hero_alt: "Bitcoin.com Wallet Android multichain portfolio screen",
+    hero_caption: "Official Bitcoin.com Wallet Android app screen from Google Play",
+    body_html: `
+      <h2>The delivery boundary was bigger than one screen</h2>
+      <p>At Bitcoin.com, I work on the Android wallet while following features through shared code, service contracts, local state, observability, and release behavior. The product is a self-custody wallet, so a polished interface is only the visible end of a chain of decisions about assets, networks, signing, precision, migration, and failure recovery.</p>
+      <p>My work has included the first end-to-end Android implementation of a multichain rewards platform, reward-backed crypto market predictions, Bitcoin replace-by-fee, an in-app move from single-chain to multichain wallets, staking and liquidity-reward pool modernization, provider-aware swaps, recurring-buy reminders, shared Rust services through UniFFI, startup profiling, and Android release hardening.</p>
+
+      <h2>Rewards had to preserve wallet context</h2>
+      <p>I led the Android delivery of a server-driven rewards experience that crossed quests, wallet linking, multiple networks, asset balances, and claim results. The hard part was not drawing a list of activities. It was preserving enough wallet and network context for each step to remain correct when a user changed accounts, returned from another flow, or received a delayed result.</p>
+      <p>I kept server-owned campaign content separate from wallet-owned state and made result handling explicit rather than optimistic. That same discipline carried into crypto market predictions, where reward eligibility and price inputs had to remain precise and explainable across the user journey.</p>
+
+      <h2>Transaction tools needed narrow guardrails</h2>
+      <p>I co-built Bitcoin replace-by-fee on Android. A replacement transaction is useful when an earlier Bitcoin transaction is taking too long, but it cannot be treated like an ordinary resend. The app has to identify an eligible transaction, preserve the correct spend context, communicate the fee change, and surface the resulting transaction without implying a guarantee about network confirmation.</p>
+      <p>I also led the Android path that moved eligible users from single-chain wallets into a multichain model. Migration work is product work and data work at the same time: existing users need continuity, new identifiers need to map to the right assets and networks, and interruption must not leave the interface claiming more progress than the underlying state can support.</p>
+
+      <h2>Shared code still required platform judgment</h2>
+      <p>I moved selected services into a shared Rust core exposed to mobile through UniFFI. The goal was to share behavior that genuinely belonged in one core while keeping lifecycle, presentation, and platform integration native. I worked across that boundary rather than assuming a shared implementation automatically removed Android-specific risk.</p>
+      <p>The same principle guided provider-aware swaps, staking and liquidity-reward pool reads, buy and sell paths, and recurring-buy reminders: represent the domain once where that was safe, then keep user-facing state and recovery explicit on Android.</p>
+
+      <h2>Verification extended to startup and release behavior</h2>
+      <p>I profiled startup, traced regressions across module and dependency boundaries, and worked on release hardening when a change was correct in source but fragile in the assembled app. For transaction and balance-facing work, I separated compilation, automated checks, runtime behavior, service responses, and release evidence instead of treating one green signal as proof of all five.</p>
+      <p>The outcome is not one isolated feature. It is a body of Android work that connects self-custody product decisions to multichain data, shared systems, and the release path users actually receive.</p>
+
+      <h2>Public evidence and confidentiality boundary</h2>
+      <p><a href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en">The public Google Play listing</a> identifies the production Bitcoin.com Wallet and lists more than ten million downloads. This case study describes my responsibilities and shipped product areas at a public-safe level. It intentionally omits private repository references, internal service names and addresses, account data, ticket identifiers, and unverified impact metrics.</p>
+    `
+  },
+  {
+    slug: "case-study-itvx-playback-at-candyspace",
+    title: "ITVX at Candyspace: Playback Features Under Live Constraints",
+    published_date: "2026-08-11",
+    reading_time: "4 min read",
+    category: "work",
+    topics: ["Candyspace", "ITVX", "Android", "Streaming", "Media Playback"],
+    summary:
+      "How I delivered ITVX Android player features at Candyspace across recommendations, timeline previews, phone and tablet motion, reliability, security, and XML parsing.",
+    hero_image: "/assets/images/work/img_itvx_live.webp",
+    hero_alt: "ITVX Android app live streaming screen",
+    hero_caption: "Official ITVX Android app screen from Google Play",
+    body_html: `
+      <h2>Candyspace was the employer; ITVX was the project</h2>
+      <p>I worked at Candyspace on the Android media player for ITVX. That hierarchy matters: Candyspace was my employer, and ITVX was the streaming project where I delivered the player work described here.</p>
+      <p>A video player concentrates product state into a small area. Playback, controls, recommendations, focus, device orientation, errors, and entitlement or security behavior can all change what appears over the same frame. A feature that looks like one panel therefore has to cooperate with the rest of the player rather than simply sit on top of it.</p>
+
+      <h2>Recommendations had to move with the player</h2>
+      <p>I built an in-player recommendations panel shown during playback. Opening it changed the usable space, so I coordinated the panel animation with movement in existing controls and buttons instead of allowing layers to collide. I accounted for both phone and tablet layouts, where the same transition had different spatial constraints.</p>
+      <p>The implementation treated the panel as another player state. Entering and leaving it had to preserve a coherent control hierarchy, and repeated transitions had to return elements to the correct position rather than accumulate visual drift.</p>
+
+      <h2>Timeline previews needed playback-aware state</h2>
+      <p>I independently delivered preview timeline scrubbing with a visual landing preview. The interaction linked a user’s touch position, the candidate playback time, the preview image, and the final seek target. Those values change quickly while a finger moves, so the visible preview needed to remain attached to the latest intent without making the player itself feel unstable.</p>
+      <p>I worked through the full interaction rather than treating the preview as a decorative thumbnail: entry into scrubbing, movement, release, cancellation, and the return to normal controls all mattered.</p>
+
+      <h2>Reliability work removed older player friction</h2>
+      <p>Alongside feature delivery, I resolved long-standing player issues, strengthened error tracking, contributed security fixes, and migrated XML handling from Simple XML to Jackson. The parsing change reduced reliance on an older path, but it still had to preserve the response shapes and failure behavior the player expected.</p>
+      <p>Error tracking was most useful when it carried enough context to distinguish a playback failure from a UI transition or data-parsing problem. I used that evidence to narrow fixes while preserving established player behavior outside the affected path.</p>
+
+      <h2>How I verified the work</h2>
+      <p>I checked the player as a stateful system: phone and tablet layouts, opening and closing transitions, control movement, timeline interaction, cancellation, error paths, and the handoff back to normal playback. That was more representative than verifying each view in isolation.</p>
+      <p><a href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en">The public Google Play listing</a> identifies the ITVX Android product. This public-safe case study limits itself to my role and product-level delivery. It omits private source references, ticket identifiers, security details, internal service information, and unsupported outcome metrics.</p>
+    `
+  },
+  {
     slug: "case-study-mystc-scale-and-reliability",
     title: "MySTC: Leading a Five-Person Android Team",
     published_date: "2025-02-05",

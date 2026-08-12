@@ -3,6 +3,8 @@ const crypto = require("crypto");
 const os = require("os");
 const path = require("path");
 const {
+  LLMS_SECTIONS,
+  PERSON_ID,
   articleMode,
   buildStaticBlog,
   decorateArticleBody,
@@ -11,12 +13,79 @@ const {
 const { injectBigBangLoader } = require("./build-site");
 const { DEFAULT_DB_PATH, openDatabase } = require("./lib/blog-db");
 
+const SITE_ORIGIN = "https://ac-opensource.github.io";
+
+function jsonLdOfType(html, type, label) {
+  const documents = [...String(html).matchAll(
+    /<script\b[^>]*\btype=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
+  )].map((match) => {
+    try {
+      return JSON.parse(match[1]);
+    } catch (error) {
+      throw new Error(`${label}: invalid JSON-LD: ${error.message}`);
+    }
+  });
+  const matches = documents
+    .flatMap((document) => Array.isArray(document?.["@graph"]) ? document["@graph"] : [document])
+    .filter((node) => node?.["@type"] === type);
+  if (matches.length !== 1) {
+    throw new Error(`${label}: expected exactly one ${type} JSON-LD node, found ${matches.length}.`);
+  }
+  return matches[0];
+}
+
+function llmsSectionUrls(llms, section) {
+  const startIndex = llms.indexOf(section.start);
+  const endIndex = llms.indexOf(section.end);
+  if (
+    startIndex < 0 ||
+    endIndex < startIndex ||
+    llms.lastIndexOf(section.start) !== startIndex ||
+    llms.lastIndexOf(section.end) !== endIndex
+  ) {
+    throw new Error(`llms.txt must contain exactly one ordered ${section.category} generated section.`);
+  }
+  const body = llms.slice(startIndex + section.start.length, endIndex);
+  return [...body.matchAll(/^\s*-\s+\[[^\n]*?\]\(([^)\s]+)\)/gm)]
+    .map((match) => match[1]);
+}
+
+function expectedLlmsUrls(posts, category) {
+  return posts
+    .filter(
+      (post) =>
+        post.status === "published" &&
+        String(post.category || "").trim().toLowerCase() === category
+    )
+    .map((post) => `${SITE_ORIGIN}/blog/${encodeURIComponent(post.slug)}.html`);
+}
+
+function assertLlmsMatchesPosts(llms, posts, excludedSlugs = []) {
+  for (const section of LLMS_SECTIONS) {
+    const actual = llmsSectionUrls(llms, section);
+    const expected = expectedLlmsUrls(posts, section.category);
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+      throw new Error(
+        `llms.txt ${section.category} URLs do not exactly match published database order: ` +
+        `expected ${JSON.stringify(expected)}, found ${JSON.stringify(actual)}.`
+      );
+    }
+    if (new Set(actual).size !== actual.length) {
+      throw new Error(`llms.txt ${section.category} section contains duplicate article URLs.`);
+    }
+  }
+  for (const slug of excludedSlugs) {
+    const url = `${SITE_ORIGIN}/blog/${encodeURIComponent(slug)}.html`;
+    if (llms.includes(url)) throw new Error(`llms.txt exposed non-published post ${slug}.`);
+  }
+}
+
 function main() {
   const loaderFixture = "<!doctype html><html><head><title>Fixture</title></head><body>Ready</body></html>";
   const loaderEnhanced = injectBigBangLoader(loaderFixture, "work.html");
   if (!loaderEnhanced.includes('data-big-bang-bootstrap')
-    || !loaderEnhanced.includes('/assets/css/big-bang-loader.css?v=20260809-integrated1')
-    || !loaderEnhanced.includes('/assets/js/big-bang-loader.js?v=20260809-integrated1')
+    || !loaderEnhanced.includes('/assets/css/big-bang-loader.css?v=20260812-motion1')
+    || !loaderEnhanced.includes('/assets/js/big-bang-loader.js?v=20260812-motion1')
     || !loaderEnhanced.includes('root.dataset.bigBang="pending"')
     || !loaderEnhanced.includes('root.dataset.universePerspectiveTo==="work"')
     || !loaderEnhanced.includes('sessionStorage.getItem("ac.bigBangPortfolioPlayed.v1")')
@@ -52,10 +121,32 @@ function main() {
   );
 
   try {
+    const { db: expectationDb } = openDatabase(databasePath, { readonly: true });
+    let expectedPublishedRows;
+    let hiddenSlugs;
+    try {
+      expectedPublishedRows = expectationDb
+        .prepare("SELECT slug, category FROM posts WHERE status = 'published' ORDER BY published_date DESC, slug ASC")
+        .all();
+      hiddenSlugs = expectationDb
+        .prepare("SELECT slug FROM posts WHERE status <> 'published' ORDER BY slug ASC")
+        .all()
+        .map((row) => row.slug);
+    } finally {
+      expectationDb.close();
+    }
+
     const databaseDigestBeforeBuild = crypto.createHash("sha256").update(fs.readFileSync(databasePath)).digest("hex");
     const initial = buildStaticBlog({ dbPath: databasePath, outputRoot });
     if (!initial.posts.length) throw new Error("Expected at least one published post in the fixture database.");
-    if (initial.posts.length !== 26) throw new Error(`Expected all 26 published posts, found ${initial.posts.length}.`);
+    if (initial.posts.length !== expectedPublishedRows.length) {
+      throw new Error(`Expected all ${expectedPublishedRows.length} published posts, found ${initial.posts.length}.`);
+    }
+    const expectedPublishedSlugs = expectedPublishedRows.map((row) => row.slug);
+    const builtPublishedSlugs = initial.posts.map((post) => post.slug);
+    if (JSON.stringify(builtPublishedSlugs) !== JSON.stringify(expectedPublishedSlugs)) {
+      throw new Error("The static build did not preserve the exact published database order.");
+    }
     const initialIndex = fs.readFileSync(path.join(outputRoot, "blog", "index.html"), "utf8");
     if (!initialIndex.includes(initial.posts[0].title) || initialIndex.includes("Stale fallback")) {
       throw new Error("The no-JavaScript blog fallback was not rebuilt from published posts.");
@@ -63,25 +154,35 @@ function main() {
     if ((initialIndex.match(/class="galaxy-entry(?: has-media)?"/g) || []).length !== initial.posts.length) {
       throw new Error("The no-JavaScript Logs route did not preserve every published transmission.");
     }
+    const initialLlms = fs.readFileSync(path.join(outputRoot, "llms.txt"), "utf8");
+    assertLlmsMatchesPosts(initialLlms, initial.posts, hiddenSlugs);
 
     const firstPostPage = fs.readFileSync(
       path.join(outputRoot, "blog", `${initial.posts[0].slug}.html`),
       "utf8"
     );
+    if (!firstPostPage.includes('id="share-post-button" type="button" hidden')
+      || !firstPostPage.includes('id="bookmark-post-button" type="button" hidden')) {
+      throw new Error("Generated articles must hide JavaScript-only actions until their handlers initialize.");
+    }
     if (firstPostPage.includes("hero-overlay-alpha") || firstPostPage.includes("overlayAlphaPulse")) {
       throw new Error("Article hero images must render without a show/hide animation.");
     }
-    if (!firstPostPage.includes('/assets/css/article-debrief.css?v=20260807-regions2')
+    if (!firstPostPage.includes('/assets/css/article-debrief.css?v=20260812-actions2')
       || !firstPostPage.includes('/assets/js/article-debrief.js?v=20260807-regions1')
       || !firstPostPage.includes('/assets/css/universe-field-map.css?v=20260809-guide9')
-      || !firstPostPage.includes('/assets/css/universe-perspective-navigation.css?v=20260809-guide14')
-      || !firstPostPage.includes('/assets/js/universe-theme-transition.js?v=20260809-guide14')
+      || !firstPostPage.includes('/assets/css/universe-perspective-navigation.css?v=20260812-discovery1')
+      || !firstPostPage.includes('/assets/js/universe-theme-transition.js?v=20260812-discovery1')
       || !firstPostPage.includes('/assets/js/universe-field-map.js?v=20260809-guide9')) {
       throw new Error("Generated articles are missing their region and shared navigation assets.");
     }
 
     for (const post of initial.posts) {
       const postPage = fs.readFileSync(path.join(outputRoot, "blog", `${post.slug}.html`), "utf8");
+      const blogPosting = jsonLdOfType(postPage, "BlogPosting", post.slug);
+      if (blogPosting.author?.["@id"] !== PERSON_ID || blogPosting.publisher?.["@id"] !== PERSON_ID) {
+        throw new Error(`${post.slug}: BlogPosting author and publisher must reference ${PERSON_ID}.`);
+      }
       const sourceHeadingCount = (post.body_html.match(/<h[23]\b/gi) || []).length;
       const sourceFigureCount = (post.body_html.match(/<figure\b/gi) || []).length;
       const decoratedHeadingCount = (postPage.match(/data-debrief-heading/g) || []).length;
@@ -171,6 +272,12 @@ function main() {
       throw new Error("The openpay project note did not use the edge-to-edge hero presentation.");
     }
 
+    buildStaticBlog({ dbPath: databasePath, outputRoot });
+    const repeatedLlms = fs.readFileSync(path.join(outputRoot, "llms.txt"), "utf8");
+    if (repeatedLlms !== initialLlms) {
+      throw new Error("Generating llms.txt twice from unchanged published rows was not deterministic.");
+    }
+
     const removedSlug = initial.posts[0].slug;
     const removedPage = path.join(outputRoot, "blog", `${removedSlug}.html`);
     const manualPage = path.join(outputRoot, "blog", "manual-page.html");
@@ -197,6 +304,8 @@ function main() {
     if (rebuiltIndex.includes(initial.posts[0].title) || !rebuiltIndex.includes(rebuilt.posts[0].title)) {
       throw new Error("The no-JavaScript blog fallback did not follow the latest published rows.");
     }
+    const rebuiltLlms = fs.readFileSync(path.join(outputRoot, "llms.txt"), "utf8");
+    assertLlmsMatchesPosts(rebuiltLlms, rebuilt.posts, [...hiddenSlugs, removedSlug]);
 
     console.log("Verified generated fallbacks and pruning while preserving manual pages.");
   } finally {

@@ -68,10 +68,10 @@
   <link href="/assets/css/neural-background.css?v=20260722-flow5" rel="stylesheet">
   <link href="/assets/css/orbital-option-8.css?v=20260808-7" rel="stylesheet">
   <link href="/assets/css/route-signal-handoff.css?v=20260806-t3" rel="stylesheet">
-  <link href="/assets/css/universe-perspective-navigation.css?v=20260809-guide14" rel="stylesheet" data-universe-perspective-styles>
-  <script src="/assets/js/universe-theme-transition.js?v=20260809-guide14"></script>
-  <script src="/assets/js/orbital-option-8.js?v=20260808-7" defer></script>
-  <script src="/assets/js/route-signal-handoff.js?v=20260806-t3" defer></script>
+  <link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles>
+  <script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
+  <script src="/assets/js/orbital-option-8.js?v=20260812-motion1" defer></script>
+  <script src="/assets/js/route-signal-handoff.js?v=20260812-motion1" defer></script>
 </head>
 <body data-route-signal-page="dashboard">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -97,7 +97,7 @@
         <a class="site-nav-link" data-route="/about.html" href="/about.html">[about]</a>
         <a class="site-nav-link" data-route="/contact.html" href="/contact.html">[contact]</a>
       </nav>
-      <div class="site-status">[status: online]</div>
+      <div class="site-status" data-site-search-slot><a class="site-search-link" href="/search.html" data-site-search-link aria-label="Search published evidence" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></div>
     </div>
     <nav class="site-nav site-nav--mobile" id="site-nav-mobile" aria-label="Mobile navigation">
       <a class="site-nav-link" data-route="/" href="/" aria-current="page">[dashboard]</a>
@@ -160,9 +160,9 @@
               <span class="sculpture sculpture--opensource" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b><b></b></span>
               <span class="node-label"><small>04 / SELECTED SYSTEMS</small><strong>Highlighted projects</strong><span>Bitcoin.com Wallet · public builds</span></span>
             </button>
-            <button class="orbit-node orbit-node--threads" type="button" data-orbit-object="threads" aria-label="Focus Current threads">
+            <button class="orbit-node orbit-node--threads" type="button" data-orbit-object="threads" aria-label="Focus current work radar">
               <span class="sculpture sculpture--questions" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b></span>
-              <span class="node-label"><small>05 / NOW</small><strong>Current threads</strong><span>Agents · privacy · observation</span></span>
+              <span class="node-label"><small>05 / NOW</small><strong>Current work</strong><span>Dated · curated · public</span></span>
             </button>
             <button class="orbit-node orbit-node--contact" type="button" data-orbit-object="contact" aria-label="Focus Contact">
               <span class="sculpture sculpture--practice" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b></span>
@@ -178,7 +178,7 @@
         <article data-preview="profile"><small>02 / SKILLS + INTERESTS</small><h2>What I build—and what keeps me curious.</h2><p>Mobile is home turf. The work extends into backend systems, architecture, reliability, agent-first delivery, family, cameras, the night sky, philosophy, and fitness.</p></article>
         <article data-preview="work"><small>03 / WORK</small><h2>I build the parts people notice when they fail.</h2><p>Android, iOS, backend, and architecture—leading teams, staying close to the code, and moving from idea to verified release.</p></article>
         <article data-preview="projects"><small>04 / HIGHLIGHTED PROJECTS</small><h2>I go where the product needs me.</h2><p>Android, iOS, backend, or architecture—leading teams, staying close to the code, and using AI to move from idea to verified release faster.</p></article>
-        <article data-preview="threads"><small>05 / CURRENT THREADS</small><h2>Questions I keep returning to.</h2><p>Agent systems that leave receipts, location tools without surveillance, and learning to look before moving on.</p></article>
+        <article data-preview="threads"><small>05 / CURRENT WORK RADAR</small><h2>What I’m building and documenting now.</h2><p>A checked-in, dated view of recent portfolio, agent-delivery, and memory-system work.</p></article>
         <article data-preview="contact"><small>06 / CONTACT</small><h2>Let’s build something durable.</h2><p>I’m open to engineering leadership, mobile and backend systems, reliability work, and thoughtful agent-assisted delivery.</p></article>
       </section>
 
@@ -193,7 +193,7 @@
       <button type="button" data-map-target="profile" style="--mx:24%;--my:24%" aria-label="Focus Skills and interests"><span>02</span><strong>Skills</strong></button>
       <button type="button" data-map-target="work" style="--mx:43%;--my:15%" aria-label="Focus Work"><span>03</span><strong>Work</strong></button>
       <button type="button" data-map-target="projects" style="--mx:71%;--my:26%" aria-label="Focus Highlighted projects"><span>04</span><strong>Projects</strong></button>
-      <button type="button" data-map-target="threads" style="--mx:86%;--my:66%" aria-label="Focus Current threads"><span>05</span><strong>Threads</strong></button>
+      <button type="button" data-map-target="threads" style="--mx:86%;--my:66%" aria-label="Focus current work radar"><span>05</span><strong>Now</strong></button>
       <button type="button" data-map-target="contact" style="--mx:56%;--my:86%" aria-label="Focus Contact"><span>06</span><strong>Contact</strong></button>
     </nav>
 
@@ -224,20 +224,20 @@
           <span class="landing-code">OBJECT 04 / APP CONSTELLATION</span>
           <span class="project-app-orbits" role="img" aria-label="Twelve selected apps including Bitcoin.com Wallet, ITVX, and OCBC Business orbiting one engineering practice">
             <span class="project-app-ring project-app-ring--outer">
-              <span class="project-app-logo" style="--logo-x:50%;--logo-y:0%"><img src="/assets/images/work/ic_bitcoin_wallet_logo.svg" alt="" decoding="async"></span>
-              <span class="project-app-logo" style="--logo-x:93%;--logo-y:25%"><img src="/assets/images/work/ic_itvx_logo.svg" alt="" decoding="async"></span>
-              <span class="project-app-logo" style="--logo-x:93%;--logo-y:75%"><img src="/assets/images/work/ic_ocbc_logo.png" alt="" width="512" height="512" decoding="async"></span>
-              <span class="project-app-logo" style="--logo-x:50%;--logo-y:100%"><img src="/assets/images/work/ic_stc_logo.png" alt="" width="512" height="512" decoding="async"></span>
-              <span class="project-app-logo project-app-logo--contain" style="--logo-x:7%;--logo-y:75%"><img src="/assets/images/work/ic_openpay_logo.svg" alt="" decoding="async"></span>
-              <span class="project-app-logo" style="--logo-x:7%;--logo-y:25%"><img src="/assets/images/work/ic_owto_logo.webp" alt="" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:50%;--logo-y:0%"><img data-src="/assets/images/work/ic_bitcoin_wallet_logo.svg" alt="" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:93%;--logo-y:25%"><img data-src="/assets/images/work/ic_itvx_logo.svg" alt="" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:93%;--logo-y:75%"><img data-src="/assets/images/work/ic_ocbc_logo.png" alt="" width="512" height="512" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:50%;--logo-y:100%"><img data-src="/assets/images/work/ic_stc_logo.png" alt="" width="512" height="512" decoding="async"></span>
+              <span class="project-app-logo project-app-logo--contain" style="--logo-x:7%;--logo-y:75%"><img data-src="/assets/images/work/ic_openpay_logo.svg" alt="" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:7%;--logo-y:25%"><img data-src="/assets/images/work/ic_owto_logo.webp" alt="" decoding="async"></span>
             </span>
             <span class="project-app-ring project-app-ring--inner">
-              <span class="project-app-logo" style="--logo-x:50%;--logo-y:0%"><img src="/assets/images/work/ic_popslide_logo.png" alt="" width="170" height="170" decoding="async"></span>
-              <span class="project-app-logo" style="--logo-x:93%;--logo-y:25%"><img src="/assets/images/work/ic_websafety_logo.webp" alt="" width="400" height="400" decoding="async"></span>
-              <span class="project-app-logo project-app-logo--contain" style="--logo-x:93%;--logo-y:75%"><img src="/assets/images/work/ic_solo_logo.png" alt="" width="1080" height="411" decoding="async"></span>
-              <span class="project-app-logo" style="--logo-x:50%;--logo-y:100%"><img src="/assets/images/work/ic_projectbass_logo.webp" alt="" decoding="async"></span>
-              <span class="project-app-logo" style="--logo-x:7%;--logo-y:75%"><img src="/assets/images/work/ic_ntu_pass_logo.png" alt="" width="512" height="512" decoding="async"></span>
-              <span class="project-app-logo project-app-logo--contain" style="--logo-x:7%;--logo-y:25%"><img src="/assets/images/work/ic_aqua_expeditions_logo.svg" alt="" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:50%;--logo-y:0%"><img data-src="/assets/images/work/ic_popslide_logo.png" alt="" width="170" height="170" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:93%;--logo-y:25%"><img data-src="/assets/images/work/ic_websafety_logo.webp" alt="" width="400" height="400" decoding="async"></span>
+              <span class="project-app-logo project-app-logo--contain" style="--logo-x:93%;--logo-y:75%"><img data-src="/assets/images/work/ic_solo_logo.png" alt="" width="1080" height="411" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:50%;--logo-y:100%"><img data-src="/assets/images/work/ic_projectbass_logo.webp" alt="" decoding="async"></span>
+              <span class="project-app-logo" style="--logo-x:7%;--logo-y:75%"><img data-src="/assets/images/work/ic_ntu_pass_logo.png" alt="" width="512" height="512" decoding="async"></span>
+              <span class="project-app-logo project-app-logo--contain" style="--logo-x:7%;--logo-y:25%"><img data-src="/assets/images/work/ic_aqua_expeditions_logo.svg" alt="" decoding="async"></span>
             </span>
             <span class="project-app-core"><b>12</b><small>SELECTED APPS</small></span>
           </span>
@@ -247,13 +247,15 @@
         <div class="focus-satellites focus-satellites--projects" aria-label="Highlighted projects"><a class="project-satellite--primary" style="--sx:3%;--sy:11%" href="/work.html#production-work"><small>LEAD PROJECT / ANDROID</small><strong>Bitcoin.com Wallet</strong><em>Multichain rewards, market predictions, transaction replacement, wallet migration, shared Rust, and release hardening.</em></a><a style="--sx:77%;--sy:10%" href="/work.html#production-work"><small>ANDROID / STREAMING</small><strong>ITVX</strong><em>Playback UI, in-player recommendations, preview scrubbing, phone, tablet, and reliability work.</em></a><a style="--sx:80%;--sy:72%" href="/blog/case-study-ocbc-banking-experience.html"><small>ANDROID / BANKING</small><strong>OCBC Business</strong><em>Onboarding, accounts, transfers, identity integrations, state, lifecycle, and network reliability.</em></a></div>
       </article>
 
-      <article class="facet-detail" data-facet-detail="threads" aria-labelledby="facet-threads-title">
-        <figure class="landing-object"><span class="landing-code">OBJECT 05 / THOUGHT LOOM</span><span class="sculpture sculpture--questions" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b></span><figcaption>Three live threads moving through one field of judgment.</figcaption></figure>
-        <div class="landing-copy"><p class="eyebrow">[CURRENT THREADS]</p><h2 id="facet-threads-title">Questions I keep returning to.</h2><p>In code, in writing, and away from a screen: credible evidence, useful privacy, and the discipline to look before moving on.</p><a href="/blog/">Open all logs <span aria-hidden="true">→</span></a></div>
-        <div class="focus-satellites focus-satellites--threads" aria-label="Current threads">
-          <a style="--sx:3%;--sy:11%" href="/blog/2026-04-30-agents-that-leave-receipts.html"><small>APR 30 2026 · AGENT SYSTEMS</small><strong>Agents should leave receipts.</strong><em>The next run should know what changed, what passed, and what still needs proof.</em></a>
-          <a style="--sx:71%;--sy:8%" href="/blog/2026-07-21-what-building-persons-finder-taught-me.html"><small>JUL 21 2026 · LOCATION + PRIVACY</small><strong>Useful location systems shouldn’t become surveillance.</strong><em>How much history, precision, and AI context does a useful product actually need?</em></a>
-          <a style="--sx:77%;--sy:70%" href="/blog/2024-09-14-film-photography-gallery.html"><small>SEP 14 2024 · PHOTOGRAPHY</small><strong>Learning to look before I move on.</strong><em>Code invites a patch. A photograph makes me stop and look again.</em></a>
+      <article class="facet-detail" data-facet-detail="threads" aria-labelledby="facet-threads-title" id="current-work">
+        <figure class="landing-object"><span class="landing-code">OBJECT 05 / CURRENT-WORK RADAR</span><span class="sculpture sculpture--questions" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><b></b><b></b></span><figcaption>Three dated public signals moving through one curated field.</figcaption></figure>
+        <div class="landing-copy"><p class="eyebrow">[CURRENT WORK RADAR · <!-- current-work:updated:start --><time datetime="2026-08-12">AUG 12 2026</time> · CHECKED-IN PUBLIC SIGNALS<!-- current-work:updated:end -->]</p><h2 id="facet-threads-title">What I’m building and documenting now.</h2><p>A deterministic snapshot of recent work, curated from public artifacts rather than a live activity feed.</p><a href="/blog/">Open all logs <span aria-hidden="true">→</span></a></div>
+        <div class="focus-satellites focus-satellites--threads" aria-label="Current work radar">
+<!-- current-work:list:start -->
+          <a style="--sx:3%;--sy:11%" href="/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html"><small><time datetime="2026-08-06">AUG 6 2026</time> · PORTFOLIO SYSTEMS</small><strong>Rebuilding the homepage as an orbital system.</strong><em>A documented pass through interaction design, implementation constraints, accessibility, and visual QA.</em></a>
+          <a style="--sx:71%;--sy:8%" href="/blog/2026-04-30-agents-that-leave-receipts.html"><small><time datetime="2026-04-30">APR 30 2026</time> · AGENT SYSTEMS</small><strong>Making agents leave receipts.</strong><em>A delivery practice built around durable context, explicit verification, and honest handoffs.</em></a>
+          <a style="--sx:77%;--sy:70%" href="/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html"><small><time datetime="2026-04-09">APR 9 2026</time> · MEMORY SYSTEMS</small><strong>Using MemPalace with local agents.</strong><em>A practical workflow for giving local coding agents searchable, durable project memory.</em></a>
+<!-- current-work:list:end -->
         </div>
       </article>
 

@@ -1,0 +1,516 @@
+<!-- generated: scripts/build-static-blog-pages.js -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
+<title>Bitcoin.com Wallet: Shipping Multichain Android Systems | Andrew Concepcion</title>
+<meta name="description" content="A public-safe account of my Android work across multichain rewards, transaction replacement, wallet migration, swaps, shared Rust, startup performance, and release reliability."/>
+<link rel="canonical" href="https://ac-opensource.github.io/blog/case-study-bitcoin-wallet-multichain-android-systems.html"/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:site_name" content="Andrew Concepcion"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:type" content="article"/>
+<meta property="og:url" content="https://ac-opensource.github.io/blog/case-study-bitcoin-wallet-multichain-android-systems.html"/>
+<meta property="og:title" content="Bitcoin.com Wallet: Shipping Multichain Android Systems | Andrew Concepcion"/>
+<meta property="og:description" content="A public-safe account of my Android work across multichain rewards, transaction replacement, wallet migration, swaps, shared Rust, startup performance, and release reliability."/>
+<meta property="og:image" content="https://ac-opensource.github.io/assets/images/work/img_bitcoin_wallet_1.webp"/>
+<meta property="og:image:alt" content="Bitcoin.com Wallet Android multichain portfolio screen"/>
+<meta property="article:published_time" content="2026-08-12"/>
+<meta property="article:author" content="Andrew Concepcion"/>
+<meta property="article:tag" content="Bitcoin.com Wallet">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Fintech">
+<meta property="article:tag" content="Multichain">
+<meta property="article:tag" content="Rust">
+<meta property="article:tag" content="work">
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Bitcoin.com Wallet: Shipping Multichain Android Systems | Andrew Concepcion"/>
+<meta name="twitter:description" content="A public-safe account of my Android work across multichain rewards, transaction replacement, wallet migration, swaps, shared Rust, startup performance, and release reliability."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/work/img_bitcoin_wallet_1.webp"/>
+<meta name="twitter:image:alt" content="Bitcoin.com Wallet Android multichain portfolio screen"/>
+<link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="/assets/css/article-debrief.css?v=20260812-actions2" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet"/>
+<link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles/>
+<script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#faf9f4",
+          "tertiary": "#1f5cba",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f4f4ee",
+          "surface-container": "#edefe7",
+          "surface-container-highest": "#e0e4d9",
+          "secondary": "#57606a",
+          "on-surface": "#2f342d",
+          "outline": "#787c73",
+          "outline-variant": "#afb3aa",
+          "primary": "#5a5f65",
+          "on-primary": "#f4f8ff"
+        },
+        fontFamily: {
+          "headline": ["Space Grotesk"],
+          "body": ["Manrope"],
+          "label": ["Space Grotesk"]
+        },
+        borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"}
+      }
+    }
+  }
+</script>
+<style>
+  body {
+    background-color: #faf9f4;
+  }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .code-block {
+    background: #1A1C1E;
+    color: #DEE3E9;
+    font-family: 'Space Grotesk', monospace;
+    padding: 1.5rem;
+    border-left: 4px solid #1F5CBA;
+  }
+  .code-keyword { color: #6799FB; }
+  .code-type { color: #FE8983; }
+  .code-func { color: #E0E4D9; }
+  .work-post-hero {
+    position: relative;
+    display: grid;
+    aspect-ratio: 1;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(175, 179, 170, 0.28);
+    background: #edefe7;
+  }
+  .work-post-hero--gallery {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(210, 47, 51, 0.12), transparent 13rem),
+      linear-gradient(145deg, #f4f5f1, #e9eeec);
+  }
+  .work-post-hero__screen {
+    display: block;
+    flex: 0 0 auto;
+    height: 92%;
+    aspect-ratio: 608 / 1080;
+    overflow: hidden;
+    border-radius: 0.4rem;
+    box-shadow: 0 14px 28px rgba(44, 55, 49, 0.16);
+  }
+  .work-post-hero__screen img,
+  .work-post-hero--cover > img,
+  .work-post-hero--contain > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .work-post-hero__screen img,
+  .work-post-hero--cover > img {
+    object-fit: cover;
+  }
+  .work-post-hero--cover > img {
+    object-position: 62% center;
+  }
+  .work-post-hero--contain {
+    aspect-ratio: 4 / 5;
+  }
+  .work-post-hero--contain > img {
+    object-fit: contain;
+    background: #fff;
+  }
+  @media (max-width: 700px) {
+    .work-post-hero--gallery {
+      aspect-ratio: 4 / 3;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+    }
+    .work-post-hero--gallery .work-post-hero__screen {
+      height: 94%;
+    }
+    .work-post-hero__screen {
+      scroll-snap-align: center;
+    }
+  }
+</style>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bitcoin.com Wallet: Shipping Multichain Android Systems",
+  "description": "A public-safe account of my Android work across multichain rewards, transaction replacement, wallet migration, swaps, shared Rust, startup performance, and release reliability.",
+  "author": {
+    "@type": "Person",
+    "@id": "https://ac-opensource.github.io/#person",
+    "name": "Andrew Concepcion"
+  },
+  "publisher": {
+    "@type": "Person",
+    "@id": "https://ac-opensource.github.io/#person",
+    "name": "Andrew Concepcion",
+    "url": "https://ac-opensource.github.io"
+  },
+  "datePublished": "2026-08-12",
+  "dateModified": "2026-08-12T11:22:21.000Z",
+  "image": "https://ac-opensource.github.io/assets/images/work/img_bitcoin_wallet_1.webp",
+  "mainEntityOfPage": "https://ac-opensource.github.io/blog/case-study-bitcoin-wallet-multichain-android-systems.html"
+}</script>
+</head>
+<body class="article-debrief-page bg-background text-on-surface font-body antialiased" data-universe-region="article" data-article-mode="case-study">
+<a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
+<header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
+  <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
+    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+      <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+      <a data-route="/work.html" href="/work.html" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+      <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+      <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+    </nav>
+    <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]" data-site-search-slot><a class="site-search-link" href="/search.html" data-site-search-link aria-label="Search published evidence" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></div>
+  </div>
+  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+    <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
+    <a data-route="/work.html" href="/work.html" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
+    <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
+    <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
+  </nav>
+</header>
+<main id="main-content" class="article-region-main">
+<article class="article-debrief article-region" data-article-debrief data-debrief-variant="mission" data-article-mode="case-study">
+<header class="article-region__header">
+  <div class="article-region__meta">
+    <strong>DELIVERY DOSSIER</strong>
+    <span id="post-category">portfolio</span>
+    <time id="post-date" datetime="2026-08-12">2026-08-12</time>
+    <span id="post-reading">5 min read</span>
+    <span>6 sections</span>
+  </div>
+  <div class="article-region__title">
+    <h1 id="post-title">Bitcoin.com Wallet: Shipping Multichain Android Systems</h1>
+    <p id="post-summary">A public-safe account of my Android work across multichain rewards, transaction replacement, wallet migration, swaps, shared Rust, startup performance, and release reliability.</p>
+    <div id="post-actions" class="article-region__actions">
+      <button id="share-post-button" type="button" hidden>Share</button>
+      <button id="bookmark-post-button" type="button" hidden>Bookmark</button>
+      <a href="/blog/rss.xml">RSS</a>
+      <a href="/work.html">Return to portfolio</a>
+    </div>
+  </div>
+
+<figure class="work-post-hero work-post-hero--contain lg:col-span-5" data-work-hero-layout="contain">
+  <img id="post-hero-image" src="/assets/images/work/img_bitcoin_wallet_1.webp" alt="Bitcoin.com Wallet Android multichain portfolio screen" loading="eager" decoding="async"/>
+  <figcaption class="sr-only">Official Bitcoin.com Wallet Android app screen from Google Play</figcaption>
+</figure>
+
+  <div class="article-region__topic-field">
+    <span>Authored by <strong id="post-author-name">Andrew Concepcion</strong></span>
+    <span id="post-author-role">DELIVERY DOSSIER</span>
+    <div id="post-tags"><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#bitcoin.com_wallet</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#android</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#fintech</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#multichain</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#rust</span><span class="text-[10px] font-label border border-outline-variant/30 px-2 py-1">#work</span></div>
+  </div>
+</header>
+
+<details class="article-trajectory article-trajectory--mobile" data-trajectory-details>
+  <summary class="article-trajectory__summary">
+    <span>[delivery dossier]</span>
+    <span>6 sections</span>
+  </summary>
+  <nav aria-label="Delivery dossier sections">
+    <ol class="article-trajectory__list">
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-the-delivery-boundary-was-bigger-than-one-screen" data-trajectory-link data-section-id="debrief-the-delivery-boundary-was-bigger-than-one-screen">
+        <span class="article-trajectory__index">01</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">The delivery boundary was bigger than one screen</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-rewards-had-to-preserve-wallet-context" data-trajectory-link data-section-id="debrief-rewards-had-to-preserve-wallet-context">
+        <span class="article-trajectory__index">02</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">Rewards had to preserve wallet context</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-transaction-tools-needed-narrow-guardrails" data-trajectory-link data-section-id="debrief-transaction-tools-needed-narrow-guardrails">
+        <span class="article-trajectory__index">03</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">Transaction tools needed narrow guardrails</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-shared-code-still-required-platform-judgment" data-trajectory-link data-section-id="debrief-shared-code-still-required-platform-judgment">
+        <span class="article-trajectory__index">04</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">Shared code still required platform judgment</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-verification-extended-to-startup-and-release-behavior" data-trajectory-link data-section-id="debrief-verification-extended-to-startup-and-release-behavior">
+        <span class="article-trajectory__index">05</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">Verification extended to startup and release behavior</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-public-evidence-and-confidentiality-boundary" data-trajectory-link data-section-id="debrief-public-evidence-and-confidentiality-boundary">
+        <span class="article-trajectory__index">06</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">Public evidence and confidentiality boundary</span>
+      </a>
+    </li>
+    </ol>
+  </nav>
+</details>
+<div class="article-debrief__layout article-region__reading">
+  <aside class="article-debrief__sidebar article-region__rail">
+
+<nav class="article-trajectory article-trajectory--desktop" aria-label="Delivery dossier sections" data-article-trajectory>
+  <p class="article-trajectory__eyebrow">[delivery dossier]</p>
+  <ol class="article-trajectory__list">
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-the-delivery-boundary-was-bigger-than-one-screen" data-trajectory-link data-section-id="debrief-the-delivery-boundary-was-bigger-than-one-screen">
+        <span class="article-trajectory__index">01</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">The delivery boundary was bigger than one screen</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-rewards-had-to-preserve-wallet-context" data-trajectory-link data-section-id="debrief-rewards-had-to-preserve-wallet-context">
+        <span class="article-trajectory__index">02</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">Rewards had to preserve wallet context</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-transaction-tools-needed-narrow-guardrails" data-trajectory-link data-section-id="debrief-transaction-tools-needed-narrow-guardrails">
+        <span class="article-trajectory__index">03</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">Transaction tools needed narrow guardrails</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-shared-code-still-required-platform-judgment" data-trajectory-link data-section-id="debrief-shared-code-still-required-platform-judgment">
+        <span class="article-trajectory__index">04</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">Shared code still required platform judgment</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-verification-extended-to-startup-and-release-behavior" data-trajectory-link data-section-id="debrief-verification-extended-to-startup-and-release-behavior">
+        <span class="article-trajectory__index">05</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">Verification extended to startup and release behavior</span>
+      </a>
+    </li>
+    <li class="article-trajectory__item" data-trajectory-item>
+      <a class="article-trajectory__link" href="#debrief-public-evidence-and-confidentiality-boundary" data-trajectory-link data-section-id="debrief-public-evidence-and-confidentiality-boundary">
+        <span class="article-trajectory__index">06</span>
+        <span class="article-trajectory__phase">[delivery record]</span>
+        <span class="article-trajectory__title">Public evidence and confidentiality boundary</span>
+      </a>
+    </li>
+  </ol>
+</nav>
+    <p class="article-region__reading-signal">
+      <span>DELIVERY DOSSIER</span>
+      <span>Published source</span>
+      <span>6 authored sections</span>
+    </p>
+  </aside>
+  <div id="post-body" class="article-debrief__body article-region__body" data-debrief-body><h2 id="debrief-the-delivery-boundary-was-bigger-than-one-screen" data-debrief-heading data-debrief-phase="delivery record">The delivery boundary was bigger than one screen</h2>
+      <p>At Bitcoin.com, I work on the Android wallet while following features through shared code, service contracts, local state, observability, and release behavior. The product is a self-custody wallet, so a polished interface is only the visible end of a chain of decisions about assets, networks, signing, precision, migration, and failure recovery.</p>
+      <p>My work has included the first end-to-end Android implementation of a multichain rewards platform, reward-backed crypto market predictions, Bitcoin replace-by-fee, an in-app move from single-chain to multichain wallets, staking and liquidity-reward pool modernization, provider-aware swaps, recurring-buy reminders, shared Rust services through UniFFI, startup profiling, and Android release hardening.</p>
+
+      <h2 id="debrief-rewards-had-to-preserve-wallet-context" data-debrief-heading data-debrief-phase="delivery record">Rewards had to preserve wallet context</h2>
+      <p>I led the Android delivery of a server-driven rewards experience that crossed quests, wallet linking, multiple networks, asset balances, and claim results. The hard part was not drawing a list of activities. It was preserving enough wallet and network context for each step to remain correct when a user changed accounts, returned from another flow, or received a delayed result.</p>
+      <p>I kept server-owned campaign content separate from wallet-owned state and made result handling explicit rather than optimistic. That same discipline carried into crypto market predictions, where reward eligibility and price inputs had to remain precise and explainable across the user journey.</p>
+
+      <h2 id="debrief-transaction-tools-needed-narrow-guardrails" data-debrief-heading data-debrief-phase="delivery record">Transaction tools needed narrow guardrails</h2>
+      <p>I co-built Bitcoin replace-by-fee on Android. A replacement transaction is useful when an earlier Bitcoin transaction is taking too long, but it cannot be treated like an ordinary resend. The app has to identify an eligible transaction, preserve the correct spend context, communicate the fee change, and surface the resulting transaction without implying a guarantee about network confirmation.</p>
+      <p>I also led the Android path that moved eligible users from single-chain wallets into a multichain model. Migration work is product work and data work at the same time: existing users need continuity, new identifiers need to map to the right assets and networks, and interruption must not leave the interface claiming more progress than the underlying state can support.</p>
+
+      <h2 id="debrief-shared-code-still-required-platform-judgment" data-debrief-heading data-debrief-phase="delivery record">Shared code still required platform judgment</h2>
+      <p>I moved selected services into a shared Rust core exposed to mobile through UniFFI. The goal was to share behavior that genuinely belonged in one core while keeping lifecycle, presentation, and platform integration native. I worked across that boundary rather than assuming a shared implementation automatically removed Android-specific risk.</p>
+      <p>The same principle guided provider-aware swaps, staking and liquidity-reward pool reads, buy and sell paths, and recurring-buy reminders: represent the domain once where that was safe, then keep user-facing state and recovery explicit on Android.</p>
+
+      <h2 id="debrief-verification-extended-to-startup-and-release-behavior" data-debrief-heading data-debrief-phase="delivery record">Verification extended to startup and release behavior</h2>
+      <p>I profiled startup, traced regressions across module and dependency boundaries, and worked on release hardening when a change was correct in source but fragile in the assembled app. For transaction and balance-facing work, I separated compilation, automated checks, runtime behavior, service responses, and release evidence instead of treating one green signal as proof of all five.</p>
+      <p>The outcome is not one isolated feature. It is a body of Android work that connects self-custody product decisions to multichain data, shared systems, and the release path users actually receive.</p>
+
+      <h2 id="debrief-public-evidence-and-confidentiality-boundary" data-debrief-heading data-debrief-phase="delivery record">Public evidence and confidentiality boundary</h2>
+      <p><a href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en">The public Google Play listing</a> identifies the production Bitcoin.com Wallet and lists more than ten million downloads. This case study describes my responsibilities and shipped product areas at a public-safe level. It intentionally omits private repository references, internal service names and addresses, account data, ticket identifiers, and unverified impact metrics.</p></div>
+</div>
+<nav class="article-region__adjacent" aria-label="Adjacent entries">
+  <a id="prev-link" href="/blog/case-study-itvx-playback-at-candyspace.html">
+    <span>[previous entry]</span>
+    <h2 id="prev-title">ITVX at Candyspace: Playback Features Under Live Constraints</h2>
+    <small>← read entry</small>
+  </a>
+  <a id="next-link" href="/work.html">
+    <span>[next entry]</span>
+    <h2 id="next-title">Return to Source</h2>
+    <small>read entry →</small>
+  </a>
+</nav>
+</article>
+</main>
+<footer id="site-footer" class="w-full bg-[#F4F4EE] border-t border-stone-200/30 mt-24">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]">
+    <span>© 2026 Andrew Concepcion</span>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/">[dashboard]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/work.html">[portfolio]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/blog/">[logs]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/about.html">[about]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="/contact.html">[contact]</a>
+    <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
+  </div>
+</footer>
+<script src="/assets/js/article-debrief.js?v=20260807-regions1"></script>
+<script src="/assets/js/universe-field-map.js?v=20260809-guide9"></script>
+<script>
+  (() => {
+    const FORCE_ACTIVE_ROUTE = "/work.html";
+    const path = window.location.pathname.replace(/\/index\.html$/, "/");
+    document.querySelectorAll("#site-nav .site-nav-link, #site-nav-mobile .site-nav-link").forEach((link) => {
+      const route = link.dataset.route;
+      let active = false;
+      if (route === FORCE_ACTIVE_ROUTE) {
+        active = true;
+      } else if (FORCE_ACTIVE_ROUTE === "/work.html" && route === "/blog/") {
+        active = false;
+      } else {
+        active = route === "/blog/" ? path.startsWith("/blog/") : path === route || (route === "/" && path === "/");
+      }
+      if (active) {
+        link.classList.add("text-[#1F5CBA]", "border-b-2", "border-[#1F5CBA]", "pb-1");
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+
+    const BOOKMARKS_KEY = "ac.blog.bookmarks.v1";
+    const LEGACY_BOOKMARKS_KEYS = Object.freeze(["ac_blog_bookmarks_v1"]);
+    const CURRENT_POST_SLUG = "case-study-bitcoin-wallet-multichain-android-systems";
+    const CURRENT_POST_TITLE = "Bitcoin.com Wallet: Shipping Multichain Android Systems";
+    const CURRENT_POST_URL = "/blog/case-study-bitcoin-wallet-multichain-android-systems.html";
+    const sharePostButton = document.getElementById("share-post-button");
+    const bookmarkPostButton = document.getElementById("bookmark-post-button");
+
+    function loadBookmarks() {
+      const merged = new Set();
+      let shouldMigrate = false;
+      try {
+        [BOOKMARKS_KEY, ...LEGACY_BOOKMARKS_KEYS].forEach((key) => {
+          const raw = localStorage.getItem(key);
+          if (!raw) return;
+          if (key !== BOOKMARKS_KEY) shouldMigrate = true;
+          let parsed;
+          try {
+            parsed = JSON.parse(raw);
+          } catch (_error) {
+            return;
+          }
+          if (!Array.isArray(parsed)) return;
+          parsed
+            .map((value) => String(value || "").trim())
+            .filter(Boolean)
+            .forEach((value) => merged.add(value));
+        });
+        if (shouldMigrate) saveBookmarks(merged);
+      } catch (_error) {
+        // Valid bookmark values collected before storage became unavailable remain usable.
+      }
+      return merged;
+    }
+
+    function saveBookmarks(set) {
+      try {
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(Array.from(set).sort()));
+        LEGACY_BOOKMARKS_KEYS.forEach((key) => localStorage.removeItem(key));
+      } catch (_error) {
+        // Ignore write failures.
+      }
+    }
+
+    function setBookmarkButtonState(active) {
+      if (!bookmarkPostButton) return;
+      bookmarkPostButton.textContent = active ? "[BOOKMARKED]" : "[BOOKMARK]";
+      bookmarkPostButton.classList.toggle("border-tertiary/40", active);
+      bookmarkPostButton.classList.toggle("text-tertiary", active);
+      bookmarkPostButton.classList.toggle("bg-surface-container-highest", active);
+      bookmarkPostButton.classList.toggle("border-outline-variant/20", !active);
+      bookmarkPostButton.classList.toggle("text-secondary", !active);
+      bookmarkPostButton.setAttribute("aria-pressed", String(active));
+      bookmarkPostButton.setAttribute("aria-label", active ? "Remove from saved reading" : "Save for later reading");
+    }
+
+    async function shareCurrentPost() {
+      const absoluteUrl = new URL(CURRENT_POST_URL, window.location.origin).href;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: CURRENT_POST_TITLE || "Blog post",
+            url: absoluteUrl
+          });
+          return;
+        } catch (_error) {
+          // Continue to fallback.
+        }
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(absoluteUrl);
+          return;
+        } catch (_error) {
+          // Continue to prompt fallback.
+        }
+      }
+      window.prompt("Copy post URL:", absoluteUrl);
+    }
+
+    if (sharePostButton) {
+      sharePostButton.hidden = false;
+      sharePostButton.addEventListener("click", () => {
+        shareCurrentPost();
+      });
+    }
+
+    if (bookmarkPostButton && CURRENT_POST_SLUG) {
+      bookmarkPostButton.hidden = false;
+      let bookmarks = loadBookmarks();
+      setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      bookmarkPostButton.addEventListener("click", () => {
+        if (bookmarks.has(CURRENT_POST_SLUG)) {
+          bookmarks.delete(CURRENT_POST_SLUG);
+        } else {
+          bookmarks.add(CURRENT_POST_SLUG);
+        }
+        saveBookmarks(bookmarks);
+        setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      });
+      window.addEventListener("storage", (event) => {
+        if (event.key !== BOOKMARKS_KEY && !LEGACY_BOOKMARKS_KEYS.includes(event.key)) return;
+        bookmarks = loadBookmarks();
+        setBookmarkButtonState(bookmarks.has(CURRENT_POST_SLUG));
+      });
+    }
+  })();
+</script>
+</body></html>

@@ -16,23 +16,37 @@ Use the canonical static pages below for public professional and technical infor
 - [Evidence profile tree](https://ac-opensource.github.io/about.html#profile-map): Accessible, rooted branching systems for engineering capabilities and interests, with interactive junctions and a public evidence index.
 - [Contact](https://ac-opensource.github.io/contact.html): Public contact channels.
 
-## Selected engineering case studies
+## Published work
 
-- [MySTC Android delivery](https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html): First-person project note on leading five senior Android engineers through multilingual account, ordering, and support work.
-- [OCBC Business Android work](https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html): Project note on identity verification, SDK integration, concurrency, network state, and regression safety.
-- [OWTO mobile-to-backend delivery](https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html): Project note on owning Android, iOS, GPS, payments, API contracts, and backend delivery as one journey.
-- [openpay checkout state](https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html): Project note on spend limits, merchant discovery, checkout state, partner integrations, and release hardening.
-- [Solo white-label Android platform](https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html): Project note on shared Android behavior across many restaurant-branded apps.
-- [Popslide Android experiments](https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html): Project note on rewards, notifications, lock-screen behavior, caching, and experiment cleanup.
-- [WebSafety mobile platform limits](https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html): Project note on GPS, synchronization, permissions, privacy, and constrained platform behavior.
-- [ProjectBASS community network mapping](https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html): Project note on volunteer-built Kotlin tooling for crowdsourced connectivity data.
+<!-- BEGIN GENERATED: published-work -->
+- [Bitcoin.com Wallet: Shipping Multichain Android Systems](https://ac-opensource.github.io/blog/case-study-bitcoin-wallet-multichain-android-systems.html): A public-safe account of my Android work across multichain rewards, transaction replacement, wallet migration, swaps, shared Rust, startup performance, and release reliability.
+- [ITVX at Candyspace: Playback Features Under Live Constraints](https://ac-opensource.github.io/blog/case-study-itvx-playback-at-candyspace.html): How I delivered ITVX Android player features at Candyspace across recommendations, timeline previews, phone and tablet motion, reliability, security, and XML parsing.
+- [MySTC: Leading a Five-Person Android Team](https://ac-opensource.github.io/blog/case-study-mystc-scale-and-reliability.html): I led five senior Android engineers on MySTC, working in Kotlin and Java across account, ordering, support, and multilingual flows.
+- [OCBC Business: Android Banking Work](https://ac-opensource.github.io/blog/case-study-ocbc-banking-experience.html): I worked on OCBC Business for Android in Kotlin and XML, covering chart UI, identity-verification integration, network behavior, and focused unit tests.
+- [openpay: Checkout, Spend Limits, and Release Edges](https://ac-opensource.github.io/blog/case-study-openpay-bnpl-experience.html): I worked on openpay's Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths.
+- [Solo: Android Across a White-Label Food Platform](https://ac-opensource.github.io/blog/case-study-solo-whitelabel-delivery-platform.html): I worked in Solo's shared Kotlin and XML codebase, shipping Android features and production fixes used by multiple restaurant-branded apps.
+- [OWTO: Android, iOS, and the Backend Between Them](https://ac-opensource.github.io/blog/case-study-owto-ride-hailing-platform.html): I led delivery across OWTO's Android, iOS, and backend work and stayed hands-on with booking, GPS, payments, and the APIs connecting them.
+- [Popslide: Experiments on a Lockscreen Product](https://ac-opensource.github.io/blog/case-study-popslide-engagement-and-monetization.html): I built and evaluated Android experiment variants for Popslide and worked on lockscreen behavior, notifications, caching, and production state handling.
+- [WebSafety: Parental Controls Meet Platform Limits](https://ac-opensource.github.io/blog/case-study-websafety-parental-controls.html): I worked on WebSafety features across Java and Objective-C code, including GPS, synchronization, permissions, and platform behavior that wasn't always documented.
+- [ProjectBASS: Crowdsourced Network Measurements](https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html): I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements.
+<!-- END GENERATED: published-work -->
 
-## Selected technical writing
+## Published technical writing
 
-- [What Building Persons Finder Taught Me About AI-Ready Backend Work](https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html)
-- [One Rust Core Across Android and iOS](https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html)
-- [Prompt Patterns for Production-Ready Code](https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html)
-- [E2E and Visual QA for Personal Websites](https://ac-opensource.github.io/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html)
+<!-- BEGIN GENERATED: published-technical -->
+- [Rebuilding My Homepage as an Interactive Orbital System](https://ac-opensource.github.io/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html): I’m not a web developer, but with Codex I turned a static portfolio into a working orbital interface—and spent more time shaping the product than wrestling with syntax.
+- [What Building a Small Backend Taught Me About AI-Ready Engineering](https://ac-opensource.github.io/blog/2026-07-21-what-building-persons-finder-taught-me.html): Lessons from a compact backend: explicit API contracts, append-only location history, PostGIS semantics, guarded AI prose, and evidence-based verification.
+- [Agents That Leave Receipts](https://ac-opensource.github.io/blog/2026-04-30-agents-that-leave-receipts.html): A practical reflection on local agents, memory, verification, and the handoffs that let the next run trust what happened.
+- [How I Use MemPalace to Make Local Agents Better](https://ac-opensource.github.io/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html): How I set up MemPalace as a practical tool for local agents: small taxonomy, verify-first retrieval, agent diaries, AAAK wake-up context, and why protocol matters more than storage.
+- [Deep Dive: One Rust Core Across Android and iOS](https://ac-opensource.github.io/blog/2026-04-07-one-rust-core-across-android-and-ios.html): How a Rust facade, UniFFI bindings, and platform packaging can give Android and iOS one domain core without duplicating behavior.
+- [Career Growth as Ownership, Not Just Job Titles](https://ac-opensource.github.io/blog/2026-03-26-career-trajectory-platform-ownership.html): A practical framework for reading engineering growth through scope, decision quality, operational responsibility, and durable outcomes.
+- [End-to-End and Visual QA for Personal Websites](https://ac-opensource.github.io/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html): A practical quality loop for static personal sites: verify the publication boundary, exercise critical routes, and review desktop and mobile rendering.
+- [Building an Editable Blog That Still Works on GitHub Pages](https://ac-opensource.github.io/blog/2026-03-26-editable-blog-system-on-github-pages.html): How SQLite authoring, deterministic static generation, and a public-only build artifact create an editable blog without shipping a runtime database.
+- [From Mobile Developer to AI-Accelerated Engineer](https://ac-opensource.github.io/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html): How agentic tools widened my engineering workflow without replacing mobile depth, explicit ownership, or evidence-based delivery.
+- [Prompt Patterns for Reviewable, Production-Ready Code](https://ac-opensource.github.io/blog/2026-03-26-prompt-patterns-for-production-ready-code.html): A practical prompt structure for coding agents: live context, real constraints, side-effect boundaries, observable acceptance evidence, and reproducible handoffs.
+- [Running an Agent Fleet Without Losing the Plot](https://ac-opensource.github.io/blog/2024-10-08-running-ai-fleet-learnings.html): Lessons from multi-agent engineering work: define output contracts, instrument repeated effort, match verification to risk, and preserve trustworthy handoffs.
+- [Building Across Kotlin and Swift Without Blurring Platform Boundaries](https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html): A practical way to divide shared domain behavior, state, packaging, and native UI responsibilities across Kotlin and Swift.
+<!-- END GENERATED: published-technical -->
 
 ## Content discovery
 

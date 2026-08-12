@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { LLMS_SECTIONS } = require("./build-static-blog-pages");
 const { openDatabase, assertSchema } = require("./lib/blog-db");
 const { shouldExcludeOriginal } = require("./lib/public-images");
 const publication = require("./site-publication.config");
@@ -9,6 +10,7 @@ const ContactTransport = require("../assets/js/contact-transport");
 const ROOT_DIR = path.join(__dirname, "..");
 const DEFAULT_DIST_DIR = path.join(ROOT_DIR, "dist");
 const SITE_ORIGIN = "https://ac-opensource.github.io";
+const PERSON_ID = `${SITE_ORIGIN}/#person`;
 const GOOGLE_SITE_VERIFICATION = "cG-TBeLi9kd77kCjn9ujeH_G6b-5r-Jv69vGJiROZnU";
 const SITE_LOCATION = Object.freeze({
   origin: SITE_ORIGIN,
@@ -53,6 +55,7 @@ function assertPublicInventory(distDir, relativeFiles) {
     "blog/posts.json",
     "blog/rss.xml",
     "assets/css/tailwind.css",
+    "llms.txt",
     "robots.txt",
     "sitemap.xml",
     ".nojekyll"
@@ -114,6 +117,126 @@ function assertPublicInventory(distDir, relativeFiles) {
   }
 }
 
+function jsonLdNodes(html, label) {
+  const documents = [...String(html).matchAll(
+    /<script\b[^>]*\btype=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
+  )].map((match) => {
+    try {
+      return JSON.parse(match[1]);
+    } catch (error) {
+      throw new Error(`${label} contains invalid JSON-LD: ${error.message}`);
+    }
+  });
+  const nodes = [];
+  const visit = (value) => {
+    if (Array.isArray(value)) {
+      value.forEach(visit);
+      return;
+    }
+    if (!value || typeof value !== "object") return;
+    if (Object.hasOwn(value, "@type")) nodes.push(value);
+    Object.values(value).forEach(visit);
+  };
+  documents.forEach(visit);
+  return nodes;
+}
+
+function hasJsonLdType(node, type) {
+  const types = Array.isArray(node?.["@type"]) ? node["@type"] : [node?.["@type"]];
+  return types.includes(type);
+}
+
+function jsonLdOfType(html, type, label) {
+  const matches = jsonLdNodes(html, label).filter((node) => hasJsonLdType(node, type));
+  if (matches.length !== 1) {
+    throw new Error(`${label} must contain exactly one ${type} JSON-LD node; found ${matches.length}.`);
+  }
+  return matches[0];
+}
+
+function assertCanonicalPersonIdentity(distDir) {
+  const homepagePath = path.join(distDir, "index.html");
+  const aboutPath = path.join(distDir, "about.html");
+  const homepage = fs.readFileSync(homepagePath, "utf8");
+  const about = fs.readFileSync(aboutPath, "utf8");
+  const homePeople = jsonLdNodes(homepage, "index.html").filter((node) => hasJsonLdType(node, "Person"));
+  const aboutPeople = jsonLdNodes(about, "about.html").filter((node) => hasJsonLdType(node, "Person"));
+  if (!homePeople.length || homePeople.some((person) => person["@id"] !== PERSON_ID)) {
+    throw new Error(`Homepage Person JSON-LD must use canonical identity ${PERSON_ID}.`);
+  }
+  if (!aboutPeople.length || aboutPeople.some((person) => person["@id"] !== PERSON_ID)) {
+    throw new Error(`About Person JSON-LD must use canonical identity ${PERSON_ID}.`);
+  }
+  const profilePage = jsonLdOfType(about, "ProfilePage", "about.html");
+  if (profilePage.mainEntity?.["@id"] !== PERSON_ID) {
+    throw new Error(`About ProfilePage.mainEntity must reference canonical identity ${PERSON_ID}.`);
+  }
+}
+
+function assertGeneratedArticleIdentity(distDir, slugs) {
+  for (const slug of slugs) {
+    const relativePath = `blog/${slug}.html`;
+    const html = fs.readFileSync(path.join(distDir, relativePath), "utf8");
+    const blogPosting = jsonLdOfType(html, "BlogPosting", relativePath);
+    if (blogPosting.author?.["@id"] !== PERSON_ID || blogPosting.publisher?.["@id"] !== PERSON_ID) {
+      throw new Error(`${relativePath} author and publisher must reference canonical Person ${PERSON_ID}.`);
+    }
+  }
+}
+
+function llmsSectionUrls(llms, section) {
+  const startIndex = llms.indexOf(section.start);
+  const endIndex = llms.indexOf(section.end);
+  if (
+    startIndex < 0 ||
+    endIndex < startIndex ||
+    llms.lastIndexOf(section.start) !== startIndex ||
+    llms.lastIndexOf(section.end) !== endIndex
+  ) {
+    throw new Error(`llms.txt must contain exactly one ordered ${section.category} generated section.`);
+  }
+  const body = llms.slice(startIndex + section.start.length, endIndex);
+  return [...body.matchAll(/^\s*-\s+\[[^\n]*?\]\(([^)\s]+)\)/gm)]
+    .map((match) => match[1]);
+}
+
+function assertLlmsPublishedPosts(distDir, publishedRows, excludedSlugs) {
+  const llms = fs.readFileSync(path.join(distDir, "llms.txt"), "utf8");
+  for (const section of LLMS_SECTIONS) {
+    const expected = publishedRows
+      .filter((row) => String(row.category || "").trim().toLowerCase() === section.category)
+      .map((row) => `${SITE_ORIGIN}/blog/${encodeURIComponent(row.slug)}.html`);
+    const actual = llmsSectionUrls(llms, section);
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+      throw new Error(
+        `llms.txt ${section.category} URLs do not exactly match published database order: ` +
+        `expected ${JSON.stringify(expected)}, found ${JSON.stringify(actual)}.`
+      );
+    }
+    if (new Set(actual).size !== actual.length) {
+      throw new Error(`llms.txt ${section.category} section contains duplicate article URLs.`);
+    }
+  }
+  for (const slug of excludedSlugs) {
+    const url = `${SITE_ORIGIN}/blog/${encodeURIComponent(slug)}.html`;
+    if (llms.includes(url)) throw new Error(`llms.txt exposes non-published post ${slug}.`);
+  }
+}
+
+function assertRetiredPublicWording(distDir, files) {
+  const textualFiles = files.filter((file) => /\.(?:html|js|css|json|xml|txt)$/i.test(file));
+  for (const absolutePath of textualFiles) {
+    const contents = fs.readFileSync(absolutePath, "utf8");
+    const relativePath = relativePosix(distDir, absolutePath);
+    if (contents.includes("[status: online]")) {
+      throw new Error(`Retired [status: online] wording found in ${relativePath}.`);
+    }
+    if (contents.includes("Verified public ")) {
+      throw new Error(`Retired Verified public evidence label found in ${relativePath}.`);
+    }
+  }
+}
+
 function assertPublishedPosts(distDir, dbPath) {
   const manifestPath = path.join(distDir, "blog", "posts.json");
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
@@ -139,16 +262,22 @@ function assertPublishedPosts(distDir, dbPath) {
   }
 
   const { db } = openDatabase(dbPath, { readonly: true });
-  let expectedSlugs;
+  let expectedRows;
+  let excludedSlugs;
   try {
     assertSchema(db);
-    expectedSlugs = db
-      .prepare("SELECT slug FROM posts WHERE status = 'published' ORDER BY published_date DESC, slug ASC")
+    expectedRows = db
+      .prepare("SELECT slug, category FROM posts WHERE status = 'published' ORDER BY published_date DESC, slug ASC")
+      .all();
+    excludedSlugs = db
+      .prepare("SELECT slug FROM posts WHERE status <> 'published' ORDER BY slug ASC")
       .all()
       .map((row) => row.slug);
   } finally {
     db.close();
   }
+
+  const expectedSlugs = expectedRows.map((row) => row.slug);
 
   if (JSON.stringify(manifestSlugs) !== JSON.stringify(expectedSlugs)) {
     throw new Error("blog/posts.json does not exactly match the published rows in the authoring database.");
@@ -163,6 +292,9 @@ function assertPublishedPosts(distDir, dbPath) {
   if (JSON.stringify(generatedHtml) !== JSON.stringify(expectedHtml)) {
     throw new Error("Published blog HTML does not exactly match blog/posts.json.");
   }
+
+  assertGeneratedArticleIdentity(distDir, manifestSlugs);
+  assertLlmsPublishedPosts(distDir, expectedRows, excludedSlugs);
 
   return manifest.length;
 }
@@ -392,6 +524,17 @@ function assertNoAuthoringReferences(distDir, files) {
   }
 }
 
+function assertSearchIndexPrivacy(distDir) {
+  const indexPath = path.join(distDir, "assets", "data", "search-index.json");
+  if (!fs.existsSync(indexPath)) throw new Error("Published search index is missing.");
+  const serialized = fs.readFileSync(indexPath, "utf8");
+  if (/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i.test(serialized)
+    || /\+(?:\d[\s-]?){8,}\d/.test(serialized)
+    || /\b(?:mailto|tel):/i.test(serialized)) {
+    throw new Error("Published search index contains direct email or phone contact data.");
+  }
+}
+
 function readInlineJson(html, id) {
   const pattern = new RegExp('<script\\b[^>]*\\bid="' + id + '"[^>]*>([\\s\\S]*?)<\\/script>', "i");
   const match = html.match(pattern);
@@ -536,10 +679,13 @@ function verifyDist({ distDir = DEFAULT_DIST_DIR, dbPath } = {}) {
   const files = walkFiles(resolvedDist);
   const relativeFiles = files.map((file) => relativePosix(resolvedDist, file));
   assertPublicInventory(resolvedDist, relativeFiles);
+  assertCanonicalPersonIdentity(resolvedDist);
   assertContactSignalsPublication(resolvedDist, relativeFiles);
   const postCount = assertPublishedPosts(resolvedDist, dbPath);
   assertNoAuthoringReferences(resolvedDist, files);
+  assertSearchIndexPrivacy(resolvedDist);
   assertNoPublishedExif(resolvedDist, files);
+  assertRetiredPublicWording(resolvedDist, files);
   assertGoogleSiteVerification(resolvedDist);
   assertReferencesResolve(resolvedDist, files);
   assertSitemapAndCanonicals(resolvedDist, files);
@@ -567,11 +713,16 @@ if (require.main === module) {
 }
 
 module.exports = {
+  assertCanonicalPersonIdentity,
   assertContactSignalsPublication,
+  assertGeneratedArticleIdentity,
   assertGoogleSiteVerification,
+  assertLlmsPublishedPosts,
   assertNoAuthoringReferences,
   assertNoPublishedExif,
   assertPublishedPosts,
+  assertRetiredPublicWording,
+  assertSearchIndexPrivacy,
   assertSitemapAndCanonicals,
   assertSocialMetadata,
   verifyDist,

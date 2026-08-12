@@ -159,6 +159,36 @@ async function testDefaultBoundary(browser, origin) {
   await context.close();
 }
 
+async function testPublicInvitationPreset(browser, origin) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  const errors = [];
+  installPageGuards(page, errors);
+
+  await page.goto(
+    origin + "/contact.html?publicBoundary=1&intent=public&target=portfolio",
+    { waitUntil: "domcontentloaded" }
+  );
+  assert.strictEqual(await page.locator('input[name="intent"][value="public"]').isChecked(), true);
+  assert.strictEqual(await page.locator("#contact-public-target").inputValue(), "portfolio");
+  assert.strictEqual(await page.locator("[data-public-fields]").isVisible(), true);
+  assert.strictEqual(await page.locator("#contact-name").inputValue(), "");
+  assert.strictEqual(await page.locator("#contact-email").inputValue(), "");
+  assert.strictEqual(await page.locator("#contact-message").inputValue(), "");
+  assert.strictEqual(await page.locator("#contact-public-quote").inputValue(), "");
+  assert.strictEqual(await page.locator("#contact-storage-consent").isChecked(), false);
+  assert.strictEqual(await page.locator("#contact-public-consent").isChecked(), false);
+
+  await page.goto(
+    origin + "/contact.html?publicBoundary=1&intent=public&target=not-a-public-surface",
+    { waitUntil: "domcontentloaded" }
+  );
+  assert.strictEqual(await page.locator('input[name="intent"][value="public"]').isChecked(), true);
+  assert.strictEqual(await page.locator("#contact-public-target").inputValue(), "dashboard");
+  assert.deepStrictEqual(errors, []);
+  await context.close();
+}
+
 async function testConfiguredContact(browser, origin, local) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const page = await context.newPage();
@@ -459,7 +489,7 @@ async function testTouchReducedAndNoJs(browser, origin) {
   assert.ok(await noJsPage.locator(".payload-bay__noscript").isVisible());
   assert.match(
     await noJsPage.locator(".payload-bay__noscript").textContent(),
-    /does not submit or open an email client/i
+    /does not submit,? open an email client/i
   );
   assert.strictEqual(await noJsPage.locator("[data-js-public-intent]").isVisible(), false);
   assert.strictEqual(await noJsPage.locator("[data-public-fields]").isVisible(), false);
@@ -513,6 +543,7 @@ async function main() {
   const browser = await chromium.launch({ headless: true });
   try {
     await testDefaultBoundary(browser, origin);
+    await testPublicInvitationPreset(browser, origin);
     await testConfiguredContact(browser, origin, local);
     await testDesktopLaunchMotion(browser, origin);
     await testAppsScriptIframeBridge(browser, origin, local);

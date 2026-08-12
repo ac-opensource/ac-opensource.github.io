@@ -4,6 +4,7 @@
   const root = document.documentElement;
   const FULL_SEQUENCE_MS = 820;
   const SESSION_KEY = "ac.bigBangPortfolioPlayed.v1";
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   // The bootstrap is the session gate. Bail out before any geometry work on
   // repeat Portfolio visits or on routes that never opted into the loader.
@@ -72,7 +73,7 @@
     },
     logs: {
       label: "LOGS NEBULA",
-      structure: "SPIRAL ARCHIVE / 26 ENTRIES",
+      structure: "SPIRAL ARCHIVE / 28 ENTRIES",
       surface: "#faf9f4",
       ink: "#2f342d",
       accents: ["#1f5cba", "#687fc4", "#168c86", "#a4aca3"],
@@ -850,8 +851,7 @@
 
   function begin(reason) {
     if (state.active) return false;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      || window.matchMedia("(forced-colors: active)").matches) {
+    if (reducedMotion.matches || window.matchMedia("(forced-colors: active)").matches) {
       root.dataset.bigBang = "complete";
       emit("complete", "motion-preference");
       return false;
@@ -925,6 +925,9 @@
   }
   window.addEventListener("pageshow", function (event) {
     if (event.persisted && state.active) finish("bfcache", false);
+  });
+  reducedMotion.addEventListener?.("change", function (event) {
+    if (state.active && event.matches) finish("motion-preference", false);
   });
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && state.active) {

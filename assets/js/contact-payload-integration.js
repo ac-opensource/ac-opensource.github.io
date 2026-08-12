@@ -86,6 +86,20 @@
     return selected && selected.value === "named" ? "named" : "anonymous";
   }
 
+  function applyRequestContext() {
+    const parameters = new URL(window.location.href).searchParams;
+    if (parameters.get("intent") === "public") {
+      const publicIntent = intentInputs.find(function (input) { return input.value === "public"; });
+      if (publicIntent) publicIntent.checked = true;
+    }
+    const requestedTarget = parameters.get("target");
+    if (requestedTarget && Array.from(elements.target.options).some(function (option) {
+      return option.value === requestedTarget;
+    })) {
+      elements.target.value = requestedTarget;
+    }
+  }
+
   function after(delay, callback) {
     const timer = window.setTimeout(function () {
       animationTimers.delete(timer);
@@ -599,6 +613,7 @@
   elements.startedAt.value = String(Date.now());
   elements.contextPath.value = window.location.pathname;
   elements.returnOrigin.value = window.location.origin;
+  applyRequestContext();
   if (online()) {
     elements.runtimeMessage.dataset.runtimeState = "online";
     elements.runtimeMessage.textContent = runtime.transport === "apps_script_iframe"

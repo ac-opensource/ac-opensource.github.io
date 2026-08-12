@@ -39,6 +39,14 @@ jobs:
       - name: Run browser end-to-end checks
         run: npm run test:e2e
 
+      - name: Run focused feature browser checks
+        run: |
+          npm run test:discovery:browser
+          npm run test:contact-signals:browser
+          npm run test:saved-reading
+          npm run test:options
+          npm run test:work-briefing
+
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: actions/configure-pages@v5
