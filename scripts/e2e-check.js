@@ -2873,16 +2873,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     return null;
   });
   await assert(Boolean(lockedScrollPoint), 'Locked mobile About has no pass-through scroll surface');
-  const cdp = await touchAboutContext.newCDPSession(touchAboutPage);
   if (lockedScrollPoint) {
-    await cdp.send('Input.synthesizeScrollGesture', {
-      x: lockedScrollPoint.x,
-      y: lockedScrollPoint.y,
-      yDistance: -180,
-      gestureSourceType: 'touch',
-      preventFling: true,
-      speed: 800,
-    });
+    await touchAboutPage.mouse.move(lockedScrollPoint.x, lockedScrollPoint.y);
+    await touchAboutPage.mouse.wheel(0, 180);
   }
   await touchAboutPage.waitForTimeout(220);
   const lockedScrollAfter = await touchAboutPage.evaluate(() => ({
@@ -2894,14 +2887,16 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && lockedTouchSurface.lockPressed === 'true'
       && lockedTouchSurface.pointerEvents === 'none'
       && lockedTouchSurface.touchAction === 'pan-y'
-      // Headless Linux may commit only one scroll frame for this synthetic
-      // touch gesture; any positive movement proves the locked canvas yields
-      // the gesture to page scrolling while the rotation check guards intent.
+      // Chromium's synthetic touch-scroll CDP gesture is a no-op on some
+      // headless Linux runners. The wheel gesture proves the hit-tested
+      // surface yields scrolling, while the mobile computed styles verify
+      // that the same surface delegates touch panning to the page.
       && lockedScrollAfter.scrollY > lockedTouchSurface.scrollY
       && lockedScrollAfter.rotated === '',
     `Locked mobile nebula prevents page scrolling or rotates anyway: ${JSON.stringify({ lockedTouchSurface, lockedScrollAfter })}`
   );
 
+  const cdp = await touchAboutContext.newCDPSession(touchAboutPage);
   await touchAboutPage.locator('.stellar-tree__root').click();
   const mobileSourceScrollPoint = await touchAboutPage.evaluate(() => {
     const body = document.querySelector('#profile-map-evidence .profile-map-evidence__body');
