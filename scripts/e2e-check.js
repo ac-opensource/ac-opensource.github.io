@@ -4169,8 +4169,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     );
   }
 
-  // Nav clickthrough from home
-  await page.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
+  // Ordinary header navigation has its own settled source fixtures.
+  await page.goto('about:blank');
+  const headerBrowser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+  const headerPage = await headerBrowser.newPage({ viewport: { width: 1600, height: 1100 } });
+  await headerPage.addInitScript((key) => sessionStorage.setItem(key, '1'), BIG_BANG_SESSION_KEY);
   const navMap = [
     ['/work.html', '[portfolio]'],
     ['/blog/', '[logs]'],
@@ -4180,18 +4183,26 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   ];
 
   for (const [expected, label] of navMap) {
-    await page.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
-    await page.locator(`#site-nav a[href='${expected}']`).first().click();
-    await page.waitForURL((url) => url.pathname === expected, { timeout: 5000, waitUntil: 'domcontentloaded' });
-    const current = new URL(page.url()).pathname;
+    await headerPage.goto(BASE_URL + '/', { waitUntil: 'networkidle' });
+    await headerPage.locator(`#site-nav a[href='${expected}']`).first().click();
+    try {
+      await headerPage.waitForURL((url) => url.pathname === expected, { timeout: 5000, waitUntil: 'domcontentloaded' });
+    } catch (error) {
+      console.error('Header navigation state:', { expected, url: headerPage.url(), state: await headerPage.evaluate(() => ({ root: { ...document.documentElement.dataset }, perspective: window.UniversePerspective?.snapshot() })) });
+      throw error;
+    }
+    const current = new URL(headerPage.url()).pathname;
     if (!(expected === '/' ? current === '/' : current === expected)) {
       failures.push(`Nav link ${label} expected ${expected} but landed on ${current}`);
     }
   }
-  await page.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  await page.locator('#site-topbar > div > a[href="/"]').first().click();
-  await page.waitForURL((url) => url.pathname === '/', { timeout: 5000, waitUntil: 'domcontentloaded' });
-  await assert(new URL(page.url()).pathname === '/', 'The shared wordmark no longer returns home.');
+  await headerPage.goto(BASE_URL + '/work.html', { waitUntil: 'networkidle' });
+  await waitForWorkEntrance(headerPage);
+  await headerPage.locator('#site-topbar > div > a[href="/"]').first().click();
+  await headerPage.waitForURL((url) => url.pathname === '/', { timeout: 5000, waitUntil: 'domcontentloaded' });
+  await assert(new URL(headerPage.url()).pathname === '/', 'The shared wordmark no longer returns home.');
+
+  await headerBrowser.close();
 
   // Blog list behavior
   await page.goto(BASE_URL + '/blog/', { waitUntil: 'networkidle' });
