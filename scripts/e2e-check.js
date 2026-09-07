@@ -4386,9 +4386,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const mapBounds = map.getBoundingClientRect();
     const tuner = document.querySelector('#galaxy-tuner').getBoundingClientRect();
     const field = document.querySelector('#galaxy-field').getBoundingClientRect();
+    const playback = document.querySelector('.galaxy-playback').getBoundingClientRect();
+    const motionButton = document.querySelector('#galaxy-motion');
+    const motionBounds = motionButton.getBoundingClientRect();
     const nodeLabel = document.querySelector('.galaxy-node__label');
     return {
-      fieldGap: field.top - tuner.bottom,
+      playbackGap: playback.top - tuner.bottom,
+      fieldGap: field.top - playback.bottom,
+      motionReachable: motionButton.contains(document.elementFromPoint(motionBounds.left + motionBounds.width / 2, motionBounds.top + motionBounds.height / 2)),
       fieldHeight: field.height,
       labelFontSize: Number.parseFloat(getComputedStyle(nodeLabel).fontSize),
       mapExpanded: map.dataset.mapExpanded,
@@ -4404,7 +4409,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     };
   });
   await assert(
-    mobileLogsLayout.fieldGap <= 8
+    mobileLogsLayout.playbackGap >= 0
+      && mobileLogsLayout.playbackGap <= 8
+      && mobileLogsLayout.fieldGap <= 8
+      && mobileLogsLayout.motionReachable
       && mobileLogsLayout.fieldHeight <= 864
       && mobileLogsLayout.labelFontSize >= 10
       && mobileLogsLayout.mapExpanded === 'false'
