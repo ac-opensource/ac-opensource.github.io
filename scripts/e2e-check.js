@@ -185,9 +185,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
           const bounds = map.getBoundingClientRect();
           return bounds.width >= 287 && bounds.height >= 123;
         }, null, { timeout: 2000, polling: 100 });
-        await targetPage.evaluate(() => {
-          document.querySelector('[data-universe-route-map]')
-            ?.dispatchEvent(new PointerEvent('pointerleave'));
+        const viewport = targetPage.viewportSize();
+        await targetPage.mouse.move(viewport.width - 1, 1);
+        await targetPage.evaluate(async () => {
+          const map = document.querySelector('[data-universe-route-map]');
+          await Promise.all(map.getAnimations({ subtree: true }).map((animation) => animation.ready));
         });
         await targetPage.waitForFunction(() => {
           const map = document.querySelector('[data-universe-route-map]');
