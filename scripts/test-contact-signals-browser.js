@@ -529,6 +529,35 @@ async function testViewportsAndScreenshots(browser, origin) {
   await page.screenshot({ path: path.join(EVIDENCE_ROOT, "signals-local-demo-desktop.png"), fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(origin + "/contact.html?localDemo=1&intent=public", { waitUntil: "domcontentloaded" });
+  const mobileComposition = await page.evaluate(function () {
+    const intro = document.querySelector(".payload-bay__intro").getBoundingClientRect();
+    const visual = document.querySelector("[data-payload-visual]").getBoundingClientRect();
+    const satellite = document.querySelector(".satellite").getBoundingClientRect();
+    const firstInput = document.querySelector("#contact-name").getBoundingClientRect();
+    return {
+      fairings: document.querySelectorAll(".fairing").length,
+      firstInputTop: firstInput.top,
+      introBottom: intro.bottom,
+      satelliteInsideVisual: satellite.left >= visual.left - 1 && satellite.right <= visual.right + 1
+        && satellite.top >= visual.top - 1 && satellite.bottom <= visual.bottom + 1,
+      visualBottom: visual.bottom,
+      visualHeight: visual.height,
+      visualTop: visual.top,
+      viewportHeight: innerHeight
+    };
+  });
+  assert.ok(
+    mobileComposition.firstInputTop <= mobileComposition.viewportHeight * 1.25,
+    "Contact's first real input lands too far below the mobile fold: " + JSON.stringify(mobileComposition)
+  );
+  assert.ok(
+    mobileComposition.fairings === 2
+      && mobileComposition.visualHeight >= 190
+      && mobileComposition.visualTop >= mobileComposition.introBottom
+      && mobileComposition.visualBottom < mobileComposition.firstInputTop
+      && mobileComposition.satelliteInsideVisual,
+    "Compact mobile Contact lost or overlaps its satellite stage: " + JSON.stringify(mobileComposition)
+  );
   await page.screenshot({ path: path.join(EVIDENCE_ROOT, "contact-public-mobile.png"), fullPage: true });
   await context.close();
 }

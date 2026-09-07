@@ -2,6 +2,8 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { spawnSync } = require("child_process");
+const postcss = require("postcss");
+const { lazyCssnano } = require("tailwindcss/peers/index.js");
 const { buildStaticBlog } = require("./build-static-blog-pages");
 const { syncBlogManifest } = require("./sync-blog-from-db");
 const { rewritePublicImageUrls, shouldExcludeOriginal } = require("./lib/public-images");
@@ -19,6 +21,16 @@ const GENERATED_MANIFEST_NAME = ".generated-blog-pages.json";
 const TAILWIND_CLI = require.resolve("tailwindcss/lib/cli.js");
 const TAILWIND_CONFIG = path.join(__dirname, "tailwind.config.js");
 const TAILWIND_INPUT = path.join(__dirname, "styles", "tailwind-input.css");
+const SITE_FONT_STYLESHEET = "/assets/css/site-fonts.css?v=20260819-local1";
+const SITE_FONT_PRELOADS = Object.freeze([
+  "/assets/fonts/manrope-latin-variable.woff2",
+  "/assets/fonts/space-grotesk-latin-variable.woff2"
+]);
+const MINIFIED_ROUTE_STYLESHEETS = Object.freeze([
+  "assets/css/about-spectrograph.css",
+  "assets/css/orbital-option-8.css",
+  "assets/css/work-portfolio.css"
+]);
 
 function isWithin(parent, child) {
   const relative = path.relative(parent, child);
@@ -151,6 +163,28 @@ function replaceTailwindRuntime(html, relativePath) {
   );
 }
 
+function localizeProductionFonts(html, relativePath) {
+  const withoutRemoteFonts = String(html).replace(
+    /\s*<link\b[^>]*\bhref=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com[^"']*["'][^>]*\/?\s*>/gi,
+    ""
+  );
+  if (/https:\/\/fonts\.(?:googleapis|gstatic)\.com/i.test(withoutRemoteFonts)) {
+    throw new Error(`Could not remove a remote Google font reference from ${relativePath}.`);
+  }
+  if (withoutRemoteFonts.includes(`href="${SITE_FONT_STYLESHEET}"`)) return withoutRemoteFonts;
+  if (!withoutRemoteFonts.includes("</head>")) {
+    throw new Error(`Cannot add the local font stylesheet to ${relativePath}: missing </head>.`);
+  }
+
+  const preloadMarkup = SITE_FONT_PRELOADS
+    .map((fontPath) => `<link rel="preload" href="${fontPath}" as="font" type="font/woff2" crossorigin/>`)
+    .join("\n");
+  return withoutRemoteFonts.replace(
+    "</head>",
+    `${preloadMarkup}\n<link href="${SITE_FONT_STYLESHEET}" rel="stylesheet"/>\n</head>`
+  );
+}
+
 function injectBigBangLoader(html, relativePath) {
   const normalizedPath = relativePath.split(path.sep).join("/");
   if (normalizedPath !== "work.html") return html;
@@ -160,12 +194,18 @@ function injectBigBangLoader(html, relativePath) {
   if (html.includes("data-big-bang-bootstrap")) return html;
 
   const bootstrap = [
-    '<link href="/assets/css/big-bang-loader.css?v=20260812-motion1" rel="stylesheet"/>',
+    '<link href="/assets/css/big-bang-loader.css?v=20260819-performance2" rel="stylesheet"/>',
     '<script data-big-bang-bootstrap>(function(){',
     'var root=document.documentElement;',
     'if(window.matchMedia&&(',
     'window.matchMedia("(prefers-reduced-motion: reduce)").matches||',
-    'window.matchMedia("(forced-colors: active)").matches))return;',
+    'window.matchMedia("(forced-colors: active)").matches||',
+    'window.matchMedia("(max-width: 700px)").matches))return;',
+    'var connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;',
+    'var slowConnection=connection&&(connection.saveData||/^(?:slow-)?2g$/.test(connection.effectiveType||""));',
+    'var constrainedMemory=Number(navigator.deviceMemory)>0&&Number(navigator.deviceMemory)<=2;',
+    'var constrainedCpu=Number(navigator.hardwareConcurrency)>0&&Number(navigator.hardwareConcurrency)<=2;',
+    'if(slowConnection||constrainedMemory||constrainedCpu)return;',
     'var integrated=root.dataset.universeMotion==="arrive"&&root.dataset.universePerspectiveTo==="work";',
     'if(integrated){try{window.sessionStorage.setItem("ac.bigBangPortfolioPlayed.v1","1");}catch(error){}return;}',
     'var seen=false;try{seen=window.sessionStorage.getItem("ac.bigBangPortfolioPlayed.v1")==="1";}catch(error){}',
@@ -173,9 +213,11 @@ function injectBigBangLoader(html, relativePath) {
     'root.dataset.bigBang="pending";',
     'window.__bigBangLoaderGuard=window.setTimeout(function(){',
     'if(root.dataset.bigBang==="pending")delete root.dataset.bigBang;',
-    '},4000);',
-    '}());</script>',
-    '<script src="/assets/js/big-bang-loader.js?v=20260812-motion1" defer></script>'
+    '},900);',
+    'var loader=document.createElement("script");',
+    'loader.src="/assets/js/big-bang-loader.js?v=20260819-performance2";',
+    'loader.async=false;loader.dataset.bigBangRuntime="";document.head.append(loader);',
+    '}());</script>'
   ].join("");
 
   return html.replace("</head>", `${bootstrap}\n</head>`);
@@ -184,9 +226,12 @@ function injectBigBangLoader(html, relativePath) {
 function compileTailwind(stagingRoot) {
   for (const htmlPath of walkHtmlFiles(stagingRoot)) {
     const relativePath = path.relative(stagingRoot, htmlPath);
-    const transformed = injectSharedSiteTools(
-      injectBigBangLoader(
-        replaceTailwindRuntime(fs.readFileSync(htmlPath, "utf8"), relativePath),
+    const transformed = localizeProductionFonts(
+      injectSharedSiteTools(
+        injectBigBangLoader(
+          replaceTailwindRuntime(fs.readFileSync(htmlPath, "utf8"), relativePath),
+          relativePath
+        ),
         relativePath
       ),
       relativePath
@@ -214,6 +259,42 @@ function compileTailwind(stagingRoot) {
   }
 }
 
+function minifyPublishedRouteStyles(stagingRoot) {
+  for (const relativePath of MINIFIED_ROUTE_STYLESHEETS) {
+    const inputPath = path.join(stagingRoot, relativePath);
+    if (!fs.existsSync(inputPath)) {
+      throw new Error(`Cannot optimize missing published stylesheet: ${relativePath}`);
+    }
+
+    const outputPath = `${inputPath}.minifying-${process.pid}`;
+    try {
+      const optimized = postcss([
+        lazyCssnano()({
+          preset: [
+            "default",
+            {
+              colormin: false,
+              cssDeclarationSorter: false
+            }
+          ]
+        })
+      ]).process(fs.readFileSync(inputPath, "utf8"), {
+        from: inputPath,
+        map: false,
+        to: outputPath
+      }).css;
+      fs.writeFileSync(outputPath, optimized, "utf8");
+    } catch (error) {
+      if (fs.existsSync(outputPath)) fs.rmSync(outputPath, { force: true });
+      throw new Error(
+        `Published stylesheet optimization failed for ${relativePath}:\n` +
+        (error?.stack || error?.message || String(error))
+      );
+    }
+    fs.renameSync(outputPath, inputPath);
+  }
+}
+
 function populateStagingDirectory(stagingRoot, { dbPath } = {}) {
   fs.mkdirSync(stagingRoot, { recursive: true });
 
@@ -235,6 +316,7 @@ function populateStagingDirectory(stagingRoot, { dbPath } = {}) {
 
   copyFile("blog/index.html", stagingRoot);
   copyPublicAssetDirectory("assets/css", stagingRoot);
+  copyPublicAssetDirectory("assets/fonts", stagingRoot);
   copyPublicAssetDirectory("assets/js", stagingRoot);
   copyPublicAssetDirectory("assets/images", stagingRoot);
   copyPublicAssetDirectory("blog/images", stagingRoot);
@@ -280,6 +362,7 @@ function populateStagingDirectory(stagingRoot, { dbPath } = {}) {
 
   fs.unlinkSync(manifestPath);
   compileTailwind(stagingRoot);
+  minifyPublishedRouteStyles(stagingRoot);
   fs.writeFileSync(path.join(stagingRoot, ".nojekyll"), "", "utf8");
   assertNoForbiddenOutput(stagingRoot);
 
@@ -339,7 +422,9 @@ module.exports = {
   assertReplaceableOutput,
   buildSite,
   compileTailwind,
+  minifyPublishedRouteStyles,
   injectBigBangLoader,
   injectSharedSiteTools,
+  localizeProductionFonts,
   populateStagingDirectory
 };

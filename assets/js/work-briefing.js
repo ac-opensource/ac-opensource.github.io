@@ -11,6 +11,7 @@
 
   const briefing = document.querySelector("[data-work-briefing]");
   if (!briefing) return;
+  const archiveDossier = document.querySelector("[data-work-archive-dossier]");
 
   const presets = Array.from(briefing.querySelectorAll("[data-brief-preset]"));
   const panels = Array.from(briefing.querySelectorAll("[data-brief-panel]"));
@@ -24,8 +25,47 @@
   let arrivalObserver = null;
   let routeFallback = 0;
   let routeSettledHandler = null;
+  const briefRails = [];
 
   const validBrief = (value) => Object.prototype.hasOwnProperty.call(BRIEFS, value);
+
+  function updateBriefRail(rail) {
+    const cards = Array.from(rail.beats.children);
+    if (!cards.length) return;
+    const maxScroll = Math.max(0, rail.beats.scrollWidth - rail.beats.clientWidth);
+    const centers = cards.map((card) => card.offsetLeft + card.offsetWidth / 2);
+    const viewportCenter = rail.beats.scrollLeft + rail.beats.clientWidth / 2;
+    const index = centers.reduce((closest, center, candidate) => (
+      Math.abs(center - viewportCenter) < Math.abs(centers[closest] - viewportCenter) ? candidate : closest
+    ), 0);
+    rail.shell.dataset.railEnd = String(maxScroll <= 1 || rail.beats.scrollLeft >= maxScroll - 2);
+    rail.shell.style.setProperty("--brief-rail-progress", `${((index + 1) / cards.length * 100).toFixed(3)}%`);
+    rail.status.textContent = `${index + 1} / ${cards.length}${index + 1 < cards.length ? " · swipe" : " · complete"}`;
+  }
+
+  function createBriefRails() {
+    panels.forEach((panel) => {
+      const beats = panel.querySelector(".work-briefing__beats");
+      if (!beats || beats.closest(".work-briefing__rail-shell")) return;
+      const shell = document.createElement("div");
+      shell.className = "work-briefing__rail-shell";
+      beats.before(shell);
+      shell.append(beats);
+      const cue = document.createElement("p");
+      cue.className = "work-briefing__rail-cue";
+      cue.setAttribute("aria-hidden", "true");
+      cue.innerHTML = '<span>Proof beats</span><i><b></b></i><span data-brief-rail-status>1 / 3 · swipe</span>';
+      shell.append(cue);
+      const rail = { beats, shell, status: cue.querySelector("[data-brief-rail-status]") };
+      briefRails.push(rail);
+      beats.addEventListener("scroll", () => updateBriefRail(rail), { passive: true });
+      updateBriefRail(rail);
+    });
+  }
+
+  function syncBriefRails() {
+    window.requestAnimationFrame(() => briefRails.forEach(updateBriefRail));
+  }
 
   function fragmentTarget() {
     if (!window.location.hash) return null;
@@ -39,6 +79,14 @@
   function briefFromFragment() {
     const panel = fragmentTarget()?.closest("[data-brief-panel]");
     return validBrief(panel?.dataset.briefPanel) ? panel.dataset.briefPanel : null;
+  }
+
+  function revealArchivedTarget() {
+    const target = fragmentTarget();
+    if (archiveDossier && target && (target === archiveDossier || archiveDossier.contains(target))) {
+      archiveDossier.open = true;
+      target.scrollIntoView({ behavior: "instant", block: "start" });
+    }
   }
 
   function briefFromUrl() {
@@ -99,6 +147,7 @@
     }
 
     setStatus(nextBrief);
+    syncBriefRails();
   }
 
   function applyLocation() {
@@ -155,7 +204,7 @@
     };
     routeSettledHandler = settled;
     document.addEventListener("universe-perspective:settled", settled, { once: true });
-    routeFallback = window.setTimeout(settled, 2400);
+    routeFallback = window.setTimeout(settled, 900);
   }
 
   function finishArrivalMotion() {
@@ -247,6 +296,7 @@
     }
   }
 
+  createBriefRails();
   briefing.querySelector("[data-brief-presets]")?.setAttribute("role", "tablist");
   document.addEventListener("click", (event) => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -272,9 +322,7 @@
       window.history.pushState({ ...(window.history.state || {}), workBriefArrival: true }, "",
         `${destination.pathname}${destination.search}${destination.hash}`);
     }
-    const arrive = () => arriveAtBriefing({ focus: true, target });
-    if (universeArrivalActive() && !reduceMotion.matches) waitForUniverseSettlement(arrive);
-    else arrive();
+    arriveAtBriefing({ focus: true, target });
   });
   presets.forEach((preset, index) => {
     preset.addEventListener("click", (event) => {
@@ -296,13 +344,24 @@
   });
 
   copyButton.addEventListener("click", copyBriefingLink);
-  window.addEventListener("popstate", applyLocation);
-  window.addEventListener("hashchange", applyLocation);
-  window.addEventListener("pageshow", applyLocation);
+  window.addEventListener("resize", syncBriefRails, { passive: true });
+  window.addEventListener("popstate", () => {
+    applyLocation();
+    revealArchivedTarget();
+  });
+  window.addEventListener("hashchange", () => {
+    applyLocation();
+    revealArchivedTarget();
+  });
+  window.addEventListener("pageshow", () => {
+    applyLocation();
+    revealArchivedTarget();
+  });
 
   const url = new URL(window.location.href);
   const requestedBrief = url.searchParams.get("brief");
   applyLocation();
+  revealArchivedTarget();
   if (requestedBrief && !validBrief(requestedBrief)) {
     url.searchParams.delete("brief");
     window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);

@@ -18,8 +18,8 @@ html[data-big-bang="revealing"] {
 
 html[data-big-bang="pending"] body,
 html[data-big-bang="running"] body {
-  opacity: 0;
-  pointer-events: none;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 html[data-big-bang="revealing"] body {
@@ -498,7 +498,7 @@ html[data-big-bang-skip="true"] .big-bang-loader.is-revealing {
 }
 
 @keyframes big-bang-page-arrive {
-  from { opacity: 0.72; }
+  from { opacity: 0.94; }
   to { opacity: 1; }
 }
 

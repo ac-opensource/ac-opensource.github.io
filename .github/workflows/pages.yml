@@ -33,11 +33,14 @@ jobs:
       - name: Build and verify publication output
         run: npm run verify
 
-      - name: Install Chromium for browser checks
-        run: npx playwright install --with-deps chromium
+      - name: Install browsers for compatibility checks
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Run browser end-to-end checks
         run: npm run test:e2e
+
+      - name: Run cross-browser production smoke checks
+        run: npm run test:cross-browser
 
       - name: Run focused feature browser checks
         run: |

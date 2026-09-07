@@ -1,0 +1,526 @@
+{
+  "generator": "ac-social-previews-v1",
+  "dimensions": {
+    "width": 1200,
+    "height": 630
+  },
+  "brand": "Andrew Concepcion · AI-Native Software Engineer",
+  "logs": {
+    "kind": "logs-index",
+    "route": "/blog/",
+    "path": "/assets/images/og/logs-spiral-galaxy.png",
+    "title": "Ideas with their own gravity.",
+    "category": "logs",
+    "publishedCount": 28,
+    "categoryCounts": {
+      "hobby": 2,
+      "portfolio": 10,
+      "reflection": 4,
+      "technical": 12
+    }
+  },
+  "search": {
+    "kind": "search",
+    "route": "/search.html",
+    "path": "/assets/images/og/search-evidence-field.png",
+    "title": "Plot a route through the work.",
+    "category": "public evidence"
+  },
+  "posts": [
+    {
+      "kind": "post",
+      "slug": "case-study-bitcoin-wallet-multichain-android-systems",
+      "route": "/blog/case-study-bitcoin-wallet-multichain-android-systems.html",
+      "path": "/assets/images/og/posts/case-study-bitcoin-wallet-multichain-android-systems.png",
+      "title": "Bitcoin.com Wallet: Shipping Multichain Android Systems",
+      "category": "portfolio",
+      "publishedDate": "2026-08-12",
+      "readingTime": "5 min read",
+      "topics": [
+        "Bitcoin.com Wallet",
+        "Android",
+        "Fintech",
+        "Multichain"
+      ],
+      "sequence": 1,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "case-study-itvx-playback-at-candyspace",
+      "route": "/blog/case-study-itvx-playback-at-candyspace.html",
+      "path": "/assets/images/og/posts/case-study-itvx-playback-at-candyspace.png",
+      "title": "ITVX at Candyspace: Playback Features Under Live Constraints",
+      "category": "portfolio",
+      "publishedDate": "2026-08-11",
+      "readingTime": "4 min read",
+      "topics": [
+        "Candyspace",
+        "ITVX",
+        "Android",
+        "Streaming"
+      ],
+      "sequence": 2,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system",
+      "route": "/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html",
+      "path": "/assets/images/og/posts/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.png",
+      "title": "Rebuilding My Homepage as an Interactive Orbital System",
+      "category": "technical",
+      "publishedDate": "2026-08-06",
+      "readingTime": "7 min read",
+      "topics": [
+        "ai-workflow",
+        "product-engineering",
+        "web-animation",
+        "ux"
+      ],
+      "sequence": 3,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-07-22-its-not-okay-to-stay-not-okay",
+      "route": "/blog/2026-07-22-its-not-okay-to-stay-not-okay.html",
+      "path": "/assets/images/og/posts/2026-07-22-its-not-okay-to-stay-not-okay.png",
+      "title": "It’s Not Okay to Not Be Okay",
+      "category": "reflection",
+      "publishedDate": "2026-07-22",
+      "readingTime": "8 min read",
+      "topics": [
+        "Mental Health",
+        "Self-Awareness",
+        "Personal Responsibility",
+        "Cultural Critique"
+      ],
+      "sequence": 4,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-07-22-the-fortress-we-mistake-for-home",
+      "route": "/blog/2026-07-22-the-fortress-we-mistake-for-home.html",
+      "path": "/assets/images/og/posts/2026-07-22-the-fortress-we-mistake-for-home.png",
+      "title": "The Fortress We Mistake for Home",
+      "category": "reflection",
+      "publishedDate": "2026-07-22",
+      "readingTime": "6 min read",
+      "topics": [
+        "Self-Awareness",
+        "Personal Growth",
+        "Accountability",
+        "Healing"
+      ],
+      "sequence": 5,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-07-21-what-building-persons-finder-taught-me",
+      "route": "/blog/2026-07-21-what-building-persons-finder-taught-me.html",
+      "path": "/assets/images/og/posts/2026-07-21-what-building-persons-finder-taught-me.png",
+      "title": "What Building a Small Backend Taught Me About AI-Ready Engineering",
+      "category": "technical",
+      "publishedDate": "2026-07-21",
+      "readingTime": "8 min read",
+      "topics": [
+        "kotlin",
+        "spring-boot",
+        "postgis",
+        "backend"
+      ],
+      "sequence": 6,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-04-30-agents-that-leave-receipts",
+      "route": "/blog/2026-04-30-agents-that-leave-receipts.html",
+      "path": "/assets/images/og/posts/2026-04-30-agents-that-leave-receipts.png",
+      "title": "Agents That Leave Receipts",
+      "category": "technical",
+      "publishedDate": "2026-04-30",
+      "readingTime": "7 min read",
+      "topics": [
+        "ai-workflow",
+        "local-agents",
+        "engineering-discipline",
+        "android"
+      ],
+      "sequence": 7,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-04-09-how-i-use-mempalace-with-local-agents",
+      "route": "/blog/2026-04-09-how-i-use-mempalace-with-local-agents.html",
+      "path": "/assets/images/og/posts/2026-04-09-how-i-use-mempalace-with-local-agents.png",
+      "title": "How I Use MemPalace to Make Local Agents Better",
+      "category": "technical",
+      "publishedDate": "2026-04-09",
+      "readingTime": "7 min read",
+      "topics": [
+        "ai-workflow",
+        "mempalace",
+        "local-agents",
+        "memory-systems"
+      ],
+      "sequence": 8,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-04-07-one-rust-core-across-android-and-ios",
+      "route": "/blog/2026-04-07-one-rust-core-across-android-and-ios.html",
+      "path": "/assets/images/og/posts/2026-04-07-one-rust-core-across-android-and-ios.png",
+      "title": "Deep Dive: One Rust Core Across Android and iOS",
+      "category": "technical",
+      "publishedDate": "2026-04-07",
+      "readingTime": "8 min read",
+      "topics": [
+        "rust",
+        "mobile",
+        "architecture",
+        "android"
+      ],
+      "sequence": 9,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-03-26-career-trajectory-platform-ownership",
+      "route": "/blog/2026-03-26-career-trajectory-platform-ownership.html",
+      "path": "/assets/images/og/posts/2026-03-26-career-trajectory-platform-ownership.png",
+      "title": "Career Growth as Ownership, Not Just Job Titles",
+      "category": "technical",
+      "publishedDate": "2026-03-26",
+      "readingTime": "3 min read",
+      "topics": [
+        "career",
+        "leadership",
+        "platform-ownership",
+        "delivery"
+      ],
+      "sequence": 10,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-03-26-cognitive-profile-deep-dive",
+      "route": "/blog/2026-03-26-cognitive-profile-deep-dive.html",
+      "path": "/assets/images/og/posts/2026-03-26-cognitive-profile-deep-dive.png",
+      "title": "Using Emergenetics and Harrison as Calibration Tools",
+      "category": "reflection",
+      "publishedDate": "2026-03-26",
+      "readingTime": "3 min read",
+      "topics": [
+        "emergenetics",
+        "harrison",
+        "paradox",
+        "self-awareness"
+      ],
+      "sequence": 11,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-03-26-e2e-and-visual-qa-for-personal-websites",
+      "route": "/blog/2026-03-26-e2e-and-visual-qa-for-personal-websites.html",
+      "path": "/assets/images/og/posts/2026-03-26-e2e-and-visual-qa-for-personal-websites.png",
+      "title": "End-to-End and Visual QA for Personal Websites",
+      "category": "technical",
+      "publishedDate": "2026-03-26",
+      "readingTime": "3 min read",
+      "topics": [
+        "quality",
+        "e2e",
+        "playwright",
+        "qa"
+      ],
+      "sequence": 12,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-03-26-editable-blog-system-on-github-pages",
+      "route": "/blog/2026-03-26-editable-blog-system-on-github-pages.html",
+      "path": "/assets/images/og/posts/2026-03-26-editable-blog-system-on-github-pages.png",
+      "title": "Building an Editable Blog That Still Works on GitHub Pages",
+      "category": "technical",
+      "publishedDate": "2026-03-26",
+      "readingTime": "3 min read",
+      "topics": [
+        "site-architecture",
+        "sqlite",
+        "github-pages",
+        "seo"
+      ],
+      "sequence": 13,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-03-26-from-mobile-developer-to-ai-accelerated-engineer",
+      "route": "/blog/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.html",
+      "path": "/assets/images/og/posts/2026-03-26-from-mobile-developer-to-ai-accelerated-engineer.png",
+      "title": "From Mobile Developer to AI-Accelerated Engineer",
+      "category": "technical",
+      "publishedDate": "2026-03-26",
+      "readingTime": "3 min read",
+      "topics": [
+        "ai-workflow",
+        "engineering",
+        "delivery",
+        "scope"
+      ],
+      "sequence": 14,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2026-03-26-prompt-patterns-for-production-ready-code",
+      "route": "/blog/2026-03-26-prompt-patterns-for-production-ready-code.html",
+      "path": "/assets/images/og/posts/2026-03-26-prompt-patterns-for-production-ready-code.png",
+      "title": "Prompt Patterns for Reviewable, Production-Ready Code",
+      "category": "technical",
+      "publishedDate": "2026-03-26",
+      "readingTime": "3 min read",
+      "topics": [
+        "ai-workflow",
+        "prompting",
+        "engineering",
+        "delivery"
+      ],
+      "sequence": 15,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2024-10-08-running-ai-fleet-learnings",
+      "route": "/blog/2024-10-08-running-ai-fleet-learnings.html",
+      "path": "/assets/images/og/posts/2024-10-08-running-ai-fleet-learnings.png",
+      "title": "Running an Agent Fleet Without Losing the Plot",
+      "category": "technical",
+      "publishedDate": "2025-09-28",
+      "readingTime": "4 min read",
+      "topics": [
+        "AI Ops",
+        "Prompt Engineering",
+        "Team Process"
+      ],
+      "sequence": 16,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2024-11-02-sunrise-trail-runs",
+      "route": "/blog/2024-11-02-sunrise-trail-runs.html",
+      "path": "/assets/images/og/posts/2024-11-02-sunrise-trail-runs.png",
+      "title": "A Month in New Zealand",
+      "category": "hobby",
+      "publishedDate": "2025-02-05",
+      "readingTime": "4 min read",
+      "topics": [
+        "Travel",
+        "Family",
+        "Reflection"
+      ],
+      "sequence": 17,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "case-study-mystc-scale-and-reliability",
+      "route": "/blog/case-study-mystc-scale-and-reliability.html",
+      "path": "/assets/images/og/posts/case-study-mystc-scale-and-reliability.png",
+      "title": "MySTC: Leading a Five-Person Android Team",
+      "category": "portfolio",
+      "publishedDate": "2025-02-05",
+      "readingTime": "2 min read",
+      "topics": [
+        "MySTC",
+        "Android",
+        "Kotlin",
+        "Telecom"
+      ],
+      "sequence": 18,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2024-11-21-quiet-systems-reflection",
+      "route": "/blog/2024-11-21-quiet-systems-reflection.html",
+      "path": "/assets/images/og/posts/2024-11-21-quiet-systems-reflection.png",
+      "title": "Quiet Systems: Reflection Rituals for Builders",
+      "category": "reflection",
+      "publishedDate": "2024-11-21",
+      "readingTime": "2 min read",
+      "topics": [
+        "Philosophy",
+        "Creative Process"
+      ],
+      "sequence": 19,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "case-study-ocbc-banking-experience",
+      "route": "/blog/case-study-ocbc-banking-experience.html",
+      "path": "/assets/images/og/posts/case-study-ocbc-banking-experience.png",
+      "title": "OCBC Business: Android Banking Work",
+      "category": "portfolio",
+      "publishedDate": "2024-11-20",
+      "readingTime": "2 min read",
+      "topics": [
+        "OCBC",
+        "Fintech",
+        "Android",
+        "Kotlin"
+      ],
+      "sequence": 20,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2024-09-14-film-photography-gallery",
+      "route": "/blog/2024-09-14-film-photography-gallery.html",
+      "path": "/assets/images/og/posts/2024-09-14-film-photography-gallery.png",
+      "title": "Weekend Photo Experiments: Paradise Mist, Dobsonian Moon, and Lake Pukaki",
+      "category": "hobby",
+      "publishedDate": "2024-09-14",
+      "readingTime": "2 min read",
+      "topics": [
+        "Photography"
+      ],
+      "sequence": 21,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "case-study-openpay-bnpl-experience",
+      "route": "/blog/case-study-openpay-bnpl-experience.html",
+      "path": "/assets/images/og/posts/case-study-openpay-bnpl-experience.png",
+      "title": "openpay: Checkout, Spend Limits, and Release Edges",
+      "category": "portfolio",
+      "publishedDate": "2024-09-01",
+      "readingTime": "2 min read",
+      "topics": [
+        "openpay",
+        "Fintech",
+        "BNPL",
+        "Android"
+      ],
+      "sequence": 22,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "case-study-solo-whitelabel-delivery-platform",
+      "route": "/blog/case-study-solo-whitelabel-delivery-platform.html",
+      "path": "/assets/images/og/posts/case-study-solo-whitelabel-delivery-platform.png",
+      "title": "Solo: Android Across a White-Label Food Platform",
+      "category": "portfolio",
+      "publishedDate": "2024-08-10",
+      "readingTime": "2 min read",
+      "topics": [
+        "Solo",
+        "Food Delivery",
+        "Android",
+        "Whitelabel"
+      ],
+      "sequence": 23,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "case-study-owto-ride-hailing-platform",
+      "route": "/blog/case-study-owto-ride-hailing-platform.html",
+      "path": "/assets/images/og/posts/case-study-owto-ride-hailing-platform.png",
+      "title": "OWTO: Android, iOS, and the Backend Between Them",
+      "category": "portfolio",
+      "publishedDate": "2024-06-15",
+      "readingTime": "2 min read",
+      "topics": [
+        "OWTO",
+        "Mobility",
+        "Android",
+        "iOS"
+      ],
+      "sequence": 24,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "2024-05-22-building-with-kotlin-and-swift",
+      "route": "/blog/2024-05-22-building-with-kotlin-and-swift.html",
+      "path": "/assets/images/og/posts/2024-05-22-building-with-kotlin-and-swift.png",
+      "title": "Building Across Kotlin and Swift Without Blurring Platform Boundaries",
+      "category": "technical",
+      "publishedDate": "2024-05-22",
+      "readingTime": "3 min read",
+      "topics": [
+        "KMP",
+        "SwiftUI"
+      ],
+      "sequence": 25,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "case-study-popslide-engagement-and-monetization",
+      "route": "/blog/case-study-popslide-engagement-and-monetization.html",
+      "path": "/assets/images/og/posts/case-study-popslide-engagement-and-monetization.png",
+      "title": "Popslide: Experiments on a Lockscreen Product",
+      "category": "portfolio",
+      "publishedDate": "2023-11-30",
+      "readingTime": "2 min read",
+      "topics": [
+        "Popslide",
+        "Adtech",
+        "Android",
+        "Experimentation"
+      ],
+      "sequence": 26,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "case-study-websafety-parental-controls",
+      "route": "/blog/case-study-websafety-parental-controls.html",
+      "path": "/assets/images/og/posts/case-study-websafety-parental-controls.png",
+      "title": "WebSafety: Parental Controls Meet Platform Limits",
+      "category": "portfolio",
+      "publishedDate": "2023-06-22",
+      "readingTime": "2 min read",
+      "topics": [
+        "WebSafety",
+        "Security",
+        "Parental Controls",
+        "Android"
+      ],
+      "sequence": 27,
+      "total": 28
+    },
+    {
+      "kind": "post",
+      "slug": "case-study-projectbass-crowdsourced-network-mapping",
+      "route": "/blog/case-study-projectbass-crowdsourced-network-mapping.html",
+      "path": "/assets/images/og/posts/case-study-projectbass-crowdsourced-network-mapping.png",
+      "title": "ProjectBASS: Crowdsourced Network Measurements",
+      "category": "portfolio",
+      "publishedDate": "2022-10-05",
+      "readingTime": "2 min read",
+      "topics": [
+        "ProjectBASS",
+        "Open Source",
+        "Network Mapping",
+        "Kotlin"
+      ],
+      "sequence": 28,
+      "total": 28
+    }
+  ]
+}

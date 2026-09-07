@@ -22,6 +22,9 @@
     "blog:writer": "node scripts/blog-writer-server.js",
     "blog:new": "node scripts/new-post.js",
     "work:seed": "node scripts/seed-work-deep-dives.js",
+    "resume:pdf": "node scripts/generate-resume-pdf.js",
+    "social:previews": "node scripts/generate-social-previews.js",
+    "social:previews:check": "node scripts/generate-social-previews.js --check",
     "build": "node scripts/build-site.js",
     "verify:dist": "node scripts/verify-dist.js",
     "verify:deterministic": "node scripts/check-deterministic-build.js",
@@ -34,12 +37,14 @@
     "test:contact-signals:browser": "node scripts/test-contact-signals-browser.js",
     "test:saved-reading": "node scripts/test-saved-reading-404.js",
     "test:work-briefing": "node scripts/test-work-briefing-and-flagships.js",
+    "test:semantics": "node scripts/test-accessibility-semantics.js",
     "test:contact-apps-script-verifier": "node scripts/test-contact-apps-script-verifier.js",
     "test:options": "node scripts/test-universe-options.js",
     "contact-signals:local": "node scripts/local-contact-signals-server.js",
     "contact:verify-apps-script": "node scripts/verify-contact-apps-script.js",
-    "verify": "npm run build && npm run verify:dist && npm run verify:deterministic && npm run test:build && npm run test:discovery && npm run test:writer && npm run test:contact-apps-script && npm run test:contact-signals && npm run test:contact-apps-script-verifier",
-    "test:e2e": "node scripts/run-e2e.js"
+    "verify": "npm run build && npm run social:previews:check && npm run verify:dist && npm run verify:deterministic && npm run test:build && npm run test:semantics && npm run test:discovery && npm run test:writer && npm run test:contact-apps-script && npm run test:contact-signals && npm run test:contact-apps-script-verifier",
+    "test:e2e": "node scripts/run-e2e.js",
+    "test:cross-browser": "node scripts/test-cross-browser-production.js"
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",
@@ -48,6 +53,7 @@
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.11",
+    "pdfjs-dist": "^6.2.108",
     "playwright": "^1.58.2",
     "tailwindcss": "^3.4.19"
   }

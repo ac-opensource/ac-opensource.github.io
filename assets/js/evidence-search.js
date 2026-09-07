@@ -7,12 +7,71 @@
   var results = document.querySelector("[data-evidence-search-results]");
   var status = document.querySelector("[data-evidence-search-status]");
   var empty = document.querySelector("[data-evidence-search-empty]");
-  if (!form || !input || !results || !status || !empty) return;
+  var navigation = document.querySelector("[data-search-navigation]");
+  var resultsRegion = document.querySelector(".evidence-search__results");
+  var resultsTitle = document.getElementById("results-title");
+  var readout = document.querySelector("[data-search-readout]");
+  var searchLink = document.querySelector("[data-site-search-link]");
+  if (!form || !input || !results || !status || !empty || !navigation) return;
 
   document.documentElement.classList.replace("no-js", "has-js");
+  if (searchLink) {
+    searchLink.setAttribute("href", "#evidence-query");
+    searchLink.setAttribute("aria-label", "Focus evidence search");
+  }
   var documents = [];
   var pendingQuery = null;
+  var pendingReveal = false;
   var ready = false;
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var routeMotionTimer = 0;
+
+  function setPhase(phase, count) {
+    navigation.dataset.searchPhase = phase;
+    if (!readout) return;
+    readout.textContent = {
+      idle: "INDEX READY",
+      loading: "INDEXING",
+      results: String(count || 0) + " MATCHES",
+      empty: "NO MATCH",
+      error: "INDEX UNAVAILABLE"
+    }[phase] || "INDEX READY";
+  }
+
+  function clearRouteMotion() {
+    window.clearTimeout(routeMotionTimer);
+    routeMotionTimer = 0;
+    delete navigation.dataset.searchMotion;
+  }
+
+  function signalRouteMotion() {
+    clearRouteMotion();
+    if (reduceMotion.matches) return;
+    // Restart the short route-acquisition sequence for an intentional query.
+    // The geometry remains static at rest; there is no ambient animation loop.
+    void navigation.offsetWidth;
+    navigation.dataset.searchMotion = "routing";
+    routeMotionTimer = window.setTimeout(clearRouteMotion, 720);
+  }
+
+  function revealResults() {
+    if (!resultsRegion) return;
+    window.requestAnimationFrame(function () {
+      var topbar = document.querySelector(".search-topbar");
+      // Reserve the same header space whether the current shell scrolls or
+      // sticks. This keeps the result heading clear during shared-nav changes.
+      var topOffset = topbar ? topbar.getBoundingClientRect().height + 16 : 16;
+      var targetTop = window.scrollY + resultsRegion.getBoundingClientRect().top - topOffset;
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: "auto" });
+      if (resultsTitle) resultsTitle.focus({ preventScroll: true });
+    });
+  }
+
+  if (typeof reduceMotion.addEventListener === "function") {
+    reduceMotion.addEventListener("change", function (event) {
+      if (event.matches) clearRouteMotion();
+    });
+  }
 
   function normalize(value) {
     return String(value || "").toLowerCase();
@@ -130,24 +189,31 @@
   }
 
   function render(query, options) {
+    options = options || {};
     query = String(query || "").slice(0, 160);
     var canonical = query.trim();
     var tokens = tokensFor(canonical);
     results.replaceChildren();
     input.value = query;
-    if (!options || options.history !== false) syncQueryUrl(canonical);
+    if (options.history !== false) syncQueryUrl(canonical);
     if (!canonical) {
       pendingQuery = ready ? null : "";
       empty.hidden = false;
-      empty.textContent = "Try a capability, project, technology, or delivery concern.";
-      status.textContent = ready ? "Enter a query to scan the public field." : "Loading the public field…";
+      empty.textContent = "Try a capability, system, project, or delivery outcome.";
+      status.textContent = ready ? "Set a destination to scan the published field." : "Loading the published route field…";
+      clearRouteMotion();
+      setPhase(ready ? "idle" : "loading");
+      if (options.reveal) input.focus({ preventScroll: true });
       return;
     }
     if (!ready) {
       pendingQuery = canonical;
+      pendingReveal = pendingReveal || options.reveal === true;
       empty.hidden = false;
-      empty.textContent = "Preparing the published index…";
-      status.textContent = "Loading the public field…";
+      empty.textContent = "Preparing the published route index…";
+      status.textContent = "Loading the published route field…";
+      clearRouteMotion();
+      setPhase("loading");
       return;
     }
     pendingQuery = null;
@@ -159,10 +225,11 @@
       })
       .slice(0, 40);
 
-    ranked.forEach(function (match) {
+    ranked.forEach(function (match, index) {
       var record = match.documentRecord;
       var item = document.createElement("li");
       item.className = "evidence-result";
+      item.style.setProperty("--result-index", String(Math.min(index, 5)));
       var meta = document.createElement("p");
       meta.className = "evidence-result__meta";
       meta.textContent = record.type + (record.date ? " · " + record.date : "");
@@ -192,19 +259,22 @@
     });
 
     empty.hidden = ranked.length > 0;
-    if (!ranked.length) empty.textContent = "No published match. Try a broader capability or project name.";
+    if (!ranked.length) empty.textContent = "No published match. Try a broader capability, system, or project name.";
     status.textContent = ranked.length + " published " + (ranked.length === 1 ? "match" : "matches") + " for “" + canonical + "”.";
+    setPhase(ranked.length ? "results" : "empty", ranked.length);
+    signalRouteMotion();
+    if (options.reveal) revealResults();
   }
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
-    render(input.value);
+    render(input.value, { reveal: true });
   });
 
   document.querySelectorAll("[data-search-suggestion]").forEach(function (button) {
     button.addEventListener("click", function () {
-      render(button.dataset.searchSuggestion || "");
-      input.focus();
+      render(button.dataset.searchSuggestion || "", { reveal: true });
+      input.focus({ preventScroll: true });
     });
   });
 
@@ -214,7 +284,9 @@
 
   var initialQuery = (new URLSearchParams(window.location.search).get("q") || "").slice(0, 160);
   input.value = initialQuery;
-  if (new URLSearchParams(window.location.search).get("focus") === "1") input.focus();
+  if (new URLSearchParams(window.location.search).get("focus") === "1") {
+    input.focus({ preventScroll: true });
+  }
 
   fetch(INDEX_URL, { credentials: "same-origin", cache: "no-cache" })
     .then(function (response) {
@@ -230,17 +302,24 @@
       });
       ready = true;
       if (pendingQuery !== null || initialQuery) {
-        render(pendingQuery !== null ? pendingQuery : initialQuery, { history: false });
+        var revealPendingResults = pendingReveal;
+        pendingReveal = false;
+        render(pendingQuery !== null ? pendingQuery : initialQuery, {
+          history: false,
+          reveal: revealPendingResults
+        });
       } else {
-        status.textContent = "Enter a query to scan the public field.";
+        status.textContent = "Set a destination to scan the published field.";
+        setPhase("idle");
       }
-      if (!input.value && document.activeElement === document.body) input.focus();
     })
     .catch(function () {
       ready = false;
+      clearRouteMotion();
       results.replaceChildren();
       empty.hidden = false;
       empty.textContent = "The published index is unavailable. Browse Portfolio, About, Résumé, or Logs directly.";
       status.textContent = "Search index unavailable.";
+      setPhase("error");
     });
 })();

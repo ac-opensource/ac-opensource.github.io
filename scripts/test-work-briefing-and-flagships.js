@@ -24,6 +24,7 @@ function read(relativePath) {
 function contentType(filePath) {
   const extension = path.extname(filePath).toLowerCase();
   return {
+    ".avif": "image/avif",
     ".css": "text/css; charset=utf-8",
     ".html": "text/html; charset=utf-8",
     ".js": "text/javascript; charset=utf-8",
@@ -59,6 +60,9 @@ function verifySources() {
   const { db } = openDatabase(undefined, { readonly: true });
 
   try {
+    const workDossiers = db.prepare(
+      "SELECT slug FROM posts WHERE status = 'published' AND category = 'work' ORDER BY slug ASC"
+    ).all().map(({ slug }) => slug);
     const bitcoin = getPostWithTopics(db, FLAGSHIPS[0]);
     const itvx = getPostWithTopics(db, FLAGSHIPS[1]);
     assert(bitcoin && itvx, "Both flagship posts must exist in the canonical SQLite database.");
@@ -117,6 +121,11 @@ function verifySources() {
       "The briefing destination heading must support deliberate programmatic focus.");
     assert(work.includes('aria-labelledby="briefing-title" tabindex="-1">'),
       "The briefing section must support focus for its own fragment destination.");
+    assert.strictEqual(
+      (work.match(/class="work-briefing__beats" role="region" tabindex="0" aria-label="[^"]+ proof beats"/g) || []).length,
+      BRIEFS.length,
+      "Every horizontally scrollable proof rail must be a named, keyboard-focusable region."
+    );
     assert(css.includes(".work-briefing__presets") && css.includes(".work-briefing__panel[hidden]"), "Briefing layout or state styles are missing.");
     assert(css.includes(".work-briefing__share[hidden]"), "Briefing share controls lack a no-JavaScript hidden state.");
     assert(neuralCss.includes("transition-duration: 0s !important;"),
@@ -133,12 +142,13 @@ function verifySources() {
       "Briefing controller retained a delayed frame-based scroll correction.");
     assert(work.includes('work-portfolio.css?v=20260812-brief3'), "Work briefing styles lack a current cache key.");
     assert(work.includes('work-briefing.js?v=20260812-brief3'), "Work briefing controller lacks a current cache key.");
+    return workDossiers;
   } finally {
     db.close();
   }
 }
 
-async function verifyBrowser() {
+async function verifyBrowser(workDossiers) {
   const server = await startServer();
   const address = server.address();
   const origin = `http://127.0.0.1:${address.port}`;
@@ -277,6 +287,116 @@ async function verifyBrowser() {
     await page.waitForFunction(() => document.querySelectorAll("[data-brief-panel]:not([hidden])").length === 1);
     const widths = await page.evaluate(() => ({ root: document.documentElement.scrollWidth, viewport: innerWidth }));
     assert(widths.root <= widths.viewport + 2, `Briefing overflows on mobile: ${JSON.stringify(widths)}`);
+
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 843 });
+      await page.goto(`${origin}/work.html?brief=android-leadership#briefing`, { waitUntil: "domcontentloaded" });
+      await page.waitForFunction(() => document.querySelectorAll("[data-brief-panel]:not([hidden])").length === 1);
+      const rail = page.locator("[data-brief-panel]:not([hidden]) .work-briefing__beats");
+      const railState = await rail.evaluate((element) => {
+        const focusable = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
+        const scrollableRegionOffenders = [...document.querySelectorAll("[data-work-briefing] *")]
+          .filter((candidate) => {
+            const style = getComputedStyle(candidate);
+            return candidate.scrollWidth > candidate.clientWidth + 1
+              && ["auto", "scroll"].includes(style.overflowX)
+              && candidate.tabIndex < 0
+              && !candidate.querySelector(focusable);
+          })
+          .map((candidate) => candidate.className || candidate.id || candidate.tagName);
+        return {
+          accessibleName: element.getAttribute("aria-label"),
+          clientWidth: element.clientWidth,
+          offenders: scrollableRegionOffenders,
+          role: element.getAttribute("role"),
+          scrollWidth: element.scrollWidth,
+          tabIndex: element.tabIndex
+        };
+      });
+      assert(
+        railState.role === "region"
+          && railState.tabIndex === 0
+          && /proof beats$/.test(railState.accessibleName || "")
+          && railState.scrollWidth > railState.clientWidth
+          && railState.offenders.length === 0,
+        `Proof rail fails the scrollable-region-focusable contract at ${width}px: ${JSON.stringify(railState)}`
+      );
+      await rail.focus();
+      const beforeScroll = await rail.evaluate((element) => element.scrollLeft);
+      await page.keyboard.press("ArrowRight");
+      await page.waitForFunction(
+        ({ selector, before }) => document.querySelector(selector)?.scrollLeft > before,
+        { selector: "[data-brief-panel]:not([hidden]) .work-briefing__beats", before: beforeScroll }
+      );
+      assert.strictEqual(await rail.evaluate((element) => element === document.activeElement), true,
+        `Proof rail lost focus after keyboard scrolling at ${width}px.`);
+    }
+
+    await page.setViewportSize({ width: 360, height: 800 });
+    for (const slug of workDossiers) {
+      await page.goto(`${origin}/blog/${slug}.html`, { waitUntil: "domcontentloaded" });
+      const dossierLayout = await page.evaluate(() => {
+        const hero = document.querySelector(".work-post-hero");
+        const heroBounds = hero?.getBoundingClientRect();
+        const mapBounds = document.querySelector("[data-universe-route-map]")?.getBoundingClientRect();
+        const protectedContentEdges = [
+          document.querySelector(".article-region__actions"),
+          document.querySelector(".article-region__topic-field")
+        ].filter(Boolean).map((element) => (
+          element.getBoundingClientRect().left + Number.parseFloat(getComputedStyle(element).paddingLeft || "0")
+        ));
+        const offenders = [...document.querySelectorAll("body *")].flatMap((element) => {
+          const bounds = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          const hasVisibleScrollOverflow = element.scrollWidth > element.clientWidth + 1
+            && !["auto", "clip", "hidden", "scroll"].includes(style.overflowX);
+          if (bounds.left >= -1 && bounds.right <= innerWidth + 1 && !hasVisibleScrollOverflow) return [];
+          return [{
+            className: String(element.className || "").slice(0, 100),
+            clientWidth: element.clientWidth,
+            id: element.id,
+            left: bounds.left,
+            overflowX: style.overflowX,
+            right: bounds.right,
+            scrollWidth: element.scrollWidth,
+            tag: element.tagName.toLowerCase()
+          }];
+        }).slice(0, 12);
+        return {
+          hero: heroBounds ? {
+            left: heroBounds.left,
+            right: heroBounds.right,
+            width: heroBounds.width
+          } : null,
+          heroInsideViewport: !heroBounds || (heroBounds.left >= -1 && heroBounds.right <= innerWidth + 1),
+          mapClearsProtectedContent: !mapBounds || protectedContentEdges.every((left) => left >= mapBounds.right + 4),
+          offenders,
+          root: document.documentElement.scrollWidth,
+          viewport: innerWidth
+        };
+      });
+      assert(
+        dossierLayout.root <= dossierLayout.viewport + 1
+          && dossierLayout.heroInsideViewport
+          && dossierLayout.mapClearsProtectedContent,
+        `${slug} overflows on a small phone: ${JSON.stringify(dossierLayout)}`
+      );
+    }
+
+    await page.goto(`${origin}/resume.html`, { waitUntil: "domcontentloaded" });
+    const resumeMapClearance = await page.evaluate(() => {
+      const map = document.querySelector("[data-universe-route-map]").getBoundingClientRect();
+      const registry = document.querySelector("[data-resume-signature-visual]");
+      const registryBounds = registry.getBoundingClientRect();
+      return {
+        mapRight: map.right,
+        registryContentLeft: registryBounds.left + Number.parseFloat(getComputedStyle(registry).paddingLeft || "0")
+      };
+    });
+    assert(
+      resumeMapClearance.registryContentLeft >= resumeMapClearance.mapRight + 4,
+      `Resume registry collides with the fixed field map: ${JSON.stringify(resumeMapClearance)}`
+    );
     await context.close();
 
     const noScriptContext = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 430, height: 932 } });
@@ -352,9 +472,11 @@ async function verifyBrowser() {
 }
 
 (async () => {
-  verifySources();
-  await verifyBrowser();
-  console.log(`Verified ${FLAGSHIPS.length} flagship dossiers and ${BRIEFS.length} shareable role briefings.`);
+  const workDossiers = verifySources();
+  await verifyBrowser(workDossiers);
+  console.log(
+    `Verified ${workDossiers.length} responsive work dossiers, ${FLAGSHIPS.length} flagships, and ${BRIEFS.length} shareable role briefings.`
+  );
 })().catch((error) => {
   console.error(error);
   process.exitCode = 1;

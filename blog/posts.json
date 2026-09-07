@@ -1,5 +1,47 @@
 [
   {
+    "slug": "case-study-bitcoin-wallet-multichain-android-systems",
+    "title": "Bitcoin.com Wallet: Shipping Multichain Android Systems",
+    "author": "Andrew Concepcion",
+    "summary": "A public-safe account of my Android work across multichain rewards, transaction replacement, wallet migration, swaps, shared Rust, startup performance, and release reliability.",
+    "date": "2026-08-12",
+    "readingTime": "5 min read",
+    "topics": [
+      "Bitcoin.com Wallet",
+      "Android",
+      "Fintech",
+      "Multichain",
+      "Rust"
+    ],
+    "category": "work",
+    "heroImage": "/assets/images/work/img_bitcoin_wallet_1.webp",
+    "heroAlt": "Bitcoin.com Wallet Android multichain portfolio screen",
+    "heroCaption": "Official Bitcoin.com Wallet Android app screen from Google Play",
+    "updatedAt": "2026-08-12 11:22:21",
+    "createdAt": "2026-08-12 11:22:21"
+  },
+  {
+    "slug": "case-study-itvx-playback-at-candyspace",
+    "title": "ITVX at Candyspace: Playback Features Under Live Constraints",
+    "author": "Andrew Concepcion",
+    "summary": "How I delivered ITVX Android player features at Candyspace across recommendations, timeline previews, phone and tablet motion, reliability, security, and XML parsing.",
+    "date": "2026-08-11",
+    "readingTime": "4 min read",
+    "topics": [
+      "Candyspace",
+      "ITVX",
+      "Android",
+      "Streaming",
+      "Media Playback"
+    ],
+    "category": "work",
+    "heroImage": "/assets/images/work/img_itvx_live.webp",
+    "heroAlt": "ITVX Android app live streaming screen",
+    "heroCaption": "Official ITVX Android app screen from Google Play",
+    "updatedAt": "2026-08-12 11:22:21",
+    "createdAt": "2026-08-12 11:22:21"
+  },
+  {
     "slug": "2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system",
     "title": "Rebuilding My Homepage as an Interactive Orbital System",
     "author": "Andrew Concepcion",
@@ -291,7 +333,7 @@
       "Team Process"
     ],
     "category": "technical",
-    "heroImage": "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1600&q=80",
+    "heroImage": "/blog/images/agent-fleet-phone-lights-1600.avif",
     "heroAlt": "A hand holds a smartphone against blurred colored lights.",
     "heroCaption": "More screens do not create coordination; the workflow between them does.",
     "updatedAt": "2026-07-25 00:00:00",
@@ -333,7 +375,7 @@
     "heroImage": "/assets/images/work/img_mystc_app-optimized.webp",
     "heroAlt": "MySTC mobile app screenshot",
     "heroCaption": "MySTC production app",
-    "updatedAt": "2026-07-22 15:37:47",
+    "updatedAt": "2026-08-12 11:22:21",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
@@ -348,7 +390,7 @@
       "Creative Process"
     ],
     "category": "reflection",
-    "heroImage": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+    "heroImage": "/blog/images/quiet-systems-mountain-ridges-1600.avif",
     "heroAlt": "Layered mountain ridges fading into a pale sunrise sky.",
     "heroCaption": "Quiet systems create enough distance to see what the noise was hiding.",
     "updatedAt": "2026-07-25 00:00:00",
@@ -360,7 +402,7 @@
     "author": "Andrew Concepcion",
     "summary": "I worked on OCBC Business for Android in Kotlin and XML, covering chart UI, identity-verification integration, network behavior, and focused unit tests.",
     "date": "2024-11-20",
-    "readingTime": "1 min read",
+    "readingTime": "2 min read",
     "topics": [
       "OCBC",
       "Fintech",
@@ -371,7 +413,7 @@
     "heroImage": "/assets/images/work/img_ocbc_business_cashflow.webp",
     "heroAlt": "OCBC Business Android app screen showing sales, expenses, and cashflow",
     "heroCaption": "Official OCBC Business Android app screen from Google Play",
-    "updatedAt": "2026-07-25 00:00:00",
+    "updatedAt": "2026-08-12 11:22:21",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
@@ -397,7 +439,7 @@
     "author": "Andrew Concepcion",
     "summary": "I worked on openpay's Android purchase flow, including spend-limit cards, merchant content, checkout state, and partner-dependent payment paths.",
     "date": "2024-09-01",
-    "readingTime": "1 min read",
+    "readingTime": "2 min read",
     "topics": [
       "openpay",
       "Fintech",
@@ -409,7 +451,7 @@
     "heroImage": "/assets/images/work/img_openpay_app-optimized.webp",
     "heroAlt": "openpay app interface showing spend limits and merchant discovery cards",
     "heroCaption": "openpay purchase experience",
-    "updatedAt": "2026-07-25 00:00:00",
+    "updatedAt": "2026-08-12 11:22:21",
     "createdAt": "2026-03-26 14:57:56"
   },
   {
@@ -429,7 +471,7 @@
     "heroImage": "/assets/images/work/img_solo_app-optimized.webp",
     "heroAlt": "Solo food delivery app screenshot",
     "heroCaption": "Solo whitelabel app family",
-    "updatedAt": "2026-07-22 15:37:47",
+    "updatedAt": "2026-08-12 11:22:21",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
@@ -450,7 +492,7 @@
     "heroImage": "/assets/images/work/img_owto_app-optimized.webp",
     "heroAlt": "OWTO ride-hailing app screenshot",
     "heroCaption": "OWTO app booking flow",
-    "updatedAt": "2026-07-22 15:37:47",
+    "updatedAt": "2026-08-12 11:22:21",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
@@ -465,7 +507,7 @@
       "SwiftUI"
     ],
     "category": "technical",
-    "heroImage": "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=1600&q=80",
+    "heroImage": "/blog/images/kotlin-swift-developer-laptops-1600.avif",
     "heroAlt": "A developer works between a Windows laptop and a MacBook.",
     "heroCaption": "Two native toolchains, one product boundary to design deliberately.",
     "updatedAt": "2026-07-25 00:00:00",
@@ -488,7 +530,7 @@
     "heroImage": "/assets/images/work/img_popslide_app-optimized.webp",
     "heroAlt": "Popslide app screenshot",
     "heroCaption": "Popslide lockscreen and rewards experience",
-    "updatedAt": "2026-07-22 15:37:47",
+    "updatedAt": "2026-08-12 11:22:21",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
@@ -508,7 +550,7 @@
     "heroImage": "/assets/images/work/img_websafety_app-optimized.webp",
     "heroAlt": "WebSafety app screenshot",
     "heroCaption": "WebSafety monitoring dashboard",
-    "updatedAt": "2026-07-22 15:37:47",
+    "updatedAt": "2026-08-12 11:22:21",
     "createdAt": "2026-03-26 02:18:28"
   },
   {
@@ -517,7 +559,7 @@
     "author": "Andrew Concepcion",
     "summary": "I contributed Kotlin feature and maintenance work to ProjectBASS, an open-source Android app for collecting volunteer network measurements.",
     "date": "2022-10-05",
-    "readingTime": "1 min read",
+    "readingTime": "2 min read",
     "topics": [
       "ProjectBASS",
       "Open Source",
@@ -528,7 +570,7 @@
     "heroImage": "/assets/images/work/img_projectbass_app-optimized.webp",
     "heroAlt": "ProjectBASS app screenshot",
     "heroCaption": "ProjectBASS map visualization",
-    "updatedAt": "2026-07-25 00:00:00",
+    "updatedAt": "2026-08-12 11:22:21",
     "createdAt": "2026-03-26 02:18:28"
   }
 ]

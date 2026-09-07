@@ -5,10 +5,12 @@
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const ARRIVAL_KEY = "ac.universe-perspective.v1";
   const MAX_ARRIVAL_AGE = 8000;
-  const FALLBACK_DEPARTURE_MS = 760;
-  const ARRIVAL_MS = 1550;
-  const STYLE_HREF = "/assets/css/universe-perspective-navigation.css?v=20260812-discovery1";
+  const FALLBACK_DEPARTURE_MS = 720;
+  const ARRIVAL_MS = 1320;
+  const STYLE_HREF = "/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1";
+  const forcedColors = window.matchMedia("(forced-colors: active)");
   const timers = new Set();
+  let pendingDestination = null;
   let transitionInFlight = false;
   let activeViewTransition = null;
   let travelGeneration = 0;
@@ -29,7 +31,7 @@
   });
 
   function motionIsReduced() {
-    return reducedMotion.matches;
+    return reducedMotion.matches || forcedColors.matches;
   }
 
   function schedule(callback, delay) {
@@ -154,6 +156,75 @@
     };
   }
 
+  const LANDMARKS = Object.freeze({
+    home: "[data-camera-window]", work: ".work-hero__art",
+    projects: ".work-bitcoin-stage", about: "#stellar-spectrum-panel",
+    profile: "#stellar-spectrum-panel", logs: "#galaxy-sky",
+    article: ".article-region__hero", contact: "[data-payload-visual]",
+    resume: "[data-resume-signature-visual]", signals: ".signals-hero__telemetry",
+    search: ".evidence-search__console",
+  });
+
+  function landmarkOffset(key, focusX, focusY) {
+    const landmark = document.querySelector(LANDMARKS[key] || "main");
+    if (!landmark) return { x: 0, y: 0 };
+    // Live fallback arrivals already translate the element. Measure its resting
+    // box, otherwise a second alignment would cancel the first flight offset.
+    const animation = landmark.style.getPropertyValue("animation");
+    const priority = landmark.style.getPropertyPriority("animation");
+    landmark.style.setProperty("animation", "none", "important");
+    const bounds = landmark.getBoundingClientRect();
+    if (animation) landmark.style.setProperty("animation", animation, priority);
+    else landmark.style.removeProperty("animation");
+    if (!bounds.width || !bounds.height) return { x: 0, y: 0 };
+    return {
+      x: window.innerWidth * focusX / 100 - (bounds.left + bounds.width / 2),
+      y: window.innerHeight * focusY / 100 - (bounds.top + bounds.height / 2),
+    };
+  }
+
+  function alignArrivalLandmark() {
+    if (!lastTravel || root.dataset.universeMotion !== "arrive") return;
+    const offset = landmarkOffset(lastTravel.to, lastTravel.focusX, lastTravel.focusY);
+    root.style.setProperty("--universe-landmark-x", `${offset.x.toFixed(2)}px`);
+    root.style.setProperty("--universe-landmark-y", `${offset.y.toFixed(2)}px`);
+    installCurvedPath(lastTravel, offset);
+  }
+
+  function installCurvedPath(travel, arrivalOffset) {
+    let style = document.querySelector("style[data-universe-trajectory]");
+    if (!style) {
+      style = document.createElement("style");
+      style.dataset.universeTrajectory = "";
+      document.head.append(style);
+    }
+    const bendX = (travel.curveX || 0) * window.innerWidth / 100;
+    const bendY = (travel.curveY || 0) * window.innerHeight / 100;
+    const cubic = (a, b, c, d, t) => {
+      const u = 1 - t;
+      return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * d;
+    };
+    // Sample a cubic spatial arc; adjacent samples share the curve's tangent.
+    // CSS interpolates the samples on the compositor without a frame loop.
+    const frames = Array.from({ length: 41 }, (_, index) => {
+      const t = index / 40;
+      const x = cubic(arrivalOffset.x, arrivalOffset.x + bendX, bendX * 0.6, 0, t);
+      const y = cubic(arrivalOffset.y, arrivalOffset.y + bendY, bendY * 0.6, 0, t);
+      const z = cubic(-620, -420 - (travel.curveZ || 0), 100, 0, t);
+      const scale = 0.018 + 0.982 * t * t;
+      return `${(56 + 44 * t).toFixed(2)}% { opacity: ${Math.min(1, t * 10).toFixed(3)}; transform: translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) rotateX(${((travel.cameraTiltX || 0) * (1 - t)).toFixed(2)}deg) rotateY(${((travel.cameraTiltY || 0) * (1 - t)).toFixed(2)}deg) scale(${scale.toFixed(5)}); }`;
+    });
+    const release = Array.from({ length: 25 }, (_, index) => {
+      const t = index / 24;
+      const x = cubic(0, -bendX * 0.7, (travel.sourceOffsetX || 0) * 0.6 - bendX * 0.3, travel.sourceOffsetX || 0, t);
+      const y = cubic(0, -bendY * 0.7, (travel.sourceOffsetY || 0) * 0.6 - bendY * 0.3, travel.sourceOffsetY || 0, t);
+      const z = cubic(0, -80, -380, -650, t);
+      return `${(34 * t).toFixed(2)}% { opacity: ${(t === 1 ? 0 : 1 - t * 0.7).toFixed(3)}; transform: translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${(0.006 + 0.994 * Math.pow(1 - t, 3)).toFixed(5)}); }`;
+    });
+    style.textContent = `@keyframes universe-world-arrive { 0% { opacity: 0; } ${frames.join("\n")} }
+@keyframes universe-visual-release { ${release.join("\n")} 100% { opacity: 0; } }`;
+  }
+
   function directionFor(deltaX, deltaY) {
     if (Math.abs(deltaX) < 4 && Math.abs(deltaY) < 4) return "depth";
     if (Math.abs(deltaX) >= Math.abs(deltaY) * 0.55 && Math.abs(deltaY) >= Math.abs(deltaX) * 0.55) {
@@ -170,12 +241,12 @@
     const angularDistance = Math.hypot(deltaX, deltaY);
     const cameraX = clamp(deltaX * -0.09, -4.5, 4.5);
     const cameraY = clamp(deltaY * -0.065, -3.5, 3.5);
-    const cameraZ = clamp(deltaDepth * -24, -150, 150);
+    const cameraZ = clamp(deltaDepth * 24, -150, 150);
     const magnificationRatio = destination.magnification / source.magnification;
     const magnificationShift = Math.abs(Math.log2(magnificationRatio));
     const cameraScale = clamp(1.035 + (angularDistance * 0.0005) + (magnificationShift * 0.022), 1.04, 1.1);
-    const cameraTiltX = clamp(deltaY * 0.011, -0.62, 0.62);
-    const cameraTiltY = clamp(deltaX * -0.013, -0.78, 0.78);
+    const cameraTiltX = clamp(deltaY * 0.11, -8, 8);
+    const cameraTiltY = clamp(deltaX * -0.14, -11, 11);
     const skyX = clamp(deltaX * -0.82, -58, 58);
     const skyY = clamp(deltaY * -0.62, -46, 46);
     const targetEntryDistance = clamp(58 + (angularDistance * 0.3), 60, 78);
@@ -185,12 +256,38 @@
     const palette = skyPalette(source, destination);
     const depthDirection = Math.abs(deltaDepth) < 0.25 ? "level" : deltaDepth > 0 ? "farther" : "nearer";
     const duration = Math.round(clamp(
-      1180 + (angularDistance * 5) + (Math.abs(deltaDepth) * 30),
-      1350,
-      1750
+      1160 + (angularDistance * 1.7) + (Math.abs(deltaDepth) * 10),
+      1240,
+      1420
     ));
+    // A fixed atlas supplies X, Y and Z. Reverse trips use the same bend,
+    // traversed from the other end, instead of choosing a random entrance.
+    const deltaZ = deltaDepth * 12;
+    const distance3D = Math.hypot(deltaX, deltaY, deltaZ);
+    const yaw = Math.atan2(deltaX, deltaZ || 0.001);
+    const pitch = Math.atan2(deltaY, Math.hypot(deltaX, deltaZ));
+    const focusX = clamp(50 + Math.sin(yaw) * 52, 2, 98);
+    const focusY = clamp(48 + Math.sin(pitch) * 42, 8, 90);
+    const orientation = source.x !== destination.x
+      ? Math.sign(destination.x - source.x)
+      : Math.sign(destination.y - source.y) || 1;
+    const bend = clamp(distance3D * 0.24, 12, 28);
+    const curveX = angularDistance ? (-deltaY / angularDistance) * bend * orientation : bend;
+    const curveY = angularDistance ? (deltaX / angularDistance) * bend * 0.7 * orientation : bend * 0.5;
+    const sourceOffset = landmarkOffset(source.key, 100 - focusX, 96 - focusY);
     return {
-      version: 7,
+      version: 8,
+      travelMethod: "curved-spatial-continuity",
+      worldFrom: [source.x, source.y, source.depth * 12],
+      worldTo: [destination.x, destination.y, destination.depth * 12],
+      distance3D,
+      headingYaw: yaw * 180 / Math.PI,
+      headingPitch: pitch * 180 / Math.PI,
+      curveX,
+      curveY,
+      curveZ: clamp(distance3D * 1.2, 36, 140),
+      sourceOffsetX: sourceOffset.x,
+      sourceOffsetY: sourceOffset.y,
       motionModel: "observer-camera-3d",
       searchModel: "directional-guiding-scope",
       createdAt: Date.now(),
@@ -207,8 +304,8 @@
       direction: directionFor(deltaX, deltaY),
       depthDirection,
       duration,
-      searchStart: 0.22,
-      searchEnd: 0.68,
+      searchStart: 0.28,
+      searchEnd: 0.60,
       cameraX,
       cameraY,
       cameraZ,
@@ -235,8 +332,8 @@
       starFar: palette.starFar,
       starMiddle: palette.starMiddle,
       starNear: palette.starNear,
-      focusX: clamp(destination.x, 22, 78),
-      focusY: clamp(destination.y, 20, 80),
+      focusX,
+      focusY,
     };
   }
 
@@ -255,6 +352,7 @@
       <i class="universe-depth-field__target" data-universe-target-cue></i>
     `;
     document.body.prepend(field);
+    alignArrivalLandmark();
   }
 
   function ensureStylesheet() {
@@ -275,6 +373,9 @@
 
   function applyTravel(travel) {
     lastTravel = travel;
+    root.style.setProperty("--universe-arrival-animation", "universe-world-arrive");
+    root.style.setProperty("--universe-release-x", `${Number(travel.sourceOffsetX || 0).toFixed(2)}px`);
+    root.style.setProperty("--universe-release-y", `${Number(travel.sourceOffsetY || 0).toFixed(2)}px`);
     root.dataset.universeTravel = travel.direction;
     root.dataset.universeDepthTravel = travel.depthDirection;
     root.dataset.universePerspectiveFrom = travel.from;
@@ -282,6 +383,8 @@
     root.style.setProperty("--universe-perspective-duration", `${travel.duration || ARRIVAL_MS}ms`);
     root.style.setProperty("--universe-camera-x", `${travel.cameraX.toFixed(2)}vw`);
     root.style.setProperty("--universe-camera-y", `${travel.cameraY.toFixed(2)}vh`);
+    root.style.setProperty("--universe-curve-x", `${Number(travel.curveX || 0).toFixed(2)}vw`);
+    root.style.setProperty("--universe-curve-y", `${Number(travel.curveY || 0).toFixed(2)}vh`);
     root.style.setProperty("--universe-camera-z", `${travel.cameraZ.toFixed(2)}px`);
     root.style.setProperty("--universe-camera-scale", travel.cameraScale.toFixed(4));
     root.style.setProperty("--universe-camera-tilt-x", `${travel.cameraTiltX.toFixed(2)}deg`);
@@ -322,6 +425,7 @@
     if (generation !== null && generation !== travelGeneration) return;
     clearTimers();
     transitionInFlight = false;
+    pendingDestination = null;
     activeViewTransition = null;
     root.dataset.universePerspective = "ready";
     delete root.dataset.universeMotion;
@@ -368,7 +472,7 @@
       const travel = JSON.parse(serialized);
       const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
       if (!travel
-        || travel.version !== 7
+        || travel.version !== 8
         || travel.motionModel !== "observer-camera-3d"
         || travel.searchModel !== "directional-guiding-scope"
         || Date.now() - travel.createdAt > MAX_ARRIVAL_AGE
@@ -464,6 +568,7 @@
     }
 
     event.preventDefault();
+    pendingDestination = targetUrl.href;
     const departureDelay = Math.round((travel.duration || FALLBACK_DEPARTURE_MS) * 0.56);
     schedule(() => {
       try {
@@ -499,8 +604,11 @@
   });
 
   window.addEventListener("pagereveal", (event) => {
+    installDepthField();
     if (!arrival || motionIsReduced()) return;
+    alignArrivalLandmark();
     if (!event.viewTransition) {
+      root.dataset.universeCrossDocument = "false";
       schedule(() => clearTravelState({ generation: arrivalGeneration }), (arrival.duration || ARRIVAL_MS) + 120);
       return;
     }
@@ -541,11 +649,14 @@
 
   function settleForMotionPreference() {
     if (!motionIsReduced()) return;
+    const destination = pendingDestination;
     skipActiveTransition();
     clearTravelState({ keepLast: false });
+    if (destination) window.location.assign(destination);
   }
 
   reducedMotion.addEventListener?.("change", settleForMotionPreference);
+  forcedColors.addEventListener?.("change", settleForMotionPreference);
 
   window.UniversePerspective = Object.freeze({
     snapshot() {

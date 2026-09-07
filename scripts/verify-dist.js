@@ -1,8 +1,17 @@
 const fs = require("fs");
 const path = require("path");
 const { LLMS_SECTIONS } = require("./build-static-blog-pages");
-const { openDatabase, assertSchema } = require("./lib/blog-db");
+const { openDatabase, assertSchema, getPostList, getPostWithTopics } = require("./lib/blog-db");
 const { shouldExcludeOriginal } = require("./lib/public-images");
+const {
+  LOGS_SOCIAL_PREVIEW_PATH,
+  SEARCH_SOCIAL_PREVIEW_PATH,
+  assertSocialPreviewSet,
+  logsSocialPreviewAlt,
+  postSocialPreviewAlt,
+  postSocialPreviewPath,
+  searchSocialPreviewAlt
+} = require("./lib/social-previews");
 const publication = require("./site-publication.config");
 const SignalsContract = require("../assets/js/signals-contract");
 const ContactTransport = require("../assets/js/contact-transport");
@@ -55,6 +64,9 @@ function assertPublicInventory(distDir, relativeFiles) {
     "blog/posts.json",
     "blog/rss.xml",
     "assets/css/tailwind.css",
+    "assets/css/site-fonts.css",
+    "assets/fonts/manrope-latin-variable.woff2",
+    "assets/fonts/space-grotesk-latin-variable.woff2",
     "llms.txt",
     "robots.txt",
     "sitemap.xml",
@@ -117,6 +129,63 @@ function assertPublicInventory(distDir, relativeFiles) {
   }
 }
 
+function assertLocalProductionFonts(distDir, files) {
+  const fontFiles = [
+    "assets/fonts/manrope-latin-variable.woff2",
+    "assets/fonts/space-grotesk-latin-variable.woff2"
+  ];
+  for (const relativePath of fontFiles) {
+    const size = fs.statSync(path.join(distDir, relativePath)).size;
+    if (size < 10_000 || size > 64_000) {
+      throw new Error(`Local font ${relativePath} has an unexpected ${size}-byte payload.`);
+    }
+  }
+
+  for (const file of files.filter((candidate) => candidate.endsWith(".html"))) {
+    const relativePath = relativePosix(distDir, file);
+    const html = fs.readFileSync(file, "utf8");
+    if (/https:\/\/fonts\.(?:googleapis|gstatic)\.com/i.test(html)) {
+      throw new Error(`${relativePath} still makes a third-party Google Fonts request.`);
+    }
+    if (/Material\+Symbols/i.test(html)) {
+      throw new Error(`${relativePath} still requests the Material Symbols font.`);
+    }
+    if (!html.includes('href="/assets/css/site-fonts.css?v=20260819-local1"')) {
+      throw new Error(`${relativePath} is missing the local production font stylesheet.`);
+    }
+  }
+}
+
+function assertResponsiveImageDelivery(distDir) {
+  const workHtml = fs.readFileSync(path.join(distDir, "work.html"), "utf8");
+  for (const stem of ["img_itvx_library", "img_itvx_live", "img_itvx_home"]) {
+    for (const width of [192, 384]) {
+      const relativePath = `assets/images/work/${stem}-${width}.avif`;
+      if (!workHtml.includes(`/${relativePath} ${width}w`)) {
+        throw new Error(`work.html is missing the ${width}px responsive source for ${stem}.`);
+      }
+      const size = fs.statSync(path.join(distDir, relativePath)).size;
+      if (size > 55_000) {
+        throw new Error(`${relativePath} exceeds its 55 KB portfolio-card budget (${size} bytes).`);
+      }
+    }
+  }
+
+  const logsHtml = fs.readFileSync(path.join(distDir, "blog", "index.html"), "utf8");
+  for (const stem of ["fortress-we-mistake-for-home", "not-okay-is-a-starting-point"]) {
+    for (const width of [320, 640]) {
+      const relativePath = `blog/images/${stem}-${width}.avif`;
+      if (!logsHtml.includes(`/${relativePath} ${width}w`)) {
+        throw new Error(`Logs fallback is missing the ${width}px responsive source for ${stem}.`);
+      }
+      const size = fs.statSync(path.join(distDir, relativePath)).size;
+      if (size > 100_000) {
+        throw new Error(`${relativePath} exceeds its 100 KB Logs-thumbnail budget (${size} bytes).`);
+      }
+    }
+  }
+}
+
 function jsonLdNodes(html, label) {
   const documents = [...String(html).matchAll(
     /<script\b[^>]*\btype=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
@@ -159,6 +228,8 @@ function assertCanonicalPersonIdentity(distDir) {
   const aboutPath = path.join(distDir, "about.html");
   const homepage = fs.readFileSync(homepagePath, "utf8");
   const about = fs.readFileSync(aboutPath, "utf8");
+  const resume = fs.readFileSync(path.join(distDir, "resume.html"), "utf8");
+  const blog = fs.readFileSync(path.join(distDir, "blog", "index.html"), "utf8");
   const homePeople = jsonLdNodes(homepage, "index.html").filter((node) => hasJsonLdType(node, "Person"));
   const aboutPeople = jsonLdNodes(about, "about.html").filter((node) => hasJsonLdType(node, "Person"));
   if (!homePeople.length || homePeople.some((person) => person["@id"] !== PERSON_ID)) {
@@ -170,6 +241,29 @@ function assertCanonicalPersonIdentity(distDir) {
   const profilePage = jsonLdOfType(about, "ProfilePage", "about.html");
   if (profilePage.mainEntity?.["@id"] !== PERSON_ID) {
     throw new Error(`About ProfilePage.mainEntity must reference canonical identity ${PERSON_ID}.`);
+  }
+  const resumeProfilePage = jsonLdOfType(resume, "ProfilePage", "resume.html");
+  if (resumeProfilePage.mainEntity?.["@id"] !== PERSON_ID) {
+    throw new Error(`Résumé ProfilePage.mainEntity must reference canonical identity ${PERSON_ID}.`);
+  }
+  const collectionPage = jsonLdOfType(blog, "CollectionPage", "blog/index.html");
+  const itemList = jsonLdOfType(blog, "ItemList", "blog/index.html");
+  const expectedPostUrls = fs
+    .readdirSync(path.join(distDir, "blog"), { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".html") && entry.name !== "index.html")
+    .map((entry) => `${SITE_ORIGIN}/blog/${entry.name}`)
+    .sort();
+  const structuredPostUrls = (itemList.itemListElement || [])
+    .map((entry) => entry?.url)
+    .filter(Boolean)
+    .sort();
+  if (
+    collectionPage.author?.["@id"] !== PERSON_ID ||
+    collectionPage.mainEntity?.["@id"] !== itemList["@id"] ||
+    itemList.numberOfItems !== expectedPostUrls.length ||
+    JSON.stringify(structuredPostUrls) !== JSON.stringify(expectedPostUrls)
+  ) {
+    throw new Error("Blog CollectionPage/ItemList structured data does not match the canonical published archive.");
   }
 }
 
@@ -375,12 +469,26 @@ function metaContent(html, attribute, value) {
     || "";
 }
 
-function assertSocialMetadata(distDir) {
+function decodeHtmlEntities(value) {
+  return String(value || "")
+    .replace(/&#(\d+);/g, (_match, code) => String.fromCodePoint(Number(code)))
+    .replace(/&#x([0-9a-f]+);/gi, (_match, code) => String.fromCodePoint(Number.parseInt(code, 16)))
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&amp;/gi, "&");
+}
+
+function assertSocialMetadata(distDir, posts = []) {
   const generatedPosts = fs
     .readdirSync(path.join(distDir, "blog"), { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith(".html") && entry.name !== "index.html")
     .map((entry) => path.posix.join("blog", entry.name));
   const canonicalPages = [...publication.publicPages, "blog/index.html", ...generatedPosts];
+
+  const postBySlug = new Map(posts.map((post) => [String(post.slug), post]));
+  const claimedPostImages = new Set();
 
   for (const relativePath of canonicalPages) {
     const html = fs.readFileSync(path.join(distDir, relativePath), "utf8");
@@ -425,11 +533,11 @@ function assertSocialMetadata(distDir) {
       throw new Error(`${relativePath} has incomplete or inconsistent Open Graph/Twitter metadata: ${JSON.stringify(metadata)}`);
     }
 
-    if (expectedType === "website" && (
+    if (
       metadata.imageType !== "image/png" ||
       metadata.imageWidth !== "1200" ||
       metadata.imageHeight !== "630"
-    )) {
+    ) {
       throw new Error(`${relativePath} social preview must declare a 1200x630 PNG.`);
     }
 
@@ -437,6 +545,55 @@ function assertSocialMetadata(distDir) {
     if (imageUrl.origin === SITE_ORIGIN && !fs.existsSync(referenceTarget(distDir, imageUrl.pathname))) {
       throw new Error(`${relativePath} social preview does not exist in publication output: ${imageUrl.pathname}`);
     }
+
+    let expectedImage = "";
+    let expectedAlt = "";
+    if (relativePath === "blog/index.html") {
+      expectedImage = `${SITE_ORIGIN}${LOGS_SOCIAL_PREVIEW_PATH}`;
+      expectedAlt = logsSocialPreviewAlt(posts);
+    } else if (relativePath === "search.html") {
+      expectedImage = `${SITE_ORIGIN}${SEARCH_SOCIAL_PREVIEW_PATH}`;
+      expectedAlt = searchSocialPreviewAlt();
+    } else if (relativePath.startsWith("blog/")) {
+      const slug = path.basename(relativePath, ".html");
+      const post = postBySlug.get(slug);
+      if (!post) throw new Error(`${relativePath} has no matching published database row for its social preview.`);
+      expectedImage = `${SITE_ORIGIN}${postSocialPreviewPath(post)}`;
+      expectedAlt = postSocialPreviewAlt(post);
+      if (claimedPostImages.has(expectedImage)) {
+        throw new Error(`${relativePath} reuses another published post's social preview: ${expectedImage}`);
+      }
+      claimedPostImages.add(expectedImage);
+    }
+
+    if (expectedImage && (metadata.image !== expectedImage || decodeHtmlEntities(metadata.imageAlt) !== expectedAlt)) {
+      throw new Error(`${relativePath} does not use its canonical route-specific social preview.`);
+    }
+    if (relativePath.startsWith("blog/") && /\/(?:blog|project-detail)\.png(?:$|[?#])/.test(metadata.image)) {
+      throw new Error(`${relativePath} still uses a retired shared article preview.`);
+    }
+  }
+
+  if (claimedPostImages.size !== posts.length) {
+    throw new Error(`Expected ${posts.length} unique post social previews, found ${claimedPostImages.size}.`);
+  }
+}
+
+function publishedPostsFromDatabase(dbPath) {
+  const { db } = openDatabase(dbPath, { readonly: true });
+  try {
+    assertSchema(db);
+    return getPostList(db)
+      .filter((post) => post.status === "published")
+      .sort(
+        (left, right) =>
+          String(right.published_date).localeCompare(String(left.published_date)) ||
+          String(left.slug).localeCompare(String(right.slug))
+      )
+      .map((post) => getPostWithTopics(db, post.slug))
+      .filter(Boolean);
+  } finally {
+    db.close();
   }
 }
 
@@ -679,9 +836,16 @@ function verifyDist({ distDir = DEFAULT_DIST_DIR, dbPath } = {}) {
   const files = walkFiles(resolvedDist);
   const relativeFiles = files.map((file) => relativePosix(resolvedDist, file));
   assertPublicInventory(resolvedDist, relativeFiles);
+  assertLocalProductionFonts(resolvedDist, files);
+  assertResponsiveImageDelivery(resolvedDist);
   assertCanonicalPersonIdentity(resolvedDist);
   assertContactSignalsPublication(resolvedDist, relativeFiles);
   const postCount = assertPublishedPosts(resolvedDist, dbPath);
+  const publishedPosts = publishedPostsFromDatabase(dbPath);
+  if (publishedPosts.length !== postCount) {
+    throw new Error("Published social-preview source rows drifted from the generated post inventory.");
+  }
+  assertSocialPreviewSet({ rootDir: resolvedDist, posts: publishedPosts });
   assertNoAuthoringReferences(resolvedDist, files);
   assertSearchIndexPrivacy(resolvedDist);
   assertNoPublishedExif(resolvedDist, files);
@@ -689,7 +853,7 @@ function verifyDist({ distDir = DEFAULT_DIST_DIR, dbPath } = {}) {
   assertGoogleSiteVerification(resolvedDist);
   assertReferencesResolve(resolvedDist, files);
   assertSitemapAndCanonicals(resolvedDist, files);
-  assertSocialMetadata(resolvedDist);
+  assertSocialMetadata(resolvedDist, publishedPosts);
 
   return { fileCount: files.length, postCount };
 }
@@ -717,14 +881,17 @@ module.exports = {
   assertContactSignalsPublication,
   assertGeneratedArticleIdentity,
   assertGoogleSiteVerification,
+  assertLocalProductionFonts,
   assertLlmsPublishedPosts,
   assertNoAuthoringReferences,
   assertNoPublishedExif,
   assertPublishedPosts,
+  assertResponsiveImageDelivery,
   assertRetiredPublicWording,
   assertSearchIndexPrivacy,
   assertSitemapAndCanonicals,
   assertSocialMetadata,
+  publishedPostsFromDatabase,
   verifyDist,
   walkFiles
 };

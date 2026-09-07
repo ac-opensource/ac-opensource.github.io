@@ -83,7 +83,6 @@
   transform: rotate(90deg);
 }
 
-.work-supernova-theme #site-topbar,
 .work-supernova-theme .work-page,
 .work-supernova-theme #site-footer {
   position: relative;
@@ -91,6 +90,8 @@
 }
 
 .work-supernova-theme #site-topbar {
+  position: fixed;
+  z-index: 50;
   background: rgba(250, 249, 244, 0.88);
 }
 
@@ -102,8 +103,10 @@
 .work-supernova-canvas {
   position: absolute;
   z-index: 0;
-  top: 0;
-  left: 0;
+  top: -24%;
+  left: -26%;
+  width: 152%;
+  height: 148%;
   max-width: none;
   pointer-events: none;
   mix-blend-mode: multiply;
@@ -334,6 +337,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .work-supernova-canvas {
+    display: none;
+  }
+
   .work-supernova-theme *,
   .work-supernova-theme *::before,
   .work-supernova-theme *::after {
@@ -341,3 +348,58 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* An organic remnant on the same paper as the surrounding portfolio. */
+.work-supernova-theme:has(.work-nova) {
+  background-image: radial-gradient(ellipse at 80% 5%, rgba(40, 100, 199, .025), transparent 34rem);
+}
+.work-supernova-theme .work-hero:has(.work-nova) { overflow: visible; }
+.work-supernova-theme .work-hero__art:has(.work-nova) { width: 100%; max-width: 36rem; margin-inline: auto; }
+.work-supernova-theme .work-hero__art:has(.work-nova)::before,
+.work-supernova-theme .work-hero__art:has(.work-nova)::after,
+.work-supernova-theme .work-hero:has(.work-nova)::after { content: none; }
+.work-nova-figure { margin: 0; }
+.work-nova { width: 100%; aspect-ratio: 1; position: relative; }
+.work-nova__image { display: block; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; mask-image: radial-gradient(ellipse, #000 48%, rgba(0, 0, 0, .85) 60%, transparent 73%); }
+.work-nova__footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 1.5rem; color: #737970; font: .7rem/1.5 "Manrope", sans-serif; }
+.work-nova__footer button { display: inline-flex; align-items: center; gap: .5rem; flex-shrink: 0; min-height: 44px; padding: .3rem 0; border: 0; background: none; color: #526757; font: .68rem "Space Grotesk", sans-serif; cursor: pointer; }
+.work-nova__footer [hidden] { display: none; }
+.work-nova__footer button:hover { color: #1f5cba; }
+.work-nova__footer button:focus-visible { outline: 2px solid #2864c7; outline-offset: 4px; border-radius: 2px; }
+.work-supernova-theme:has(.work-nova) .work-supernova-geometry,
+.work-supernova-theme:has(.work-nova) .neural-global-bg { display: none; }
+@media (max-width: 480px) {
+  .work-supernova-theme .work-hero__art:has(.work-nova) { max-width: 25rem; }
+  .work-nova__footer { padding: 0 .5rem; font-size: .65rem; }
+}
+@media (prefers-reduced-motion: reduce), (forced-colors: active) {
+  .work-nova__image { animation: none !important; }
+  [data-nova-replay] { display: none !important; }
+}
+
+.work-nova__field { position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: multiply; mask-image: radial-gradient(ellipse, #000 48%, rgba(0,0,0,.85) 60%, transparent 73%); }
+.work-nova__surface { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; border: 0; padding: 0; background: transparent; cursor: crosshair; border-radius: 50%; }
+.work-nova__surface:focus-visible { outline: none; }
+.work-nova__surface:focus-visible::after { content: ""; position: absolute; width: 28px; height: 28px; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 2px solid #dca95d; border-radius: 50%; box-shadow: 0 0 0 2px #faf9f4; }
+.work-nova[data-renderer="active"] .work-nova__image { visibility: hidden; }
+.work-nova [hidden] { display: none; }
+@media (prefers-reduced-motion: reduce), (forced-colors: active) {
+  .work-nova__surface, .work-nova__field { display: none !important; }
+  .work-nova[data-renderer="active"] .work-nova__image { visibility: visible; }
+}
+
+/* Overscan grows around the original core; copy remains above the field. */
+.work-supernova-theme:has(.work-nova) { overflow-x: clip; }
+.work-supernova-theme:has(.work-nova) .work-page { overflow: visible; }
+.work-supernova-theme:has(.work-nova) .work-hero__copy,
+.work-supernova-theme:has(.work-nova) .work-signals { z-index: 4; }
+.work-nova__field,
+.work-nova__image { position: absolute; width: 230%; height: 230%; max-width: none; left: 50%; top: 50%; inset-inline-start: 50%; transform: translate(-50%, -50%); }
+.work-nova__footer { position: relative; z-index: 4; }
+@media (max-width: 700px) {
+  .work-nova__field, .work-nova__image { width: 175%; height: 175%; }
+}
+
+.work-nova__footer { background: none; color: #fff; mix-blend-mode: difference; }
+.work-nova__footer button { color: inherit; }
+.work-supernova-theme:has(.work-nova) .work-signals { background: linear-gradient(180deg, transparent, rgba(250,249,244,.94) 2rem, #faf9f4); }

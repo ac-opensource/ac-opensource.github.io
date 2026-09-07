@@ -6,13 +6,21 @@ const {
   getPostList,
   getPostWithTopics
 } = require("./lib/blog-db");
-const { resolvePublicImage } = require("./lib/public-images");
+const { resolvePublicImage, THUMBNAIL_WIDTHS } = require("./lib/public-images");
+const {
+  LOGS_SOCIAL_PREVIEW_PATH,
+  logsSocialPreviewAlt,
+  postSocialPreviewAlt,
+  postSocialPreviewPath
+} = require("./lib/social-previews");
 
 const ROOT_DIR = path.join(__dirname, "..");
 const SITE_ORIGIN = String(process.env.SITE_ORIGIN || "https://ac-opensource.github.io").replace(/\/+$/, "");
 const PERSON_ID = `${SITE_ORIGIN}/#person`;
 const FALLBACK_HERO_IMAGE = "/blog/images/new-zealand-aurora.png";
 const GENERATED_PAGE_MARKER = "<!-- generated: scripts/build-static-blog-pages.js -->";
+const BLOG_STRUCTURED_DATA_START = "<!-- generated: blog-collection-jsonld:start -->";
+const BLOG_STRUCTURED_DATA_END = "<!-- generated: blog-collection-jsonld:end -->";
 const GENERATED_MANIFEST_NAME = path.join(".site-build", "generated-blog-pages.json");
 const GENERATOR_ID = "ac-opensource-static-blog-v1";
 const LLMS_TEMPLATE_PATH = path.join(ROOT_DIR, "llms.txt");
@@ -291,7 +299,10 @@ function buildBlogIndexFallback(posts) {
       const summary = String(post.summary || "").trim() || stripHtml(post.body_html).slice(0, 180);
       const publishedDate = String(post.published_date || "").trim();
       const readingTime = String(post.reading_time || "").trim() || "n/a";
-      const heroData = resolvePublicImage(toAssetUrl(post.hero_image));
+      const heroData = resolvePublicImage(toAssetUrl(post.hero_image), {
+        widths: THUMBNAIL_WIDTHS,
+        sizes: "(min-width: 1024px) 16rem, (min-width: 720px) 32vw, 42vw"
+      });
       const heroImage = heroData.src || toAssetUrl(post.hero_image);
       const heroAlt = String(post.hero_alt || `${title} preview`).trim() || `${title} preview`;
       const heroResponsiveAttributes = heroData.srcset
@@ -299,9 +310,9 @@ function buildBlogIndexFallback(posts) {
         : "";
       const topics = Array.isArray(post.topics) ? post.topics : [];
       const topicsHtml = topics.length
-        ? `<p class="galaxy-entry__topics" aria-label="Topics">${topics
-            .map((topic) => `<span>${escapeHtml(topic)}</span>`)
-            .join("")}</p>`
+        ? `<ul class="galaxy-entry__topics" aria-label="Topics">${topics
+            .map((topic) => `<li>${escapeHtml(topic)}</li>`)
+            .join("")}</ul>`
         : "";
       const heroHtml = heroImage
         ? `<a class="galaxy-entry__media" href="${escapeHtml(postPath(post.slug))}" aria-label="Read ${escapeHtml(title)}"><img src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="${index === 0 ? "eager" : "lazy"}" decoding="async"/></a>`
@@ -319,11 +330,60 @@ function buildBlogIndexFallback(posts) {
     })
     .join("\n");
 
-  return `<section id="blog-feed" aria-label="Published writing">
+  return `<section id="blog-feed" aria-label="Published writing" tabindex="-1">
 <div id="galaxy-list" class="galaxy-list" aria-live="polite">
 ${articles}
 </div>
 </section>`;
+}
+
+function buildBlogIndexStructuredData(posts) {
+  const listId = `${SITE_ORIGIN}/blog/#published-entries`;
+  return JSON.stringify(
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": ["CollectionPage", "Blog"],
+          "@id": `${SITE_ORIGIN}/blog/#collection`,
+          url: `${SITE_ORIGIN}/blog/`,
+          name: "Logs | Andrew Concepcion",
+          description: "Production engineering notes, delivery records, essays, photography, and field observations by Andrew Concepcion.",
+          author: { "@id": PERSON_ID },
+          mainEntity: { "@id": listId }
+        },
+        {
+          "@type": "ItemList",
+          "@id": listId,
+          itemListOrder: "https://schema.org/ItemListOrderDescending",
+          numberOfItems: posts.length,
+          itemListElement: posts.map((post, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: `${SITE_ORIGIN}${postPath(post.slug)}`,
+            name: String(post.title || "").trim() || "Untitled"
+          }))
+        }
+      ]
+    },
+    null,
+    2
+  ).replace(/</g, "\\u003c");
+}
+
+function replaceBlogStructuredData(html, posts, indexPath) {
+  const startIndex = html.indexOf(BLOG_STRUCTURED_DATA_START);
+  const endIndex = html.indexOf(BLOG_STRUCTURED_DATA_END);
+  if (
+    startIndex < 0 ||
+    endIndex < startIndex ||
+    html.lastIndexOf(BLOG_STRUCTURED_DATA_START) !== startIndex ||
+    html.lastIndexOf(BLOG_STRUCTURED_DATA_END) !== endIndex
+  ) {
+    throw new Error(`Cannot update blog structured data in ${indexPath}.`);
+  }
+  const replacement = `${BLOG_STRUCTURED_DATA_START}\n<script type="application/ld+json">${buildBlogIndexStructuredData(posts)}</script>\n${BLOG_STRUCTURED_DATA_END}`;
+  return `${html.slice(0, startIndex)}${replacement}${html.slice(endIndex + BLOG_STRUCTURED_DATA_END.length)}`;
 }
 
 function writeBlogIndexFallback(posts, outputBlogDir) {
@@ -344,11 +404,17 @@ function writeBlogIndexFallback(posts, outputBlogDir) {
     ? "date range unavailable"
     : years[0] === years.at(-1) ? years[0] : `${years[0]} → ${years.at(-1)}`;
   const publishedCount = `${posts.length} published ${posts.length === 1 ? "entry" : "entries"}`;
-  const updatedIndexHtml = indexHtml
+  const socialImageUrl = `${SITE_ORIGIN}${LOGS_SOCIAL_PREVIEW_PATH}`;
+  const socialImageAlt = escapeHtml(logsSocialPreviewAlt(posts));
+  const updatedIndexHtml = replaceBlogStructuredData(indexHtml, posts, indexPath)
     .replace(feedPattern, buildBlogIndexFallback(posts))
     .replace(/(<span id="(?:archive-total-count|galaxy-total)">)[^<]*(<\/span>)/, `$1${publishedCount}$2`)
     .replace(/(<span id="(?:archive-date-range|galaxy-range)">)[^<]*(<\/span>)/, `$1${yearRange}$2`)
-    .replace(/(<span id="infinite-status">)[^<]*(<\/span>)/, `$1[${posts.length} published entries · engineering, systems, and life]$2`);
+    .replace(/(<span id="infinite-status">)[^<]*(<\/span>)/, `$1[${posts.length} published entries · engineering, systems, and life]$2`)
+    .replace(/(<meta property="og:image" content=")[^"]*("\s*\/?>)/, `$1${socialImageUrl}$2`)
+    .replace(/(<meta name="twitter:image" content=")[^"]*("\s*\/?>)/, `$1${socialImageUrl}$2`)
+    .replace(/(<meta property="og:image:alt" content=")[^"]*("\s*\/?>)/, `$1${socialImageAlt}$2`)
+    .replace(/(<meta name="twitter:image:alt" content=")[^"]*("\s*\/?>)/, `$1${socialImageAlt}$2`);
 
   fs.writeFileSync(
     indexPath,
@@ -405,7 +471,7 @@ function buildWorkHeroPanel({ post, heroImage, heroResponsiveAttributes, heroAlt
     const galleryImages = WORK_HERO_GALLERY_BY_SLUG[String(post?.slug || "")] || [];
     const galleryHtml = galleryImages.map((image, index) => `
   <span class="work-post-hero__screen">
-    <img${index === 0 ? ' id="post-hero-image"' : ""} src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt)}" loading="${index === 0 ? "eager" : "lazy"}" decoding="async"/>
+    <img${index === 0 ? ' id="post-hero-image"' : ""} src="${escapeHtml(image.src)}" width="608" height="1080" alt="${escapeHtml(image.alt)}" loading="${index === 0 ? "eager" : "lazy"}" decoding="async"/>
   </span>`).join("");
 
     return `
@@ -419,7 +485,7 @@ ${galleryHtml}
   if (layout === "cover") {
     return `
 <figure class="work-post-hero work-post-hero--cover lg:col-span-5" data-work-hero-layout="cover">
-  <img id="post-hero-image" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+  <img id="post-hero-image" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} width="1600" height="1200" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
   <figcaption class="sr-only">${escapeHtml(caption)}</figcaption>
 </figure>
 `;
@@ -427,7 +493,7 @@ ${galleryHtml}
 
   return `
 <figure class="work-post-hero work-post-hero--contain lg:col-span-5" data-work-hero-layout="contain">
-  <img id="post-hero-image" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
+  <img id="post-hero-image" src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} width="1600" height="1200" alt="${escapeHtml(heroAlt)}" loading="eager" decoding="async"/>
   <figcaption class="sr-only">${escapeHtml(caption)}</figcaption>
 </figure>
 `;
@@ -465,6 +531,9 @@ function buildStaticPostHtml({ post, previous, next }) {
   const heroCaption = String(post.hero_caption || "").trim();
   const canonicalPath = postPath(post.slug);
   const canonicalUrl = `${SITE_ORIGIN}${canonicalPath}`;
+  const socialImagePath = postSocialPreviewPath(post);
+  const socialImageAbs = `${SITE_ORIGIN}${socialImagePath}`;
+  const socialImageAlt = postSocialPreviewAlt(post);
   const bodyWithImageDefaults =
     addImageDefaults(String(post.body_html || "").trim()) || `<p>${escapeHtml(summary)}</p>`;
   const debrief = decorateArticleBody(bodyWithImageDefaults, post);
@@ -534,7 +603,7 @@ function buildStaticPostHtml({ post, previous, next }) {
       },
       datePublished: publishedDate,
       dateModified: dateForStructuredData(post.updated_at, publishedDate),
-      image: heroImageAbs,
+      image: socialImageAbs,
       mainEntityOfPage: canonicalUrl
     },
     null,
@@ -557,24 +626,29 @@ function buildStaticPostHtml({ post, previous, next }) {
 <meta property="og:url" content="${escapeHtml(canonicalUrl)}"/>
 <meta property="og:title" content="${escapeHtml(title)} | Andrew Concepcion"/>
 <meta property="og:description" content="${escapeHtml(summary)}"/>
-<meta property="og:image" content="${escapeHtml(heroImageAbs)}"/>
-<meta property="og:image:alt" content="${escapeHtml(heroAlt)}"/>
+<meta property="og:image" content="${escapeHtml(socialImageAbs)}"/>
+<meta property="og:image:type" content="image/png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="${escapeHtml(socialImageAlt)}"/>
 <meta property="article:published_time" content="${escapeHtml(publishedDate)}"/>
 <meta property="article:author" content="${escapeHtml(author)}"/>
 ${articleTagsMeta}
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="${escapeHtml(title)} | Andrew Concepcion"/>
 <meta name="twitter:description" content="${escapeHtml(summary)}"/>
-<meta name="twitter:image" content="${escapeHtml(heroImageAbs)}"/>
-<meta name="twitter:image:alt" content="${escapeHtml(heroAlt)}"/>
+<meta name="twitter:image" content="${escapeHtml(socialImageAbs)}"/>
+<meta name="twitter:image:alt" content="${escapeHtml(socialImageAlt)}"/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
+<script>document.documentElement.classList.add("article-js");</script>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="/assets/css/article-debrief.css?v=20260812-actions2" rel="stylesheet"/>
-<link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet"/>
-<link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles/>
-<script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
+<link rel="preload" href="/assets/fonts/manrope-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
+<link rel="preload" href="/assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
+<link href="/assets/css/site-fonts.css?v=20260819-local1" rel="stylesheet"/>
+<link href="/assets/css/article-debrief.css?v=20260820-hierarchy1" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20260819-safe1" rel="stylesheet"/>
+<link href="/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1" rel="stylesheet" data-universe-perspective-styles/>
+<script src="/assets/js/universe-theme-transition.js?v=20260820-fast-travel1"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -607,9 +681,6 @@ ${articleTagsMeta}
 <style>
   body {
     background-color: #faf9f4;
-  }
-  .material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
   .code-block {
     background: #1A1C1E;
@@ -693,20 +764,22 @@ ${articleTagsMeta}
 <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
   <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
-    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs" aria-label="Primary navigation">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
       <a data-route="/work.html" href="/work.html"${sourceCurrent} class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
       <a data-route="/blog/" href="/blog/"${blogCurrent} class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/resume.html" href="/resume.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[résumé]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
     <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]" data-site-search-slot><a class="site-search-link" href="/search.html" data-site-search-link aria-label="Search published evidence" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></div>
   </div>
-  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]" aria-label="Mobile navigation">
     <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
     <a data-route="/work.html" href="/work.html"${sourceCurrent} class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
     <a data-route="/blog/" href="/blog/"${blogCurrent} class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
     <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/resume.html" href="/resume.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[résumé]</a>
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
@@ -739,14 +812,14 @@ ${articleTagsMeta}
 </header>
 ${trajectoryHtml.mobile}
 <div class="article-debrief__layout article-region__reading">
-  <aside class="article-debrief__sidebar article-region__rail">
+  <div class="article-debrief__sidebar article-region__rail">
     ${trajectoryHtml.desktop}
     <p class="article-region__reading-signal">
       <span>${escapeHtml(regionLabel)}</span>
       <span>Published source</span>
       <span>${contentCount} ${contentUnit}</span>
     </p>
-  </aside>
+  </div>
   <div id="post-body" class="article-debrief__body article-region__body" data-debrief-body>${bodyHtml}</div>
 </div>
 <nav class="article-region__adjacent" aria-label="Adjacent entries">
@@ -851,7 +924,10 @@ ${trajectoryHtml.mobile}
       bookmarkPostButton.classList.toggle("border-outline-variant/20", !active);
       bookmarkPostButton.classList.toggle("text-secondary", !active);
       bookmarkPostButton.setAttribute("aria-pressed", String(active));
-      bookmarkPostButton.setAttribute("aria-label", active ? "Remove from saved reading" : "Save for later reading");
+      bookmarkPostButton.setAttribute(
+        "aria-label",
+        active ? "Bookmarked — remove from saved reading" : "Bookmark — save for later reading"
+      );
     }
 
     async function shareCurrentPost() {
@@ -1205,12 +1281,15 @@ if (require.main === module) {
 }
 
 module.exports = {
+  BLOG_STRUCTURED_DATA_END,
+  BLOG_STRUCTURED_DATA_START,
   GENERATED_PAGE_MARKER,
   GENERATOR_ID,
   LLMS_SECTIONS,
   PERSON_ID,
   articleMode,
   buildBlogIndexFallback,
+  buildBlogIndexStructuredData,
   buildTrajectoryHtml,
   buildStaticBlog,
   buildStaticPostHtml,

@@ -55,28 +55,36 @@
   let posts = [];
   let lastSelectedNode = null;
   let choreographyTimer = 0;
+  let focusFrame = 0;
   let focusTimer = 0;
+  let focusFrameGeneration = 0;
   let hasRendered = false;
+  let layoutFrame = 0;
   let layoutTimer = 0;
   let searchTimer = 0;
 
   const canvasState = {
     animationFrame: 0,
+    budget: null,
     context: elements.canvas.getContext("2d", { alpha: true }),
     companionParticles: [],
     dpr: 1,
     field: { centerX: 0, centerY: 0, radiusX: 0, radiusY: 0 },
+    frameInterval: 1000 / 45,
     height: 0,
-    impactParticles: [],
     intersectsViewport: true,
     lastFrame: 0,
-    merger: { duration: 0, from: 0, progress: 0, startedAt: 0, target: 0 },
+    merger: { progress: 0, target: 0, signature: "", encounter: null, sprites: [] },
+    lastDraw: 0,
+    elapsed: 0,
+    paused: false,
     mergerOffset: { x: 0, y: 0 },
     parallax: { x: 0, y: 0, targetX: 0, targetY: 0 },
     particles: [],
     remnantParticles: [],
     startedAt: 0,
     stars: [],
+    starSprites: [],
     width: 0
   };
 
@@ -84,6 +92,16 @@
   const articleUrl = (post) => `/blog/${encodeURIComponent(post.slug)}.html`;
   const displayCategory = (category) => category === "work" ? "portfolio" : String(category || "writing");
   const timestamp = (value) => Number.isFinite(Date.parse(value)) ? Date.parse(value) : 0;
+
+  function bindBrowseHandoff() {
+    const link = document.querySelector('.galaxy-ledger__browse[href="#blog-feed"]');
+    const target = document.getElementById("blog-feed");
+    if (!link || !target) return;
+    target.tabIndex = -1;
+    link.addEventListener("click", () => {
+      requestAnimationFrame(() => target.focus({ preventScroll: true }));
+    });
+  }
 
   function loadBookmarks() {
     const merged = new Set();
@@ -241,43 +259,81 @@
   }
 
   function createParticle(random, index, arms, { compact = false, remnant = false } = {}) {
-    const radius = Math.pow(random(), remnant ? 0.74 : 0.68);
+    const radius = Math.pow(random(), remnant ? 0.88 : 0.82);
+    const brightness = random();
     return {
-      alpha: 0.08 + (1 - radius) * 0.24 + random() * 0.3,
-      angleJitter: (random() - 0.5) * (remnant ? 0.2 + radius * 0.34 : 0.26 + radius * 0.42),
+      alpha: 0.42 + random() * 0.52,
+      // Narrow, irregular strands leave dark lanes between the luminous arms.
+      angleJitter: (random() - 0.5) * (0.12 + radius * 0.22)
+        + Math.sin(radius * 24 + index % arms) * 0.025,
       arm: index % arms,
       phase: random() * Math.PI * 2,
-      radialJitter: (random() - 0.5) * (0.02 + radius * (remnant ? 0.025 : 0.035)),
+      radialJitter: (random() - 0.5) * (0.015 + radius * 0.025),
       radius,
-      size: 0.35 + random() * (radius < 0.25 ? (compact ? 1.65 : 2.1) : 1.25),
-      tone: random()
+      size: (compact ? 0.8 : 1) * (0.6 + Math.pow(brightness, 4) * 4.2),
+      tone: random(),
+      variant: index % 3
     };
+  }
+
+  function buildStarSprites() {
+    // Rasterize bloom and neighboring dust once, rather than blurring every star every frame.
+    return ["224, 237, 255", "150, 201, 255", "255, 205, 165"].map((tone, toneIndex) =>
+      Array.from({ length: 3 }, (_, variant) => {
+        const sprite = document.createElement("canvas");
+        sprite.width = 64;
+        sprite.height = 64;
+        const context = sprite.getContext("2d");
+        const glow = context.createRadialGradient(32, 32, 0, 32, 32, 28);
+        glow.addColorStop(0, "rgba(255, 255, 255, 1)");
+        glow.addColorStop(0.065, `rgba(${tone}, 0.96)`);
+        glow.addColorStop(0.16, `rgba(${tone}, 0.28)`);
+        glow.addColorStop(0.42, `rgba(${tone}, 0.045)`);
+        glow.addColorStop(1, `rgba(${tone}, 0)`);
+        context.fillStyle = glow;
+        context.fillRect(0, 0, 64, 64);
+        const random = seededRandom(0x57A2 + toneIndex * 31 + variant);
+        for (let index = 0; index < 9; index += 1) {
+          const x = 8 + random() * 48;
+          const y = 8 + random() * 48;
+          context.fillStyle = `rgba(${tone}, ${0.25 + random() * 0.6})`;
+          const size = 0.65 + random() * 1.3;
+          context.fillRect(x, y, size, size);
+        }
+        return sprite;
+      })
+    );
+  }
+
+  function performanceBudgetFor(width) {
+    if (width <= 480) {
+      return { companion: 80, dpr: 1, fps: 24, impact: 28, particles: 300, remnant: 180, stars: 90, tier: "phone" };
+    }
+    if (width < 760) {
+      return { companion: 130, dpr: 1, fps: 30, impact: 48, particles: 430, remnant: 260, stars: 140, tier: "compact" };
+    }
+    if (width < 1200) {
+      return { companion: 160, dpr: 1.25, fps: 30, impact: 72, particles: 500, remnant: 350, stars: 220, tier: "medium" };
+    }
+    return { companion: 200, dpr: 1.25, fps: 30, impact: 96, particles: 600, remnant: 400, stars: 280, tier: "wide" };
   }
 
   function buildCanvasScene() {
     const random = seededRandom(0xAC202608);
     const compact = canvasState.width < 760;
-    const starCount = compact ? 230 : 430;
-    const particleCount = compact ? 620 : 1180;
-    canvasState.stars = Array.from({ length: starCount }, () => ({
+    const budget = canvasState.budget || performanceBudgetFor(canvasState.width);
+    if (!canvasState.starSprites.length) canvasState.starSprites = buildStarSprites();
+    canvasState.stars = Array.from({ length: budget.stars }, () => ({
       alpha: 0.16 + random() * 0.7,
       phase: random() * Math.PI * 2,
       radius: 0.25 + random() * 1.25,
       x: random(),
       y: random()
     }));
-    canvasState.particles = Array.from({ length: particleCount }, (_, index) => createParticle(random, index, geometry.arms, { compact }));
-    canvasState.companionParticles = Array.from({ length: compact ? 250 : 430 }, (_, index) => createParticle(random, index, 2, { compact, remnant: true }));
-    canvasState.remnantParticles = Array.from({ length: compact ? 470 : 840 }, (_, index) => createParticle(random, index, 2, { compact, remnant: true }));
-    canvasState.impactParticles = Array.from({ length: compact ? 72 : 128 }, () => ({
-      angle: random() * Math.PI * 2,
-      drift: (random() - 0.5) * 0.46,
-      length: 0.012 + random() * 0.034,
-      radius: 0.08 + random() * 0.9,
-      size: 0.35 + random() * 1.2,
-      speed: 0.68 + random() * 0.72,
-      tone: random()
-    }));
+    canvasState.particles = Array.from({ length: budget.particles }, (_, index) => createParticle(random, index, geometry.arms, { compact }));
+    canvasState.companionParticles = Array.from({ length: budget.companion }, (_, index) => createParticle(random, index, 2, { compact, remnant: true }));
+    canvasState.remnantParticles = Array.from({ length: budget.remnant }, (_, index) => createParticle(random, index, 2, { compact, remnant: true }));
+
   }
 
   function resizeCanvas() {
@@ -286,7 +342,16 @@
     const coreRect = elements.core.getBoundingClientRect();
     canvasState.width = Math.max(1, Math.round(heroRect.width));
     canvasState.height = Math.max(1, Math.round(heroRect.height));
-    canvasState.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const previousTier = canvasState.budget?.tier;
+    canvasState.budget = performanceBudgetFor(canvasState.width);
+    canvasState.dpr = Math.min(window.devicePixelRatio || 1, canvasState.budget.dpr);
+    canvasState.frameInterval = 1000 / canvasState.budget.fps;
+    elements.hero.dataset.galaxyBudget = canvasState.budget.tier;
+    elements.hero.dataset.galaxyDpr = canvasState.dpr.toFixed(2);
+    elements.hero.dataset.galaxyFps = String(canvasState.budget.fps);
+    elements.hero.dataset.galaxyParticleBudget = String(
+      canvasState.budget.particles + canvasState.budget.companion + canvasState.budget.remnant
+    );
     elements.canvas.width = Math.round(canvasState.width * canvasState.dpr);
     elements.canvas.height = Math.round(canvasState.height * canvasState.dpr);
     elements.canvas.style.width = `${canvasState.width}px`;
@@ -298,228 +363,245 @@
       radiusY: fieldRect.height * geometry.radiusY
     };
     buildCanvasScene();
+    if (canvasState.merger.encounter && previousTier !== canvasState.budget.tier) startEncounter();
     drawGalaxyIfVisible();
-    resolveLabelCollisions();
+    scheduleLabelCollisions({ updateFocus: true });
     positionFocus();
   }
 
-  function particleColor(particle, alpha) {
-    if (particle.tone < 0.18) return `rgba(41, 47, 41, ${alpha * 0.62})`;
-    if (particle.tone < 0.46) return `rgba(40, 100, 199, ${alpha})`;
-    if (particle.tone < 0.78) return `rgba(102, 139, 191, ${alpha * 0.9})`;
-    return `rgba(174, 193, 215, ${alpha * 0.92})`;
-  }
-
-  function drawGeometricField(context, time, centerX, centerY, radiusX, radiusY, mergerProgress) {
+  function drawSelectedArm(context, centerX, centerY, radiusX, radiusY, mergerProgress) {
     const selectedNode = state.selected ? nodeElements.get(state.selected) : null;
-    const selectedArm = Number.parseInt(selectedNode?.dataset.arm || "-1", 10);
+    if (!selectedNode) return;
+    const arm = Number.parseInt(selectedNode.dataset.arm || "0", 10);
     context.save();
-    context.lineWidth = 0.75;
-
-    [0.24, 0.48, 0.72, 0.96].forEach((scale, index) => {
-      context.beginPath();
-      context.setLineDash(index % 2 ? [2, 8] : []);
-      context.lineDashOffset = reducedMotion.matches ? 0 : -time * (index % 2 ? 0.002 : 0);
-      context.strokeStyle = index === 2 ? "rgba(40, 100, 199, 0.19)" : "rgba(78, 101, 94, 0.13)";
-      context.ellipse(centerX, centerY, radiusX * scale, radiusY * scale, (index - 1.5) * 0.035, 0, Math.PI * 2);
-      context.stroke();
-    });
-
-    for (let arm = 0; arm < geometry.arms; arm += 1) {
-      context.beginPath();
-      for (let step = 0; step <= 84; step += 1) {
-        const progress = 0.04 + step / 84 * 0.94;
-        const point = spiralPoint(progress, arm, centerX, centerY, radiusX, radiusY);
-        if (step === 0) context.moveTo(point.x, point.y);
-        else context.lineTo(point.x, point.y);
-      }
-      context.setLineDash(arm % 2 ? [3, 8] : []);
-      context.lineDashOffset = reducedMotion.matches ? 0 : -time * 0.003;
-      const baseAlpha = 1 - mergerProgress * 0.74;
-      context.strokeStyle = arm === selectedArm
-        ? `rgba(40, 100, 199, ${0.46 * baseAlpha})`
-        : `rgba(40, 100, 199, ${0.14 * baseAlpha})`;
-      context.lineWidth = arm === selectedArm ? 1.35 : 0.8;
-      context.stroke();
-
-      if (!reducedMotion.matches) {
-        const progress = 0.14 + ((time * 0.000018 + arm * 0.217) % 0.78);
-        const tracer = spiralPoint(progress, arm, centerX, centerY, radiusX, radiusY);
-        context.beginPath();
-        context.fillStyle = arm === selectedArm ? "rgba(40, 100, 199, 0.9)" : "rgba(40, 100, 199, 0.54)";
-        context.arc(tracer.x, tracer.y, arm === selectedArm ? 2.4 : 1.55, 0, Math.PI * 2);
-        context.fill();
-      }
-    }
-
-    if (mergerProgress > 0.015) {
-      for (let arm = 0; arm < 2; arm += 1) {
-        context.beginPath();
-        for (let step = 0; step <= 92; step += 1) {
-          const progress = 0.04 + step / 92 * 0.92;
-          const point = remnantPoint(progress, arm, centerX, centerY, radiusX * 0.92, radiusY * 0.78);
-          if (step === 0) context.moveTo(point.x, point.y);
-          else context.lineTo(point.x, point.y);
-        }
-        context.setLineDash(arm ? [3, 7] : []);
-        context.lineDashOffset = reducedMotion.matches ? 0 : -time * 0.004;
-        context.strokeStyle = `rgba(40, 100, 199, ${0.32 * mergerProgress})`;
-        context.lineWidth = 0.9 + mergerProgress * 0.45;
-        context.stroke();
-
-        if (!reducedMotion.matches) {
-          const progress = 0.12 + ((time * 0.000024 + arm * 0.39) % 0.8);
-          const tracer = remnantPoint(progress, arm, centerX, centerY, radiusX * 0.92, radiusY * 0.78);
-          context.beginPath();
-          context.fillStyle = `rgba(40, 100, 199, ${0.76 * mergerProgress})`;
-          context.arc(tracer.x, tracer.y, 1.7 + mergerProgress * 0.5, 0, Math.PI * 2);
-          context.fill();
-        }
-      }
-    }
-
-    context.setLineDash([]);
-    context.strokeStyle = "rgba(78, 101, 94, 0.13)";
-    context.lineWidth = 0.75;
     context.beginPath();
-    context.moveTo(centerX - radiusX * 1.04, centerY);
-    context.lineTo(centerX + radiusX * 1.04, centerY);
-    context.moveTo(centerX, centerY - radiusY * 1.04);
-    context.lineTo(centerX, centerY + radiusY * 1.04);
+    for (let step = 0; step <= 84; step += 1) {
+      const progress = 0.04 + step / 84 * 0.94;
+      const point = mergerProgress > 0.5
+        ? remnantPoint(progress, arm, centerX, centerY, radiusX * 0.92, radiusY * 0.78)
+        : spiralPoint(progress, arm, centerX, centerY, radiusX, radiusY);
+      if (step === 0) context.moveTo(point.x, point.y);
+      else context.lineTo(point.x, point.y);
+    }
+    context.strokeStyle = "rgba(176, 214, 255, 0.18)";
+    context.lineWidth = 0.65;
     context.stroke();
     context.restore();
   }
 
   function drawParticleSet(context, particles, pointFor, time, alphaMultiplier = 1, distortion = 0) {
+    context.save();
+    context.globalCompositeOperation = "lighter";
     particles.forEach((particle) => {
       const point = pointFor(particle);
-      const fade = Math.min(1, particle.radius * 5.2) * Math.min(1, (1.05 - particle.radius) * 5.6);
-      const shimmer = reducedMotion.matches ? 1 : 0.84 + Math.sin(time * 0.00072 + particle.phase) * 0.16;
+      const fade = Math.min(1, (1.06 - particle.radius) * 6);
+      const shimmer = reducedMotion.matches ? 1 : 0.9 + Math.sin(time * 0.00045 + particle.phase) * 0.1;
       const tidalX = distortion * Math.sin(particle.phase + particle.radius * 9) * (0.2 + particle.radius) * 20;
       const tidalY = distortion * Math.cos(particle.phase * 0.7 + particle.radius * 7) * (0.2 + particle.radius) * 11;
-      context.beginPath();
-      context.fillStyle = particleColor(particle, particle.alpha * fade * shimmer * alphaMultiplier);
-      context.arc(point.x + tidalX, point.y + tidalY, particle.size, 0, Math.PI * 2);
-      context.fill();
-    });
-  }
-
-  function drawMergerEvent(context, centerX, centerY, radiusX, radiusY, mergerProgress) {
-    if (reducedMotion.matches || mergerProgress < 0.69 || mergerProgress >= 0.995) return;
-    const waveAge = Math.min(1, Math.max(0, (mergerProgress - 0.69) / 0.305));
-    const burstAge = Math.min(1, Math.max(0, (mergerProgress - 0.72) / 0.23));
-    const flash = Math.exp(-Math.pow((mergerProgress - 0.775) / 0.052, 2));
-    const baseRadius = Math.min(radiusX, radiusY);
-
-    context.save();
-    context.lineCap = "round";
-    canvasState.impactParticles.forEach((particle) => {
-      if (burstAge <= 0 || burstAge >= 1) return;
-      const travel = baseRadius * particle.radius * particle.speed * (0.08 + Math.pow(burstAge, 0.72));
-      const angle = particle.angle + particle.drift * burstAge;
-      const trail = baseRadius * particle.length * (0.4 + burstAge);
-      const alpha = Math.sin(burstAge * Math.PI) * (0.12 + particle.size * 0.16);
-      const x = centerX + Math.cos(angle) * travel;
-      const y = centerY + Math.sin(angle) * travel * 0.72;
-      context.beginPath();
-      context.moveTo(x - Math.cos(angle) * trail, y - Math.sin(angle) * trail * 0.72);
-      context.lineTo(x, y);
-      context.strokeStyle = particle.tone > 0.72
-        ? `rgba(52, 65, 59, ${alpha * 0.62})`
-        : `rgba(40, 100, 199, ${alpha})`;
-      context.lineWidth = particle.size;
-      context.stroke();
-    });
-
-    if (flash > 0.01) {
-      const glow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, baseRadius * (0.1 + flash * 0.42));
-      glow.addColorStop(0, `rgba(255, 255, 255, ${flash * 0.96})`);
-      glow.addColorStop(0.12, `rgba(112, 161, 230, ${flash * 0.72})`);
-      glow.addColorStop(0.45, `rgba(40, 100, 199, ${flash * 0.2})`);
-      glow.addColorStop(1, "rgba(40, 100, 199, 0)");
-      context.fillStyle = glow;
-      context.fillRect(centerX - baseRadius, centerY - baseRadius, baseRadius * 2, baseRadius * 2);
-    }
-
-    [0, 0.08, 0.16].forEach((delay, index) => {
-      const localAge = waveAge - delay;
-      if (localAge <= 0 || localAge >= 0.74) return;
-      const normalizedAge = localAge / 0.74;
-      const waveRadius = 0.1 + (1 - Math.pow(1 - normalizedAge, 2.4)) * (0.72 + index * 0.1);
-      const alpha = Math.sin(normalizedAge * Math.PI) * (0.44 - index * 0.065);
-      context.beginPath();
-      context.setLineDash(index === 1 ? [3, 7] : []);
-      context.strokeStyle = `rgba(40, 100, 199, ${alpha})`;
-      context.lineWidth = 0.9 + (1 - normalizedAge) * 1.35;
-      context.ellipse(
-        centerX,
-        centerY,
-        radiusX * waveRadius,
-        radiusY * waveRadius * (0.72 + index * 0.055),
-        -0.13 + index * 0.13,
-        0,
-        Math.PI * 2
-      );
-      context.stroke();
+      const tone = particle.tone < 0.12 ? 2 : particle.tone < 0.42 ? 1 : 0;
+      const size = 8 + particle.size * 11;
+      context.globalAlpha = particle.alpha * fade * shimmer * alphaMultiplier;
+      context.drawImage(canvasState.starSprites[tone][particle.variant],
+        point.x + tidalX - size / 2, point.y + tidalY - size / 2, size, size);
     });
     context.restore();
   }
 
-  function setMergerTarget(target) {
+  function orbitalAngle(particle, companion = false) {
+    const base = companion
+      ? particle.arm * Math.PI + particle.radius * 7.3 - 1.08
+      : particle.arm * Math.PI * 2 / geometry.arms + particle.radius * geometry.twist + geometry.phase;
+    // Differential circular motion in a softened potential; the time scale is slow at rest.
+    const frequency = 1 / Math.pow(particle.radius * particle.radius + 0.25 * 0.25, 0.75);
+    return base + particle.angleJitter + canvasState.elapsed * 0.012 * frequency;
+  }
+
+  function startEncounter() {
     const merger = canvasState.merger;
-    if (reducedMotion.matches) {
-      merger.from = target;
-      merger.progress = target;
-      merger.startedAt = 0;
-      merger.target = target;
-      elements.hero.classList.remove("is-merging");
-      return;
+    if (!window.GalaxyDynamics || !canvasState.particles.length) return;
+    const seeds = (particles, companion) => particles.map((particle) => ({
+      radius: Math.max(0.06, particle.radius + particle.radialJitter),
+      angle: orbitalAngle(particle, companion)
+    }));
+    merger.encounter = new window.GalaxyDynamics.Encounter(
+      seeds(canvasState.particles, false), seeds(canvasState.companionParticles, true)
+    );
+    merger.sprites = [...canvasState.particles, ...canvasState.companionParticles];
+    canvasState.lastDraw = 0;
+    merger.progress = 0;
+    merger.settled = false;
+    if (elements.motion) {
+      elements.motion.disabled = false;
+      elements.motion.textContent = canvasState.paused ? "Resume motion" : "Pause motion";
     }
-    if (target === merger.target) return;
-    merger.from = merger.progress;
-    merger.target = target;
-    merger.startedAt = performance.now();
-    merger.duration = (target > merger.from ? 3200 : 2200) * Math.max(0.42, Math.abs(target - merger.from));
+    const field = elements.field.getBoundingClientRect();
+    const hero = elements.hero.getBoundingClientRect();
+    merger.nodeFrame = { width: field.width, height: field.height, x: field.left - hero.left, y: field.top - hero.top };
+    merger.nodes = posts.map((post, index) => {
+      const node = nodeElements.get(post.slug);
+      const initial = nodePosition(index, posts.length);
+      const x = (initial.x / 100 - geometry.centerX) / geometry.radiusX;
+      const y = (initial.y / 100 - geometry.centerY) / geometry.radiusY;
+      let closest = 0;
+      let distance = Infinity;
+      merger.encounter.particles.slice(0, canvasState.particles.length).forEach((star, i) => {
+        const d = (star.x + 1.4 - x) ** 2 + (star.y + 0.25 - y) ** 2;
+        if (d < distance) { distance = d; closest = i; }
+      });
+      node.getAnimations().forEach((animation) => animation.cancel());
+      node.style.visibility = "";
+      return { node, particle: closest, match: matches(post),
+        targetX: parseFloat(node.style.getPropertyValue("--node-x")) / 100 * field.width,
+        targetY: parseFloat(node.style.getPropertyValue("--node-y")) / 100 * field.height };
+    });
+    elements.hero.classList.add("is-encounter-choreography");
+    elements.hero.dataset.encounterPhase = "approach";
     elements.hero.classList.add("is-merging");
+    if (shouldAnimateGalaxy()) elements.hero.dataset.galaxyActivity = "running";
+    if (!canvasState.animationFrame && shouldAnimateGalaxy()) {
+      canvasState.animationFrame = requestAnimationFrame(animateGalaxy);
+    }
   }
 
-  function updateMerger(time) {
+  function setMergerTarget(target, { replay = false } = {}) {
     const merger = canvasState.merger;
-    if (reducedMotion.matches) {
-      merger.progress = merger.target;
-      merger.startedAt = 0;
+    const signature = JSON.stringify([state.category, state.query.trim(), state.savedOnly]);
+    const changed = target !== merger.target || signature !== merger.signature;
+    merger.target = target;
+    merger.signature = signature;
+    if (elements.replay) elements.replay.hidden = !target;
+    if (!target || reducedMotion.matches) {
+      merger.encounter = null;
+      if (elements.motion) {
+        elements.motion.disabled = reducedMotion.matches;
+        elements.motion.textContent = canvasState.paused ? "Resume motion" : "Pause motion";
+      }
+      elements.hero.classList.remove("is-encounter-choreography");
+      nodeElements.forEach((node) => {
+        node.style.translate = "";
+        node.style.opacity = "";
+        node.style.visibility = target && !node.classList.contains("is-match") ? "hidden" : "";
+      });
+      merger.progress = target;
+      elements.hero.dataset.encounterPhase = target ? "remnant" : "archive";
       elements.hero.classList.remove("is-merging");
-      return merger.progress;
+    } else if (changed || replay || !merger.encounter) {
+      startEncounter();
     }
-    if (!merger.startedAt || !merger.duration) return merger.progress;
-    const elapsed = Math.max(0, time - merger.startedAt);
-    const raw = Math.min(1, elapsed / merger.duration);
-    const eased = (1 - Math.cos(raw * Math.PI)) / 2;
-    merger.progress = merger.from + (merger.target - merger.from) * eased;
-    elements.hero.classList.toggle("is-merging", raw < 1);
-    if (raw >= 1) {
-      merger.progress = merger.target;
-      merger.startedAt = 0;
+    if (shouldAnimateGalaxy()) elements.hero.dataset.galaxyActivity = "running";
+    if (!canvasState.animationFrame && shouldAnimateGalaxy()) {
+      canvasState.lastDraw = 0;
+      canvasState.animationFrame = requestAnimationFrame(animateGalaxy);
     }
-    return merger.progress;
   }
 
-  function mergerOrbit(progress) {
-    const approach = Math.min(1, Math.max(0, progress / 0.78));
-    const angle = -0.58 + approach * Math.PI * 3.6;
-    const separation = Math.pow(1 - approach, 1.18);
-    return { angle, approach, separation };
+  function drawNucleus(context, x, y, radius, alpha = 1) {
+    context.save();
+    context.globalCompositeOperation = "lighter";
+    context.globalAlpha = alpha;
+    const glow = context.createRadialGradient(x, y, 0, x, y, radius);
+    glow.addColorStop(0, "rgba(248, 251, 255, 0.8)");
+    glow.addColorStop(0.09, "rgba(226, 239, 255, 0.38)");
+    glow.addColorStop(0.3, "rgba(163, 195, 235, 0.12)");
+    glow.addColorStop(1, "rgba(122, 166, 214, 0)");
+    context.fillStyle = glow;
+    context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    const size = radius * 0.65;
+    context.drawImage(canvasState.starSprites[0][0], x - size / 2, y - size / 2, size, size);
+    context.restore();
+  }
+
+  function drawEncounter(context, delta, centerX, centerY, radiusX, radiusY) {
+    const merger = canvasState.merger;
+    const encounter = merger.encounter;
+    // Twelve simulation units in four wall-clock seconds. Keep each physics advance bounded.
+    let remaining = Math.min(delta, 0.1) * 3;
+    while (remaining > 0 && encounter.time < window.GalaxyDynamics.duration) {
+      const step = Math.min(remaining, 0.1);
+      encounter.advance(step);
+      remaining -= step;
+    }
+    const phase = encounter.phase;
+    const reveal = Math.min(1, encounter.time / 1.5);
+    const ease = reveal * reveal * (3 - 2 * reveal);
+    const zoom = 1 - ease * 0.52;
+    const cameraX = -1.4 * (1 - ease);
+    const cameraY = -0.25 * (1 - ease);
+    const project = (star) => ({
+      x: centerX + (star.x - cameraX) * radiusX * zoom,
+      y: centerY + ((star.y - cameraY) * radiusY + star.z * radiusX * 0.28) * zoom
+    });
+    merger.progress = Math.min(1, encounter.time / window.GalaxyDynamics.duration);
+    // Finish the physical encounter with an authored two-arm reading constellation.
+    // This visual relaxation keeps the search endpoint legible, rather than claiming
+    // that a collisionless gravitational remnant spontaneously forms a spiral disk.
+    const settle = Math.max(0, (merger.progress - 0.58) / 0.42);
+    const blend = settle * settle * (3 - 2 * settle);
+    const stellarPoint = (star, particle) => {
+      const physical = project(star);
+      const spiral = remnantPoint(particle.radius, particle.arm % 2, centerX, centerY,
+        radiusX * 0.92, radiusY * 0.78, particle.angleJitter * 0.45, particle.radialJitter * 0.5);
+      return { x: physical.x + (spiral.x - physical.x) * blend,
+        y: physical.y + (spiral.y - physical.y) * blend };
+    };
+    elements.hero.dataset.encounterPhase = phase;
+    elements.hero.dataset.encounterTime = encounter.time.toFixed(2);
+    elements.hero.dataset.encounterSeparation = encounter.separation.toFixed(3);
+    elements.hero.classList.toggle("is-merging", phase !== "remnant");
+    elements.hero.classList.add("has-stellar-encounter");
+    context.save();
+    context.globalCompositeOperation = "lighter";
+    encounter.particles.forEach((star, index) => {
+      const particle = merger.sprites[index];
+      const point = stellarPoint(star, particle);
+      // Escaped stars continue on their trajectories; only distant light fades from view.
+      const distance = Math.hypot(star.x, star.y, star.z);
+      const visibility = Math.min(1, Math.max(0, (7 - distance) / 3)) * (1 - blend) + blend;
+      const tone = particle.tone < 0.12 ? 2 : particle.tone < 0.42 ? 1 : 0;
+      const size = (8 + particle.size * 11) * (0.72 + zoom * 0.28);
+      context.globalAlpha = particle.alpha * visibility * (star.galaxy === 1 ? Math.min(1, reveal * 3) : 1);
+      context.drawImage(canvasState.starSprites[tone][particle.variant], point.x - size / 2, point.y - size / 2, size, size);
+    });
+    context.restore();
+    const frame = merger.nodeFrame;
+    merger.nodes.forEach(({ node, particle, match, targetX, targetY }) => {
+      const point = stellarPoint(encounter.particles[particle], merger.sprites[particle]);
+      const dx = (point.x - frame.x - targetX) * (1 - blend);
+      const dy = (point.y - frame.y - targetY) * (1 - blend);
+      node.style.translate = `${dx.toFixed(2)}px ${dy.toFixed(2)}px`;
+      node.style.opacity = match ? "1" : String(Math.max(0, 1 - merger.progress * 1.5));
+      node.style.visibility = !match && merger.progress >= 2 / 3 ? "hidden" : "";
+    });
+    if (merger.progress >= 1) {
+      elements.hero.classList.remove("is-encounter-choreography");
+      elements.hero.dataset.galaxyActivity = "settled";
+      if (!merger.settled) {
+        merger.settled = true;
+        if (elements.motion) { elements.motion.disabled = true; elements.motion.textContent = "Merge complete"; }
+        scheduleLabelCollisions({ updateFocus: true });
+      }
+    }
+    encounter.cores.forEach((core, index) => {
+      const point = project(core);
+      point.x += (centerX - point.x) * blend;
+      point.y += (centerY - point.y) * blend;
+      drawNucleus(context, point.x, point.y, Math.min(radiusX, radiusY) * 0.3,
+        index === 1 ? Math.min(1, reveal * 3) : 1);
+    });
   }
 
   function drawGalaxy(time) {
     const context = canvasState.context;
     if (!context || !canvasState.width || !canvasState.height) return;
+    const delta = canvasState.lastDraw && shouldAnimateGalaxy()
+      ? Math.min(0.1, Math.max(0, (time - canvasState.lastDraw) / 1000)) : 0;
+    canvasState.lastDraw = time;
+    canvasState.elapsed += delta;
     const parallax = canvasState.parallax;
-    const mergerProgress = updateMerger(time);
-    if (!reducedMotion.matches) {
+    if (!reducedMotion.matches && !canvasState.paused) {
       parallax.x += (parallax.targetX - parallax.x) * 0.075;
       parallax.y += (parallax.targetY - parallax.y) * 0.075;
-    } else {
+    } else if (reducedMotion.matches) {
       parallax.x = 0;
       parallax.y = 0;
     }
@@ -527,139 +609,39 @@
     elements.hero.style.setProperty("--parallax-y", `${parallax.y.toFixed(2)}px`);
     context.setTransform(canvasState.dpr, 0, 0, canvasState.dpr, 0, 0);
     context.clearRect(0, 0, canvasState.width, canvasState.height);
-
+    const clock = canvasState.elapsed * 1000;
     canvasState.stars.forEach((star) => {
-      const pulse = reducedMotion.matches ? 1 : 0.78 + Math.sin(time * 0.0007 + star.phase) * 0.22;
+      const pulse = reducedMotion.matches ? 1 : 0.85 + Math.sin(clock * 0.0007 + star.phase) * 0.15;
       context.beginPath();
-      context.fillStyle = `rgba(62, 91, 80, ${star.alpha * pulse * 0.34})`;
+      context.fillStyle = `rgba(195, 216, 239, ${star.alpha * pulse * 0.48})`;
       context.arc(star.x * canvasState.width, star.y * canvasState.height, star.radius, 0, Math.PI * 2);
       context.fill();
     });
-
     const { radiusX, radiusY } = canvasState.field;
-    const systemX = canvasState.field.centerX + parallax.x;
-    const systemY = canvasState.field.centerY + parallax.y;
-    const orbit = mergerOrbit(mergerProgress);
-    const barycentricEnvelope = Math.sin(Math.PI * orbit.approach) * orbit.separation;
-    const mergerOffsetX = -Math.cos(orbit.angle) * radiusX * 0.1 * barycentricEnvelope;
-    const mergerOffsetY = -Math.sin(orbit.angle) * radiusY * 0.1 * barycentricEnvelope;
-    canvasState.mergerOffset.x = mergerOffsetX;
-    canvasState.mergerOffset.y = mergerOffsetY;
-    elements.hero.style.setProperty("--merger-x", `${mergerOffsetX.toFixed(2)}px`);
-    elements.hero.style.setProperty("--merger-y", `${mergerOffsetY.toFixed(2)}px`);
-    const centerX = systemX + mergerOffsetX;
-    const centerY = systemY + mergerOffsetY;
-    drawGeometricField(context, time, centerX, centerY, radiusX, radiusY, mergerProgress);
-    const coreGlow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.min(radiusX, radiusY) * 0.52);
-    coreGlow.addColorStop(0, "rgba(40, 100, 199, 0.16)");
-    coreGlow.addColorStop(0.3, "rgba(40, 100, 199, 0.075)");
-    coreGlow.addColorStop(1, "rgba(250, 249, 244, 0)");
-    context.fillStyle = coreGlow;
-    context.fillRect(centerX - radiusX, centerY - radiusY, radiusX * 2, radiusY * 2);
-
-    const impact = Math.exp(-Math.pow((mergerProgress - 0.78) / 0.13, 2));
-    drawParticleSet(
-      context,
-      canvasState.particles,
-      (particle) => spiralPoint(
-        particle.radius,
-        particle.arm,
-        centerX,
-        centerY,
-        radiusX,
-        radiusY,
-        particle.angleJitter,
-        particle.radialJitter
-      ),
-      time,
-      1 - mergerProgress * 0.72,
-      impact
-    );
-
-    if (mergerProgress > 0.005) {
-      const { angle, approach, separation } = orbit;
-      const dissolve = 1 - Math.max(0, (mergerProgress - 0.78) / 0.22);
-      const companionX = systemX + Math.cos(angle) * radiusX * 0.92 * separation;
-      const companionY = systemY + Math.sin(angle) * radiusY * 0.92 * separation;
-      const companionScale = 0.55 - approach * 0.09;
-      context.save();
-      for (let arm = 0; arm < 2; arm += 1) {
-        context.beginPath();
-        for (let step = 0; step <= 58; step += 1) {
-          const progress = 0.06 + step / 58 * 0.88;
-          const point = remnantPoint(
-            progress,
-            arm,
-            companionX,
-            companionY,
-            radiusX * companionScale,
-            radiusY * companionScale,
-            approach * Math.PI * 1.25
-          );
-          if (step === 0) context.moveTo(point.x, point.y);
-          else context.lineTo(point.x, point.y);
-        }
-        context.setLineDash(arm ? [2, 7] : []);
-        context.lineDashOffset = reducedMotion.matches ? 0 : time * -0.004;
-        context.strokeStyle = `rgba(40, 100, 199, ${0.36 * Math.max(0, dissolve)})`;
-        context.lineWidth = 0.9;
-        context.stroke();
-      }
-      context.restore();
-      drawParticleSet(
-        context,
-        canvasState.companionParticles,
-        (particle) => remnantPoint(
-          particle.radius,
-          particle.arm,
-          companionX,
-          companionY,
-          radiusX * companionScale,
-          radiusY * companionScale,
-          particle.angleJitter + approach * Math.PI * 1.25,
-          particle.radialJitter
-        ),
-        time,
-        Math.max(0, dissolve) * 0.86,
-        impact * 0.7
-      );
-      if (dissolve > 0.04) {
-        context.beginPath();
-        context.strokeStyle = `rgba(40, 100, 199, ${0.72 * dissolve})`;
-        context.lineWidth = 1.2;
-        context.ellipse(companionX, companionY, 18 + dissolve * 13, 4 + dissolve * 4, -0.18 + approach * 0.36, 0, Math.PI * 2);
-        context.stroke();
-        context.beginPath();
-        context.fillStyle = `rgba(10, 15, 15, ${0.76 * dissolve})`;
-        context.strokeStyle = `rgba(40, 100, 199, ${0.72 * dissolve})`;
-        context.lineWidth = 1.4;
-        context.arc(companionX, companionY, 3.8 + dissolve * 2.2, 0, Math.PI * 2);
-        context.fill();
-        context.stroke();
-      }
+    const centerX = canvasState.field.centerX + parallax.x;
+    const centerY = canvasState.field.centerY + parallax.y;
+    const merger = canvasState.merger;
+    if (merger.target && merger.encounter && !reducedMotion.matches) {
+      drawEncounter(context, delta, centerX, centerY, radiusX, radiusY);
+    } else {
+      elements.hero.classList.remove("has-stellar-encounter");
+      elements.hero.dataset.encounterPhase = merger.target ? "remnant" : "archive";
+      drawSelectedArm(context, centerX, centerY, radiusX, radiusY, merger.target);
+      const particles = merger.target ? canvasState.remnantParticles : canvasState.particles;
+      drawParticleSet(context, particles, (particle) => {
+        const angle = orbitalAngle(particle, Boolean(merger.target));
+        const radius = particle.radius + particle.radialJitter;
+        return { x: centerX + Math.cos(angle) * radius * radiusX,
+          y: centerY + Math.sin(angle) * radius * radiusY * (merger.target ? 0.78 : 1) };
+      }, clock);
+      drawNucleus(context, centerX, centerY, Math.min(radiusX, radiusY) * 0.4);
     }
-
-    if (mergerProgress > 0.01) {
-      drawParticleSet(
-        context,
-        canvasState.remnantParticles,
-        (particle) => remnantPoint(
-          particle.radius,
-          particle.arm,
-          centerX,
-          centerY,
-          radiusX * 0.92,
-          radiusY * 0.78,
-          particle.angleJitter,
-          particle.radialJitter
-        ),
-        time,
-        mergerProgress * 0.92,
-        impact * 0.4
-      );
+    if (elements.phase) {
+      const labels = { archive: "Stars in orbit", approach: "Two galaxies approaching", "first-passage": "First passage",
+        "tidal-tails": "Tidal tails", coalescence: "Cores coalescing", remnant: "A shared galaxy" };
+      const label = reducedMotion.matches ? "Motion reduced" : canvasState.paused ? "Motion paused" : labels[elements.hero.dataset.encounterPhase];
+      if (elements.phase.textContent !== label) elements.phase.textContent = label;
     }
-
-    drawMergerEvent(context, centerX, centerY, radiusX, radiusY, mergerProgress);
   }
 
   function drawGalaxyIfVisible(time = performance.now()) {
@@ -670,7 +652,7 @@
   function animateGalaxy(time) {
     canvasState.animationFrame = 0;
     if (!shouldAnimateGalaxy()) return;
-    if (time - canvasState.lastFrame >= 15) {
+    if (time - canvasState.lastFrame >= canvasState.frameInterval) {
       canvasState.lastFrame = time;
       drawGalaxy(time);
     }
@@ -678,7 +660,8 @@
   }
 
   function shouldAnimateGalaxy() {
-    return canvasState.intersectsViewport && !document.hidden && !reducedMotion.matches;
+    return canvasState.intersectsViewport && !document.hidden && !reducedMotion.matches && !canvasState.paused
+      && !(canvasState.merger.encounter && canvasState.merger.progress >= 1);
   }
 
   function stopGalaxy() {
@@ -688,6 +671,17 @@
 
   function syncGalaxyActivity({ drawStaticFrame = true } = {}) {
     stopGalaxy();
+    canvasState.lastDraw = 0;
+    if (reducedMotion.matches) {
+      setMergerTarget(canvasState.merger.target);
+      elements.hero.classList.remove("is-merging");
+    }
+    if (elements.motion) {
+      elements.motion.disabled = reducedMotion.matches || Boolean(canvasState.merger.encounter && canvasState.merger.settled);
+      elements.motion.textContent = canvasState.merger.encounter && canvasState.merger.settled ? "Merge complete" : canvasState.paused ? "Resume motion" : "Pause motion";
+      elements.motion.setAttribute("aria-pressed", String(canvasState.paused));
+    }
+    if (elements.replay) elements.replay.disabled = reducedMotion.matches;
     const active = shouldAnimateGalaxy();
     elements.hero.dataset.galaxyActivity = active ? "running" : "paused";
     if (drawStaticFrame) drawGalaxyIfVisible();
@@ -798,15 +792,15 @@
       opacityStops = isVisible
         ? [from.opacity, Math.max(0.48, from.opacity), 0.92, 1]
         : [from.opacity, Math.max(0.16, from.opacity * 0.82), Math.max(0.1, from.opacity * 0.3), 0.075];
-      duration = 2700;
+      duration = 1050;
     } else {
       first = orbitalNodePosition(from, direction * -0.72, wasFiltered ? 0.88 : 0.98);
       second = orbitalNodePosition(to, direction * 0.34, 1.08);
       opacityStops = [from.opacity, Math.max(0.34, from.opacity), 0.82, 1];
-      duration = 2050;
+      duration = 900;
     }
 
-    const delay = Math.min(390, index * 22);
+    const delay = Math.min(180, index * 10);
     node.animate([
       { left: `${from.x}%`, opacity: opacityStops[0], top: `${from.y}%` },
       { easing: "cubic-bezier(.42, 0, .58, 1)", left: `${first.x}%`, opacity: opacityStops[1], offset: 0.32, top: `${first.y}%` },
@@ -837,49 +831,208 @@
 
   function resolveLabelCollisions() {
     if (elements.field.hidden) return;
+    const startedAt = performance.now();
+    elements.field.dataset.labelLayoutState = "running";
     const fieldRect = elements.field.getBoundingClientRect();
-    const accepted = [];
-    const nodes = [...nodeElements.values()]
+    const narrow = fieldRect.width <= 480;
+    const nudges = narrow
+      ? [0, -14, 14, -28, 28, -42, 42, -56, 56, -70, 70, -84, 84, -98, 98, -112, 112, -126, 126, -140, 140, -154, 154, -168, 168, -182, 182]
+      : [0, -16, 16, -30, 30, -46, 46, -62, 62];
+    const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize || "16");
+    const descriptors = [...nodeElements.values()]
       .filter((node) => !node.classList.contains("is-muted"))
-      .sort((left, right) => Number(right.dataset.readingMinutes) - Number(left.dataset.readingMinutes));
-
-    nodes.forEach((node) => {
+      .map((node) => {
       const label = node.querySelector(".galaxy-node__label");
-      if (!label) return;
+      if (!label) return null;
+      const nodeRect = node.getBoundingClientRect();
+      const labelRect = label.getBoundingClientRect();
+      const nodeStyle = getComputedStyle(node);
+      const nodeSize = Number.parseFloat(nodeStyle.getPropertyValue("--node-size"))
+        * rootFontSize;
+      const centerX = nodeRect.left + nodeRect.width / 2;
+      const centerY = nodeRect.top + nodeRect.height / 2;
+      const labelWidth = labelRect.width;
+      const labelHeight = labelRect.height;
       const current = node.dataset.labelSide || "right";
       const alternatives = [current, "right", "left", "above", "below"].filter((side, index, values) => values.indexOf(side) === index);
-      const nudges = [0, -16, 16, -30, 30];
-      let best = { nudgeX: 0, nudgeY: 0, side: current, score: Number.POSITIVE_INFINITY, rect: null };
+      const candidates = [];
 
       alternatives.forEach((side) => {
         nudges.forEach((nudge) => {
           const vertical = side === "left" || side === "right";
           const nudgeX = vertical ? 0 : nudge;
           const nudgeY = vertical ? nudge : 0;
-          node.dataset.labelSide = side;
-          label.style.setProperty("--label-nudge-x", `${nudgeX}px`);
-          label.style.setProperty("--label-nudge-y", `${nudgeY}px`);
-          const rect = label.getBoundingClientRect();
-          const overflow = Math.max(0, fieldRect.left + 3 - rect.left)
-            + Math.max(0, rect.right - fieldRect.right + 3)
-            + Math.max(0, fieldRect.top + 3 - rect.top)
-            + Math.max(0, rect.bottom - fieldRect.bottom + 3);
-          const collisions = accepted.reduce((total, acceptedRect) => total + overlapArea(rect, acceptedRect), 0);
-          const score = overflow * 120 + collisions + Math.abs(nudge) * 0.04;
-          if (score < best.score) best = { nudgeX, nudgeY, side, score, rect };
+          const horizontalGap = nodeSize * 0.52;
+          const verticalGap = nodeSize * 0.45;
+          let left = centerX + horizontalGap;
+          let top = centerY - labelHeight / 2 + nudgeY;
+          if (side === "left") left = centerX - horizontalGap - labelWidth;
+          if (side === "above") {
+            left = centerX - labelWidth / 2 + nudgeX;
+            top = centerY - verticalGap - labelHeight;
+          }
+          if (side === "below") {
+            left = centerX - labelWidth / 2 + nudgeX;
+            top = centerY + verticalGap;
+          }
+          const rect = {
+            bottom: top + labelHeight,
+            height: labelHeight,
+            left,
+            right: left + labelWidth,
+            top,
+            width: labelWidth
+          };
+          const inBounds = rect.left >= fieldRect.left + 3
+            && rect.right <= fieldRect.right - 3
+            && rect.top >= fieldRect.top + 3
+            && rect.bottom <= fieldRect.bottom - 3;
+          if (!inBounds) return;
+          const sideCost = side === current ? 0 : (side === "left" || side === "right") === (current === "left" || current === "right") ? 1.2 : 2.4;
+          candidates.push({
+            cost: sideCost + Math.abs(nudge) * 0.012,
+            nudgeX,
+            nudgeY,
+            rect,
+            side
+          });
         });
       });
 
-      node.dataset.labelSide = best.side;
-      label.style.setProperty("--label-nudge-x", `${best.nudgeX}px`);
-      label.style.setProperty("--label-nudge-y", `${best.nudgeY}px`);
-      accepted.push(label.getBoundingClientRect());
+      candidates.sort((left, right) => left.cost - right.cost);
+      return {
+        candidates,
+        label,
+        minutes: Number(node.dataset.readingMinutes),
+        node
+      };
+    })
+      .filter(Boolean)
+      .sort((left, right) => left.candidates.length - right.candidates.length || right.minutes - left.minutes);
+
+    const placements = [];
+    descriptors.forEach((descriptor) => {
+      const best = descriptor.candidates.reduce((choice, candidate) => {
+        const collisions = placements.reduce((total, placement) => total + overlapArea(candidate.rect, placement.candidate.rect, 2), 0);
+        const score = collisions * 1000 + candidate.cost;
+        return !choice || score < choice.score ? { candidate, score } : choice;
+      }, null);
+      if (best) placements.push({ ...descriptor, candidate: best.candidate });
+    });
+
+    const collisionScore = (candidate, index, ceiling = Number.POSITIVE_INFINITY) => {
+      let total = 0;
+      for (let candidateIndex = 0; candidateIndex < placements.length; candidateIndex += 1) {
+        if (candidateIndex === index) continue;
+        total += overlapArea(candidate.rect, placements[candidateIndex].candidate.rect, 2);
+        if (total >= ceiling) break;
+      }
+      return total;
+    };
+
+    for (let pass = 0; pass < placements.length; pass += 1) {
+      let moved = false;
+      placements.forEach((placement, index) => {
+        const currentCollision = collisionScore(placement.candidate, index);
+        if (currentCollision <= 0) return;
+        let bestCandidate = placement.candidate;
+        let bestCollision = currentCollision;
+        let bestScore = currentCollision * 1000 + placement.candidate.cost;
+        for (const candidate of placement.candidates) {
+          const collision = collisionScore(candidate, index, bestCollision || Number.POSITIVE_INFINITY);
+          const score = collision * 1000 + candidate.cost;
+          if (score >= bestScore) continue;
+          bestCandidate = candidate;
+          bestCollision = collision;
+          bestScore = score;
+          if (collision === 0) break;
+        }
+        if (bestCandidate === placement.candidate) return;
+        placement.candidate = bestCandidate;
+        moved = true;
+      });
+      if (!moved) break;
+    }
+
+    placements.forEach(({ candidate, label, node }) => {
+      node.dataset.labelSide = candidate.side;
+      label.style.setProperty("--label-nudge-x", `${candidate.nudgeX}px`);
+      label.style.setProperty("--label-nudge-y", `${candidate.nudgeY}px`);
+    });
+
+    let overlapCount = 0;
+    let clippedCount = descriptors.length - placements.length;
+    const accepted = placements.map((placement) => placement.candidate.rect);
+    accepted.forEach((rect, index) => {
+      if (rect.left < fieldRect.left + 2 || rect.right > fieldRect.right - 2
+        || rect.top < fieldRect.top + 2 || rect.bottom > fieldRect.bottom - 2) clippedCount += 1;
+      for (let candidate = index + 1; candidate < accepted.length; candidate += 1) {
+        if (overlapArea(rect, accepted[candidate], 2) > 0) overlapCount += 1;
+      }
+    });
+    elements.field.dataset.labelOverlapCount = String(overlapCount);
+    elements.field.dataset.labelClippedCount = String(clippedCount);
+    elements.field.dataset.labelLayoutMs = (performance.now() - startedAt).toFixed(2);
+    elements.field.dataset.labelPlacementCount = String(placements.length);
+    elements.field.dataset.labelLayoutRuns = String(Number(elements.field.dataset.labelLayoutRuns || "0") + 1);
+    elements.field.dataset.labelLayoutState = "settled";
+  }
+
+  function scheduleLabelCollisions({ delay = 0, updateFocus = false } = {}) {
+    window.clearTimeout(layoutTimer);
+    window.cancelAnimationFrame(layoutFrame);
+    layoutTimer = 0;
+    layoutFrame = 0;
+    elements.field.dataset.labelLayoutState = "scheduled";
+    // Measure once the particle-bound nodes reach their readable result positions.
+    if (canvasState.merger.encounter && !canvasState.merger.settled) return;
+    const queueFrame = () => {
+      layoutTimer = 0;
+      layoutFrame = window.requestAnimationFrame(() => {
+        layoutFrame = 0;
+        resolveLabelCollisions();
+        if (updateFocus) positionFocus();
+      });
+    };
+    if (delay > 0) layoutTimer = window.setTimeout(queueFrame, delay);
+    else queueFrame();
+  }
+
+  function syncCategoryRailAffordance() {
+    const rail = elements.categories;
+    const overflow = rail.scrollWidth - rail.clientWidth;
+    if (overflow <= 2) {
+      rail.dataset.railState = "fit";
+      elements.tuner.dataset.categoryRailState = "fit";
+      return;
+    }
+    const atStart = rail.scrollLeft <= 2;
+    const atEnd = rail.scrollLeft >= overflow - 2;
+    rail.dataset.railState = atStart ? "start" : atEnd ? "end" : "middle";
+    elements.tuner.dataset.categoryRailState = rail.dataset.railState;
+  }
+
+  function revealActiveCategory() {
+    if (!mobileLayout.matches) return;
+    const active = state.savedOnly
+      ? elements.savedFilter
+      : elements.categories.querySelector(`button[data-category="${CSS.escape(state.category)}"]`);
+    if (!active) return;
+    window.requestAnimationFrame(() => {
+      const railRect = elements.categories.getBoundingClientRect();
+      const activeRect = active.getBoundingClientRect();
+      const centeredLeft = elements.categories.scrollLeft
+        + activeRect.left - railRect.left
+        - (railRect.width - activeRect.width) / 2;
+      elements.categories.scrollLeft = Math.max(0, centeredLeft);
+      syncCategoryRailAffordance();
     });
   }
 
   function createNode(post, index) {
     const position = nodePosition(index, posts.length);
     const minutes = minutesFor(post);
+    const visibleLabel = nodeLabel(post);
     const node = document.createElement("button");
     node.type = "button";
     node.className = "galaxy-node";
@@ -892,10 +1045,10 @@
     node.style.setProperty("--node-size", `${(1.03 + minutes * 0.105).toFixed(3)}rem`);
     node.style.setProperty("--node-x", `${position.x.toFixed(3)}%`);
     node.style.setProperty("--node-y", `${position.y.toFixed(3)}%`);
-    node.setAttribute("aria-label", `${post.title}. ${post.date}, ${displayCategory(post.category)}, ${post.readingTime || "reading time unavailable"}.`);
+    node.setAttribute("aria-label", `${visibleLabel}. ${post.title}. ${post.date}, ${displayCategory(post.category)}, ${post.readingTime || "reading time unavailable"}.`);
     node.setAttribute("aria-pressed", "false");
     node.title = post.title;
-    node.append(text("span", "galaxy-node__label", nodeLabel(post)));
+    node.append(text("span", "galaxy-node__label", visibleLabel));
     nodeElements.set(post.slug, node);
     elements.nodes.append(node);
   }
@@ -963,10 +1116,10 @@
     body.append(heading, text("p", "galaxy-entry__summary", post.summary || ""));
 
     if (post.topics?.length) {
-      const topics = document.createElement("p");
+      const topics = document.createElement("ul");
       topics.className = "galaxy-entry__topics";
       topics.setAttribute("aria-label", "Topics");
-      post.topics.forEach((topic) => topics.append(text("span", "", topic)));
+      post.topics.forEach((topic) => topics.append(text("li", "", topic)));
       body.append(topics);
     }
     entry.append(meta, body);
@@ -1014,7 +1167,7 @@
     const counts = new Map();
     posts.forEach((post) => counts.set(post.category, (counts.get(post.category) || 0) + 1));
     const categories = [...counts].sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
-    [["all", posts.length], ...categories].forEach(([category, count]) => {
+    const appendCategory = ([category, count]) => {
       const button = document.createElement("button");
       button.type = "button";
       button.dataset.category = category;
@@ -1022,7 +1175,9 @@
       button.textContent = `${category === "all" ? "all writing" : displayCategory(category)} ${count}`;
       button.setAttribute("aria-pressed", String(category === state.category));
       elements.categories.append(button);
-    });
+    };
+
+    appendCategory(["all", posts.length]);
 
     const savedButton = document.createElement("button");
     savedButton.type = "button";
@@ -1033,6 +1188,7 @@
       text("span", "galaxy-saved-filter__count", "0")
     );
     elements.categories.append(savedButton);
+    categories.forEach(appendCategory);
     elements.categories.setAttribute("aria-label", "Filter writing by category or saved status");
     elements.savedFilter = savedButton;
 
@@ -1055,17 +1211,13 @@
     const savedCount = posts.filter((post) => bookmarks.has(post.slug)).length;
     const noun = savedCount === 1 ? "entry" : "entries";
     elements.savedFilter?.setAttribute("aria-pressed", String(state.savedOnly));
-    elements.savedFilter?.setAttribute(
-      "aria-label",
-      `${state.savedOnly ? "Show all writing" : "Show only saved reading"}; ${savedCount} saved ${noun}`
-    );
+    elements.savedFilter?.removeAttribute("aria-label");
     const visibleCount = elements.savedFilter?.querySelector(".galaxy-saved-filter__count");
     if (visibleCount) visibleCount.textContent = String(savedCount);
     if (elements.savedStatus) elements.savedStatus.textContent = `${savedCount} saved ${noun}`;
   }
 
   function positionFocus() {
-    window.clearTimeout(focusTimer);
     const node = state.selected ? nodeElements.get(state.selected) : null;
     if (!node || elements.focus.hidden) return;
     const fieldRect = elements.field.getBoundingClientRect();
@@ -1098,11 +1250,84 @@
       left = anchorX - popupWidth / 2;
       top = nodeTop - gap - popupHeight;
     }
+    const headerBottom = document.querySelector("#site-topbar")?.getBoundingClientRect().bottom || 0;
+    const safeViewportTop = headerBottom + 8;
+    const minimumTop = Math.max(margin, safeViewportTop - fieldRect.top);
+    const maximumTop = Math.min(
+      fieldRect.height - popupHeight - margin,
+      window.innerHeight - fieldRect.top - popupHeight - 8
+    );
     left = Math.max(margin, Math.min(fieldRect.width - popupWidth - margin, left));
-    top = Math.max(margin, Math.min(fieldRect.height - popupHeight - margin, top));
+    top = Math.max(minimumTop, Math.min(Math.max(minimumTop, maximumTop), top));
     elements.focus.style.setProperty("--focus-left", `${left}px`);
     elements.focus.style.setProperty("--focus-top", `${top}px`);
     elements.focus.dataset.placement = placement;
+  }
+
+  function cancelFocusFraming() {
+    window.cancelAnimationFrame(focusFrame);
+    window.clearTimeout(focusTimer);
+    focusFrame = 0;
+    focusTimer = 0;
+    focusFrameGeneration += 1;
+    document.documentElement.removeAttribute("data-galaxy-focus-framing");
+  }
+
+  function scheduleFocusFraming() {
+    cancelFocusFraming();
+    if (elements.focus.hidden || !state.selected) return;
+    const generation = focusFrameGeneration;
+    const root = document.documentElement;
+    root.dataset.galaxyFocusFraming = "true";
+    elements.focus.dataset.frameState = "framing";
+    let attempts = 0;
+    let previousTop = null;
+    let stableFrames = 0;
+
+    const settle = () => {
+      if (generation !== focusFrameGeneration || elements.focus.hidden || !state.selected) return;
+      attempts += 1;
+      positionFocus();
+      const headerBottom = document.querySelector("#site-topbar")?.getBoundingClientRect().bottom || 0;
+      let bounds = elements.focus.getBoundingClientRect();
+      const safeTop = headerBottom + 8;
+      const safeBottom = window.innerHeight - 8;
+      const delta = bounds.top < safeTop
+        ? bounds.top - safeTop
+        : bounds.bottom > safeBottom
+          ? bounds.bottom - safeBottom
+          : 0;
+      if (Math.abs(delta) > 1) {
+        window.scrollTo({ left: window.scrollX, top: window.scrollY + delta, behavior: "auto" });
+        positionFocus();
+        bounds = elements.focus.getBoundingClientRect();
+      }
+      const fieldBounds = elements.field.getBoundingClientRect();
+      const safelyFramed = bounds.top >= safeTop - 1
+        && bounds.bottom <= safeBottom + 1
+        && bounds.top >= fieldBounds.top - 1
+        && bounds.bottom <= fieldBounds.bottom + 1;
+      const stable = previousTop !== null && Math.abs(bounds.top - previousTop) <= 0.5;
+      stableFrames = safelyFramed && stable ? stableFrames + 1 : 0;
+      previousTop = bounds.top;
+      elements.focus.dataset.frameAttempts = String(attempts);
+      if (stableFrames >= 2 || attempts >= 10) {
+        elements.focus.dataset.frameState = safelyFramed ? "settled" : "unframed";
+        root.removeAttribute("data-galaxy-focus-framing");
+        window.clearTimeout(focusTimer);
+        focusFrame = 0;
+        focusTimer = 0;
+        return;
+      }
+      focusFrame = window.requestAnimationFrame(settle);
+    };
+
+    focusFrame = window.requestAnimationFrame(settle);
+    focusTimer = window.setTimeout(() => {
+      if (generation !== focusFrameGeneration || elements.focus.dataset.frameState === "settled") return;
+      window.cancelAnimationFrame(focusFrame);
+      focusFrame = window.requestAnimationFrame(settle);
+    }, 240);
   }
 
   function renderFocus() {
@@ -1114,6 +1339,7 @@
       entry.dataset.blogSelected = String(selected);
     });
     if (!post) {
+      cancelFocusFraming();
       elements.focus.hidden = true;
       drawGalaxyIfVisible();
       return;
@@ -1127,8 +1353,7 @@
     elements.focus.hidden = false;
     drawGalaxyIfVisible();
     positionFocus();
-    requestAnimationFrame(positionFocus);
-    focusTimer = window.setTimeout(positionFocus, 180);
+    scheduleFocusFraming();
   }
 
   function render() {
@@ -1151,7 +1376,7 @@
     }
     const filtered = state.category !== "all" || state.savedOnly || Boolean(normalize(state.query));
     const wasFiltered = elements.hero.dataset.merger === "remnant";
-    const canChoreograph = hasRendered && !reducedMotion.matches && typeof Element.prototype.animate === "function";
+    const canChoreograph = !filtered && hasRendered && !reducedMotion.matches && !canvasState.paused && typeof Element.prototype.animate === "function";
     const fieldRect = canChoreograph ? elements.field.getBoundingClientRect() : null;
     const startingPositions = new Map();
     if (canChoreograph) {
@@ -1168,6 +1393,9 @@
         : nodePosition(index, posts.length);
       const slug = post.slug;
       const isVisible = visibleSlugs.has(slug);
+      node.style.translate = "";
+      node.style.opacity = "";
+      node.style.visibility = filtered && !isVisible && reducedMotion.matches ? "hidden" : "";
       node.style.setProperty("--node-x", `${position.x.toFixed(3)}%`);
       node.style.setProperty("--node-y", `${position.y.toFixed(3)}%`);
       node.style.setProperty("--node-delay", "0ms");
@@ -1209,6 +1437,7 @@
       : "No writing matches that subject yet.";
     elements.empty.hidden = visible.length !== 0;
     savedFocusTarget?.focus({ preventScroll: true });
+    revealActiveCategory();
     elements.hero.dataset.merger = filtered ? "remnant" : "archive";
     setMergerTarget(filtered ? 1 : 0);
     if (reducedMotion.matches) drawGalaxyIfVisible();
@@ -1221,12 +1450,10 @@
     } else {
       elements.hero.classList.remove("is-node-choreography");
     }
-    window.clearTimeout(layoutTimer);
-    if (!canChoreograph) requestAnimationFrame(resolveLabelCollisions);
-    layoutTimer = window.setTimeout(() => {
-      resolveLabelCollisions();
-      positionFocus();
-    }, reducedMotion.matches ? 0 : Math.max(1400, longestChoreography + 90));
+    scheduleLabelCollisions({
+      delay: canChoreograph && !reducedMotion.matches ? longestChoreography + 60 : 0,
+      updateFocus: true
+    });
     hasRendered = true;
   }
 
@@ -1283,6 +1510,20 @@
   }
 
   function bindEvents() {
+    elements.motion = document.getElementById("galaxy-motion");
+    elements.replay = document.getElementById("galaxy-replay");
+    elements.phase = document.getElementById("galaxy-phase");
+    document.querySelector(".galaxy-playback")?.removeAttribute("hidden");
+    elements.motion?.addEventListener("click", () => {
+      canvasState.paused = !canvasState.paused;
+      syncGalaxyActivity();
+    });
+    elements.replay?.addEventListener("click", () => {
+      canvasState.paused = false;
+      setMergerTarget(1, { replay: true });
+      syncGalaxyActivity();
+      elements.core.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
     elements.hero.addEventListener("pointermove", (event) => {
       if (reducedMotion.matches || event.pointerType === "touch") return;
       const rect = elements.hero.getBoundingClientRect();
@@ -1297,7 +1538,7 @@
       state.query = elements.search.value.slice(0, 160);
       writeUrl();
       window.clearTimeout(searchTimer);
-      searchTimer = window.setTimeout(render, reducedMotion.matches ? 0 : 420);
+      searchTimer = window.setTimeout(render, reducedMotion.matches ? 0 : (mobileLayout.matches ? 120 : 260));
     });
     elements.tuner.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -1335,6 +1576,7 @@
       writeUrl("pushState");
       render();
     });
+    elements.categories.addEventListener("scroll", syncCategoryRailAffordance, { passive: true });
     elements.list.addEventListener("click", (event) => {
       const share = event.target.closest("button[data-share-slug]");
       if (share) {
@@ -1373,7 +1615,10 @@
       releasePost({ restoreFocus: true });
       event.preventDefault();
     });
-    window.addEventListener("resize", resizeCanvas, { passive: true });
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      syncCategoryRailAffordance();
+    }, { passive: true });
     document.addEventListener("visibilitychange", syncGalaxyActivity);
     window.addEventListener("popstate", () => {
       const next = readUrlState();
@@ -1429,6 +1674,7 @@
     });
     syncEntries();
     createCategories();
+    syncCategoryRailAffordance();
 
     const years = posts.map((post) => Number(String(post.date).slice(0, 4))).filter(Number.isFinite);
     elements.total.textContent = `${posts.length} published entries`;
@@ -1444,11 +1690,14 @@
     state.selected = initial.selected;
     elements.search.value = state.query;
     writeUrl();
+    bindBrowseHandoff();
     bindEvents();
+    resizeCanvas();
     render();
     observeGalaxyVisibility();
     startGalaxy();
-    requestAnimationFrame(resolveLabelCollisions);
+    requestAnimationFrame(syncCategoryRailAffordance);
+    document.fonts?.ready.then(() => scheduleLabelCollisions({ updateFocus: true }));
   }
 
   init().catch((error) => {

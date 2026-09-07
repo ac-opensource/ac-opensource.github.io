@@ -8,10 +8,26 @@
   const geometryLayer = document.querySelector("[data-nova-geometry]");
   if (!canvas || !hero || !art) return;
 
-  const context = canvas.getContext("2d", { alpha: true });
-  if (!context) return;
+  // The canonical Work page uses its own interactive fluid field.
+  if (art.querySelector("[data-nova-field]")) {
+    canvas.hidden = true;
+    return;
+  }
 
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  const forcedColors = matchMedia("(forced-colors: active)");
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (reduceMotion.matches || forcedColors.matches || connection?.saveData) {
+    document.documentElement.dataset.workSupernova = "static";
+    canvas.hidden = true;
+    return;
+  }
+
+  const context = canvas.getContext("2d", { alpha: true, desynchronized: true });
+  if (!context) return;
+
+  const FRAME_INTERVAL_MS = 1000 / 30;
+  const BURST_DURATION_MS = 2200;
   const palette = [
     [40, 100, 199],
     [104, 127, 196],
@@ -28,8 +44,15 @@
   let centerY = 0;
   let radius = 1;
   let frame = 0;
+  let resizeFrame = 0;
   let visible = true;
   let seed = 20260807;
+  let initialized = false;
+  let burstStarted = 0;
+  let burstComplete = false;
+  let lastPaint = 0;
+  let lastResizeKey = "";
+  let motionSuppressed = false;
 
   const random = () => {
     seed = (seed * 1664525 + 1013904223) >>> 0;
@@ -44,7 +67,7 @@
       return fieldSeed / 0x80000000;
     };
     const types = ["ring", "square", "diamond", "triangle", "line", "cross"];
-    for (let index = 0; index < 34; index += 1) {
+    for (let index = 0; index < 24; index += 1) {
       const shape = document.createElement("span");
       shape.className = `work-supernova-geometry__shape work-supernova-geometry__shape--${types[Math.floor(fieldRandom() * types.length)]}`;
       shape.style.setProperty("--gx", `${Math.round(fieldRandom() * 100)}%`);
@@ -61,7 +84,8 @@
     cloudLobes.length = 0;
     seed = 20260807;
 
-    const count = Math.max(140, Math.min(260, Math.round((width * height) / 3900)));
+    const compact = matchMedia("(max-width: 700px)").matches;
+    const count = Math.max(compact ? 48 : 72, Math.min(compact ? 84 : 128, Math.round((width * height) / 9000)));
     for (let index = 0; index < count; index += 1) {
       const spoke = Math.floor(random() * 23);
       const baseAngle = (spoke / 23) * Math.PI * 2;
@@ -91,25 +115,38 @@
   };
 
   const resize = () => {
-    const heroRect = hero.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
     const artRect = art.getBoundingClientRect();
-    const horizontalBleed = Math.min(420, Math.max(88, Math.round(heroRect.width * 0.26)));
-    const verticalBleed = Math.min(280, Math.max(96, Math.round(heroRect.height * 0.24)));
-    width = Math.max(1, Math.round(heroRect.width + horizontalBleed * 2));
-    height = Math.max(1, Math.round(heroRect.height + verticalBleed * 2));
-    centerX = artRect.left - heroRect.left + artRect.width * 0.51 + horizontalBleed;
-    centerY = artRect.top - heroRect.top + artRect.height * 0.51 + verticalBleed;
+    width = Math.max(1, Math.round(canvasRect.width));
+    height = Math.max(1, Math.round(canvasRect.height));
+    centerX = artRect.left - canvasRect.left + artRect.width * 0.51;
+    centerY = artRect.top - canvasRect.top + artRect.height * 0.51;
     radius = Math.max(150, Math.min(artRect.width, artRect.height) * 0.78);
-    pixelRatio = Math.min(window.devicePixelRatio || 1, 1.6);
+    const compact = matchMedia("(max-width: 700px)").matches;
+    const pixelBudget = compact ? 900_000 : 2_000_000;
+    const budgetRatio = Math.sqrt(pixelBudget / Math.max(1, width * height));
+    pixelRatio = Math.max(0.75, Math.min(window.devicePixelRatio || 1, compact ? 1 : 1.25, budgetRatio));
+    const resizeKey = `${width}:${height}:${pixelRatio.toFixed(3)}:${Math.round(centerX)}:${Math.round(centerY)}`;
+    if (resizeKey === lastResizeKey) return;
+    lastResizeKey = resizeKey;
     canvas.width = Math.round(width * pixelRatio);
     canvas.height = Math.round(height * pixelRatio);
-    canvas.style.left = `${-horizontalBleed}px`;
-    canvas.style.top = `${-verticalBleed}px`;
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     buildField();
-    draw(performance.now(), false);
+    initialized = true;
+    canvas.dataset.pixelCount = String(canvas.width * canvas.height);
+    canvas.dataset.particleCount = String(particles.length);
+    canvas.dataset.frameRate = "30";
+    draw(burstComplete ? 2800 : performance.now());
+  };
+
+  const queueResize = () => {
+    if (resizeFrame) return;
+    resizeFrame = requestAnimationFrame(() => {
+      resizeFrame = 0;
+      resize();
+      start();
+    });
   };
 
   const drawCloud = (lobe, pulse) => {
@@ -132,7 +169,7 @@
     context.restore();
   };
 
-  const draw = (time, schedule = true) => {
+  const draw = (time) => {
     context.clearRect(0, 0, width, height);
     const clock = reduceMotion.matches ? 2800 : time;
     const pulse = 0.5 + Math.sin(clock * 0.00125) * 0.5;
@@ -217,18 +254,35 @@
     context.stroke();
     context.restore();
 
-    if (schedule && !reduceMotion.matches && visible && !document.hidden) {
-      frame = requestAnimationFrame((nextTime) => draw(nextTime));
+  };
+
+  const tick = (time) => {
+    frame = 0;
+    if (!initialized || !visible || document.hidden || burstComplete || motionSuppressed) return;
+    if (!burstStarted) burstStarted = time;
+    if (time - lastPaint >= FRAME_INTERVAL_MS) {
+      draw(time);
+      lastPaint = time;
     }
+    if (time - burstStarted < BURST_DURATION_MS) {
+      frame = requestAnimationFrame(tick);
+      return;
+    }
+    burstComplete = true;
+    canvas.dataset.animationState = "settled";
+    draw(2800);
   };
 
   const start = () => {
     cancelAnimationFrame(frame);
-    if (reduceMotion.matches || document.hidden || !visible) {
-      draw(performance.now(), false);
+    frame = 0;
+    if (!initialized || document.hidden || !visible || motionSuppressed) return;
+    if (burstComplete) {
+      draw(2800);
       return;
     }
-    frame = requestAnimationFrame((time) => draw(time));
+    canvas.dataset.animationState = "burst";
+    frame = requestAnimationFrame(tick);
   };
 
   const observer = new IntersectionObserver(([entry]) => {
@@ -236,11 +290,20 @@
     start();
   }, { rootMargin: "120px" });
 
-  new ResizeObserver(resize).observe(hero);
+  new ResizeObserver(queueResize).observe(hero);
   observer.observe(hero);
   document.addEventListener("visibilitychange", start);
-  reduceMotion.addEventListener("change", start);
+  const suppressMotion = (event) => {
+    if (!event.matches) return;
+    motionSuppressed = true;
+    cancelAnimationFrame(frame);
+    frame = 0;
+    canvas.hidden = true;
+    canvas.dataset.animationState = "static";
+    document.documentElement.dataset.workSupernova = "static";
+  };
+  reduceMotion.addEventListener("change", suppressMotion);
+  forcedColors.addEventListener("change", suppressMotion);
   buildGeometry();
-  resize();
-  start();
+  queueResize();
 })();

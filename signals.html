@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Signals Registry | Andrew Concepcion</title>
-  <meta name="description" content="A privacy-bounded satellite operations registry for approved public feedback and removal tombstones in deterministic public slots.">
+  <title>Public Signals | Andrew Concepcion</title>
+  <meta name="description" content="A consent-based record of feedback people explicitly chose to make public, reviewed and published by Andrew Concepcion.">
   <link rel="canonical" href="https://ac-opensource.github.io/signals.html">
   <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml">
   <meta name="robots" content="noindex,follow">
@@ -13,7 +13,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ac-opensource.github.io/signals.html">
   <meta property="og:title" content="Public Signals Registry | Andrew Concepcion">
-  <meta property="og:description" content="A privacy-bounded registry of explicitly approved public feedback and minimal removal tombstones.">
+  <meta property="og:description" content="A small, consent-based record of feedback people explicitly chose to make public.">
   <meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/signals-registry.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
@@ -21,17 +21,17 @@
   <meta property="og:image:alt" content="Andrew Concepcion's privacy-bounded public Signals registry and orbital track counter">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Public Signals Registry | Andrew Concepcion">
-  <meta name="twitter:description" content="A privacy-bounded registry of explicitly approved public feedback and minimal removal tombstones.">
+  <meta name="twitter:description" content="A small, consent-based record of feedback people explicitly chose to make public.">
   <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/signals-registry.png">
   <meta name="twitter:image:alt" content="Andrew Concepcion's privacy-bounded public Signals registry and orbital track counter">
   <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-  <link href="/assets/css/signals-registry.css?v=20260807-ops2" rel="stylesheet">
-  <link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet">
-  <link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles>
-  <script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
+  <link href="/assets/css/signals-registry.css?v=20260820-consent5" rel="stylesheet">
+  <link href="/assets/css/universe-field-map.css?v=20260819-safe1" rel="stylesheet">
+  <link href="/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1" rel="stylesheet" data-universe-perspective-styles>
+  <script src="/assets/js/universe-theme-transition.js?v=20260820-fast-travel1"></script>
 </head>
 <body data-universe-region="signals">
   <a class="skip-link" href="#signal-registry">Skip to Signals registry</a>
@@ -40,10 +40,10 @@
     <div class="signals-topbar__inner">
       <a class="signals-brand" href="/">Andrew Concepcion</a>
       <nav class="signals-nav" aria-label="Primary navigation">
-        <a href="/">[dashboard]</a>
         <a href="/work.html">[portfolio]</a>
         <a href="/blog/">[logs]</a>
         <a href="/about.html">[about]</a>
+        <a href="/resume.html">[résumé]</a>
         <a href="/contact.html">[contact]</a>
       </nav>
       <span>[registry: moderated]</span>
@@ -53,29 +53,31 @@
   <main class="signals-main" data-signals-root data-feed-state="empty" aria-busy="false">
     <header class="signals-hero">
       <div class="signals-hero__copy">
-        <p class="signals-kicker">[SATELLITE OPERATIONS / PRIVACY BOUNDED]</p>
-        <h1>Signals<br>registry.</h1>
-        <p>I publish feedback only when the person offering it has chosen a public quote and it has passed human review. Private, pending, rejected, and unmoderated words stay private.</p>
+        <p class="signals-kicker">[REFERENCES / PUBLIC BY CONSENT]</p>
+        <h1>Public<br><em>signals.</em></h1>
+        <p class="signals-hero__lede"><strong>Feedback belongs to the person who gave it.</strong> This page shows only quotes they explicitly chose to make public and Andrew approved. Private, pending, rejected, and unmoderated words never appear here.</p>
         <a class="signals-action signals-action--primary" href="/contact.html?intent=public&amp;target=portfolio">Propose a portfolio quote for review <span aria-hidden="true">→</span></a>
       </div>
       <aside class="signals-hero__telemetry" aria-label="Registry telemetry">
-        <span>[PUBLIC TRACKS]</span>
-        <strong data-registry-total>0</strong>
-        <p><b data-approved-total>0</b> approved</p>
-        <p><b data-removed-total>0</b> removal tombstones</p>
-        <small>Feed version 1 · moderated contract</small>
+        <p class="signals-kicker">[REGISTRY STATUS]</p>
+        <p class="signals-hero__total"><strong data-registry-total>0</strong><span>public records</span></p>
+        <dl>
+          <div><dt>Approved quotes</dt><dd data-approved-total>0</dd></div>
+          <div><dt>Withdrawn records</dt><dd data-removed-total>0</dd></div>
+        </dl>
+        <small>Human reviewed · feed version 1</small>
       </aside>
     </header>
 
     <section class="signals-truth" aria-labelledby="signals-truth-title">
       <header>
-        <p class="signals-kicker">[LIFECYCLE TRUTH]</p>
-        <h2 id="signals-truth-title">Received privately.<br>Reviewed deliberately.<br>Published minimally.</h2>
+        <p class="signals-kicker">[HOW IT WORKS]</p>
+        <h2 id="signals-truth-title">How a quote gets here.</h2>
       </header>
       <ol class="signals-lifecycle" aria-label="Public Signal lifecycle">
-        <li><span>01</span><strong>Private receipt</strong><p>A proposal begins outside this registry. Submission is not publication.</p></li>
-        <li><span>02</span><strong>Human review</strong><p>Only explicitly approved public fields can cross the moderation boundary.</p></li>
-        <li><span>03</span><strong>Minimal track</strong><p>Removal leaves only an opaque ID, removed status, and stable slot—never the quote.</p></li>
+        <li><span>01</span><strong>Shared privately</strong><p>Sending feedback does not publish it.</p></li>
+        <li><span>02</span><strong>Approved by a person</strong><p>Only explicitly public fields pass human review.</p></li>
+        <li><span>03</span><strong>Kept minimal</strong><p>If withdrawn, the quote disappears. Only an opaque ID and stable slot remain.</p></li>
       </ol>
     </section>
 
@@ -84,26 +86,26 @@
     <section class="signals-orbit" data-signals-orbit aria-labelledby="signals-orbit-title">
       <header class="signals-section-heading">
         <div>
-          <p class="signals-kicker">[SLOT FIELD / 000—999]</p>
-          <h2 id="signals-orbit-title">Public orbital tracks</h2>
+          <p class="signals-kicker">[PUBLIC SLOT MAP]</p>
+          <h2 id="signals-orbit-title">A place for every public record.</h2>
         </div>
-        <p>Approved words keep a stable place here; removal leaves only the minimum record needed to honor that history.</p>
+        <p>The orbit preserves stable public slots without turning private feedback into telemetry. A removed quote leaves no readable trace.</p>
       </header>
       <div class="signals-orbit__layout">
-        <div class="signals-orbit__field" data-orbit-field aria-label="Public Signals slot field">
+        <div class="signals-orbit__field" data-orbit-field role="group" aria-label="Public Signals slot field">
           <span class="signals-orbit__axis signals-orbit__axis--x" aria-hidden="true"></span>
           <span class="signals-orbit__axis signals-orbit__axis--y" aria-hidden="true"></span>
           <span class="signals-orbit__ring signals-orbit__ring--outer" aria-hidden="true"></span>
           <span class="signals-orbit__ring signals-orbit__ring--middle" aria-hidden="true"></span>
           <span class="signals-orbit__ring signals-orbit__ring--inner" aria-hidden="true"></span>
           <span class="signals-orbit__origin" aria-hidden="true"><b>AC</b><small>REGISTRY ORIGIN</small></span>
-          <p class="signals-orbit__empty" data-orbit-empty><strong>NO PUBLIC FEEDBACK YET</strong><span>No approved quote has been published.</span></p>
+          <p class="signals-orbit__empty" data-orbit-empty><strong>PRIVACY-BOUNDED SLOTS</strong><span>Quotes appear here only after consent and human review.</span></p>
           <p class="signals-orbit__empty" data-orbit-filter-empty hidden><strong>NO TRACKS IN FILTER</strong><span>Clear or change the registry filters to restore matching public slots.</span></p>
           <!-- SIGNALS_ORBIT_START -->
           <!-- SIGNALS_ORBIT_END -->
         </div>
-        <aside class="signals-orbit__readout" aria-label="Slot field readout">
-          <p class="signals-kicker">[FIELD READOUT]</p>
+        <div class="signals-orbit__readout" role="group" aria-label="Slot field readout">
+          <p class="signals-kicker">[SLOT READOUT]</p>
           <p class="signals-orbit__preview" data-orbit-preview aria-live="polite">No approved public feedback has been published yet.</p>
           <dl>
             <div><dt>Occupied</dt><dd data-field-total>0</dd></div>
@@ -111,17 +113,17 @@
             <div><dt>Position</dt><dd>Stable public slot</dd></div>
             <div><dt>Source</dt><dd>Moderated registry</dd></div>
           </dl>
-        </aside>
+        </div>
       </div>
     </section>
 
     <section class="signals-registry" id="signal-registry" aria-labelledby="signal-registry-title">
       <header class="signals-section-heading">
         <div>
-          <p class="signals-kicker">[SEMANTIC SOURCE OF TRUTH]</p>
-          <h2 id="signal-registry-title">Public registry</h2>
+          <p class="signals-kicker">[PUBLIC RECORDS]</p>
+          <h2 id="signal-registry-title">The registry itself.</h2>
         </div>
-        <p>Approved quotes stay paired with the smallest public attribution and moderation record needed to understand them.</p>
+        <p>Each approved quote carries only the attribution and dates needed to understand its public context.</p>
       </header>
 
       <form class="signals-controls" data-signal-filters role="search" aria-label="Search and filter public Signals" hidden>

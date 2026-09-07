@@ -136,6 +136,18 @@ body[data-universe-region="article"] #site-topbar {
   display: none;
 }
 
+html.article-js .article-region[data-article-mode="case-study"] .article-region__actions button[hidden] {
+  display: inline-flex !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  html.article-js body[data-universe-region="article"] .article-region[data-article-mode="case-study"] .article-region__actions {
+    padding-left: 3rem !important;
+  }
+}
+
 .article-region__actions button:hover,
 .article-region__actions button:focus-visible,
 .article-region__actions a:hover,
@@ -410,6 +422,18 @@ body[data-universe-region="article"] #site-topbar {
   color: var(--article-blue);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
+}
+
+.article-region__body a.bg-primary {
+  background: var(--article-ink);
+  color: #f4f8ff;
+  text-decoration: none;
+}
+
+.article-region__body a.bg-primary:hover,
+.article-region__body a.bg-primary:focus-visible {
+  background: var(--article-blue);
+  color: #fff;
 }
 
 .article-region__body blockquote {
@@ -697,11 +721,15 @@ body[data-universe-region="article"] #site-topbar {
 }
 
 .article-region[data-article-mode="case-study"] .article-region__title h1 {
-  max-width: 10ch;
-  font-size: clamp(3.6rem, 7vw, 7.4rem);
+  max-width: 13ch;
+  font-size: clamp(3.5rem, 6.25vw, 6.7rem);
+  line-height: 0.88;
 }
 
 .article-region[data-article-mode="case-study"] .work-post-hero {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
   aspect-ratio: 4 / 3;
   padding: 0;
   background: transparent;
@@ -761,6 +789,7 @@ body[data-universe-region="article"] #site-topbar {
   .article-region__meta,
   .article-region__title,
   .article-region__hero,
+  .article-region[data-article-mode="case-study"] .work-post-hero,
   .article-region__topic-field,
   .article-region[data-article-mode="personal"] .article-region__title,
   .article-region[data-article-mode="personal"] .article-region__hero,
@@ -874,8 +903,27 @@ body[data-universe-region="article"] #site-topbar {
   .article-region[data-article-mode="travel"] .article-region__title h1,
   .article-region[data-article-mode="photography"] .article-region__title h1,
   .article-region[data-article-mode="case-study"] .article-region__title h1 {
-    font-size: clamp(3.1rem, 16vw, 5.5rem);
+    font-size: clamp(3rem, 14vw, 5.5rem);
     line-height: 0.9;
+    overflow-wrap: break-word;
+  }
+
+  .article-region[data-article-mode="case-study"] .article-region__title h1 {
+    max-width: none;
+    font-size: clamp(2.45rem, 10.6vw, 3.45rem);
+    line-height: 0.94;
+    letter-spacing: -0.055em;
+  }
+
+  .article-region[data-article-mode="case-study"] .article-region__title > p {
+    margin-top: 1.25rem;
+    font-size: 1rem;
+    line-height: 1.58;
+  }
+
+  .article-region[data-article-mode="case-study"] .work-post-hero {
+    margin-top: 1.4rem;
+    aspect-ratio: 16 / 10;
   }
 
   .article-region__hero,
@@ -913,7 +961,8 @@ body[data-universe-region="article"] #site-topbar {
   }
 
   .article-region__body h2 {
-    font-size: clamp(2.25rem, 12vw, 3.6rem);
+    font-size: clamp(2.1rem, 10vw, 3.6rem);
+    overflow-wrap: break-word;
   }
 
   .article-region__adjacent {
@@ -937,10 +986,9 @@ body[data-universe-region="article"] #site-topbar {
   .article-region *,
   .article-region *::before,
   .article-region *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
+    animation: none !important;
     scroll-behavior: auto !important;
-    transition-duration: 0.001ms !important;
+    transition: none !important;
   }
 }
 

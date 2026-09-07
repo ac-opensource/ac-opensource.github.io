@@ -461,18 +461,28 @@ body.has-universe-route-map {
     left: max(0.75rem, env(safe-area-inset-left));
   }
 
+  /* Keep the collapsed 44px field map out of dense first-column evidence. */
+  body.has-universe-route-map[data-universe-region="article"] .article-region__actions,
+  body.has-universe-route-map[data-universe-region="article"] .article-region__topic-field,
+  body.has-universe-route-map[data-universe-region="resume"] [data-resume-signature-visual] {
+    padding-left: 3rem !important;
+  }
+
+  body.has-universe-route-map[data-universe-region="contact"] .bay-node--intent .module-state {
+    margin-left: 3rem;
+  }
+
   .universe-route-map[data-map-expanded="true"] {
     width: min(18rem, calc(100vw - 1.5rem - env(safe-area-inset-left)));
   }
 }
 
-@media (max-width: 360px) {
-  .universe-route-map a {
-    width: 2.75rem;
-  }
-
-  .universe-route-map a strong {
-    font-size: 0.33rem;
+@media (max-width: 480px) {
+  /* On very narrow screens the fixed telescope cannot avoid every long-page
+     control. The primary header already exposes the same routes, so remove the
+     redundant overlay instead of covering evidence or actions. */
+  .universe-route-map {
+    display: none !important;
   }
 }
 

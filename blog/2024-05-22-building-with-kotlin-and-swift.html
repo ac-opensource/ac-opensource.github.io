@@ -14,8 +14,11 @@
 <meta property="og:url" content="https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html"/>
 <meta property="og:title" content="Building Across Kotlin and Swift Without Blurring Platform Boundaries | Andrew Concepcion"/>
 <meta property="og:description" content="A practical way to divide shared domain behavior, state, packaging, and native UI responsibilities across Kotlin and Swift."/>
-<meta property="og:image" content="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&amp;fit=crop&amp;w=1600&amp;q=80"/>
-<meta property="og:image:alt" content="A developer works between a Windows laptop and a MacBook."/>
+<meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/posts/2024-05-22-building-with-kotlin-and-swift.png"/>
+<meta property="og:image:type" content="image/png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="Building Across Kotlin and Swift Without Blurring Platform Boundaries — technical social preview by Andrew Concepcion"/>
 <meta property="article:published_time" content="2024-05-22"/>
 <meta property="article:author" content="Andrew Concepcion"/>
 <meta property="article:tag" content="KMP">
@@ -24,16 +27,18 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Building Across Kotlin and Swift Without Blurring Platform Boundaries | Andrew Concepcion"/>
 <meta name="twitter:description" content="A practical way to divide shared domain behavior, state, packaging, and native UI responsibilities across Kotlin and Swift."/>
-<meta name="twitter:image" content="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&amp;fit=crop&amp;w=1600&amp;q=80"/>
-<meta name="twitter:image:alt" content="A developer works between a Windows laptop and a MacBook."/>
+<meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/posts/2024-05-22-building-with-kotlin-and-swift.png"/>
+<meta name="twitter:image:alt" content="Building Across Kotlin and Swift Without Blurring Platform Boundaries — technical social preview by Andrew Concepcion"/>
 <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
+<script>document.documentElement.classList.add("article-js");</script>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="/assets/css/article-debrief.css?v=20260812-actions2" rel="stylesheet"/>
-<link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet"/>
-<link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles/>
-<script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
+<link rel="preload" href="/assets/fonts/manrope-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
+<link rel="preload" href="/assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
+<link href="/assets/css/site-fonts.css?v=20260819-local1" rel="stylesheet"/>
+<link href="/assets/css/article-debrief.css?v=20260820-hierarchy1" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20260819-safe1" rel="stylesheet"/>
+<link href="/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1" rel="stylesheet" data-universe-perspective-styles/>
+<script src="/assets/js/universe-theme-transition.js?v=20260820-fast-travel1"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -66,9 +71,6 @@
 <style>
   body {
     background-color: #faf9f4;
-  }
-  .material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
   .code-block {
     background: #1A1C1E;
@@ -163,7 +165,7 @@
   },
   "datePublished": "2024-05-22",
   "dateModified": "2026-07-25T00:00:00.000Z",
-  "image": "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=1600&q=80",
+  "image": "https://ac-opensource.github.io/assets/images/og/posts/2024-05-22-building-with-kotlin-and-swift.png",
   "mainEntityOfPage": "https://ac-opensource.github.io/blog/2024-05-22-building-with-kotlin-and-swift.html"
 }</script>
 </head>
@@ -172,20 +174,22 @@
 <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
   <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
     <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
-    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+    <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs" aria-label="Primary navigation">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
       <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
       <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/resume.html" href="/resume.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[résumé]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
     <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]" data-site-search-slot><a class="site-search-link" href="/search.html" data-site-search-link aria-label="Search published evidence" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></div>
   </div>
-  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+  <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]" aria-label="Mobile navigation">
     <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
     <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
     <a data-route="/blog/" href="/blog/" aria-current="page" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
     <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+    <a data-route="/resume.html" href="/resume.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[résumé]</a>
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
@@ -211,7 +215,7 @@
   </div>
 
 <figure class="article-region__hero article-region__hero--technical">
-  <img id="post-hero-image" src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&amp;fit=crop&amp;w=1600&amp;q=80" alt="A developer works between a Windows laptop and a MacBook." loading="eager" decoding="async"/>
+  <img id="post-hero-image" src="/blog/images/kotlin-swift-developer-laptops-1600.avif" srcset="/blog/images/kotlin-swift-developer-laptops-800.avif 800w, /blog/images/kotlin-swift-developer-laptops-1600.avif 1600w" sizes="(min-width: 1024px) 50vw, 100vw" alt="A developer works between a Windows laptop and a MacBook." loading="eager" decoding="async"/>
   <figcaption>Two native toolchains, one product boundary to design deliberately.</figcaption>
 </figure>
 
@@ -268,7 +272,7 @@
   </nav>
 </details>
 <div class="article-debrief__layout article-region__reading">
-  <aside class="article-debrief__sidebar article-region__rail">
+  <div class="article-debrief__sidebar article-region__rail">
 
 <nav class="article-trajectory article-trajectory--desktop" aria-label="Systems debrief sections" data-article-trajectory>
   <p class="article-trajectory__eyebrow">[systems debrief]</p>
@@ -315,7 +319,7 @@
       <span>Published source</span>
       <span>5 authored sections</span>
     </p>
-  </aside>
+  </div>
   <div id="post-body" class="article-debrief__body article-region__body" data-debrief-body><section class="space-y-6">
   <p>
     Kotlin and Swift can share a product without pretending the two platforms are identical. The
@@ -508,7 +512,10 @@
       bookmarkPostButton.classList.toggle("border-outline-variant/20", !active);
       bookmarkPostButton.classList.toggle("text-secondary", !active);
       bookmarkPostButton.setAttribute("aria-pressed", String(active));
-      bookmarkPostButton.setAttribute("aria-label", active ? "Remove from saved reading" : "Save for later reading");
+      bookmarkPostButton.setAttribute(
+        "aria-label",
+        active ? "Bookmarked — remove from saved reading" : "Bookmark — save for later reading"
+      );
     }
 
     async function shareCurrentPost() {
