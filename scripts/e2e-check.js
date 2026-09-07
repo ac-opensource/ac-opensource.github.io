@@ -3905,10 +3905,21 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
   await waitForWorkEntrance(perspectiveTransitionPage);
   await expandUniverseRouteMap(perspectiveTransitionPage);
-  await Promise.all([
-    perspectiveTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' }),
-    perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="threads"]').click(),
-  ]);
+  const logsRoute = perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="threads"]');
+  await logsRoute.evaluate((link) => {
+    link.addEventListener('click', () => sessionStorage.setItem('e2e.logsNavigationStarted', String(Date.now())), { once: true, capture: true });
+  });
+  // Actionability waits belong to click preparation, not the route's travel budget.
+  await logsRoute.click({ noWaitAfter: true });
+  await perspectiveTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' });
+  const logsNavigationMs = await perspectiveTransitionPage.evaluate(() => {
+    const started = Number(sessionStorage.getItem('e2e.logsNavigationStarted'));
+    sessionStorage.removeItem('e2e.logsNavigationStarted');
+    const navigation = performance.getEntriesByType('navigation')[0];
+    return started > 0 && navigation?.domContentLoadedEventEnd > 0
+      ? performance.timeOrigin + navigation.domContentLoadedEventEnd - started : Infinity;
+  });
+  await assert(logsNavigationMs <= 5000, `Work to Logs exceeded its activation-to-document budget (${logsNavigationMs}ms)`);
   await seekUniverseTransition(perspectiveTransitionPage, 0.4);
   const arrivedLogs = await perspectiveTransitionPage.evaluate(() => {
     const root = document.documentElement;
@@ -4639,7 +4650,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await assert(
     portfolioContract.heroFontSize <= 90
-      && portfolioContract.hero.height <= 700
+      && portfolioContract.hero.bottom <= portfolioContract.viewportHeight
+      && portfolioContract.productionRect.top >= portfolioContract.hero.bottom
       && portfolioContract.heroTitleRect.bottom <= portfolioContract.viewportHeight
       && portfolioContract.productionRect.top < portfolioContract.viewportHeight * 1.6,
     `Work opening is oversized or buries the flagship content: ${JSON.stringify(portfolioContract)}`
@@ -4695,10 +4707,30 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       `${projectName} production card is missing exact role or delivery evidence`);
   }
 
-  const pipelineText = ((await page.locator('.work-pipeline').textContent()) || '').replace(/\s+/g, ' ').trim().toUpperCase();
-  for (const stage of ['PRODUCT PROBLEM', 'SHARED CORE', 'ANDROID', 'IOS', 'BACKEND', 'AI', 'VERIFIED RELEASE']) {
-    await assert(pipelineText.includes(stage), `Portfolio opening diagram is missing ${stage}`);
-  }
+  const supernovaArtwork = await page.locator('.work-nova').evaluate((group) => {
+    const image = group.querySelector('img');
+    return {
+      role: group.getAttribute('role'),
+      label: group.getAttribute('aria-label'),
+      imageSource: image?.getAttribute('src'),
+      imageAlt: image?.getAttribute('alt'),
+      imageWidth: image?.getAttribute('width'),
+      imageHeight: image?.getAttribute('height'),
+      pulseLabel: group.querySelector('[data-nova-ignite]')?.getAttribute('aria-label'),
+      canvasDecorative: group.querySelector('[data-nova-field]')?.getAttribute('aria-hidden'),
+    };
+  });
+  await assert(
+    supernovaArtwork.role === 'group'
+      && supernovaArtwork.label === 'Explore the supernova'
+      && supernovaArtwork.imageSource === '/assets/images/work/supernova-remnant.jpg'
+      && supernovaArtwork.imageAlt === 'A luminous supernova with cobalt and copper clouds.'
+      && supernovaArtwork.imageWidth === '1254'
+      && supernovaArtwork.imageHeight === '1254'
+      && supernovaArtwork.pulseLabel === 'Send an energy pulse through the supernova'
+      && supernovaArtwork.canvasDecorative === 'true',
+    `Work opening artwork or accessible controls are incomplete: ${JSON.stringify(supernovaArtwork)}`
+  );
 
   const productionImageContracts = [
     ['Bitcoin.com Wallet', '.work-case--bitcoin .work-bitcoin-shot', 3, '/assets/images/work/img_bitcoin_wallet_'],
