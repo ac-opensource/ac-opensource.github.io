@@ -112,7 +112,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   });
 
   async function assert(condition, message) {
-    if (!condition) failures.push(message);
+    if (!condition) {
+      failures.push(message);
+      console.error(`E2E assertion: ${message}`);
+    }
   }
 
   async function waitForBigBangComplete(targetPage) {
@@ -122,6 +125,16 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       null,
       { timeout: 5000 }
     );
+  }
+
+  async function waitForUnattendedAboutRotation(targetPage) {
+    // Nodes pause rotation while hovered or focused. Leave the scene and
+    // return focus to its container before testing the unattended camera.
+    await targetPage.mouse.move(0, 0);
+    await targetPage.locator('#stellar-spectrum-panel').focus();
+    await targetPage.waitForFunction(() => (
+      document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion === 'idle-rotation'
+    ), undefined, { timeout: 3500 });
   }
 
   async function expandUniverseRouteMap(targetPage) {
@@ -2210,6 +2223,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `About section typography regressed to oversized display scale: ${JSON.stringify(desktopSpectrum.typography)}`
   );
 
+  await waitForUnattendedAboutRotation(page);
   const idleBefore = await readAboutCamera(page);
   await page.waitForTimeout(700);
   const idleAfter = await readAboutCamera(page);
@@ -2222,6 +2236,24 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && idleMotion === 'idle-rotation',
     `About nebula does not rotate gently while idle: ${JSON.stringify({ idleBefore, idleAfter, idleMotion })}`
   );
+
+  const hoverNodeBounds = await page.locator('[data-node-id="android"]').boundingBox();
+  await assert(Boolean(hoverNodeBounds), 'About Android signal has no pointer target');
+  if (hoverNodeBounds) {
+    await page.mouse.move(hoverNodeBounds.x + hoverNodeBounds.width / 2, hoverNodeBounds.y + hoverNodeBounds.height / 2);
+  }
+  await page.waitForFunction(() => (
+    document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion === 'paused'
+  ));
+  const hoveredCamera = await readAboutCamera(page);
+  await page.waitForTimeout(300);
+  const hoverPausedCamera = await readAboutCamera(page);
+  await assert(
+    await page.locator('[data-stellar-spectrum]').getAttribute('data-tree-motion') === 'paused'
+      && Math.abs(hoverPausedCamera.yaw - hoveredCamera.yaw) < 0.001,
+    `Hovering an About signal must pause its camera: ${JSON.stringify({ hoveredCamera, hoverPausedCamera })}`
+  );
+  await waitForUnattendedAboutRotation(page);
 
   await page.locator('.stellar-tree__root').click();
   const openedSourceIndex = await page.evaluate(() => {
@@ -2370,9 +2402,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && maximumZoom === 2.6,
     `About zoom endpoints or tween are not reachable: ${JSON.stringify({ minimumZoom, tweenedMaximumState, maximumZoom })}`
   );
-  await page.waitForFunction(() => (
-    document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion === 'idle-rotation'
-  ), undefined, { timeout: 3000 });
+  await waitForUnattendedAboutRotation(page);
   const tweenedIdleBranchId = await page.evaluate(() => {
     const branches = [...document.querySelectorAll('[data-band-trigger]')];
     const visible = branches.find((branch) => {
@@ -2406,18 +2436,20 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         canvasPixels: Number(document.querySelector('[data-stellar-spectrum]')?.dataset.treeCanvasPixels),
         canvasSignature: canvasSignature >>> 0,
         position: `${bounds.x.toFixed(3)}:${bounds.y.toFixed(3)}`,
+        yaw: document.querySelector('[data-stellar-spectrum]')?.dataset.treeYaw,
         properties: style.transitionProperty,
       };
     }, tweenedIdleBranchId));
     await page.waitForTimeout(20);
   }
   await assert(
-    new Set(tweenedIdlePositions.map(({ position }) => position)).size === 1
+    new Set(tweenedIdlePositions.map(({ yaw }) => yaw)).size >= 2
+      && tweenedIdlePositions.every(({ position }) => !position.includes('NaN'))
       && new Set(tweenedIdlePositions.map(({ canvasFrame }) => canvasFrame)).size >= 3
       && new Set(tweenedIdlePositions.map(({ canvasSignature }) => canvasSignature)).size >= 5
-      && tweenedIdlePositions.every(({ canvasPixels }) => canvasPixels > 0 && canvasPixels <= 1050000)
+      && tweenedIdlePositions.every(({ canvasPixels }) => canvasPixels > 0 && canvasPixels <= 600000)
       && tweenedIdlePositions.every(({ properties }) => properties.includes('left') && properties.includes('top')),
-    `About high-zoom nebula motion or stable controls regressed: ${JSON.stringify(tweenedIdlePositions)}`
+    `About high-zoom projected controls, nebula motion or pixel budget regressed: ${JSON.stringify(tweenedIdlePositions)}`
   );
   await zoomRange.fill('145');
   await page.waitForFunction(() => (
@@ -2462,6 +2494,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && frontState.view === 'front',
     `About front projection state is incomplete: ${JSON.stringify(frontState)}`
   );
+  await waitForUnattendedAboutRotation(page);
   const frontIdleBefore = await page.locator('[data-node-id="android"]').evaluate((element) => ({
     left: parseFloat(element.style.left),
     top: parseFloat(element.style.top),
@@ -2508,6 +2541,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && topState.view === 'top',
     `About top projection state is incomplete: ${JSON.stringify(topState)}`
   );
+  await waitForUnattendedAboutRotation(page);
   const topIdleBefore = await page.locator('[data-node-id="android"]').evaluate((element) => ({
     left: parseFloat(element.style.left),
     top: parseFloat(element.style.top),
