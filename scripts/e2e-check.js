@@ -162,6 +162,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   }
 
   async function expandUniverseRouteMap(targetPage) {
+    // Geometry and CSS-transition completion do not require a canvas RAF.
+    // Timer polling keeps these checks responsive when software rendering is busy.
     const toggle = targetPage.locator('[data-universe-map-toggle]');
     if (await toggle.count() === 0) return;
     if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
@@ -174,7 +176,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         if (!map || map.dataset.mapExpanded !== 'true') return false;
         const bounds = map.getBoundingClientRect();
         return bounds.width >= 287 && bounds.height >= 123;
-      }, null, { timeout: 2000 });
+      }, null, { timeout: 2000, polling: 100 });
       await targetPage.evaluate(() => {
         document.querySelector('[data-universe-route-map]')
           ?.dispatchEvent(new PointerEvent('pointerleave'));
@@ -184,7 +186,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         return map && map.getAnimations({ subtree: true }).every((animation) => (
           animation.playState === 'finished' || animation.playState === 'idle'
         ));
-      }, null, { timeout: 2000 });
+      }, null, { timeout: 2000, polling: 100 });
       await targetPage.waitForFunction(() => {
         const map = document.querySelector('[data-universe-route-map]');
         const telescope = map?.querySelector('.universe-route-map__telescope');
@@ -194,7 +196,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         return Number.isFinite(barrelLength)
           && Number.isFinite(sightlineLength)
           && sightlineLength > barrelLength;
-      }, null, { timeout: 2000 });
+      }, null, { timeout: 2000, polling: 100 });
     }
   }
 
@@ -1615,15 +1617,40 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await assert(flung.audioState === 'running', 'Desktop fling does not activate the action-sound engine');
     await assert(flung.activeControl, 'Desktop fling leaves keyboard focus on the moving node instead of the stable reset control');
 
-    const displacement = (before, after, key) => {
-      const start = before.find((point) => point.key === key);
-      const end = after.find((point) => point.key === key);
-      return start && end ? Math.hypot(end.x - start.x, end.y - start.y) : 0;
-    };
-    const apoBefore = await readOrbitCoordinates(flingPage);
-    await flingPage.waitForTimeout(320);
-    const apoAfter = await readOrbitCoordinates(flingPage);
-    const apoDistance = displacement(apoBefore, apoAfter, flingTarget.key);
+    // The renderer caps each frame's simulated delta at 48ms. Sample on
+    // that same clock, including each segment of the path, so a busy runner
+    // cannot turn different frame delivery into apparent acceleration.
+    const sampleOrbitMotion = () => flingPage.evaluate(() => new Promise((resolve) => {
+      const read = () => [...document.querySelectorAll('[data-orbit-object]')].map((node) => ({
+        key: node.dataset.orbitObject,
+        x: Number.parseFloat(getComputedStyle(node).getPropertyValue('--x')),
+        y: Number.parseFloat(getComputedStyle(node).getPropertyValue('--y')),
+      }));
+      let previousTime;
+      let previous;
+      let elapsed = 0;
+      const distances = {};
+      const sample = (timestamp) => {
+        const current = read();
+        if (previousTime !== undefined) {
+          elapsed += Math.min(timestamp - previousTime, 48);
+          current.forEach((point, index) => {
+            distances[point.key] = (distances[point.key] || 0)
+              + Math.hypot(point.x - previous[index].x, point.y - previous[index].y);
+          });
+        }
+        if (elapsed >= 320) {
+          resolve({ elapsed, distances, speeds: Object.fromEntries(Object.entries(distances).map(([key, distance]) => [key, distance / elapsed * 1000])) });
+          return;
+        }
+        previousTime = timestamp;
+        previous = current;
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    }));
+    const apoSpeeds = await sampleOrbitMotion();
+    const apoSpeed = apoSpeeds.speeds[flingTarget.key];
     const apoRadius = await flingPage.evaluate((key) => {
       const plane = document.querySelector('[data-orbit-plane]');
       const node = document.querySelector(`[data-orbit-object="${key}"]`);
@@ -1651,25 +1678,19 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       proximity: Number.parseFloat(getComputedStyle(node).getPropertyValue('--solar-proximity')),
       scale: Number.parseFloat(getComputedStyle(node).getPropertyValue('--wake-scale')),
     }));
-    const inboundBefore = await readOrbitCoordinates(flingPage);
-    await flingPage.waitForTimeout(420);
-    const inboundAfter = await readOrbitCoordinates(flingPage);
-    const inboundDistance = displacement(inboundBefore, inboundAfter, flingTarget.key);
-    const regularDistances = inboundBefore
-      .filter(({ key }) => key !== flingTarget.key)
-      .map(({ key }) => displacement(inboundBefore, inboundAfter, key));
-    const averageRegularDistance = regularDistances.reduce((total, distance) => total + distance, 0)
-      / Math.max(regularDistances.length, 1);
+    const inboundSpeeds = await sampleOrbitMotion();
+    const inboundSpeed = inboundSpeeds.speeds[flingTarget.key];
+    const regularSpeeds = Object.entries(inboundSpeeds.speeds)
+      .filter(([key]) => key !== flingTarget.key).map(([, speed]) => speed);
+    const averageRegularSpeed = regularSpeeds.reduce((total, speed) => total + speed, 0)
+      / Math.max(regularSpeeds.length, 1);
     await assert(
-      // CI runners can briefly deliver a single throttled frame at apoapsis;
-      // keep the acceleration assertion about the relative inbound speed,
-      // rather than requiring a minimum pixel displacement for that frame.
-      apoDistance > .1 && inboundDistance > apoDistance * 1.35,
-      `Altered node does not visibly accelerate from apoapsis toward the AC focus (${apoDistance.toFixed(2)}px → ${inboundDistance.toFixed(2)}px)`
+      apoSpeeds.distances[flingTarget.key] > .1 && inboundSpeed > apoSpeed * 1.35,
+      `Altered node does not accelerate from apoapsis toward AC on the simulation clock (${apoSpeed.toFixed(2)}px/s → ${inboundSpeed.toFixed(2)}px/s; ${apoSpeeds.elapsed.toFixed(1)}ms / ${inboundSpeeds.elapsed.toFixed(1)}ms simulated)`
     );
     await assert(
-      inboundDistance > averageRegularDistance * 1.8,
-      `Inbound comet is not substantially faster than the regular orbit nodes (${inboundDistance.toFixed(2)}px vs ${averageRegularDistance.toFixed(2)}px average)`
+      inboundSpeed > averageRegularSpeed * 1.8,
+      `Inbound comet is not substantially faster than regular orbit nodes (${inboundSpeed.toFixed(2)}px/s vs ${averageRegularSpeed.toFixed(2)}px/s average)`
     );
     await assert(
       inboundWake.proximity > apoWake.proximity && inboundWake.scale > apoWake.scale + .08,
