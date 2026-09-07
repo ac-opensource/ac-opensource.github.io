@@ -127,6 +127,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     );
   }
 
+  async function waitForWorkEntrance(targetPage) {
+    // The fluid scene has its own six-second entrance after the page loader.
+    // Start ordinary route-departure checks from the settled source scene.
+    await targetPage.waitForFunction(() => (
+      document.querySelector('[data-nova-field]')?.dataset.phase === 'remnant'
+    ), null, { timeout: 20000 });
+  }
+
   async function waitForUnattendedAboutRotation(targetPage) {
     // Nodes pause rotation while hovered or focused. Leave the scene and
     // return focus to its container before testing the unattended camera.
@@ -3426,6 +3434,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await perspectiveTransitionPage.evaluate(() => sessionStorage.clear());
   await perspectiveTransitionPage.reload({ waitUntil: 'domcontentloaded' });
   await waitForBigBangComplete(perspectiveTransitionPage);
+  await waitForWorkEntrance(perspectiveTransitionPage);
   await expandUniverseRouteMap(perspectiveTransitionPage);
 
   const workPerspective = await perspectiveTransitionPage.evaluate(() => {
@@ -3819,6 +3828,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await resumeUniverseTransition(perspectiveTransitionPage);
   await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
+  await waitForWorkEntrance(perspectiveTransitionPage);
   await expandUniverseRouteMap(perspectiveTransitionPage);
   await Promise.all([
     perspectiveTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' }),
@@ -3904,6 +3914,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const retargetTransitionPage = await retargetTransitionContext.newPage();
   await retargetTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await waitForBigBangComplete(retargetTransitionPage);
+  await waitForWorkEntrance(retargetTransitionPage);
   await expandUniverseRouteMap(retargetTransitionPage);
   await Promise.all([
     retargetTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
