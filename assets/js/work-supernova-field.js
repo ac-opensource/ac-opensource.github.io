@@ -20,6 +20,8 @@
   };
   staticView();
   if (suppressed()) return;
+  const startRenderer = () => {
+  if (suppressed()) return;
   const gl = field.getContext('webgl', { alpha: true, antialias: false, depth: false, premultipliedAlpha: false });
   if (!gl) return;
   const vertex = `attribute vec2 position; varying vec2 uv; void main(){uv=position*.5+.5;gl_Position=vec4(position,0.,1.);}`;
@@ -227,4 +229,31 @@
   });
   if (image.complete) initialize();
   else image.addEventListener('load',initialize,{once:true});
+  };
+  // Keep GPU setup outside document parsing and the shared page entrance.
+  // The artwork remains visible while the browser acquires the destination.
+  let setupTimer = 0;
+  let rendererStarted = false;
+  const entranceSettled = () => document.readyState !== 'loading' && !document.hidden
+    && !['pending', 'running', 'revealing'].includes(document.documentElement.dataset.bigBang)
+    && !document.documentElement.dataset.universeMotion;
+  const scheduleRenderer = () => {
+    clearTimeout(setupTimer);
+    if (rendererStarted || !entranceSettled()) return;
+    setupTimer = setTimeout(() => {
+      if (!entranceSettled()) return;
+      rendererStarted = true;
+      entranceObserver.disconnect();
+      startRenderer();
+    }, 0);
+  };
+  const entranceObserver = new MutationObserver(scheduleRenderer);
+  entranceObserver.observe(document.documentElement, {
+    attributes: true, attributeFilter: ['data-big-bang', 'data-universe-motion']
+  });
+  document.addEventListener('DOMContentLoaded', scheduleRenderer, { once: true });
+  document.addEventListener('visibilitychange', scheduleRenderer);
+  window.addEventListener('pagehide', () => clearTimeout(setupTimer));
+  window.addEventListener('pageshow', scheduleRenderer);
+  scheduleRenderer();
 })();

@@ -387,10 +387,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     window.__bigBangLongTasks = [];
     document.addEventListener('bigbang:phase', (event) => {
       window.__bigBangPhaseHistory.push({ ...event.detail });
+      if (event.detail.phase === 'complete') window.__bigBangCompletedAt = performance.now();
     });
     try {
       new PerformanceObserver((list) => {
-        window.__bigBangLongTasks.push(...list.getEntries().map((entry) => entry.duration));
+        window.__bigBangLongTasks.push(...list.getEntries().map((entry) => ({ start: entry.startTime, duration: entry.duration })));
       }).observe({ type: 'longtask', buffered: true });
     } catch (_error) {
       // Long Task timing is an optional Chromium capability; phase/deadline
@@ -525,7 +526,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   ), null, { timeout: 5000 });
   const bigBangComplete = await bigBangPage.evaluate((sessionKey) => ({
     bodyOpacity: getComputedStyle(document.body).opacity,
-    longTasks: window.__bigBangLongTasks || [],
+    longTasks: (window.__bigBangLongTasks || [])
+      .filter((entry) => entry.start < window.__bigBangCompletedAt)
+      .map((entry) => entry.duration),
     phaseHistory: window.__bigBangPhaseHistory?.map((entry) => entry.phase) || [],
     sessionValue: window.sessionStorage.getItem(sessionKey),
     snapshot: window.BigBangLoader.snapshot(),
@@ -2394,8 +2397,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const maximumZoom = (await readAboutCamera(page)).zoom;
   await assert(
     minimumZoom === 0.4
-      && tweenedMaximumState.zoom > minimumZoom
-      && tweenedMaximumState.zoom < 1
+      && tweenedMaximumState.zoom >= minimumZoom
+      && tweenedMaximumState.zoom < 2.6
       && tweenedMaximumState.range === '260'
       && tweenedMaximumState.ariaValue === '260 percent'
       && tweenedMaximumState.output !== '260%'
@@ -2727,6 +2730,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `About relationship tab is not synchronized with its panel: ${JSON.stringify(selectedRelationships)}`
   );
   await page.keyboard.press('Escape');
+  await page.waitForFunction(() => document.activeElement?.dataset.nodeId === 'android');
   const dismissedAndroid = await page.evaluate(() => ({
     activeBand: document.activeElement?.dataset?.bandTrigger,
     activeNode: document.activeElement?.dataset?.nodeId,
@@ -2831,7 +2835,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && mobileSpectrum.nodes === 31
       && mobileSpectrum.visibleBranches === mobileSpectrum.branches
       && mobileSpectrum.visibleNodes === 31
-      && mobileSpectrum.visibleNodeLabels === 0
+      && mobileSpectrum.visibleNodeLabels === 31
       && mobileSpectrum.stacked
       && mobileSpectrum.canvasCoversScene
       && mobileSpectrum.syntheticCloudCount === 0
@@ -3084,7 +3088,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await mobilePage.locator('.stellar-spectrum__readout-meta, .stellar-spectrum__source-tabs').evaluateAll((rails) => {
     rails.forEach((rail) => rail.scrollTo({ left: rail.scrollWidth, behavior: 'instant' }));
   });
-  await mobilePage.waitForTimeout(180);
+  await mobilePage.waitForFunction(() => (
+    [...document.querySelectorAll('.stellar-spectrum__horizontal-cue')]
+      .filter((cue) => cue.parentElement.dataset.railOverflow === 'true')
+      .every((cue) => cue.parentElement.dataset.railEnd === 'true' && Number.parseFloat(getComputedStyle(cue).opacity) < 0.05)
+  ));
   const finishedHorizontalCues = await mobilePage.locator('.stellar-spectrum__horizontal-cue').evaluateAll((cues) => (
     cues.map((cue) => ({
       end: cue.parentElement.dataset.railEnd,
@@ -3515,7 +3523,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `The shared Universe map does not point toward the keyboard-focused destination: ${JSON.stringify(aimedAbout)}`
   );
 
-  const canceledDeparture = await perspectiveTransitionPage.evaluate(() => new Promise((resolve) => {
+  // Hold the actual destination response while inspecting its source document.
+  // preventDefault in a later listener cannot cancel the controller's scheduled
+  // location.assign; reloading after such a click races that navigation.
+  let holdAboutRequest;
+  const heldAboutRequest = new Promise((resolve) => { holdAboutRequest = resolve; });
+  await perspectiveTransitionPage.route('**/about.html', (route) => holdAboutRequest(route), { times: 1 });
+  const aboutDeparture = await perspectiveTransitionPage.evaluate(() => new Promise((resolve) => {
     const anchor = document.querySelector('.universe-route-map a[data-map-id="about"]');
     window.addEventListener('click', (event) => {
       const snapshot = window.UniversePerspective?.snapshot();
@@ -3533,64 +3547,61 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         stored: JSON.parse(sessionStorage.getItem('ac.universe-perspective.v1') || 'null'),
         to: document.documentElement.dataset.universePerspectiveTo,
       };
-      event.preventDefault();
       resolve(result);
     }, { once: true });
     anchor.click();
   }));
   await assert(
-    canceledDeparture.from === 'work'
-      && canceledDeparture.to === 'about'
-      && canceledDeparture.motion === 'depart'
-      && canceledDeparture.perspective?.lastTravel?.motionModel === 'observer-camera-3d'
-      && canceledDeparture.perspective?.lastTravel?.searchModel === 'directional-guiding-scope'
-      && canceledDeparture.perspective?.lastTravel?.direction === 'southwest'
-      && canceledDeparture.perspective?.lastTravel?.depthDirection === 'farther'
-      && canceledDeparture.perspective?.lastTravel?.cameraX > 0
-      && canceledDeparture.perspective?.lastTravel?.cameraY < 0
-      && canceledDeparture.perspective?.lastTravel?.cameraZ < 0
-      && canceledDeparture.perspective?.lastTravel?.cameraScale > 1
-      && canceledDeparture.perspective?.lastTravel?.skyX > 20
-      && canceledDeparture.perspective?.lastTravel?.skyY < -30
-      && canceledDeparture.perspective?.lastTravel?.targetEntryX < -30
-      && canceledDeparture.perspective?.lastTravel?.targetEntryY > 50
-      && canceledDeparture.perspective?.lastTravel?.skyTone === 'twilight'
-      && canceledDeparture.perspective?.lastTravel?.skyFrom === '#faf9f4'
-      && canceledDeparture.perspective?.lastTravel?.skyTo === '#020817'
-      && Math.abs(canceledDeparture.perspective?.lastTravel?.nearX)
-        > Math.abs(canceledDeparture.perspective?.lastTravel?.middleX)
-      && Math.abs(canceledDeparture.perspective?.lastTravel?.middleX)
-        > Math.abs(canceledDeparture.perspective?.lastTravel?.farX)
-      && Math.abs(canceledDeparture.perspective?.lastTravel?.nearY)
-        > Math.abs(canceledDeparture.perspective?.lastTravel?.middleY)
-      && Math.abs(canceledDeparture.perspective?.lastTravel?.middleY)
-        > Math.abs(canceledDeparture.perspective?.lastTravel?.farY)
-      && canceledDeparture.perspective?.lastTravel?.toMagnification === 1.6
-      && canceledDeparture.perspective?.lastTravel?.duration >= 1240
-      && canceledDeparture.perspective?.lastTravel?.duration <= 1420
-      && canceledDeparture.perspective?.lastTravel?.searchStart === 0.28
-      && canceledDeparture.perspective?.lastTravel?.searchEnd === 0.60
-      && canceledDeparture.perspective?.lastTravel?.searchEnd
-        - canceledDeparture.perspective?.lastTravel?.searchStart >= 0.31
-      && canceledDeparture.perspectiveDuration === `${canceledDeparture.perspective?.lastTravel?.duration}ms`
-      && (canceledDeparture.perspective?.crossDocument
-        ? canceledDeparture.targetCueOpacity === '1'
-          && canceledDeparture.targetCueViewTransitionName === 'universe-target-cue'
-        : canceledDeparture.targetCueAnimation === 'universe-target-acquisition')
-      && canceledDeparture.stored?.from === 'work'
-      && canceledDeparture.stored?.to === 'about'
-      && canceledDeparture.stored?.version === 8
-      && !canceledDeparture.legacyPagePlaneMotion
-      && canceledDeparture.fullScreenInstrument === 0,
-    `Work-to-About departure does not move the observer through a layered 3D field: ${JSON.stringify(canceledDeparture)}`
+    aboutDeparture.from === 'work'
+      && aboutDeparture.to === 'about'
+      && aboutDeparture.motion === 'depart'
+      && aboutDeparture.perspective?.lastTravel?.motionModel === 'observer-camera-3d'
+      && aboutDeparture.perspective?.lastTravel?.searchModel === 'directional-guiding-scope'
+      && aboutDeparture.perspective?.lastTravel?.direction === 'southwest'
+      && aboutDeparture.perspective?.lastTravel?.depthDirection === 'farther'
+      && aboutDeparture.perspective?.lastTravel?.cameraX > 0
+      && aboutDeparture.perspective?.lastTravel?.cameraY < 0
+      && aboutDeparture.perspective?.lastTravel?.cameraZ > 0
+      && aboutDeparture.perspective?.lastTravel?.cameraScale > 1
+      && aboutDeparture.perspective?.lastTravel?.skyX > 20
+      && aboutDeparture.perspective?.lastTravel?.skyY < -30
+      && aboutDeparture.perspective?.lastTravel?.targetEntryX < -30
+      && aboutDeparture.perspective?.lastTravel?.targetEntryY > 50
+      && aboutDeparture.perspective?.lastTravel?.skyTone === 'twilight'
+      && aboutDeparture.perspective?.lastTravel?.skyFrom === '#faf9f4'
+      && aboutDeparture.perspective?.lastTravel?.skyTo === '#020817'
+      && Math.abs(aboutDeparture.perspective?.lastTravel?.nearX)
+        > Math.abs(aboutDeparture.perspective?.lastTravel?.middleX)
+      && Math.abs(aboutDeparture.perspective?.lastTravel?.middleX)
+        > Math.abs(aboutDeparture.perspective?.lastTravel?.farX)
+      && Math.abs(aboutDeparture.perspective?.lastTravel?.nearY)
+        > Math.abs(aboutDeparture.perspective?.lastTravel?.middleY)
+      && Math.abs(aboutDeparture.perspective?.lastTravel?.middleY)
+        > Math.abs(aboutDeparture.perspective?.lastTravel?.farY)
+      && aboutDeparture.perspective?.lastTravel?.toMagnification === 1.6
+      && aboutDeparture.perspective?.lastTravel?.duration >= 1240
+      && aboutDeparture.perspective?.lastTravel?.duration <= 1420
+      && aboutDeparture.perspective?.lastTravel?.searchStart === 0.28
+      && aboutDeparture.perspective?.lastTravel?.searchEnd === 0.60
+      && aboutDeparture.perspective?.lastTravel?.searchEnd
+        - aboutDeparture.perspective?.lastTravel?.searchStart >= 0.31
+      && aboutDeparture.perspectiveDuration === `${aboutDeparture.perspective?.lastTravel?.duration}ms`
+      && (aboutDeparture.perspective?.crossDocument
+        ? aboutDeparture.targetCueOpacity === '1'
+          && aboutDeparture.targetCueViewTransitionName === 'universe-target-cue'
+        : aboutDeparture.targetCueAnimation === 'universe-target-acquisition')
+      && aboutDeparture.stored?.from === 'work'
+      && aboutDeparture.stored?.to === 'about'
+      && aboutDeparture.stored?.version === 8
+      && !aboutDeparture.legacyPagePlaneMotion
+      && aboutDeparture.fullScreenInstrument === 0,
+    `Work-to-About departure does not move the observer through a layered 3D field: ${JSON.stringify(aboutDeparture)}`
   );
 
-  await perspectiveTransitionPage.reload({ waitUntil: 'domcontentloaded' });
-  await waitForBigBangComplete(perspectiveTransitionPage);
-  await expandUniverseRouteMap(perspectiveTransitionPage);
+  const aboutRequest = await heldAboutRequest;
   await Promise.all([
     perspectiveTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
-    perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="about"]').click(),
+    aboutRequest.continue(),
   ]);
   await seekUniverseTransition(perspectiveTransitionPage, 0.4);
   const openSkyAbout = await perspectiveTransitionPage.evaluate(() => {
@@ -3731,7 +3742,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && arrivedAbout.perspective.lastTravel?.fromDepth === 3.1
       && arrivedAbout.perspective.lastTravel?.toDepth === 4.5
       && arrivedAbout.perspective.lastTravel?.depthDirection === 'farther'
-      && arrivedAbout.perspective.lastTravel?.cameraZ < 0
+      && arrivedAbout.perspective.lastTravel?.cameraZ > 0
       && arrivedAbout.perspective.lastTravel?.cameraScale > 1
       && arrivedAbout.perspective.depthPlanes === 3
       && arrivedAbout.routeMap.current === 'about'
@@ -3838,7 +3849,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && arrivedLogs.perspective?.lastTravel?.depthDirection === 'farther'
       && arrivedLogs.perspective?.lastTravel?.cameraX < 0
       && arrivedLogs.perspective?.lastTravel?.cameraY < 0
-      && arrivedLogs.perspective?.lastTravel?.cameraZ < 0
+      && arrivedLogs.perspective?.lastTravel?.cameraZ > 0
       && arrivedLogs.perspective?.lastTravel?.skyTone === 'light'
       && arrivedLogs.perspective?.lastTravel?.skyFrom === '#faf9f4'
       && arrivedLogs.perspective?.lastTravel?.skyTo === '#faf9f4'

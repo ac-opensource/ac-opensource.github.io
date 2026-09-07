@@ -433,6 +433,7 @@
           sections[index].hidden = !active;
         });
         if (focus) tabs[nextIndex].focus();
+        if (readoutElement.contains(tabList)) positionPopup();
       };
 
       tabs.forEach((tab, index) => {
@@ -1121,7 +1122,7 @@
     trigger.type = "button";
     trigger.dataset.bandTrigger = band.id;
     trigger.setAttribute("aria-pressed", String(active));
-    trigger.setAttribute("aria-label", `${band.dataset.label}, ${band.axis.label}; ${band.nodes.length} equal signal points`);
+    trigger.setAttribute("aria-label", `${band.dataset.label}, ${band.axis.label}; ${band.nodes.length} signals`);
     trigger.append(
       element("span", "stellar-tree__branch-dataset", band.dataset.label),
       element("strong", "", band.axis.label),
@@ -1575,6 +1576,14 @@
     const projectedControls = new Map();
     geometry.controlPoints.forEach((point, key) => {
       const projected = projectControlPoint(point);
+      // Keep off-screen stars in the artwork, but not as hit targets over
+      // surrounding text when the camera is zoomed or rotated.
+      if (key.startsWith("node:")) {
+        const centerX = projected.x - controlsOffsetX;
+        const centerY = projected.y - controlsOffsetY;
+        projected.visible &&= centerX >= 22 && centerX <= sceneWidth - 22
+          && centerY >= 22 && centerY <= sceneHeight - 22;
+      }
       projectedControls.set(key, projected);
       const control = controls.get(key);
       if (!control) return;
@@ -1610,13 +1619,13 @@
     const stageBounds = stageElement.getBoundingClientRect();
     const controlsBounds = treeScene.controlsLayer.getBoundingClientRect();
     const stageWidth = stageElement.clientWidth;
-    const stageHeight = treeScene.viewport.clientHeight;
+    const stageHeight = stageElement.clientHeight;
     const inset = 12;
     const viewportInset = 8;
     const topbarBottom = document.getElementById("site-topbar")?.getBoundingClientRect().bottom || 0;
     const viewportTop = clamp(Math.max(viewportInset, topbarBottom + viewportInset) - stageBounds.top, inset, stageHeight - inset);
     const viewportBottom = clamp(window.innerHeight - viewportInset - stageBounds.top, inset, stageHeight - inset);
-    const availableViewportHeight = Math.max(1, viewportBottom - viewportTop);
+    const availableViewportHeight = Math.max(1, Math.min(stageHeight - inset * 2, viewportBottom - viewportTop));
     readoutElement.style.setProperty("--popup-available-height", `${availableViewportHeight}px`);
     const popupWidth = readoutElement.offsetWidth || 330;
     const popupHeight = Math.min(readoutElement.offsetHeight || 300, stageHeight - inset * 2, availableViewportHeight);
