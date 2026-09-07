@@ -22,7 +22,8 @@
   if (suppressed()) return;
   const startRenderer = () => {
   if (suppressed()) return;
-  const gl = field.getContext('webgl', { alpha: true, antialias: false, depth: false, premultipliedAlpha: false });
+  const contextOptions = { alpha: true, antialias: false, depth: false, premultipliedAlpha: false };
+  const gl = field.getContext('webgl2', contextOptions) || field.getContext('webgl', contextOptions);
   if (!gl) return;
   const vertex = `attribute vec2 position; varying vec2 uv; void main(){uv=position*.5+.5;gl_Position=vec4(position,0.,1.);}`;
   const fragment = `
@@ -114,7 +115,20 @@
     return !['pending','running','revealing'].includes(root.dataset.bigBang) && !root.dataset.universeMotion;
   };
   const canRun = () => ready && visible && !document.hidden && !paused && !suppressed() && !lost && entryReady();
+  let pendingFrame = null, resizeFrame = 0;
+  const frameComplete = () => {
+    // Do not queue more shader work while the previous frame is unfinished.
+    // A software GPU can otherwise accumulate seconds of work that navigation
+    // must drain. Poll without blocking, keeping input and the clock responsive.
+    if (pendingFrame) {
+      if (gl.clientWaitSync(pendingFrame, 0, 0) === gl.TIMEOUT_EXPIRED) return false;
+      gl.deleteSync(pendingFrame);
+      pendingFrame = null;
+    }
+    return true;
+  };
   const render = () => {
+    if (!frameComplete()) return false;
     gl.uniform1f(uniforms.time, elapsed);
     const age = Math.min(6, elapsed-pulseStart);
     gl.uniform1f(uniforms.sequence, age);
@@ -122,6 +136,11 @@
     if (field.dataset.phase !== phase) field.dataset.phase = phase;
     gl.uniform2f(uniforms.pointer, pointerX, pointerY);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+    if (gl.fenceSync) {
+      pendingFrame = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+      gl.flush();
+    }
+    return true;
   };
   const tick = now => {
     frame = 0;
@@ -135,9 +154,10 @@
     const follow = 1-Math.exp(-5*dt);
     pointerX += (targetX-pointerX)*follow;
     pointerY += (targetY-pointerY)*follow;
-    render();
+    // Let a pending resize consume the completed frame before submitting more.
+    const painted = resizeFrame ? false : render();
     if (!sampleStart) sampleStart = now;
-    else sampleFrames += 1;
+    else if (painted) sampleFrames += 1;
     if (now-sampleStart >= 1000) {
       field.dataset.observedFps = (sampleFrames*1000/(now-sampleStart)).toFixed(1);
       sampleStart = now;
@@ -155,11 +175,19 @@
     if (canRun()) frame = requestAnimationFrame(tick);
   };
   const resize = () => {
+    cancelAnimationFrame(resizeFrame);
+    resizeFrame = 0;
     const bounds = field.getBoundingClientRect();
     const ratio = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(750000 / Math.max(1,bounds.width*bounds.height)));
     const width = Math.max(1,Math.floor(bounds.width*ratio));
     const height = Math.max(1,Math.floor(bounds.height*ratio));
     if (field.width === width && field.height === height) return;
+    // Resizing clears the canvas. Wait until we can repaint it, including when
+    // motion is paused and the animation loop will not provide another frame.
+    if (ready && !lost && !frameComplete()) {
+      resizeFrame = requestAnimationFrame(resize);
+      return;
+    }
     field.width = width; field.height = height;
     gl.viewport(0,0,width,height);
     field.dataset.pixelCount = String(width*height);

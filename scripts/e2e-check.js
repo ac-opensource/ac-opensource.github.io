@@ -189,7 +189,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         await targetPage.mouse.move(viewport.width - 1, 1);
         await targetPage.evaluate(async () => {
           const map = document.querySelector('[data-universe-route-map]');
-          await Promise.all(map.getAnimations({ subtree: true }).map((animation) => animation.ready));
+          // Pointer exit may cancel a hover transition before it becomes ready.
+          // The following check still requires all current animations to settle.
+          await Promise.all(map.getAnimations({ subtree: true }).map((animation) => animation.ready.catch(error => {
+            if (error.name !== 'AbortError') throw error;
+          })));
         });
         await targetPage.waitForFunction(() => {
           const map = document.querySelector('[data-universe-route-map]');
@@ -4207,9 +4211,26 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   }
   await headerPage.goto(BASE_URL + '/work.html', { waitUntil: 'networkidle' });
   await waitForWorkEntrance(headerPage);
-  await headerPage.locator('#site-topbar > div > a[href="/"]').first().click();
-  await headerPage.waitForURL((url) => url.pathname === '/', { timeout: 5000, waitUntil: 'domcontentloaded' });
+  const returnHomeFromWork = async () => {
+    await headerPage.evaluate(() => {
+      document.querySelector('#site-topbar > div > a[href="/"]').addEventListener('click', () => {
+        sessionStorage.setItem('work-wordmark-click', String(Date.now()));
+      }, { once: true });
+    });
+    await headerPage.locator('#site-topbar > div > a[href="/"]').first().click();
+    await headerPage.waitForURL((url) => url.pathname === '/', { timeout: 5000, waitUntil: 'domcontentloaded' });
+    const elapsed = await headerPage.evaluate(() => (
+      performance.timeOrigin + performance.getEntriesByType('navigation')[0].domContentLoadedEventEnd
+      - Number(sessionStorage.getItem('work-wordmark-click'))
+    ));
+    await assert(elapsed >= 0 && elapsed <= 5000, `Work wordmark navigation took ${elapsed}ms from click to DOMContentLoaded.`);
+  };
+  await returnHomeFromWork();
   await assert(new URL(headerPage.url()).pathname === '/', 'The shared wordmark no longer returns home.');
+  await headerPage.goBack({ waitUntil: 'domcontentloaded' });
+  await waitForWorkEntrance(headerPage);
+  await headerPage.waitForFunction(() => document.querySelector('[data-nova-field]')?.dataset.animationState === 'flowing');
+  await returnHomeFromWork();
 
   await headerBrowser.close();
 
