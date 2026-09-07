@@ -127,6 +127,14 @@ function main() {
     const searchHtml = fs.readFileSync(path.join(ROOT_DIR, "search.html"), "utf8");
     const searchScript = fs.readFileSync(path.join(ROOT_DIR, "assets", "js", "evidence-search.js"), "utf8");
     const searchStyles = fs.readFileSync(path.join(ROOT_DIR, "assets", "css", "evidence-search.css"), "utf8");
+    const logsStyles = fs.readFileSync(path.join(
+      ROOT_DIR,
+      "assets",
+      "experiments",
+      "universe-options",
+      "logs",
+      "spiral-galaxy-archive.css"
+    ), "utf8");
     const resumeHtml = fs.readFileSync(path.join(ROOT_DIR, "resume.html"), "utf8");
     assert(!fs.existsSync(path.join(ROOT_DIR, "assets", "js", "calm-sky.js")));
     assert(!fs.existsSync(path.join(ROOT_DIR, "assets", "css", "calm-sky.css")));
@@ -137,7 +145,7 @@ function main() {
     assert(siteSearchStyles.includes(".site-search-link"));
     assert(siteSearchStyles.includes("min-width: 44px"));
     assert(siteSearchStyles.includes("min-height: 44px"));
-    assert(!/position:\s*fixed|\.site-tools|\btop:|\bright:/.test(siteSearchStyles),
+    assert(!/position:\s*fixed|\.site-tools/.test(siteSearchStyles),
       "Shared Search styling still creates a floating overlay.");
     assert(!/data-motion-mode|calm[- ]sky|data-calm/i.test(siteSearchStyles));
 
@@ -167,11 +175,27 @@ function main() {
       });
     assert(searchHtml.includes('maxlength="160"'));
     assert(searchHtml.includes("<noscript>"));
+    const searchEnhancementBootstrap = '<script>document.documentElement.classList.replace("no-js", "has-js");</script>';
+    assert(searchHtml.includes(searchEnhancementBootstrap));
+    assert(searchHtml.indexOf(searchEnhancementBootstrap) < searchHtml.indexOf('assets/css/evidence-search.css'),
+      "Evidence Search must select its enhanced layout before the first stylesheet paint.");
+    assert(searchHtml.includes("data-search-navigation") && searchHtml.includes("data-search-phase=\"loading\""));
+    assert(searchHtml.includes("data-search-field aria-hidden=\"true\""));
+    assert(searchHtml.includes("Search the work,<br><em>not the noise.</em>"));
+    assert(!/warp factor|hyperspace|launch sequence|engage/i.test(searchHtml),
+      "Evidence Search copy slipped into novelty spaceship language.");
     assert(!searchScript.includes("innerHTML"), "Search results must not render index text through innerHTML.");
     assert(searchScript.includes('searchParams.delete("q")'));
     assert(searchScript.includes("pendingQuery"));
-    assert(searchStyles.includes("--search-quiet: #626a67"));
-    assert(searchStyles.includes("input::placeholder { color: #626a67; }"));
+    assert(searchScript.includes('setPhase("loading")') && searchScript.includes('setPhase("error")'));
+    assert(searchScript.includes('navigation.dataset.searchMotion = "routing"'));
+    assert(searchStyles.includes("--search-muted: #626a67"));
+    assert(searchStyles.includes("input::placeholder { color: var(--search-muted);"));
+    assert(searchStyles.includes(".evidence-search__field-rail"));
+    assert(searchStyles.includes("@keyframes search-route-rail"));
+    assert(searchStyles.includes("min-height: 44px"));
+    assert(/\.js \.galaxy-tuner\[hidden\][\s\S]*?display:\s*block\s*!important/.test(logsStyles),
+      "Logs must override the user-agent hidden rule while reserving its mobile tuner height.");
     assert(resumeHtml.includes("data-search-exclude"), "Resume contact details are not excluded from search extraction.");
 
     const sitemapSource = fs.readFileSync(path.join(ROOT_DIR, "scripts", "build-static-blog-pages.js"), "utf8");

@@ -2,6 +2,13 @@
   justify-self: end;
 }
 
+/* The wordmark already returns home. Keeping Dashboard in the primary rail
+   duplicated that action and made the six-item mobile header clip its final
+   destination. Five deliberate destinations restore the original rhythm. */
+:is(#site-nav, #site-nav-mobile) > [data-route="/"] {
+  display: none !important;
+}
+
 .site-search-link {
   min-width: 44px;
   min-height: 44px;
@@ -18,6 +25,18 @@
   white-space: nowrap;
 }
 
+.site-search-link::before {
+  width: 0.34rem;
+  height: 0.34rem;
+  margin-right: 0.42rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: #1f5cba;
+  box-shadow: 0 0 0 0 rgba(31, 92, 186, 0.18);
+  content: "";
+  animation: site-search-signal 2.8s ease-out infinite;
+}
+
 .site-search-link:hover {
   color: #1f5cba;
 }
@@ -25,6 +44,32 @@
 .site-search-link:focus-visible {
   outline: 2px solid #1f5cba;
   outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  #site-nav-mobile {
+    justify-content: center !important;
+    gap: clamp(0.35rem, 2vw, 0.72rem) !important;
+    overflow-x: hidden !important;
+    padding-right: max(0.65rem, env(safe-area-inset-right)) !important;
+    padding-left: max(0.65rem, env(safe-area-inset-left)) !important;
+    scrollbar-width: none;
+  }
+
+  #site-nav-mobile > a {
+    flex: 0 0 auto;
+    font-size: clamp(0.65625rem, 2.75vw, 0.6875rem) !important;
+    letter-spacing: -0.02em !important;
+  }
+}
+
+@keyframes site-search-signal {
+  0%, 34% { box-shadow: 0 0 0 0 rgba(31, 92, 186, 0.2); }
+  72%, 100% { box-shadow: 0 0 0 0.32rem rgba(31, 92, 186, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-search-link::before { animation: none; }
 }
 
 @media (forced-colors: active) {

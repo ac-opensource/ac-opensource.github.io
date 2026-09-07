@@ -1023,6 +1023,22 @@ button, input, textarea, select { font: inherit; }
 }
 
 @media (max-width: 520px) {
+  .payload-bay,
+  .payload-bay[data-topology="public"] {
+    gap: 1.2rem;
+    padding-top: 4.25rem;
+  }
+
+  .payload-bay__visual {
+    height: clamp(12rem, 24svh, 13.5rem);
+    min-height: 12rem;
+    margin-top: -0.5rem;
+  }
+
+  .payload-bay__intro h1 {
+    font-size: clamp(3.25rem, 15vw, 4.8rem);
+  }
+
   .option-bar__brand {
     max-width: 8rem;
     font-size: 0.8rem;
@@ -1040,9 +1056,11 @@ button, input, textarea, select { font: inherit; }
   html { scroll-behavior: auto; }
   *, *::before, *::after {
     scroll-behavior: auto !important;
-    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+    transition-duration: 0s !important;
   }
 
   .payload-bay.is-deploying .satellite {

@@ -14,9 +14,16 @@
       if (typeof searchInput.select === "function") searchInput.select();
       return;
     }
-    var link = document.querySelector("[data-site-search-link]");
-    if (link instanceof HTMLElement) link.click();
-    else global.location.assign("/search.html?focus=1");
+    global.location.assign("/search.html?focus=1");
+  }
+
+  function revealCurrentMobileDestination() {
+    var navigation = document.querySelector('#site-nav-mobile[aria-label="Mobile navigation"]');
+    if (!(navigation instanceof HTMLElement) || navigation.scrollWidth <= navigation.clientWidth) return;
+    var current = navigation.querySelector('[aria-current="page"]');
+    if (!(current instanceof HTMLElement)) return;
+    var destination = current.offsetLeft - ((navigation.clientWidth - current.offsetWidth) / 2);
+    navigation.scrollLeft = Math.max(0, Math.min(destination, navigation.scrollWidth - navigation.clientWidth));
   }
 
   document.addEventListener("keydown", function (event) {
@@ -27,4 +34,12 @@
     event.preventDefault();
     focusOrOpenSearch();
   });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      global.requestAnimationFrame(revealCurrentMobileDestination);
+    }, { once: true });
+  } else {
+    global.requestAnimationFrame(revealCurrentMobileDestination);
+  }
 })(window);

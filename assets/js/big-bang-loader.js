@@ -2,7 +2,8 @@
   "use strict";
 
   const root = document.documentElement;
-  const FULL_SEQUENCE_MS = 820;
+  const FULL_SEQUENCE_MS = 640;
+  const MAX_SEQUENCE_MS = 900;
   const SESSION_KEY = "ac.bigBangPortfolioPlayed.v1";
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -13,7 +14,6 @@
   const phaseTimers = [];
   const state = {
     active: false,
-    geometryObserver: null,
     landmarkCount: 0,
     landmarks: [],
     markedLandmarks: [],
@@ -33,25 +33,6 @@
   };
 
   const PROFILES = Object.freeze({
-    dashboard: {
-      label: "ORBITAL DASHBOARD",
-      structure: "06 OBJECTS / LIVE ORBITS",
-      surface: "#faf9f4",
-      ink: "#2f342d",
-      accents: ["#2864c7", "#168c86", "#e98b27", "#df642c"],
-      originSelectors: [".field-origin", "[data-identity-hero] h1"],
-      fallbackOrigin: [0.67, 0.55],
-      landmarkSelectors: [
-        "#site-topbar .site-brand",
-        "#site-nav .site-nav-link",
-        "[data-identity-hero] .eyebrow",
-        "[data-identity-hero] h1",
-        ".identity-actions a",
-        ".scene-controls button",
-        ".field-origin",
-        ".orbit-node .node-label strong"
-      ]
-    },
     work: {
       label: "PORTFOLIO SUPERNOVA",
       structure: "SHARED CORE / VERIFIED RELEASE",
@@ -70,130 +51,6 @@
         ".work-pipeline__node",
         ".work-signals > *"
       ]
-    },
-    logs: {
-      label: "LOGS NEBULA",
-      structure: "SPIRAL ARCHIVE / 28 ENTRIES",
-      surface: "#faf9f4",
-      ink: "#2f342d",
-      accents: ["#1f5cba", "#687fc4", "#168c86", "#a4aca3"],
-      originSelectors: [".galaxy-core", "#galaxy-title", "#galaxy-field"],
-      fallbackOrigin: [0.68, 0.56],
-      landmarkSelectors: [
-        "#site-topbar > div > a",
-        "#site-nav .site-nav-link",
-        ".galaxy-intro .eyebrow",
-        "#galaxy-title",
-        ".galaxy-intro__lede",
-        ".galaxy-ledger > *",
-        ".galaxy-tuner__search",
-        ".galaxy-categories button",
-        ".galaxy-core",
-        ".galaxy-node"
-      ]
-    },
-    about: {
-      label: "STELLAR PROFILE",
-      structure: "WHOLE PERSON / SIGNAL TREE",
-      surface: "#020817",
-      ink: "#edf6ff",
-      accents: ["#7eb6ff", "#6799fb", "#a8bac7", "#b7d8ff"],
-      originSelectors: ["#about-title", ".stellar-tree__root", "#present-origin"],
-      fallbackOrigin: [0.63, 0.47],
-      landmarkSelectors: [
-        "#site-topbar > div > a",
-        "#site-nav .site-nav-link",
-        ".about-region__kicker",
-        "#about-title span",
-        ".about-origin__prose p",
-        ".about-origin__regions a",
-        ".stellar-tree__root",
-        ".stellar-tree__signal"
-      ]
-    },
-    contact: {
-      label: "PAYLOAD BAY",
-      structure: "05 MODULES / PRIVATE CAPSULE",
-      surface: "#f9f8f2",
-      ink: "#252e29",
-      accents: ["#1f5cba", "#3c7357", "#7b91b5", "#97403d"],
-      originSelectors: [".satellite__core", ".payload-bay__visual", "#contact-page-title"],
-      fallbackOrigin: [0.58, 0.5],
-      landmarkSelectors: [
-        "#site-topbar > div > a",
-        "#site-nav .site-nav-link",
-        ".payload-bay__intro > span",
-        "#contact-page-title",
-        ".payload-bay__intro p",
-        ".satellite__core",
-        ".satellite__array",
-        ".payload-bay__measure > *",
-        ".bay-node"
-      ]
-    },
-    resume: {
-      label: "FLIGHT RECORDER",
-      structure: "2014—NOW / EVIDENCE INDEX",
-      surface: "#faf9f4",
-      ink: "#2f342d",
-      accents: ["#1f5cba", "#aa5f39", "#687068", "#6799fb"],
-      originSelectors: [".resume-dossier__identity > aside", ".resume-dossier__identity h1"],
-      fallbackOrigin: [0.74, 0.43],
-      landmarkSelectors: [
-        "#site-topbar > div > a",
-        "#site-nav .site-nav-link",
-        ".resume-dossier__identity .bracket-label",
-        ".resume-dossier__identity h1",
-        ".resume-dossier__identity article > p",
-        ".resume-dossier__identity article a",
-        ".resume-dossier__identity aside > div > div"
-      ]
-    },
-    signals: {
-      label: "SIGNALS REGISTRY",
-      structure: "PRIVACY BOUNDED / ORBITAL SLOTS",
-      surface: "#faf9f4",
-      ink: "#2f342d",
-      accents: ["#1f5cba", "#024fad", "#858a80", "#7b91b5"],
-      originSelectors: [".signals-hero__telemetry", ".signals-hero h1"],
-      fallbackOrigin: [0.78, 0.4],
-      landmarkSelectors: [
-        ".signals-brand",
-        ".signals-nav a",
-        ".signals-topbar__inner > span",
-        ".signals-kicker",
-        ".signals-hero h1",
-        ".signals-hero__copy > p:last-of-type",
-        ".signals-action",
-        ".signals-hero__telemetry > *"
-      ]
-    },
-    article: {
-      label: "ARTICLE FIELD",
-      structure: "SOURCE / TRAJECTORY / RECEIPTS",
-      surface: "#faf9f4",
-      ink: "#2f342d",
-      accents: ["#1f5cba", "#aa5f39", "#168c86", "#687fc4"],
-      originSelectors: [".article-region__meta", "#post-title"],
-      fallbackOrigin: [0.22, 0.39],
-      landmarkSelectors: [
-        "#site-topbar > div > a",
-        "#site-nav .site-nav-link",
-        ".article-region__meta > *",
-        "#post-title",
-        "#post-summary",
-        "#post-actions > *"
-      ]
-    },
-    site: {
-      label: "SITE FIELD",
-      structure: "LIVE DOCUMENT / INTERFACE LOCK",
-      surface: "#faf9f4",
-      ink: "#2f342d",
-      accents: ["#1f5cba", "#168c86", "#e98b27", "#687fc4"],
-      originSelectors: ["main h1", "main"],
-      fallbackOrigin: [0.5, 0.5],
-      landmarkSelectors: ["header a", "nav a", "main h1", "main h2", "main a", "main button"]
     }
   });
 
@@ -250,37 +107,18 @@
   }
 
   function contextName() {
-    const declared = document.body?.dataset.universeRegion || document.body?.dataset.routeSignalPage;
-    if (declared && PROFILES[declared]) return declared;
-    if (window.location.pathname.startsWith("/blog/") && window.location.pathname !== "/blog/") return "article";
-    return "site";
+    return "work";
   }
 
   function pageProfile() {
     const id = contextName();
     const profile = { ...PROFILES[id], id, accents: [...PROFILES[id].accents] };
-    if (id === "about" && root.dataset.aboutTheme === "light") {
-      profile.surface = "#f5f7fb";
-      profile.ink = "#17243a";
-      profile.accents = ["#1f5cba", "#526f8d", "#6799fb", "#a8bac7"];
-    }
-    if (id === "article") {
-      const mode = document.body?.dataset.articleMode;
-      if (mode === "photography") profile.accents = ["#aa5f39", "#1f5cba", "#687068", "#d0a15f"];
-      if (mode === "personal" || mode === "travel") profile.accents = ["#687fc4", "#aa5f39", "#1f5cba", "#168c86"];
-    }
-    if (id === "logs") {
-      const entryCount = document.querySelectorAll(".galaxy-node").length;
-      if (entryCount) profile.structure = `04 ARMS / ${entryCount} ENTRIES`;
-    }
     return profile;
   }
 
   function visibleRect(element) {
     if (!(element instanceof Element) || element.closest("[data-big-bang-loader]")) return null;
     if (element.hasAttribute("hidden")) return null;
-    const style = getComputedStyle(element);
-    if (style.display === "none" || style.visibility === "hidden") return null;
     const rect = element.getBoundingClientRect();
     if (rect.width < 3 || rect.height < 3) return null;
     if (rect.right < -8 || rect.bottom < -8 || rect.left > window.innerWidth + 8 || rect.top > window.innerHeight + 8) return null;
@@ -321,7 +159,7 @@
 
   function collectLandmarks(profile, origin) {
     const compact = window.matchMedia("(max-width: 700px)").matches;
-    const maximum = compact ? 22 : 32;
+    const maximum = compact ? 10 : 18;
     const elements = [];
     const seen = new Set();
     for (const selector of profile.landmarkSelectors) {
@@ -340,10 +178,7 @@
       const y = clamp(rect.top + rect.height / 2, 8, window.innerHeight - 8);
       const kind = landmarkKind(element);
       const label = normalizeLabel(element);
-      const computedColor = getComputedStyle(element).color;
-      const color = computedColor && computedColor !== "rgba(0, 0, 0, 0)"
-        ? computedColor
-        : profile.accents[index % profile.accents.length];
+      const color = profile.accents[index % profile.accents.length];
       const distance = Math.hypot(x - origin.x, y - origin.y);
       const delay = Math.round((distance / Math.hypot(window.innerWidth, window.innerHeight)) * 110 + index * 4);
       const showLabel = Boolean(label) && index < (compact ? 9 : 15) && kind !== "node";
@@ -424,8 +259,8 @@
   function createMatterRenderer(canvas, profile, origin, landmarks) {
     const context = canvas.getContext("2d", { alpha: true, desynchronized: true });
     const compact = window.matchMedia("(max-width: 700px)").matches;
-    const particleCount = compact ? 64 : 96;
-    const flightDuration = compact ? 430 : 520;
+    const particleCount = compact ? 24 : 48;
+    const flightDuration = compact ? 320 : 400;
     let animationFrame = 0;
     let currentOrigin = origin;
     let currentLandmarks = landmarks;
@@ -437,9 +272,11 @@
     let stopped = false;
 
     function resize() {
-      const ratio = Math.min(window.devicePixelRatio || 1, compact ? 1.2 : 1.5);
       const width = window.innerWidth;
       const height = window.innerHeight;
+      const pixelBudget = compact ? 900_000 : 2_000_000;
+      const budgetRatio = Math.sqrt(pixelBudget / Math.max(1, width * height));
+      const ratio = Math.max(0.75, Math.min(window.devicePixelRatio || 1, compact ? 1 : 1.25, budgetRatio));
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       canvas.style.width = `${width}px`;
@@ -655,96 +492,6 @@
     return overlay;
   }
 
-  function refreshGeometry() {
-    if (!state.overlay) return;
-    clearLandmarkState();
-    const profile = pageProfile();
-    const origin = resolveOrigin(profile);
-    const landmarks = collectLandmarks(profile, origin);
-    state.profile = profile;
-    state.origin = origin;
-    state.landmarkCount = landmarks.length;
-    state.landmarks = landmarks;
-    root.style.setProperty("--big-bang-origin-x", `${origin.x.toFixed(1)}px`);
-    root.style.setProperty("--big-bang-origin-y", `${origin.y.toFixed(1)}px`);
-    state.overlay.dataset.context = profile.id;
-    state.overlay.style.setProperty("--big-bang-accent-a", profile.accents[0]);
-    state.overlay.style.setProperty("--big-bang-accent-b", profile.accents[1]);
-    state.overlay.style.setProperty("--big-bang-accent-c", profile.accents[2]);
-    state.overlay.style.setProperty("--big-bang-ink", profile.ink);
-    state.overlay.style.setProperty("--big-bang-surface", profile.surface);
-    const lockCount = state.overlay.querySelector("[data-big-bang-lock-count]");
-    if (lockCount) lockCount.textContent = `DOM MATTER MAP / ${String(landmarks.length).padStart(2, "0")} LOCKS`;
-    populateLocks(state.overlay.querySelector("[data-big-bang-locks]"), landmarks);
-    state.matterRenderer?.updateGeometry(profile, origin, landmarks);
-  }
-
-  function syncGeometry() {
-    if (!state.overlay || !state.landmarks.length) return;
-    const profile = pageProfile();
-    const origin = resolveOrigin(profile);
-    const diagonal = Math.hypot(window.innerWidth, window.innerHeight);
-    const locks = new Map(
-      [...state.overlay.querySelectorAll(".big-bang-loader__lock")]
-        .map((lock) => [lock.dataset.landmarkIndex, lock])
-    );
-    const landmarks = [];
-
-    for (const landmark of state.landmarks) {
-      const rect = visibleRect(landmark.element);
-      if (!rect) continue;
-      const x = clamp(rect.left + rect.width / 2, 8, window.innerWidth - 8);
-      const y = clamp(rect.top + rect.height / 2, 8, window.innerHeight - 8);
-      const distance = Math.hypot(x - origin.x, y - origin.y);
-      const delay = Math.round((distance / diagonal) * 90 + landmark.index * 3);
-      const next = {
-        ...landmark,
-        delay,
-        height: rect.height,
-        left: rect.left,
-        top: rect.top,
-        width: rect.width,
-        x,
-        y
-      };
-      const lock = locks.get(String(landmark.index));
-      if (lock) {
-        lock.style.setProperty("--lock-delay", `${Math.min(delay, 110)}ms`);
-        lock.style.setProperty("--lock-height", `${rect.height.toFixed(2)}px`);
-        lock.style.setProperty("--lock-left", `${rect.left.toFixed(2)}px`);
-        lock.style.setProperty("--lock-top", `${rect.top.toFixed(2)}px`);
-        lock.style.setProperty("--lock-width", `${rect.width.toFixed(2)}px`);
-      }
-      landmarks.push(next);
-    }
-
-    state.profile = profile;
-    state.origin = origin;
-    state.landmarkCount = landmarks.length;
-    state.landmarks = landmarks;
-    root.style.setProperty("--big-bang-origin-x", `${origin.x.toFixed(1)}px`);
-    root.style.setProperty("--big-bang-origin-y", `${origin.y.toFixed(1)}px`);
-    state.matterRenderer?.updateGeometry(profile, origin, landmarks);
-  }
-
-  function installGeometryObserver() {
-    state.geometryObserver?.disconnect();
-    const main = document.querySelector("main");
-    if (!main) return;
-    state.geometryObserver = new MutationObserver(function () {
-      if (state.active && !state.revealStarted) refreshGeometry();
-    });
-    state.geometryObserver.observe(main, {
-      attributeFilter: ["data-ready", "hidden"],
-      attributes: true,
-      childList: true,
-      subtree: true
-    });
-    document.fonts?.ready.then(function () {
-      if (state.active && !state.revealStarted) refreshGeometry();
-    });
-  }
-
   function moveFocusToContent() {
     const main = document.querySelector("main");
     if (!main) return;
@@ -766,17 +513,11 @@
   }
 
   function routeIsReady() {
-    if (document.readyState !== "complete") return false;
-    if (contextName() === "logs") {
-      return document.getElementById("galaxy-field")?.dataset.ready === "true";
-    }
-    return true;
+    return document.readyState !== "loading";
   }
 
   function finish(reason, moveFocus) {
     clearPhaseTimers();
-    state.geometryObserver?.disconnect();
-    state.geometryObserver = null;
     state.matterRenderer?.destroy();
     state.matterRenderer = null;
     state.overlay?.remove();
@@ -809,7 +550,6 @@
     clearPhaseTimers();
     root.dataset.bigBang = "revealing";
     if (settings.immediate) root.dataset.bigBangSkip = "true";
-    syncGeometry();
     state.revealAt = performance.now();
     state.readyDelayMs = state.readyAt ? Math.max(0, Math.round(state.revealAt - state.readyAt)) : null;
     state.matterRenderer?.setPhase("reveal");
@@ -872,7 +612,6 @@
     state.overlay = createOverlay();
     root.dataset.bigBang = "running";
     root.append(state.overlay);
-    installGeometryObserver();
     emit("singularity", reason);
 
     window.requestAnimationFrame(function () {
@@ -882,7 +621,7 @@
 
     schedule(function () {
       advancePhase("is-igniting", "ignition", "T + 10⁻⁴³ S", "CONTAINMENT LOST", "live page geometry released");
-    }, 64);
+    }, 48);
     schedule(function () {
       advancePhase(
         "is-expanding",
@@ -891,16 +630,16 @@
         "DOM TRAJECTORY SOLVER",
         `${state.landmarkCount} live coordinates acquired`
       );
-    }, 96);
+    }, 88);
     schedule(function () {
       advancePhase("is-forming", "structure", "DOM / LOCK", state.profile.structure, "matter docking to interface");
-    }, 360);
+    }, 250);
     schedule(function () {
       if (!state.revealStarted) {
         primeForReveal();
         reveal("load-cap");
       }
-    }, 4000);
+    }, MAX_SEQUENCE_MS);
     return true;
   }
 
@@ -912,17 +651,7 @@
     return true;
   }
 
-  window.addEventListener("load", onPageReady, { once: true });
-  const routeReadyTarget = document.getElementById("galaxy-field");
-  if (routeReadyTarget) {
-    const routeReadyObserver = new MutationObserver(function () {
-      if (onPageReady()) routeReadyObserver.disconnect();
-    });
-    routeReadyObserver.observe(routeReadyTarget, {
-      attributeFilter: ["data-ready", "hidden"],
-      attributes: true
-    });
-  }
+  document.addEventListener("DOMContentLoaded", onPageReady, { once: true });
   window.addEventListener("pageshow", function (event) {
     if (event.persisted && state.active) finish("bfcache", false);
   });
@@ -944,6 +673,7 @@
         context: state.profile?.id || contextName(),
         activation: "portfolio-session",
         fullSequenceMs: FULL_SEQUENCE_MS,
+        maxSequenceMs: MAX_SEQUENCE_MS,
         landmarkCount: state.landmarkCount,
         origin: state.origin ? {
           selector: state.origin.selector,
@@ -960,5 +690,5 @@
   });
 
   if (root.dataset.bigBang === "pending") begin("page-load");
-  if (document.readyState === "complete") onPageReady();
+  if (document.readyState !== "loading") onPageReady();
 })();

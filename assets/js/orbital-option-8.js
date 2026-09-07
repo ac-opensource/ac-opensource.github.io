@@ -438,6 +438,8 @@
     node.style.setProperty("--dust-bend", `${(dustSide * (5 + proximity * 11)).toFixed(3)}px`);
   };
 
+  const renderedLayers = new WeakMap();
+
   const render = () => {
     if (!state.width || !state.height) measure();
     const points = profiles.map(pointOnEllipse);
@@ -448,8 +450,12 @@
       const custom = state.customOrbits.get(profile.key);
       node.style.setProperty("--x", `${point.x.toFixed(2)}px`);
       node.style.setProperty("--y", `${point.y.toFixed(2)}px`);
-      node.style.setProperty("--depth", point.depth.toFixed(3));
-      node.style.setProperty("--layer", String(point.layer));
+      // Layer changes only when a body crosses a depth band. Avoid dirtying
+      // its entire subtree with unchanged inherited custom properties.
+      if (renderedLayers.get(node) !== point.layer) {
+        node.style.setProperty("--layer", String(point.layer));
+        renderedLayers.set(node, point.layer);
+      }
       if (custom && !(state.drag?.active && state.drag.key === profile.key)) {
         syncCometWake(node, point, custom.previousPoint, custom.direction);
         custom.previousPoint = point;
@@ -505,6 +511,7 @@
   };
 
   const syncMotion = () => {
+    document.body.dataset.orbitalMotion = state.paused || state.reduced || document.hidden ? "idle" : "active";
     root.dataset.motion = state.reduced ? "reduced" : (state.paused ? "paused" : "active");
     motionToggle.setAttribute("aria-disabled", String(state.reduced));
     motionToggle.setAttribute("aria-pressed", String(state.paused));
@@ -1318,7 +1325,9 @@
   };
 
   window.addEventListener("popstate", restoreFromLocation);
-  window.addEventListener("resize", () => {
+  let resizeFrame = 0;
+  const resizeScene = () => {
+    resizeFrame = 0;
     cancelNodeDrag();
     state.compact = compactQuery.matches;
     state.phone = phoneQuery.matches;
@@ -1328,10 +1337,14 @@
     if (state.cometKey) syncCustomTrack(state.cometKey);
     if (state.preview) placePreview(state.previewAnchor || nodeByKey.get(state.preview));
     syncMotion();
-  }, { passive: true });
+  };
+  const scheduleResize = () => {
+    if (!resizeFrame) resizeFrame = window.requestAnimationFrame(resizeScene);
+  };
+  window.addEventListener("resize", scheduleResize, { passive: true });
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) cancelNodeDrag();
-    startFrame();
+    syncMotion();
   });
   const syncReducedMotion = () => {
     cancelNodeDrag();
@@ -1342,25 +1355,8 @@
     syncMotion();
   };
   reducedMotionQuery.addEventListener?.("change", syncReducedMotion);
-  compactQuery.addEventListener?.("change", (event) => {
-    cancelNodeDrag();
-    state.compact = event.matches;
-    state.phone = phoneQuery.matches;
-    state.short = shortQuery.matches;
-    measure();
-    syncRegularTracks();
-    if (state.cometKey) syncCustomTrack(state.cometKey);
-    syncMotion();
-  });
-  phoneQuery.addEventListener?.("change", (event) => {
-    cancelNodeDrag();
-    state.phone = event.matches;
-    state.short = shortQuery.matches;
-    measure();
-    syncRegularTracks();
-    if (state.cometKey) syncCustomTrack(state.cometKey);
-    syncMotion();
-  });
+  compactQuery.addEventListener?.("change", scheduleResize);
+  phoneQuery.addEventListener?.("change", scheduleResize);
 
   root.dataset.audio = "enabled";
   root.dataset.audioState = "awaiting-gesture";

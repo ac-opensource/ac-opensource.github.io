@@ -5,7 +5,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
   <title>Resume | Andrew Concepcion</title>
-  <meta name="description" content="Resume for Andrew Concepcion, an AI-native software engineer with deep platform knowledge, agent-first delivery habits, and shipped product experience across Android, iOS, and backend systems."/>
+  <meta name="description" content="Résumé for Andrew Concepcion: 10+ years shipping Android, iOS, backend, and shared Rust systems, including multichain wallet features, ITVX playback, and leadership of five senior Android engineers."/>
   <link rel="canonical" href="https://ac-opensource.github.io/resume.html"/>
   <link rel="alternate" type="application/rss+xml" title="Andrew Concepcion Blog RSS" href="/blog/rss.xml"/>
   <meta name="robots" content="index,follow"/>
@@ -14,7 +14,7 @@
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://ac-opensource.github.io/resume.html"/>
   <meta property="og:title" content="Engineering Résumé | Andrew Concepcion"/>
-  <meta property="og:description" content="Andrew Concepcion's engineering flight record: more than 10 years of production delivery across Android, iOS, backend systems, technical leadership, and agent-first workflows."/>
+  <meta property="og:description" content="More than 10 years shipping Android, iOS, backend, and shared Rust systems, including multichain wallet features, ITVX playback, and technical leadership."/>
   <meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/resume-flight-recorder.png"/>
   <meta property="og:image:type" content="image/png"/>
   <meta property="og:image:width" content="1200"/>
@@ -22,16 +22,30 @@
   <meta property="og:image:alt" content="Andrew Concepcion's engineering flight recorder résumé with mobile, backend, and AI-native delivery experience"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="Engineering Résumé | Andrew Concepcion"/>
-  <meta name="twitter:description" content="Andrew Concepcion's engineering flight record: more than 10 years of production delivery across Android, iOS, backend systems, technical leadership, and agent-first workflows."/>
+  <meta name="twitter:description" content="More than 10 years shipping Android, iOS, backend, and shared Rust systems, including multichain wallet features, ITVX playback, and technical leadership."/>
   <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/resume-flight-recorder.png"/>
   <meta name="twitter:image:alt" content="Andrew Concepcion's engineering flight recorder résumé with mobile, backend, and AI-native delivery experience"/>
+  <meta name="author" content="Andrew V. Concepcion"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "@id": "https://ac-opensource.github.io/resume.html#profile-page",
+    "url": "https://ac-opensource.github.io/resume.html",
+    "name": "Engineering Résumé | Andrew Concepcion",
+    "description": "Andrew Concepcion's engineering flight record across Android, iOS, backend systems, shared Rust, technical leadership, and production delivery.",
+    "mainEntity": { "@id": "https://ac-opensource.github.io/#person" },
+    "isPartOf": { "@id": "https://ac-opensource.github.io/#website" }
+  }
+  </script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-  <link href="/assets/css/resume-dossier.css?v=20260807-flight-recorder" rel="stylesheet"/>
-  <link href="/assets/css/universe-field-map.css?v=20260809-guide9" rel="stylesheet"/>
-  <link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles/>
-  <script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
+  <link rel="preload" href="/assets/fonts/manrope-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
+  <link rel="preload" href="/assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
+  <link href="/assets/css/site-fonts.css?v=20260819-local1" rel="stylesheet"/>
+  <link href="/assets/css/resume-dossier.css?v=20260820-identity1" rel="stylesheet"/>
+  <link href="/assets/css/universe-field-map.css?v=20260819-safe1" rel="stylesheet"/>
+  <link href="/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1" rel="stylesheet" data-universe-perspective-styles/>
+  <script src="/assets/js/universe-theme-transition.js?v=20260820-fast-travel1"></script>
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -105,10 +119,6 @@
       background-color: #faf9f4;
     }
 
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-
     .bracket-label::before { content: "["; }
     .bracket-label::after { content: "]"; }
 
@@ -147,20 +157,22 @@
   <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
     <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
       <a href="/" class="justify-self-start font-['Space_Grotesk'] font-bold text-lg tracking-tighter text-[#2F342D] uppercase">Andrew Concepcion</a>
-      <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs">
+      <nav id="site-nav" class="hidden md:flex items-center gap-6 justify-self-center font-['Space_Grotesk'] font-medium tracking-tight uppercase text-xs" aria-label="Primary navigation">
         <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
         <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
         <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
         <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+        <a data-route="/resume.html" href="/resume.html" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[résumé]</a>
         <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
       </nav>
       <div class="justify-self-end font-['Space_Grotesk'] text-[10px] tracking-widest uppercase text-[#5A5F65]" data-site-search-slot><a class="site-search-link" href="/search.html" data-site-search-link aria-label="Search published evidence" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></div>
     </div>
-    <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]">
+    <nav id="site-nav-mobile" class="md:hidden px-6 py-2 border-t border-stone-200/40 flex items-center gap-4 overflow-x-auto whitespace-nowrap font-['Space_Grotesk'] font-medium tracking-tight uppercase text-[10px]" aria-label="Mobile navigation">
       <a data-route="/" href="/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[dashboard]</a>
       <a data-route="/work.html" href="/work.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[portfolio]</a>
       <a data-route="/blog/" href="/blog/" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[logs]</a>
       <a data-route="/about.html" href="/about.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[about]</a>
+      <a data-route="/resume.html" href="/resume.html" aria-current="page" class="site-nav-link text-[#1F5CBA] border-b-2 border-[#1F5CBA] pb-1 hover:text-[#2F342D] transition-colors duration-150">[résumé]</a>
       <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
     </nav>
   </header>
@@ -169,23 +181,23 @@
     <section class="resume-dossier__identity mb-10 grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.9fr)] gap-6">
       <article class="print-card bg-surface-container-low border border-outline-variant/20 p-8 md:p-10">
         <div class="font-label text-tertiary text-sm tracking-widest mb-3 bracket-label">engineering_flight_recorder</div>
-        <h1 class="font-headline text-4xl md:text-6xl font-bold tracking-tighter text-on-background leading-[0.95]">ANDREW V. CONCEPCION</h1>
+        <h1 class="font-headline text-4xl md:text-6xl font-bold tracking-tighter text-on-background leading-[0.95]" aria-label="Andrew V. Concepcion"><span>ANDREW&nbsp;V.</span><span>&nbsp;CONCEPCION</span></h1>
         <p class="mt-4 text-lg md:text-xl text-secondary max-w-3xl font-light leading-relaxed">
-          AI-Native Software Engineer with deep platform knowledge, shipping high-output product work across Android, iOS, backend, and agent-first workflows.
+          AI-Native Software Engineer shipping production Android, iOS, backend, and shared-native systems—from multichain wallet flows and Rust/UniFFI to ITVX playback and release hardening.
         </p>
         <div class="mt-8 flex flex-wrap gap-3">
           <a class="inline-flex items-center gap-2 bg-primary text-on-primary px-5 py-3 font-label text-xs uppercase tracking-widest hover:bg-primary-dim transition-colors no-print" href="/resume_concepcion_andrew.pdf">
             Download PDF
-            <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M7 3h7l4 4v14H7V3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v5h5M9.5 16h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
           <a class="inline-flex items-center gap-2 border border-outline-variant px-5 py-3 font-label text-xs uppercase tracking-widest hover:bg-surface-variant transition-colors" href="mailto:aarconcepcion@gmail.com">
             Contact
-            <span class="material-symbols-outlined text-sm">north_east</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
         </div>
       </article>
 
-      <aside class="print-card bg-surface-container-highest border border-outline-variant/20 p-8 md:p-10" data-search-exclude>
+      <section class="print-card bg-surface-container-highest border border-outline-variant/20 p-8 md:p-10" aria-label="Contact and profile links" data-resume-signature-visual data-search-exclude>
         <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-5">[operator_registry]</div>
         <div class="space-y-5 text-sm">
           <div class="border-b border-outline-variant/20 pb-4">
@@ -212,26 +224,26 @@
             <a class="text-on-surface font-medium hover:text-tertiary transition-colors" href="https://www.linkedin.com/in/aarconcepcion" target="_blank" rel="noreferrer">linkedin.com/in/aarconcepcion</a>
           </div>
         </div>
-      </aside>
+      </section>
     </section>
 
     <section id="professional-summary" class="resume-dossier__summary mb-14 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6">
       <article class="print-card bg-surface-container-low border border-outline-variant/20 p-8 md:p-10" data-signals="android architecture leadership fintech reliability cross-platform ai-assisted-delivery">
         <div class="font-label text-tertiary text-sm tracking-widest mb-3 bracket-label">mission_brief</div>
         <p class="text-lg md:text-xl text-secondary leading-relaxed font-light max-w-4xl">
-          AI-native software engineer with deep platform knowledge and 10+ years of experience shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce. Strong in Kotlin, Jetpack Compose, mobile architecture, performance tuning, release hardening, and third-party integrations. Known for agent-first execution, strong engineering judgment, and moving effectively across Android, iOS, backend, product, and design to ship reliable user-facing systems.
+          AI-native software engineer with 10+ years shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce. Recent work spans multichain wallet rewards and transactions, shared Rust services through UniFFI, and Android release hardening; earlier roles include ITVX playback and leading five senior Android engineers on MySTC. Kotlin and Jetpack Compose are home turf, with hands-on delivery across iOS, backend, product, and design.
         </p>
       </article>
 
-      <aside class="print-card bg-surface-container-low border border-outline-variant/20 p-8">
+      <section class="print-card bg-surface-container-low border border-outline-variant/20 p-8" aria-label="Résumé record index">
         <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-4">[record_index]</div>
         <ul class="space-y-3 text-sm text-secondary">
-          <li class="border-b border-outline-variant/20 pb-3" data-signals="ai-assisted-delivery reliability">Agent-first execution with evidence-backed verification</li>
-          <li class="border-b border-outline-variant/20 pb-3" data-signals="android cross-platform">Deep platform knowledge across Android, iOS, and backend</li>
-          <li class="border-b border-outline-variant/20 pb-3" data-signals="architecture leadership reliability">Architecture leadership and fast, reliable delivery</li>
-          <li data-signals="fintech reliability">Fintech-grade quality controls and release hardening</li>
+          <li class="border-b border-outline-variant/20 pb-3" data-signals="architecture cross-platform reliability">Multichain wallet, Bitcoin transaction, and shared-Rust delivery</li>
+          <li class="border-b border-outline-variant/20 pb-3" data-signals="android reliability">ITVX playback features and mobile reliability</li>
+          <li class="border-b border-outline-variant/20 pb-3" data-signals="android architecture leadership">Led five senior Android engineers on MySTC</li>
+          <li data-signals="cross-platform ai-assisted-delivery">Android, iOS, backend, release, and product collaboration</li>
         </ul>
-      </aside>
+      </section>
     </section>
 
     <nav class="resume-local-map no-print" aria-label="Resume record sections">
@@ -324,7 +336,7 @@
       <div class="mb-6 border-l-4 border-tertiary pl-6">
         <div class="font-label text-tertiary text-sm tracking-widest mb-2">[chronological_flight_record]</div>
         <h2 class="font-headline text-4xl font-bold tracking-tighter text-on-background">Experience recorder</h2>
-        <p class="mt-3 max-w-4xl text-sm leading-relaxed text-secondary"><strong class="text-on-background">Evidence key:</strong> A public product listing confirms public availability; a first-person project note is my account of the work; and “Source implementation private” means the underlying code is not publicly inspectable.</p>
+        <p class="mt-3 max-w-4xl text-sm leading-relaxed text-secondary"><strong class="text-on-background">Evidence key:</strong> A public product listing confirms public availability; a first-person project note is my account of the work; and “Source implementation private” means the underlying code is not publicly inspectable. Unlinked scale figures are historical product-scale figures from the period of my work.</p>
       </div>
       <div class="resume-role-list space-y-6">
         <article id="experience-bitcoin" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break" data-record="01" data-signals="android architecture leadership reliability cross-platform ai-assisted-delivery">
@@ -336,7 +348,7 @@
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2024 — Present</div>
           </div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>
@@ -356,7 +368,7 @@
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2023 — Jun 2024</div>
           </div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>
@@ -379,7 +391,7 @@
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2021 — Jun 2023</div>
           </div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="/blog/case-study-ocbc-banking-experience.html">First-person project note · OCBC</a>
             <a class="resume-evidence-source" href="/blog/case-study-openpay-bnpl-experience.html">First-person project note · OpenPay</a>
             <span class="resume-evidence-private">Source implementation private</span>
@@ -400,7 +412,7 @@
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">May 2020 — Jun 2021</div>
           </div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="/blog/case-study-mystc-scale-and-reliability.html">First-person project note · MySTC</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>
@@ -420,7 +432,7 @@
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2018 — May 2020</div>
           </div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="/blog/case-study-owto-ride-hailing-platform.html">First-person project note · OWTO</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>
@@ -440,7 +452,7 @@
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2016 — Jun 2018</div>
           </div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="/blog/case-study-popslide-engagement-and-monetization.html">First-person project note · PopSlide</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>
@@ -460,7 +472,7 @@
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">May 2014 — Jun 2016</div>
           </div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="/blog/case-study-websafety-parental-controls.html">First-person project note · WebSafety</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>
@@ -483,7 +495,7 @@
           <div class="font-headline text-2xl font-bold tracking-tight mb-3">Bitcoin.com Wallet</div>
           <p class="text-secondary leading-relaxed">Self-custody systems across multichain rewards, market predictions, Bitcoin transaction replacement, staking and liquidity pools, swaps, recurring-buy reminders, wallet migration, and shared Rust through UniFFI.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[self_custody]</div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>
@@ -492,7 +504,7 @@
           <div class="font-headline text-2xl font-bold tracking-tight mb-3">ITVX</div>
           <p class="text-secondary leading-relaxed">Playback feature work on ITVX at Candyspace: in-player recommendations, independently delivered preview timeline scrubbing, tablet support, stronger error tracking, security fixes, and a Simple XML-to-Jackson migration.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[streaming]</div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>
@@ -501,7 +513,7 @@
           <div class="font-headline text-2xl font-bold tracking-tight mb-3">OCBC</div>
           <p class="text-secondary leading-relaxed">Mobile banking delivery for a major Singaporean bank, including onboarding, account dashboards, transfers, digital account opening, and guarded third-party SDK integration.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[fintech]</div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="/blog/case-study-ocbc-banking-experience.html">First-person project note · OCBC</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>
@@ -510,7 +522,7 @@
           <div class="font-headline text-2xl font-bold tracking-tight mb-3">OpenPay</div>
           <p class="text-secondary leading-relaxed">Fintech checkout, spending-limit, performance, and partner-integration work with an emphasis on reliable payment completion and release hardening.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[payments]</div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="/blog/case-study-openpay-bnpl-experience.html">First-person project note · OpenPay</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>
@@ -519,7 +531,7 @@
           <div class="font-headline text-2xl font-bold tracking-tight mb-3">MySTC</div>
           <p class="text-secondary leading-relaxed">Telecom-scale Android product serving 10M+ installs, where I led a team of five senior engineers and drove modular, multilingual stability improvements.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[telecom_scale]</div>
-          <div class="resume-evidence-boundary" aria-label="Evidence boundary">
+          <div class="resume-evidence-boundary">
             <a class="resume-evidence-source" href="/blog/case-study-mystc-scale-and-reliability.html">First-person project note · MySTC</a>
             <span class="resume-evidence-private">Source implementation private</span>
           </div>

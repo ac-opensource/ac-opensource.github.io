@@ -9,7 +9,9 @@ const ROOT = path.join(__dirname, "..");
 const HOST = "127.0.0.1";
 const CANONICAL_KEY = "ac.blog.bookmarks.v1";
 const LEGACY_KEY = "ac_blog_bookmarks_v1";
+const FOCUS_EVIDENCE_ROOT = "/tmp/ac-logs-focus-evidence";
 const MIME_TYPES = {
+  ".avif": "image/avif",
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -153,7 +155,9 @@ async function verifyMigrationAndUrlState(browser, baseUrl, posts) {
     legacy: localStorage.getItem(legacyKey),
     pressed: document.querySelector("button[data-saved-filter]")?.getAttribute("aria-pressed"),
     label: document.querySelector("button[data-saved-filter]")?.getAttribute("aria-label"),
+    name: document.querySelector("button[data-saved-filter]")?.textContent.replace(/\s+/g, " ").trim(),
     count: document.querySelector(".galaxy-saved-filter__count")?.textContent,
+    status: document.querySelector("#galaxy-saved-count")?.textContent,
     visibleSlugs: [...document.querySelectorAll(".galaxy-entry:not([hidden])")].map((entry) => entry.dataset.slug)
   }), { canonicalKey: CANONICAL_KEY, legacyKey: LEGACY_KEY });
 
@@ -162,7 +166,12 @@ async function verifyMigrationAndUrlState(browser, baseUrl, posts) {
     `Bookmark migration did not merge both keys without loss: ${JSON.stringify(migrated.canonical)}.`
   );
   assert(migrated.legacy === null, "Bookmark migration left the legacy key behind.");
-  assert(migrated.pressed === "true" && /2 saved entries/.test(migrated.label || "") && migrated.count === "2",
+  assert(
+    migrated.pressed === "true"
+      && migrated.label === null
+      && /^saved reading\s*2$/i.test(migrated.name || "")
+      && migrated.count === "2"
+      && migrated.status === "2 saved entries",
     `Saved filter is not announced accessibly: ${JSON.stringify(migrated)}.`);
   assert(JSON.stringify(migrated.visibleSlugs) === JSON.stringify([first.slug]),
     `Saved, category, and query filters did not compose: ${JSON.stringify(migrated.visibleSlugs)}.`);
@@ -297,16 +306,272 @@ async function verifySavedFocusHandoff(browser, baseUrl, posts) {
   await context.close();
 }
 
+async function verifyGalaxyPlacementRuntime(browser, baseUrl) {
+  const evidence = [];
+  const verifyFocusCards = async (page, width, height, motion) => {
+    const visibleNodes = page.locator(".galaxy-node:not(.is-muted)");
+    const focusFailures = [];
+    let maxFrameAttempts = 0;
+    for (let index = 0; index < await visibleNodes.count(); index += 1) {
+      const node = visibleNodes.nth(index);
+      const slug = await node.getAttribute("data-slug");
+      await node.click();
+      await page.waitForFunction((selectedSlug) => {
+        const focus = document.querySelector("#galaxy-focus");
+        return new URL(location.href).searchParams.get("target") === selectedSlug
+          && !focus?.hidden
+          && focus?.dataset.frameState === "settled";
+      }, slug);
+      const focusGeometry = await page.evaluate(() => {
+        const header = document.querySelector("#site-topbar").getBoundingClientRect();
+        const field = document.querySelector("#galaxy-field").getBoundingClientRect();
+        const focus = document.querySelector("#galaxy-focus").getBoundingClientRect();
+        return {
+          bottom: focus.bottom,
+          fieldBottom: field.bottom,
+          fieldTop: field.top,
+          frameAttempts: Number(document.querySelector("#galaxy-focus").dataset.frameAttempts),
+          headerBottom: header.bottom,
+          scrollY,
+          selected: new URL(location.href).searchParams.get("target"),
+          top: focus.top,
+          viewportHeight: innerHeight
+        };
+      });
+      await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      await page.waitForTimeout(64);
+      const settledGeometry = await page.evaluate(() => {
+        const focus = document.querySelector("#galaxy-focus").getBoundingClientRect();
+        return { bottom: focus.bottom, scrollY, top: focus.top };
+      });
+      focusGeometry.jitter = Math.max(
+        Math.abs(settledGeometry.top - focusGeometry.top),
+        Math.abs(settledGeometry.bottom - focusGeometry.bottom),
+        Math.abs(settledGeometry.scrollY - focusGeometry.scrollY)
+      );
+      maxFrameAttempts = Math.max(maxFrameAttempts, focusGeometry.frameAttempts);
+      if (motion === "normal motion" && index === 0) {
+        fs.mkdirSync(FOCUS_EVIDENCE_ROOT, { recursive: true });
+        await page.screenshot({
+          path: path.join(FOCUS_EVIDENCE_ROOT, `logs-focus-${width}x${height}.png`)
+        });
+      }
+      if (!(focusGeometry.selected
+        && focusGeometry.top >= focusGeometry.headerBottom + 7
+        && focusGeometry.bottom <= focusGeometry.viewportHeight - 7
+        && focusGeometry.top >= focusGeometry.fieldTop
+        && focusGeometry.bottom <= focusGeometry.fieldBottom
+        && focusGeometry.jitter <= 1)) {
+        focusFailures.push({ index, ...focusGeometry });
+      }
+      await page.keyboard.press("Escape");
+      assert(await page.locator("#galaxy-focus").isHidden(), `Escape left Logs node ${index} open at ${width}px (${motion}).`);
+      assert(await node.evaluate((element) => document.activeElement === element),
+        `Escape did not restore focus to Logs node ${index} at ${width}px (${motion}).`);
+    }
+    assert(focusFailures.length === 0,
+      `Selected Logs evidence is not stably framed below the sticky header at ${width}x${height} (${motion}): ${JSON.stringify(focusFailures)}.`);
+    return maxFrameAttempts;
+  };
+
+  const verifySearchScroll = async (page, expectedBehavior, width) => {
+    await page.evaluate(() => {
+      const original = Element.prototype.scrollIntoView;
+      window.__logsScrollIntoView = [];
+      Element.prototype.scrollIntoView = function scrollIntoView(options) {
+        window.__logsScrollIntoView.push(options || null);
+        return original.call(this, options);
+      };
+    });
+    await page.locator("#galaxy-search").fill("Android");
+    await page.locator("#galaxy-tuner").press("Enter");
+    await page.waitForFunction(() => window.__logsScrollIntoView?.length > 0);
+    const behavior = await page.evaluate(() => window.__logsScrollIntoView.at(-1)?.behavior);
+    assert(behavior === expectedBehavior,
+      `Logs search lost its ${expectedBehavior} core journey at ${width}px: ${behavior}.`);
+  };
+
+  const verifyBrowseHandoff = async (page, width) => {
+    const browse = page.locator('.galaxy-ledger__browse[href="#blog-feed"]');
+    await browse.focus();
+    assert(await browse.evaluate((element) => document.activeElement === element),
+      `Browse link could not receive keyboard focus at ${width}px.`);
+    await page.keyboard.press("Enter");
+    await page.waitForFunction(() => location.hash === "#blog-feed" && document.activeElement?.id === "blog-feed");
+
+    const landed = await page.evaluate(() => {
+      const feed = document.querySelector("#blog-feed").getBoundingClientRect();
+      const header = document.querySelector("#site-topbar").getBoundingClientRect();
+      return { activeId: document.activeElement?.id, feedTop: feed.top, headerBottom: header.bottom, scrollY };
+    });
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await page.waitForTimeout(64);
+    const settled = await page.evaluate(() => ({
+      activeId: document.activeElement?.id,
+      feedTop: document.querySelector("#blog-feed").getBoundingClientRect().top,
+      scrollY
+    }));
+    const jitter = Math.max(
+      Math.abs(settled.feedTop - landed.feedTop),
+      Math.abs(settled.scrollY - landed.scrollY)
+    );
+    assert(
+      landed.activeId === "blog-feed"
+        && settled.activeId === "blog-feed"
+        && landed.feedTop >= landed.headerBottom + 7
+        && landed.feedTop <= landed.headerBottom + 32
+        && jitter <= 1,
+      `Browse did not hand off focus stably below the sticky header at ${width}px: ${JSON.stringify({ ...landed, jitter, settled })}.`
+    );
+    fs.mkdirSync(FOCUS_EVIDENCE_ROOT, { recursive: true });
+    await page.screenshot({
+      path: path.join(FOCUS_EVIDENCE_ROOT, `logs-browse-focus-${width}.png`)
+    });
+
+    await page.keyboard.press("Tab");
+    const nextFocus = await page.evaluate(() => ({
+      href: document.activeElement?.getAttribute?.("href") || "",
+      inFirstEntry: Boolean(document.activeElement?.closest?.(".galaxy-entry:first-child")),
+      tag: document.activeElement?.tagName || ""
+    }));
+    assert(nextFocus.tag === "A" && nextFocus.inFirstEntry && nextFocus.href.startsWith("/blog/"),
+      `Browse did not continue into the first published entry at ${width}px: ${JSON.stringify(nextFocus)}.`);
+    return {
+      feedTop: Number(landed.feedTop.toFixed(1)),
+      headerBottom: Number(landed.headerBottom.toFixed(1)),
+      jitter: Number(jitter.toFixed(1))
+    };
+  };
+
+  for (const width of [320, 390]) {
+    const height = width === 320 ? 720 : 843;
+    const context = await browser.newContext({ viewport: { width, height } });
+    await context.route("**/*", (route) => {
+      const url = new URL(route.request().url());
+      if (url.origin === baseUrl) route.continue();
+      else route.abort();
+    });
+    const page = await context.newPage();
+    await page.goto(`${baseUrl}/blog/`, { waitUntil: "domcontentloaded" });
+    await page.evaluate(() => document.fonts?.ready);
+    await page.waitForFunction(() => document.querySelector("#galaxy-field")?.dataset.labelLayoutState === "settled");
+
+    const measure = () => page.evaluate(() => {
+      const field = document.querySelector("#galaxy-field");
+      const fieldRect = field.getBoundingClientRect();
+      const labels = [...document.querySelectorAll(".galaxy-node:not(.is-muted) .galaxy-node__label")];
+      const rects = labels.map((label) => label.getBoundingClientRect());
+      let actualOverlaps = 0;
+      for (let index = 0; index < rects.length; index += 1) {
+        for (let candidate = index + 1; candidate < rects.length; candidate += 1) {
+          const left = rects[index];
+          const right = rects[candidate];
+          const overlapX = Math.min(left.right + 2, right.right + 2) - Math.max(left.left - 2, right.left - 2);
+          const overlapY = Math.min(left.bottom + 2, right.bottom + 2) - Math.max(left.top - 2, right.top - 2);
+          if (overlapX > 0 && overlapY > 0) actualOverlaps += 1;
+        }
+      }
+      const actualClipped = rects.filter((rect) => (
+        rect.left < fieldRect.left + 2 || rect.right > fieldRect.right - 2
+          || rect.top < fieldRect.top + 2 || rect.bottom > fieldRect.bottom - 2
+      )).length;
+      return {
+        actualClipped,
+        actualOverlaps,
+        clipped: Number(field.dataset.labelClippedCount),
+        layoutMs: Number(field.dataset.labelLayoutMs),
+        labels: labels.length,
+        minLabelPx: Math.min(...labels.map((label) => Number.parseFloat(getComputedStyle(label).fontSize))),
+        overlaps: Number(field.dataset.labelOverlapCount),
+        placements: Number(field.dataset.labelPlacementCount),
+        runs: Number(field.dataset.labelLayoutRuns),
+        state: field.dataset.labelLayoutState
+      };
+    });
+
+    const assertPlacement = (state, label) => {
+      assert(
+        state.state === "settled"
+          && state.clipped === 0
+          && state.overlaps === 0
+          && state.actualClipped === 0
+          && state.actualOverlaps === 0
+          && state.placements === state.labels
+          && state.minLabelPx >= 10
+          && state.layoutMs < 50,
+        `${label} placement exceeded its geometry/performance budget at ${width}px: ${JSON.stringify(state)}.`
+      );
+    };
+
+    const initial = await measure();
+    assertPlacement(initial, "Default Logs");
+    assert(initial.runs <= 2, `Logs repeated its startup label pass at ${width}px: ${JSON.stringify(initial)}.`);
+    let maxLayoutMs = initial.layoutMs;
+
+    const normalFrameAttempts = await verifyFocusCards(page, width, height, "normal motion");
+    const browseHandoff = await verifyBrowseHandoff(page, width);
+
+    const categories = await page.locator("button[data-category]").evaluateAll((buttons) =>
+      buttons.map((button) => button.dataset.category)
+    );
+    let previousRuns = initial.runs;
+    for (const category of categories.filter((value) => value !== "all")) {
+      await page.locator(`button[data-category="${category}"]`).click();
+      await page.waitForFunction(({ category, previousRuns }) => {
+        const field = document.querySelector("#galaxy-field");
+        const active = document.querySelector(`button[data-category="${category}"]`);
+        return active?.getAttribute("aria-pressed") === "true"
+          && field?.dataset.labelLayoutState === "settled"
+          && Number(field.dataset.labelLayoutRuns) > previousRuns;
+      }, { category, previousRuns });
+      const filtered = await measure();
+      assertPlacement(filtered, `${category} Logs`);
+      maxLayoutMs = Math.max(maxLayoutMs, filtered.layoutMs);
+      assert(filtered.runs === previousRuns + 1,
+        `${category} scheduled duplicate label passes at ${width}px: ${previousRuns} -> ${filtered.runs}.`);
+      previousRuns = filtered.runs;
+    }
+    await verifySearchScroll(page, "smooth", width);
+    evidence.push({ browseHandoff, initialRuns: initial.runs, maxLayoutMs, normalFrameAttempts, width });
+    await context.close();
+
+    const reducedContext = await browser.newContext({
+      reducedMotion: "reduce",
+      viewport: { width, height }
+    });
+    await reducedContext.route("**/*", (route) => {
+      const url = new URL(route.request().url());
+      if (url.origin === baseUrl) route.continue();
+      else route.abort();
+    });
+    const reducedPage = await reducedContext.newPage();
+    await reducedPage.goto(`${baseUrl}/blog/`, { waitUntil: "domcontentloaded" });
+    await reducedPage.waitForFunction(() => document.querySelector("#galaxy-field")?.dataset.labelLayoutState === "settled");
+    evidence[evidence.length - 1].reducedFrameAttempts = await verifyFocusCards(
+      reducedPage,
+      width,
+      height,
+      "reduced motion"
+    );
+    await verifySearchScroll(reducedPage, "auto", width);
+    await reducedContext.close();
+  }
+  return evidence;
+}
+
 async function verifyNoJavaScriptFallback(browser, baseUrl, expectedPosts) {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto(`${baseUrl}/focused-blog/?saved=1`, { waitUntil: "load" });
   const state = await page.evaluate(() => ({
     entries: document.querySelectorAll(".galaxy-entry").length,
+    feedTabIndex: document.querySelector("#blog-feed")?.tabIndex,
     mainText: document.querySelector("main")?.innerText || "",
     tunerDisplay: getComputedStyle(document.querySelector("#galaxy-tuner")).display
   }));
   assert(state.entries === expectedPosts, `No-JavaScript Logs lost entries when Saved appeared in the URL: ${state.entries}.`);
+  assert(state.feedTabIndex === -1,
+    `Generated Logs fallback lost the programmatically focusable Published writing target: ${state.feedTabIndex}.`);
   assert(state.mainText.includes("Writing in orbit."), "No-JavaScript Logs lost its readable archive.");
   assert(state.tunerDisplay === "none", "No-JavaScript Logs exposed an inert Saved/search control.");
 
@@ -369,9 +634,10 @@ async function main() {
     await verifyMigrationAndUrlState(browser, baseUrl, posts);
     await verifyArticleInteroperability(browser, baseUrl, posts[0]);
     await verifySavedFocusHandoff(browser, baseUrl, posts);
+    const galaxyRuntime = await verifyGalaxyPlacementRuntime(browser, baseUrl);
     await verifyNoJavaScriptFallback(browser, baseUrl, posts.length);
     await verifyLostSignal(browser, baseUrl);
-    console.log("Saved Reading and Lost Signal contract passed: merged storage, shared article/Logs state, accessible URL filter, no-JS fallback, and deterministic 404 recovery.");
+    console.log(`Saved Reading and Lost Signal contract passed; galaxy placement runtime: ${JSON.stringify(galaxyRuntime)}; focus evidence: ${FOCUS_EVIDENCE_ROOT}.`);
   } finally {
     await browser.close();
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));

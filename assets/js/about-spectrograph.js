@@ -2,6 +2,7 @@
   "use strict";
 
   const DATA_URL = "/assets/data/profile-map.json";
+  const SVG_NS = "http://www.w3.org/2000/svg";
   const DATASET_ORDER = ["engineering", "interests"];
   const BAND_TONES = {
     "engineering:surfaces": "#65a8ff",
@@ -108,6 +109,7 @@
   const zoomOutput = root.querySelector("[data-tree-zoom-output]");
   const interactionToggle = root.querySelector("[data-tree-interaction-toggle]");
   const interactionLabel = root.querySelector("[data-tree-interaction-label]");
+  const treeGuide = root.querySelector("[data-tree-guide]");
   const resetViewButton = root.querySelector("[data-tree-reset]");
   const themeButton = root.querySelector("[data-about-theme-toggle]");
   const evidenceDetails = document.getElementById("profile-map-evidence");
@@ -115,6 +117,20 @@
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const mobileTreeInteraction = window.matchMedia("(max-width: 720px)");
   if (!bandsElement || !readoutElement || !statusElement || !stageElement || !evidenceDetails) return;
+
+  let motionPaused = mobileTreeInteraction.matches;
+  const motionButton = root.querySelector("[data-tree-motion-toggle]");
+  function syncMotionButton() {
+    if (!motionButton) return;
+    motionButton.setAttribute("aria-pressed", String(motionPaused));
+    motionButton.textContent = motionPaused ? "Resume" : "Pause";
+    motionButton.setAttribute("aria-label", motionPaused ? "Resume nebula rotation" : "Pause nebula rotation");
+  }
+  syncMotionButton();
+  motionButton?.addEventListener("click", () => {
+    motionPaused = !motionPaused;
+    syncMotionButton();
+  });
 
   let profile = null;
   let bands = [];
@@ -417,6 +433,7 @@
           sections[index].hidden = !active;
         });
         if (focus) tabs[nextIndex].focus();
+        if (readoutElement.contains(tabList)) positionPopup();
       };
 
       tabs.forEach((tab, index) => {
@@ -433,6 +450,7 @@
         });
       });
 
+      installHorizontalCue(tabList);
       grid.prepend(tabList);
       activateTab(0);
     }
@@ -453,8 +471,26 @@
 
   function appendMeta(values) {
     const meta = element("div", "stellar-spectrum__readout-meta");
+    meta.tabIndex = 0;
+    meta.setAttribute("role", "group");
+    meta.setAttribute("aria-label", "Selected signal metadata. Scroll horizontally for every value.");
     values.filter(Boolean).forEach((value) => meta.append(element("span", "", value)));
+    installHorizontalCue(meta);
     readoutElement.append(meta);
+  }
+
+  function installHorizontalCue(rail) {
+    const cue = element("span", "stellar-spectrum__horizontal-cue", "→");
+    cue.setAttribute("aria-hidden", "true");
+    rail.append(cue);
+
+    const sync = () => {
+      const maximum = Math.max(0, rail.scrollWidth - rail.clientWidth);
+      rail.dataset.railOverflow = String(maximum > 2);
+      rail.dataset.railEnd = String(maximum <= 2 || rail.scrollLeft >= maximum - 2);
+    };
+    rail.addEventListener("scroll", sync, { passive: true });
+    window.requestAnimationFrame(sync);
   }
 
   function tokenSet(value) {
@@ -673,6 +709,10 @@
     button.setAttribute("aria-pressed", String(state.nodeId === node.id));
     button.setAttribute("aria-label", `${node.label}; ${MATURITY_LABELS[node.maturity] || node.maturity}; ${node.evidenceRefs.length} cited source${node.evidenceRefs.length === 1 ? "" : "s"}`);
     button.append(element("span", "stellar-spectrum__node-mark"), element("span", "stellar-spectrum__node-label", node.label));
+    button.addEventListener("pointerenter", () => noteCameraInteraction(60000));
+    button.addEventListener("pointerleave", () => noteCameraInteraction());
+    button.addEventListener("focus", () => noteCameraInteraction(60000));
+    button.addEventListener("blur", () => noteCameraInteraction());
     button.addEventListener("click", () => {
       const closing = state.nodeId === node.id;
       popupReturnTarget = { type: "node", id: node.id };
@@ -685,7 +725,8 @@
     button.addEventListener("keydown", (event) => {
       if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"].includes(event.key)) return;
       event.preventDefault();
-      const buttons = Array.from(root.querySelectorAll(`[data-band-id="${band.id}"] .stellar-spectrum__node`));
+      const buttons = Array.from(root.querySelectorAll(`[data-band-id="${band.id}"] .stellar-spectrum__node`))
+        .filter((candidate) => !candidate.hidden);
       const currentIndex = buttons.indexOf(event.currentTarget);
       let nextIndex = currentIndex;
       if (event.key === "Home") nextIndex = 0;
@@ -740,7 +781,7 @@
   }
 
   function runIdleRotation(timestamp) {
-    const canRotate = !reducedMotion.matches
+    const canRotate = !motionPaused && !reducedMotion.matches
       && !document.hidden
       && stageIsVisible
       && !state.bandId
@@ -1081,7 +1122,7 @@
     trigger.type = "button";
     trigger.dataset.bandTrigger = band.id;
     trigger.setAttribute("aria-pressed", String(active));
-    trigger.setAttribute("aria-label", `${band.dataset.label}, ${band.axis.label}; ${band.nodes.length} equal signal points`);
+    trigger.setAttribute("aria-label", `${band.dataset.label}, ${band.axis.label}; ${band.nodes.length} signals`);
     trigger.append(
       element("span", "stellar-tree__branch-dataset", band.dataset.label),
       element("strong", "", band.axis.label),
@@ -1099,7 +1140,7 @@
     trigger.addEventListener("keydown", (event) => {
       if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"].includes(event.key)) return;
       event.preventDefault();
-      const triggers = Array.from(root.querySelectorAll("[data-band-trigger]"));
+      const triggers = Array.from(root.querySelectorAll("[data-band-trigger]")).filter((button) => !button.hidden);
       const currentIndex = triggers.indexOf(event.currentTarget);
       let nextIndex = currentIndex;
       if (event.key === "Home") nextIndex = 0;
@@ -1118,11 +1159,13 @@
       const index = Math.min(path.points.length - 2, Math.floor(progress));
       const center = lerpPoint(path.points[index], path.points[index + 1], progress - index);
       const angle = random() * Math.PI * 2;
-      const radial = radius * Math.sqrt(random());
+      // Retain the original branches, tapering their clouds toward the tips.
+      const taper = 1.16 - (progress / (path.points.length - 1)) * 0.48;
+      const radial = radius * taper * Math.sqrt(random());
       const layerRoll = random();
       const layer = layerRoll < 0.14 ? "shadow" : layerRoll < 0.3 ? "haze" : layerRoll > 0.88 ? "rim" : "body";
-      const layerSize = layer === "haze" ? 1.7 : layer === "shadow" ? 1.18 : 1;
-      const layerAlpha = layer === "haze" ? 0.42 : layer === "rim" ? 0.5 : layer === "shadow" ? 0.86 : 1;
+      const layerSize = layer === "haze" ? 1.4 : layer === "shadow" ? 1.18 : 1;
+      const layerAlpha = layer === "haze" ? 0.42 : layer === "rim" ? 0.7 : layer === "shadow" ? 1.08 : 1;
       return {
         x: center.x + Math.cos(angle) * radial,
         y: center.y + Math.sin(angle) * radial * (0.52 + random() * 0.5),
@@ -1203,7 +1246,7 @@
     const cloudParticles = [];
     paths.filter((path) => path.kind !== "filament").forEach((path) => {
       const specification = path.kind === "trunk"
-        ? { count: 220, radius: 0.72, size: 0.19, alpha: 0.115 }
+        ? { count: 220, radius: 0.72, size: 0.19, alpha: 0.13 }
         : path.kind === "limb"
           ? { count: 125, radius: 0.54, size: 0.16, alpha: 0.095 }
           : { count: 25, radius: 0.27, size: 0.09, alpha: 0.072 };
@@ -1262,7 +1305,7 @@
   function projectTreePoint(point, width, height, offsetX = 0, offsetY = 0, originY = height * 0.5) {
     const rotated = rotateTreePoint(point);
     const cameraDistance = 12.5;
-    const baseScale = Math.min(width / 8.6, height / 15.5) * state.zoom;
+    const baseScale = Math.min(width / 8.6, height / 18.5) * state.zoom;
     const perspective = clamp(cameraDistance / (cameraDistance - rotated.z), 0.48, 1.75);
     return {
       x: offsetX + width * 0.5 + rotated.x * baseScale * perspective,
@@ -1354,6 +1397,78 @@
     canvas.style.height = `${Math.max(openingBounds.height, viewportBounds.height, 1) + lowerOverflow}px`;
   }
 
+  // Keep stars on their actual projected branches; only nudge the text.
+  function arrangeTreeLabels(projected, width, height) {
+    const { controls, leaderLayer } = treeScene;
+    leaderLayer.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    width = Math.max(180, width - 76);
+    leaderLayer.replaceChildren();
+    const occupied = [];
+    treeScene.labelSizes ||= new Map();
+    for (const [key, point] of projected) {
+      if (key.startsWith("node:") || !point.visible) continue;
+      const control = controls.get(key);
+      const w = control.offsetWidth;
+      const h = control.offsetHeight;
+      const originX = clamp(point.x - w / 2, 4, Math.max(4, width - w - 4));
+      const originY = clamp(point.y - h / 2, width <= 720 ? 146 : 94, height - h - 8);
+      let best;
+      for (const dx of [0, -w - 8, w + 8]) {
+        for (const dy of [0, -h - 8, h + 8, -2 * (h + 8), 2 * (h + 8)]) {
+          const x = clamp(originX + dx, 4, Math.max(4, width - w - 4));
+          const y = clamp(originY + dy, width <= 720 ? 146 : 94, height - h - 8);
+          const overlap = occupied.reduce((total, box) => total
+            + Math.max(0, Math.min(x + w + 4, box.x + box.w) - Math.max(x - 4, box.x))
+            * Math.max(0, Math.min(y + h + 4, box.y + box.h) - Math.max(y - 4, box.y)), 0);
+          const score = overlap * 100 + Math.hypot(dx, dy);
+          if (!best || score < best.score) best = { x, y, score };
+        }
+      }
+      const { x, y } = best;
+      control.style.left = `${x + w / 2}px`;
+      control.style.top = `${y + h / 2}px`;
+      delete control.dataset.treeEdge;
+      // Popup anchors use the same small displacement as the branch control.
+      projected.set(key, { ...point, x: x + w / 2, y: y + h / 2 });
+      occupied.push({ x, y, w, h });
+    }
+    const nodes = [...projected].filter(([key, point]) => key.startsWith("node:") && point.visible)
+      .sort((a, b) => a[1].y - b[1].y);
+    for (const [key, point] of nodes) {
+      const control = controls.get(key);
+      const label = control.querySelector(".stellar-spectrum__node-label");
+      let size = treeScene.labelSizes.get(key);
+      if (!size) {
+        size = { w: label.offsetWidth, h: label.offsetHeight };
+        treeScene.labelSizes.set(key, size);
+      }
+      const { w, h } = size;
+      let best;
+      for (const dy of [0, -18, 18, -36, 36, -54, 54, -72, 72, -90, 90]) {
+        for (const side of [1, -1]) {
+          const x = clamp(point.x + (side === 1 ? 16 : -w - 16), 4, Math.max(4, width - w - 4));
+          const y = clamp(point.y + dy - h / 2, width <= 720 ? 146 : 94, height - h - 8);
+          const overlap = occupied.reduce((total, box) => total
+            + Math.max(0, Math.min(x + w + 3, box.x + box.w) - Math.max(x - 3, box.x))
+            * Math.max(0, Math.min(y + h + 3, box.y + box.h) - Math.max(y - 3, box.y)), 0);
+          const score = overlap * 100 + Math.abs(dy) + (side === -1 ? 3 : 0);
+          if (!best || score < best.score) best = { x, y, w, h, score };
+        }
+      }
+      occupied.push(best);
+      label.style.setProperty("--label-x", `${best.x - point.x}px`);
+      label.style.setProperty("--label-y", `${best.y + h / 2 - point.y}px`);
+      if (Math.abs(best.y + h / 2 - point.y) > 12) {
+        const line = document.createElementNS(SVG_NS, "line");
+        line.setAttribute("x1", point.x);
+        line.setAttribute("y1", point.y);
+        line.setAttribute("x2", clamp(point.x, best.x, best.x + w));
+        line.setAttribute("y2", best.y + h / 2);
+        leaderLayer.append(line);
+      }
+    }
+  }
+
   function drawTreeScene() {
     if (!treeScene) return;
     const { canvas, context, viewport, controlsLayer, geometry, controls } = treeScene;
@@ -1383,7 +1498,7 @@
     } = measurements;
     const requestedPixelRatio = Math.min(2, window.devicePixelRatio || 1);
     const pixelRatio = Math.min(requestedPixelRatio, Math.sqrt(CANVAS_PIXEL_BUDGET / (width * height)));
-    const sceneOriginY = sceneWidth <= 720 ? sceneHeight * 0.38 : sceneHeight * 0.5;
+    const sceneOriginY = sceneWidth <= 720 ? sceneHeight * 0.52 : sceneHeight * 0.5;
     const projectCanvasPoint = (point) => projectTreePoint(point, sceneWidth, sceneHeight, canvasOffsetX, canvasOffsetY, sceneOriginY);
     const projectControlPoint = (point) => projectTreePoint(point, sceneWidth, sceneHeight, controlsOffsetX, controlsOffsetY, sceneOriginY);
     if (canvas.width !== Math.round(width * pixelRatio) || canvas.height !== Math.round(height * pixelRatio)) {
@@ -1431,9 +1546,9 @@
         context.arc(drawable.projected.x, drawable.projected.y, radius, 0, Math.PI * 2);
         context.fill();
       } else if (drawable.type === "cloud") {
-        const baseScale = Math.min(sceneWidth / 8.6, sceneHeight / 15.5) * state.zoom;
+        const baseScale = Math.min(sceneWidth / 8.6, sceneHeight / 18.5) * state.zoom;
         const size = clamp(drawable.particle.size * baseScale * drawable.projected.scale * 3.8, 6, 108);
-        context.globalAlpha = drawable.particle.alpha;
+        context.globalAlpha = Math.min(1, drawable.particle.alpha * 1.18);
         context.globalCompositeOperation = drawable.particle.layer === "rim" ? "screen" : "source-over";
         context.save();
         context.translate(drawable.projected.x, drawable.projected.y);
@@ -1444,8 +1559,8 @@
         context.globalCompositeOperation = "source-over";
       } else {
         const { path, first, last } = drawable;
-        const baseScale = Math.min(sceneWidth / 8.6, sceneHeight / 15.5) * state.zoom;
-        context.globalAlpha = path.kind === "filament" ? path.alpha : path.alpha * 0.11;
+        const baseScale = Math.min(sceneWidth / 8.6, sceneHeight / 18.5) * state.zoom;
+        context.globalAlpha = path.kind === "filament" ? path.alpha : path.alpha * 0.2;
         context.strokeStyle = path.color;
         context.lineWidth = clamp(path.width * baseScale * ((first.scale + last.scale) / 2) * 0.58, 0.35, path.kind === "trunk" ? 2.8 : path.kind === "limb" ? 1.9 : 1.05);
         context.setLineDash(path.maturity === "shipped" ? [] : path.maturity === "published" ? [5, 6] : [2, 7]);
@@ -1461,6 +1576,14 @@
     const projectedControls = new Map();
     geometry.controlPoints.forEach((point, key) => {
       const projected = projectControlPoint(point);
+      // Keep off-screen stars in the artwork, but not as hit targets over
+      // surrounding text when the camera is zoomed or rotated.
+      if (key.startsWith("node:")) {
+        const centerX = projected.x - controlsOffsetX;
+        const centerY = projected.y - controlsOffsetY;
+        projected.visible &&= centerX >= 22 && centerX <= sceneWidth - 22
+          && centerY >= 22 && centerY <= sceneHeight - 22;
+      }
       projectedControls.set(key, projected);
       const control = controls.get(key);
       if (!control) return;
@@ -1475,6 +1598,7 @@
       if (visibleX < 88) control.dataset.treeEdge = "left";
       else if (visibleX > sceneWidth - 88) control.dataset.treeEdge = "right";
     });
+    arrangeTreeLabels(projectedControls, sceneWidth, sceneHeight);
     treeScene.projectedControls = projectedControls;
     viewport.dataset.treeYaw = state.yaw.toFixed(3);
     viewport.dataset.treePitch = state.pitch.toFixed(3);
@@ -1495,13 +1619,13 @@
     const stageBounds = stageElement.getBoundingClientRect();
     const controlsBounds = treeScene.controlsLayer.getBoundingClientRect();
     const stageWidth = stageElement.clientWidth;
-    const stageHeight = treeScene.viewport.clientHeight;
+    const stageHeight = stageElement.clientHeight;
     const inset = 12;
     const viewportInset = 8;
     const topbarBottom = document.getElementById("site-topbar")?.getBoundingClientRect().bottom || 0;
     const viewportTop = clamp(Math.max(viewportInset, topbarBottom + viewportInset) - stageBounds.top, inset, stageHeight - inset);
     const viewportBottom = clamp(window.innerHeight - viewportInset - stageBounds.top, inset, stageHeight - inset);
-    const availableViewportHeight = Math.max(1, viewportBottom - viewportTop);
+    const availableViewportHeight = Math.max(1, Math.min(stageHeight - inset * 2, viewportBottom - viewportTop));
     readoutElement.style.setProperty("--popup-available-height", `${availableViewportHeight}px`);
     const popupWidth = readoutElement.offsetWidth || 330;
     const popupHeight = Math.min(readoutElement.offsetHeight || 300, stageHeight - inset * 2, availableViewportHeight);
@@ -1519,6 +1643,25 @@
       top: anchorY - targetHeight / 2,
       bottom: anchorY + targetHeight / 2
     };
+    const protectedRects = state.bandId
+      ? [...root.querySelectorAll(`[data-band-id="${state.bandId}"] [data-node-id]`)]
+        .filter((control) => !control.hidden)
+        .map((control) => {
+          const bounds = control.getBoundingClientRect();
+          return {
+            left: bounds.left - stageBounds.left,
+            right: bounds.right - stageBounds.left,
+            top: bounds.top - stageBounds.top,
+            bottom: bounds.bottom - stageBounds.top
+          };
+        })
+      : [];
+    const protectedExtent = protectedRects.length ? {
+      left: Math.min(...protectedRects.map((bounds) => bounds.left)),
+      right: Math.max(...protectedRects.map((bounds) => bounds.right)),
+      top: Math.min(...protectedRects.map((bounds) => bounds.top)),
+      bottom: Math.max(...protectedRects.map((bounds) => bounds.bottom))
+    } : null;
     const maxLeft = Math.max(inset, stageWidth - popupWidth - inset);
     const minTop = Math.max(inset, viewportTop);
     const maxTop = Math.max(minTop, Math.min(stageHeight - popupHeight - inset, viewportBottom - popupHeight));
@@ -1526,7 +1669,13 @@
       { placement: "right", left: targetRect.right + gap, top: anchorY - popupHeight * 0.28 },
       { placement: "left", left: targetRect.left - popupWidth - gap, top: anchorY - popupHeight * 0.28 },
       { placement: "below", left: anchorX - popupWidth / 2, top: targetRect.bottom + gap },
-      { placement: "above", left: anchorX - popupWidth / 2, top: targetRect.top - popupHeight - gap }
+      { placement: "above", left: anchorX - popupWidth / 2, top: targetRect.top - popupHeight - gap },
+      ...(protectedExtent ? [
+        { placement: "signals-right", left: protectedExtent.right + gap, top: anchorY - popupHeight * 0.28 },
+        { placement: "signals-left", left: protectedExtent.left - popupWidth - gap, top: anchorY - popupHeight * 0.28 },
+        { placement: "signals-below", left: anchorX - popupWidth / 2, top: protectedExtent.bottom + gap },
+        { placement: "signals-above", left: anchorX - popupWidth / 2, top: protectedExtent.top - popupHeight - gap }
+      ] : [])
     ].map((candidate) => {
       const left = clamp(candidate.left, inset, maxLeft);
       const top = clamp(candidate.top, minTop, maxTop);
@@ -1535,10 +1684,17 @@
       const overlapWidth = Math.max(0, Math.min(right, targetRect.right) - Math.max(left, targetRect.left));
       const overlapHeight = Math.max(0, Math.min(bottom, targetRect.bottom) - Math.max(top, targetRect.top));
       const overlap = overlapWidth * overlapHeight;
+      const protectedOverlap = protectedRects.reduce((total, bounds) => {
+        const width = Math.max(0, Math.min(right, bounds.right) - Math.max(left, bounds.left));
+        const height = Math.max(0, Math.min(bottom, bounds.bottom) - Math.max(top, bounds.top));
+        return total + width * height;
+      }, 0);
       const horizontalDistance = Math.max(targetRect.left - right, left - targetRect.right, 0);
       const verticalDistance = Math.max(targetRect.top - bottom, top - targetRect.bottom, 0);
-      return { ...candidate, left, top, overlap, distance: Math.hypot(horizontalDistance, verticalDistance) };
-    }).sort((first, second) => first.overlap - second.overlap || first.distance - second.distance);
+      return { ...candidate, left, top, overlap, protectedOverlap, distance: Math.hypot(horizontalDistance, verticalDistance) };
+    }).sort((first, second) => first.protectedOverlap - second.protectedOverlap
+      || first.overlap - second.overlap
+      || first.distance - second.distance);
     const position = candidates[0];
     readoutElement.style.setProperty("--popup-left", `${position.left}px`);
     readoutElement.style.setProperty("--popup-top", `${position.top}px`);
@@ -1697,28 +1853,30 @@
   function renderBands() {
     treeScene?.resizeObserver?.disconnect();
     treeScene = null;
+    root.dataset.treeFocus = state.bandId ? "branch" : "overview";
     bandsElement.replaceChildren();
     const visibleBands = bandsForMode(state.scan);
     const viewport = element("div", "stellar-tree__viewport");
     const canvas = element("canvas", "stellar-tree__canvas");
     canvas.setAttribute("aria-hidden", "true");
     canvas.tabIndex = -1;
+    const leaderLayer = document.createElementNS(SVG_NS, "svg");
+    leaderLayer.classList.add("stellar-tree__leader-layer");
+    leaderLayer.setAttribute("aria-hidden", "true");
+    leaderLayer.setAttribute("focusable", "false");
     const controlsLayer = element("div", "stellar-tree__controls-layer");
     const controls = new Map();
 
     visibleBands.forEach((band, bandIndex) => {
       const layout = TREE_LAYOUT[band.id];
       if (!layout || layout.leaves.length !== band.nodes.length) return;
-      const branch = element("section", "stellar-tree__branch");
+      const branch = element("div", "stellar-tree__branch");
       branch.dataset.bandId = band.id;
-      branch.setAttribute("role", "treeitem");
-      branch.setAttribute("aria-selected", String(state.bandId === band.id));
       branch.style.setProperty("--band-tone", band.tone);
       const branchButton = treeBranchButton(band);
       controls.set(`band:${band.id}`, branchButton);
       branch.append(branchButton);
       const signals = element("div", "stellar-tree__signals");
-      signals.setAttribute("role", "group");
       band.nodes.forEach((node, nodeIndexInBand) => {
         const button = nodeButton(band, node);
         button.classList.add("stellar-tree__signal");
@@ -1733,7 +1891,6 @@
     const rootMarker = element("button", "stellar-tree__root");
     rootMarker.type = "button";
     rootMarker.setAttribute("aria-controls", evidenceDetails.id);
-    rootMarker.setAttribute("aria-label", "Open sources and map key");
     rootMarker.innerHTML = "<strong>AC</strong><span>sources</span>";
     rootMarker.addEventListener("click", () => {
       setEvidenceOpen(!sourcePanelOpen, { focus: !sourcePanelOpen });
@@ -1742,7 +1899,7 @@
     syncEvidenceTrigger();
     controls.set("root", rootMarker);
     controlsLayer.append(rootMarker);
-    viewport.append(canvas, controlsLayer);
+    viewport.append(canvas, leaderLayer, controlsLayer);
     bandsElement.append(viewport);
 
     const context = canvas.getContext("2d", { alpha: true });
@@ -1751,11 +1908,13 @@
     const resizeObserver = "ResizeObserver" in window ? new ResizeObserver(() => {
       if (!treeScene || treeScene.viewport !== viewport) return;
       treeScene.measurements = null;
+      treeScene.labelSizes = null;
       drawTreeScene();
     }) : null;
     treeScene = {
       viewport,
       canvas,
+      leaderLayer,
       controlsLayer,
       context,
       controls,
@@ -1781,17 +1940,41 @@
     if (selected) detail += ` · ${selected.node.label}`;
     else if (state.bandId) detail += ` · ${bandForId(state.bandId).axis.label}`;
     statusElement.textContent = `[scan: ${detail}]`;
+    if (treeGuide) {
+      const focusedBand = state.bandId && bandForId(state.bandId);
+      treeGuide.textContent = focusedBand
+        ? `${focusedBand.axis.label} · Select a star to explore its sources`
+        : `Drag to explore · Select a star or branch`;
+    }
   }
 
   function restoreFocus(options) {
     if (!options || !options.focus) return;
+    const focus = (target) => {
+      if (!target) return;
+      if (options.preventFocusScroll) target.focus({ preventScroll: true });
+      else target.focus();
+    };
     window.requestAnimationFrame(() => {
       if (options.focus === "node" && (options.focusId || state.nodeId)) {
-        root.querySelector(`[data-node-id="${options.focusId || state.nodeId}"]`)?.focus();
+        const nodeId = options.focusId || state.nodeId;
+        const nodeControl = root.querySelector(`[data-node-id="${nodeId}"]`);
+        if (nodeControl && !nodeControl.hidden) {
+          focus(nodeControl);
+          return;
+        }
+        const parentBandId = nodeIndex.get(nodeId)?.bandId;
+        const parentBandControl = parentBandId
+          ? root.querySelector(`[data-band-trigger="${parentBandId}"]`)
+          : null;
+        if (parentBandControl && !parentBandControl.hidden) focus(parentBandControl);
+        else focus(stageElement);
       } else if (options.focus === "band" && options.focusId) {
-        root.querySelector(`[data-band-trigger="${options.focusId}"]`)?.focus();
+        const bandControl = root.querySelector(`[data-band-trigger="${options.focusId}"]`);
+        if (bandControl && !bandControl.hidden) focus(bandControl);
+        else focus(stageElement);
       } else if (options.focus === "popup") {
-        readoutElement.querySelector(".stellar-tree__popup-close")?.focus();
+        focus(readoutElement.querySelector(".stellar-tree__popup-close"));
       }
     });
   }
@@ -1805,6 +1988,15 @@
     state.nodeId = null;
     writeLocationState();
     render(restore ? { focus: returnTarget.type, focusId: returnTarget.id } : {});
+  }
+
+  function clearTreeSelection() {
+    if (!state.bandId && !state.nodeId) return;
+    state.bandId = null;
+    state.nodeId = null;
+    popupReturnTarget = null;
+    writeLocationState();
+    render();
   }
 
   function render(options = {}) {
@@ -1983,9 +2175,9 @@
       if (sourcePanelOpen && !target.closest(".profile-map-evidence--tree-panel, .stellar-tree__root")) {
         setEvidenceOpen(false);
       }
-      if (!state.bandId) return;
-      if (target.closest("[data-stellar-readout], [data-band-trigger], [data-node-id]")) return;
-      closePopup();
+      if (!state.bandId || !target.closest("#stellar-spectrum-panel")) return;
+      if (target.closest("[data-stellar-readout], [data-band-trigger], [data-node-id], .stellar-tree__toolbar, .stellar-tree__root")) return;
+      clearTreeSelection();
     }, true);
   }
 

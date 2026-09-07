@@ -4,6 +4,7 @@ const path = require("path");
 const ROOT_DIR = path.join(__dirname, "..", "..");
 const SITE_ORIGIN = "https://ac-opensource.github.io";
 const RESPONSIVE_WIDTHS = [800, 1600];
+const THUMBNAIL_WIDTHS = [320, 640];
 const VARIANT_EXTENSIONS = [".avif", ".webp", ".jpg", ".jpeg", ".png"];
 
 function normalizePublicUrl(raw) {
@@ -47,7 +48,11 @@ function publicUrlForLocalPath(localPath) {
   return `/${path.relative(ROOT_DIR, localPath).split(path.sep).join("/")}`;
 }
 
-function resolvePublicImage(raw) {
+function resolvePublicImage(raw, options = {}) {
+  const widths = Array.isArray(options.widths) && options.widths.length
+    ? options.widths
+    : RESPONSIVE_WIDTHS;
+  const sizes = String(options.sizes || "").trim() || "(min-width: 1024px) 50vw, 100vw";
   const original = normalizePublicUrl(raw);
   const sourcePath = localPathForPublicUrl(original);
   if (!sourcePath) {
@@ -61,7 +66,7 @@ function resolvePublicImage(raw) {
     };
   }
 
-  const variants = RESPONSIVE_WIDTHS.map((width) => ({
+  const variants = widths.map((width) => ({
     width,
     path: variantForWidth(sourcePath, width)
   })).filter((variant) => variant.path);
@@ -82,8 +87,8 @@ function resolvePublicImage(raw) {
     srcset: variants
       .map((variant) => `${publicUrlForLocalPath(variant.path)} ${variant.width}w`)
       .join(", "),
-    sizes: variants.length ? "(min-width: 1024px) 50vw, 100vw" : "",
-    hasCompleteVariants: variants.length === RESPONSIVE_WIDTHS.length,
+    sizes: variants.length ? sizes : "",
+    hasCompleteVariants: variants.length === widths.length,
     hasOptimizedAlternative,
     hasReplacement: Boolean(preferredPath),
     original
@@ -114,6 +119,7 @@ function rewritePublicImageUrls(contents) {
 
 module.exports = {
   RESPONSIVE_WIDTHS,
+  THUMBNAIL_WIDTHS,
   normalizePublicUrl,
   resolvePublicImage,
   rewritePublicImageUrls,

@@ -9,6 +9,7 @@ const DIST_ROOT = path.join(ROOT, "dist");
 let BASE_URL = process.env.OPTIONS_BASE_URL || "";
 const GALLERY_PATH = "/experiments/universe-options/index.html";
 const MIME_TYPES = {
+  ".avif": "image/avif",
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
   ".jpg": "image/jpeg",
@@ -303,8 +304,8 @@ async function verifySpiralGalaxyArchive(browser) {
     assert(state.entries === expectedPosts && state.nodeTruth.length === expectedPosts,
       `Spiral Galaxy rendered ${state.nodeTruth.length} nodes and ${state.entries} entries instead of ${expectedPosts} at ${viewport.label}.`);
     assert(state.canvasWidth > 0 && state.canvasHeight > 0 && state.coreInsideField,
-      `Spiral Galaxy is missing its rendered galaxy or centered black-hole core at ${viewport.label}.`);
-    assert(/spiral arms.+black hole/i.test(state.fieldLabel || ""),
+      `Spiral Galaxy is missing its rendered galaxy or centered galactic core at ${viewport.label}.`);
+    assert(/spiral arms.+luminous galactic core/i.test(state.fieldLabel || ""),
       "Spiral Galaxy does not expose its visual model accessibly.");
     assert(state.nodeTruth.every((node) => node.label && node.minutes > 0 && node.size > 0),
       `Spiral Galaxy has an unlabeled or unsized article node at ${viewport.label}.`);
@@ -335,15 +336,22 @@ async function verifySpiralGalaxyArchive(browser) {
     assert(!focus.hidden && focus.inside && focus.direct === `/blog/${encodeURIComponent(selectedSlug)}.html`,
       `Spiral Galaxy selected-entry bubble is not usable at ${viewport.label}: ${JSON.stringify(focus)}.`);
 
-    await page.fill("#galaxy-search", "photography");
     if (viewport.reducedMotion !== "reduce") {
-      await page.waitForTimeout(180);
-      const duringTyping = await page.evaluate(() => ({
-        choreography: document.querySelector(".galaxy-hero").classList.contains("is-node-choreography"),
-        state: document.querySelector(".galaxy-hero").dataset.merger
-      }));
+      // Schedule the observation with the input event so host/Playwright latency
+      // cannot consume the narrow-layout 120 ms debounce before sampling it.
+      const duringTyping = await page.evaluate((delay) => {
+        const input = document.querySelector("#galaxy-search");
+        input.value = "photography";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        return new Promise((resolve) => setTimeout(() => resolve({
+          choreography: document.querySelector(".galaxy-hero").classList.contains("is-encounter-choreography"),
+          state: document.querySelector(".galaxy-hero").dataset.merger
+        }), delay));
+      }, viewport.width <= 760 ? 80 : 180);
       assert(duringTyping.state === "archive" && !duringTyping.choreography,
         `Spiral Galaxy commits a search before the typing pause at ${viewport.label}: ${JSON.stringify(duringTyping)}.`);
+    } else {
+      await page.fill("#galaxy-search", "photography");
     }
     await page.waitForTimeout(viewport.reducedMotion === "reduce" ? 80 : 380);
     const filteredEntries = await page.locator(".galaxy-entry:not([hidden])").count();
@@ -352,7 +360,7 @@ async function verifySpiralGalaxyArchive(browser) {
     const merger = await page.evaluate(() => ({
       ejected: document.querySelectorAll(".galaxy-node.is-ejected").length,
       matches: document.querySelectorAll(".galaxy-node.is-match").length,
-      nodeChoreography: document.querySelector(".galaxy-hero").classList.contains("is-node-choreography"),
+      nodeChoreography: document.querySelector(".galaxy-hero").classList.contains("is-encounter-choreography"),
       remnantArms: [...document.querySelectorAll(".galaxy-node.is-match")].every((node) => Number(node.dataset.arm) < 2),
       state: document.querySelector(".galaxy-hero").dataset.merger
     }));
@@ -430,6 +438,106 @@ async function verifySpiralGalaxyOffscreenPause(browser) {
     const resumedEnd = await page.evaluate(() => window.__galaxyCanvasFrames);
     assert(resumedEnd > resumedStart,
       `Spiral Galaxy canvas did not resume after re-entry (${resumedStart} → ${resumedEnd}).`);
+  } finally {
+    await context.close();
+  }
+}
+
+async function verifyGalaxyEncounterLifecycle(browser) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: "no-preference" });
+  await context.addInitScript(() => {
+    window.__encounterFrames = [];
+    window.__galaxyCallbacks = 0;
+    const request = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (callback) => request((timestamp) => {
+      const start = performance.now();
+      callback(timestamp);
+      if (callback.name === "animateGalaxy") window.__galaxyCallbacks += 1;
+      if (callback.name === "animateGalaxy" && document.querySelector(".galaxy-hero")?.classList.contains("has-stellar-encounter")) {
+        window.__encounterFrames.push({ timestamp, cost: performance.now() - start });
+      }
+    });
+  });
+  const page = await context.newPage();
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  const time = () => page.locator(".galaxy-hero").evaluate((hero) => Number(hero.dataset.encounterTime || 0));
+  try {
+    await page.goto(`${BASE_URL}/blog/`, { waitUntil: "domcontentloaded" });
+    await page.waitForSelector('#galaxy-field[data-ready="true"]');
+    await page.locator("#galaxy-search").fill("photography");
+    await page.waitForFunction(() => Number(document.querySelector(".galaxy-hero").dataset.encounterTime) > 0.5);
+    const movingNode = page.locator(".galaxy-node.is-match").first();
+    const firstTranslate = await movingNode.evaluate((node) => node.style.translate);
+    await page.waitForTimeout(180);
+    const secondTranslate = await movingNode.evaluate((node) => node.style.translate);
+    assert(firstTranslate !== secondTranslate && secondTranslate !== "", "Article nodes must travel with the particle encounter");
+    await page.locator("#galaxy-motion").click();
+    const paused = await time();
+    await page.waitForTimeout(250);
+    assert(await time() === paused, "Pausing must freeze the gravitational encounter");
+    assert(await page.locator("#galaxy-motion").getAttribute("aria-pressed") === "true", "Pause must expose its state");
+    await page.locator(".galaxy-node.is-match").first().click();
+    assert(await time() === paused, "Selecting an article must not restart or advance a paused encounter");
+    await page.keyboard.press("Escape");
+    await page.locator("#galaxy-motion").click();
+    await page.waitForFunction((before) => Number(document.querySelector(".galaxy-hero").dataset.encounterTime) > before + 0.2, paused);
+    const resumedAt = Date.now();
+    await page.waitForFunction(() => document.querySelector(".galaxy-hero").dataset.galaxyActivity === "settled", null, { timeout: 5500 });
+    assert(Date.now() - resumedAt < 5000, "The functional encounter must settle promptly");
+    const settledTime = await time();
+    await page.waitForTimeout(50);
+    const settledCallbacks = await page.evaluate(() => window.__galaxyCallbacks);
+    await page.waitForTimeout(250);
+    assert(await page.evaluate(() => window.__galaxyCallbacks) === settledCallbacks, "A completed merge must stop RAF callbacks");
+    assert(await time() === settledTime, "A completed merge must stop its simulation clock");
+    const results = await page.locator(".galaxy-node").evaluateAll((nodes) => nodes.map((node) => ({
+      match: node.classList.contains("is-match"), visibility: getComputedStyle(node).visibility,
+      opacity: Number(getComputedStyle(node).opacity), translate: node.style.translate
+    })));
+    assert(results.filter((node) => !node.match).every((node) => node.visibility === "hidden"), "Nonmatching nodes must disappear after the merge");
+    assert(results.filter((node) => node.match).every((node) => node.visibility !== "hidden" && node.opacity > 0.9), "Matching nodes must remain available after the merge");
+    const separation = await page.locator(".galaxy-hero").evaluate((hero) => Number(hero.dataset.encounterSeparation));
+    assert(separation < 0.2, `Encounter must reach a coalesced remnant, got separation ${separation}`);
+    const visibleBeforeReplay = await page.locator(".galaxy-entry:not([hidden])").count();
+    await page.locator("#galaxy-replay").click();
+    await page.waitForFunction(() => Number(document.querySelector(".galaxy-hero").dataset.encounterTime) < 1);
+    assert(await page.locator(".galaxy-entry:not([hidden])").count() === visibleBeforeReplay, "Replay must preserve filtering");
+    await page.waitForFunction(() => document.querySelector(".galaxy-hero").dataset.galaxyActivity === "settled", null, { timeout: 5500 });
+    await page.locator("#galaxy-search").fill("Android");
+    await page.waitForFunction(() => new URL(location.href).searchParams.get("q") === "Android");
+    await page.waitForTimeout(400);
+    assert(await time() < 3, "Changing subjects after completion must restart the encounter");
+    assert(await page.locator(".galaxy-hero").getAttribute("data-galaxy-activity") === "running", "A fresh search must wake the settled renderer");
+    await page.waitForFunction(() => document.querySelector(".galaxy-hero").dataset.galaxyActivity === "settled", null, { timeout: 5500 });
+    await page.locator("#galaxy-search").fill("");
+    await page.waitForFunction(() => document.querySelector(".galaxy-hero").dataset.encounterPhase === "archive");
+    const clearedCallbacks = await page.evaluate(() => window.__galaxyCallbacks);
+    await page.waitForTimeout(150);
+    assert(await page.evaluate(() => window.__galaxyCallbacks) > clearedCallbacks, "Clearing a settled encounter must restart RAF without toggling motion");
+    await page.locator("#galaxy-search").fill("Android");
+    await page.waitForFunction(() => document.querySelector(".galaxy-hero").dataset.encounterPhase === "approach");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.waitForFunction(() => document.querySelector(".galaxy-hero").dataset.galaxyActivity === "paused");
+    assert(await page.locator("#galaxy-motion").isDisabled() && await page.locator("#galaxy-replay").isDisabled(), "Reduced motion must disable animation controls");
+    assert(await page.locator(".galaxy-hero").getAttribute("data-encounter-phase") === "remnant", "Reduced motion must present a static filtered galaxy");
+    await page.locator("#galaxy-search").fill("");
+    await page.waitForFunction(() => document.querySelector(".galaxy-hero").dataset.encounterPhase === "archive");
+    assert(await page.locator("#galaxy-replay").isHidden(), "Clearing the filter must remove replay");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.waitForFunction(() => document.querySelector(".galaxy-hero").dataset.galaxyActivity === "running");
+    const archiveCallbacks = await page.evaluate(() => window.__galaxyCallbacks);
+    await page.waitForTimeout(150);
+    assert(await page.evaluate(() => window.__galaxyCallbacks) > archiveCallbacks, "The cleared archive must resume animation");
+    assert(errors.length === 0, `Encounter raised page errors: ${errors.join("; ")}`);
+    const profile = await page.evaluate(() => {
+      const frames = window.__encounterFrames;
+      const costs = frames.map((frame) => frame.cost).sort((a, b) => a - b);
+      const intervals = frames.slice(1).map((frame, index) => frame.timestamp - frames[index].timestamp).filter((delta) => delta < 100).sort((a, b) => a - b);
+      return { samples: costs.length, callbackP95Ms: costs[Math.floor(costs.length * 0.95)], rafIntervalP95Ms: intervals[Math.floor(intervals.length * 0.95)] };
+    });
+    console.log(`Galaxy callback profile (headless, includes throttled RAF callbacks): ${JSON.stringify(profile)}`);
+    console.log(`Galaxy encounter lifecycle passed: pause/resume, selection, coalescence (${separation}), replay, new subject, reduced motion, clear.`);
   } finally {
     await context.close();
   }
@@ -606,6 +714,7 @@ async function main() {
     await smokeNoJavaScript(browser, routes);
     await verifySpiralGalaxyArchive(browser);
     await verifySpiralGalaxyOffscreenPause(browser);
+    await verifyGalaxyEncounterLifecycle(browser);
     await verifyRound04PortfolioHierarchy(browser);
     await verifyPayloadFeedbackOptionalPrivate(browser);
     verifyPublicationBoundary();

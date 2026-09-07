@@ -150,6 +150,14 @@ body[data-universe-region="resume"] #site-topbar {
   color: var(--resume-blue);
 }
 
+.resume-dossier__identity h1 > span {
+  display: inline-block;
+}
+
+.resume-dossier__identity h1 > span:first-child {
+  color: var(--resume-blue);
+}
+
 .resume-dossier__identity > article > p {
   max-width: 43rem !important;
   margin-top: 2rem !important;
@@ -176,14 +184,14 @@ body[data-universe-region="resume"] #site-topbar {
   box-shadow: none;
 }
 
-.resume-dossier__identity > aside {
+.resume-dossier__identity > section {
   position: relative;
   align-self: start;
   margin-top: 1rem;
   padding: 0.5rem 0 0 2.1rem !important;
 }
 
-.resume-dossier__identity > aside::before {
+.resume-dossier__identity > section::before {
   content: "";
   position: absolute;
   top: 0;
@@ -193,19 +201,19 @@ body[data-universe-region="resume"] #site-topbar {
   background: linear-gradient(var(--resume-blue), var(--resume-faint) 40%, transparent);
 }
 
-.resume-dossier__identity > aside .space-y-5 {
+.resume-dossier__identity > section .space-y-5 {
   display: grid;
   gap: 0;
 }
 
-.resume-dossier__identity > aside .space-y-5 > div {
+.resume-dossier__identity > section .space-y-5 > div {
   margin: 0 !important;
   padding: 1rem 0 !important;
   border: 0 !important;
   box-shadow: inset 0 -1px 0 var(--resume-faint);
 }
 
-.resume-dossier__identity > aside a {
+.resume-dossier__identity > section a {
   overflow-wrap: anywhere;
 }
 
@@ -220,7 +228,7 @@ body[data-universe-region="resume"] #site-topbar {
 }
 
 .resume-dossier__summary > article,
-.resume-dossier__summary > aside {
+.resume-dossier__summary > section {
   padding: 0 !important;
 }
 
@@ -228,7 +236,7 @@ body[data-universe-region="resume"] #site-topbar {
   width: min(67%, 56rem);
 }
 
-.resume-dossier__summary > aside {
+.resume-dossier__summary > section {
   position: absolute;
   right: 0;
   bottom: clamp(2.5rem, 7vh, 5rem);
@@ -243,7 +251,7 @@ body[data-universe-region="resume"] #site-topbar {
   line-height: 1.48 !important;
 }
 
-.resume-dossier__summary > aside li {
+.resume-dossier__summary > section li {
   position: relative;
   margin: 0 !important;
   padding: 0.85rem 0 0.85rem 1.35rem !important;
@@ -251,7 +259,7 @@ body[data-universe-region="resume"] #site-topbar {
   color: var(--resume-muted) !important;
 }
 
-.resume-dossier__summary > aside li::before {
+.resume-dossier__summary > section li::before {
   content: "";
   position: absolute;
   top: 1.25rem;
@@ -743,6 +751,9 @@ body[data-universe-region="resume"] #site-topbar {
 }
 
 .resume-evidence-source {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
   box-shadow: inset 0 -1px 0 rgba(31, 92, 186, 0.28);
 }
 
@@ -891,14 +902,14 @@ body[data-universe-region="resume"] #site-topbar {
     min-height: auto;
   }
 
-  .resume-dossier__identity > aside {
+  .resume-dossier__identity > section {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 2rem;
     padding: 1.5rem 0 0 !important;
   }
 
-  .resume-dossier__identity > aside::before {
+  .resume-dossier__identity > section::before {
     top: 0;
     right: 0;
     bottom: auto;
@@ -906,7 +917,7 @@ body[data-universe-region="resume"] #site-topbar {
     height: 1px;
   }
 
-  .resume-dossier__identity > aside .space-y-5 {
+  .resume-dossier__identity > section .space-y-5 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 2rem;
   }
@@ -917,12 +928,12 @@ body[data-universe-region="resume"] #site-topbar {
   }
 
   .resume-dossier__summary > article,
-  .resume-dossier__summary > aside {
+  .resume-dossier__summary > section {
     position: static;
     width: auto;
   }
 
-  .resume-dossier__summary > aside {
+  .resume-dossier__summary > section {
     margin-top: 3rem;
   }
 
@@ -969,11 +980,11 @@ body[data-universe-region="resume"] #site-topbar {
     margin-top: 3.5rem;
   }
 
-  .resume-dossier__identity > aside {
+  .resume-dossier__identity > section {
     grid-template-columns: 1fr;
   }
 
-  .resume-dossier__identity > aside .space-y-5 {
+  .resume-dossier__identity > section .space-y-5 {
     grid-template-columns: 1fr;
   }
 
@@ -1168,6 +1179,10 @@ body[data-universe-region="resume"] #site-topbar {
     transform: none !important;
   }
 
+  .resume-evidence-source {
+    min-height: 0;
+  }
+
   .resume-dossier__identity,
   .resume-dossier__summary,
   #core-skills,
@@ -1180,9 +1195,9 @@ body[data-universe-region="resume"] #site-topbar {
   }
 
   .resume-dossier__identity > article,
-  .resume-dossier__identity > aside,
+  .resume-dossier__identity > section,
   .resume-dossier__summary > article,
-  .resume-dossier__summary > aside,
+  .resume-dossier__summary > section,
   .resume-role,
   .resume-project,
   .resume-skill {
@@ -1226,7 +1241,7 @@ body[data-universe-region="resume"] #site-topbar {
   }
 
   .resume-role > div:first-child,
-  .resume-dossier__identity > aside .space-y-5 {
+  .resume-dossier__identity > section .space-y-5 {
     display: grid !important;
     grid-template-columns: 1fr auto !important;
   }
@@ -1243,5 +1258,143 @@ body[data-universe-region="resume"] #site-topbar {
 
   .resume-project {
     min-height: 0;
+  }
+
+  body.pdf-export .resume-dossier__identity {
+    position: static;
+    margin: 0 0 10pt !important;
+    gap: 8pt !important;
+  }
+
+  body.pdf-export .resume-dossier__identity > article > .font-label {
+    display: none !important;
+  }
+
+  body.pdf-export .resume-dossier__identity > article,
+  body.pdf-export .resume-dossier__identity > section {
+    margin: 0 !important;
+    padding: 6pt 0 !important;
+  }
+
+  body.pdf-export .resume-dossier__identity > article > p {
+    margin-top: 6pt !important;
+    font-size: 9pt !important;
+  }
+
+  body.pdf-export .resume-dossier__identity > section {
+    display: block !important;
+  }
+
+  body.pdf-export .resume-dossier__identity > section .space-y-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 7pt 12pt !important;
+  }
+
+  body.pdf-export .resume-dossier__identity > section .space-y-5 > div {
+    padding: 5pt 0 !important;
+    font-size: 7.5pt !important;
+  }
+
+  body.pdf-export .resume-dossier__identity > section a {
+    white-space: nowrap;
+  }
+
+  body.pdf-export .resume-dossier__identity h1,
+  body.pdf-export #experience h2,
+  body.pdf-export .font-label {
+    letter-spacing: 0 !important;
+    word-spacing: 0.08em !important;
+  }
+
+  body.pdf-export .resume-skill > div:last-child {
+    display: block !important;
+  }
+
+  body.pdf-export .resume-skill > div:last-child > span {
+    display: inline !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  body.pdf-export .resume-skill > div:last-child > span:not(:last-child)::after {
+    content: ", ";
+  }
+
+  body.pdf-export .resume-dossier__summary {
+    position: static;
+    display: block !important;
+    min-height: 0 !important;
+    margin: 0 0 10pt !important;
+    padding: 7pt 0 !important;
+    box-shadow: inset 0 0.5pt 0 #d8d8d8, inset 0 -0.5pt 0 #d8d8d8 !important;
+  }
+
+  body.pdf-export .resume-dossier__summary > article {
+    position: static !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.pdf-export .resume-dossier__summary > section {
+    display: none !important;
+  }
+
+  body.pdf-export #core-skills {
+    margin-bottom: 0 !important;
+  }
+
+  body.pdf-export .resume-skills-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8pt !important;
+  }
+
+  body.pdf-export .resume-skill {
+    margin: 0 !important;
+    padding: 6pt !important;
+    box-shadow: inset 0 0 0 0.5pt #e1e1dd !important;
+  }
+
+  body.pdf-export .resume-skill .flex {
+    gap: 3pt !important;
+  }
+
+  body.pdf-export .resume-skill .flex > span {
+    padding: 1pt 2pt !important;
+    font-size: 7.4pt !important;
+  }
+
+  body.pdf-export #experience {
+    break-before: page;
+    margin-bottom: 0 !important;
+  }
+
+  body.pdf-export .resume-role {
+    margin: 0 0 6pt !important;
+    padding: 6pt 0 !important;
+  }
+
+  body.pdf-export .resume-role:nth-child(4) {
+    break-before: page;
+  }
+
+  body.pdf-export .resume-role ul {
+    margin-top: 4pt !important;
+    gap: 2pt !important;
+  }
+
+  body.pdf-export .resume-role li {
+    font-size: 8pt !important;
+    line-height: 1.28 !important;
+  }
+
+  body.pdf-export .resume-evidence-boundary {
+    margin-top: 3pt !important;
+    gap: 5pt !important;
+  }
+
+  body.pdf-export #projects {
+    display: none !important;
   }
 }

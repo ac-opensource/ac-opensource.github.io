@@ -3,119 +3,144 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Evidence Search | Andrew Concepcion</title>
-  <meta name="description" content="Search Andrew Concepcion's published portfolio, profile evidence, resume, case studies, and writing from one public-only index.">
+  <script>document.documentElement.classList.replace("no-js", "has-js");</script>
+  <title>Search the Work | Andrew Concepcion</title>
+  <meta name="description" content="Search Andrew Concepcion's published projects, engineering case studies, résumé evidence, and writing from one public-only index.">
   <link rel="canonical" href="https://ac-opensource.github.io/search.html">
   <meta name="robots" content="index,follow">
   <meta property="og:site_name" content="Andrew Concepcion">
   <meta property="og:locale" content="en_US">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ac-opensource.github.io/search.html">
-  <meta property="og:title" content="Evidence Search | Andrew Concepcion">
-  <meta property="og:description" content="Search published portfolio evidence, case studies, resume details, and writing from one public-only index.">
-  <meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/resume.png">
+  <meta property="og:title" content="Search the Work | Andrew Concepcion">
+  <meta property="og:description" content="Search Andrew Concepcion's published projects, engineering case studies, résumé evidence, and writing—nothing private.">
+  <meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/search-evidence-field.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Andrew Concepcion's engineering portfolio evidence search">
+  <meta property="og:image:alt" content="Andrew Concepcion's public Evidence Search plotting a route from query to published engineering work">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Evidence Search | Andrew Concepcion">
-  <meta name="twitter:description" content="Search published portfolio evidence, case studies, resume details, and writing from one public-only index.">
-  <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/resume.png">
-  <meta name="twitter:image:alt" content="Andrew Concepcion's engineering portfolio evidence search">
+  <meta name="twitter:title" content="Search the Work | Andrew Concepcion">
+  <meta name="twitter:description" content="Search Andrew Concepcion's published projects, engineering case studies, résumé evidence, and writing—nothing private.">
+  <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/search-evidence-field.png">
+  <meta name="twitter:image:alt" content="Andrew Concepcion's public Evidence Search plotting a route from query to published engineering work">
   <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&amp;family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
-  <link href="/assets/css/evidence-search.css?v=20260812-1" rel="stylesheet">
-  <link href="/assets/css/universe-perspective-navigation.css?v=20260812-discovery1" rel="stylesheet" data-universe-perspective-styles>
-  <script src="/assets/js/universe-theme-transition.js?v=20260812-discovery1"></script>
+  <link href="/assets/css/evidence-search.css?v=20260820-focus4" rel="stylesheet">
+  <link href="/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1" rel="stylesheet" data-universe-perspective-styles>
+  <script src="/assets/js/universe-theme-transition.js?v=20260820-fast-travel1"></script>
 </head>
 <body data-universe-region="search">
   <a class="skip-link" href="#search-main">Skip to search</a>
   <header class="search-topbar" id="site-topbar">
     <div class="search-topbar__inner">
-      <a class="search-brand" href="/">Andrew Concepcion</a>
+      <a class="search-brand" href="/" aria-label="Andrew Concepcion — home">Andrew Concepcion</a>
       <nav id="site-nav" aria-label="Primary navigation">
-        <a data-route="/" href="/">[dashboard]</a>
         <a data-route="/work.html" href="/work.html">[portfolio]</a>
         <a data-route="/blog/" href="/blog/">[logs]</a>
         <a data-route="/about.html" href="/about.html">[about]</a>
+        <a data-route="/resume.html" href="/resume.html">[résumé]</a>
         <a data-route="/contact.html" href="/contact.html">[contact]</a>
       </nav>
-      <span class="search-topbar__status" data-site-search-slot><a class="site-search-link" href="#evidence-query" data-site-search-link aria-label="Focus evidence search" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></span>
+      <span class="search-topbar__status" data-site-search-slot><a class="site-search-link" href="#search-noscript-title" data-site-search-link aria-label="Jump to published evidence routes" aria-keyshortcuts="/ Control+K Meta+K" data-shared-site-search>[search /]</a></span>
     </div>
     <nav id="site-nav-mobile" aria-label="Mobile navigation">
-      <a data-route="/" href="/">[dashboard]</a>
       <a data-route="/work.html" href="/work.html">[portfolio]</a>
       <a data-route="/blog/" href="/blog/">[logs]</a>
       <a data-route="/about.html" href="/about.html">[about]</a>
+      <a data-route="/resume.html" href="/resume.html">[résumé]</a>
       <a data-route="/contact.html" href="/contact.html">[contact]</a>
     </nav>
   </header>
 
-  <main id="search-main" class="evidence-search">
-    <section class="evidence-search__hero" aria-labelledby="search-title">
-      <p class="evidence-search__eyebrow">[FIELD 07 / PUBLISHED EVIDENCE]</p>
-      <h1 id="search-title">Search the work,<br><em>not the noise.</em></h1>
-      <p>One index across the public portfolio, profile and résumé evidence, case studies, and published writing. Authoring data and hidden posts never enter this field.</p>
+  <main id="search-main" class="evidence-search" data-search-navigation data-search-phase="loading">
+    <section class="evidence-search__navigation" aria-labelledby="search-title">
+      <div class="evidence-search__hero">
+        <p class="evidence-search__eyebrow">[SEARCH / PUBLISHED WORK]</p>
+        <h1 id="search-title">Search the work,<br><em>not the noise.</em></h1>
+        <p>Projects, case studies, résumé evidence, and writing—one public index, nothing private.</p>
+      </div>
+
+      <div class="evidence-search__field" data-search-field aria-hidden="true">
+        <span class="evidence-search__field-grid"></span>
+        <span class="evidence-search__field-rail evidence-search__field-rail--one"></span>
+        <span class="evidence-search__field-rail evidence-search__field-rail--two"></span>
+        <span class="evidence-search__field-rail evidence-search__field-rail--three"></span>
+        <span class="evidence-search__field-rail evidence-search__field-rail--four"></span>
+        <span class="evidence-search__field-rail evidence-search__field-rail--five"></span>
+        <span class="evidence-search__field-rail evidence-search__field-rail--six"></span>
+        <span class="evidence-search__field-gate evidence-search__field-gate--outer"></span>
+        <span class="evidence-search__field-gate evidence-search__field-gate--middle"></span>
+        <span class="evidence-search__field-gate evidence-search__field-gate--inner"></span>
+        <span class="evidence-search__field-vector"></span>
+        <span class="evidence-search__field-target"><i></i></span>
+        <span class="evidence-search__field-origin">ORIGIN / SEARCH</span>
+        <span class="evidence-search__field-label">PUBLIC ROUTE FIELD</span>
+        <span class="evidence-search__field-range">RANGE / PUBLISHED INDEX</span>
+      </div>
+
+      <section class="evidence-search__console" aria-label="Published evidence route planner">
+        <div class="evidence-search__console-heading" aria-hidden="true">
+          <span>PUBLIC INDEX</span>
+          <span data-search-readout>INDEXING</span>
+        </div>
+        <form class="evidence-search__form" action="/search.html" method="get" role="search" data-evidence-search-form>
+          <label for="evidence-query">What are you looking for?</label>
+          <div class="evidence-search__input-row">
+            <span aria-hidden="true">SEARCH /</span>
+            <input id="evidence-query" name="q" type="search" maxlength="160" autocomplete="off" spellcheck="false" placeholder="Project, capability, system, outcome…" data-evidence-search-input>
+            <button type="submit">Search <span aria-hidden="true">→</span></button>
+          </div>
+        </form>
+        <div class="evidence-search__suggestions" role="group" aria-label="Known evidence routes">
+          <span>Known routes:</span>
+          <button type="button" data-search-suggestion="Android leadership">Android leadership</button>
+          <button type="button" data-search-suggestion="Rust UniFFI">Rust + UniFFI</button>
+          <button type="button" data-search-suggestion="privacy">Privacy</button>
+          <button type="button" data-search-suggestion="release reliability">Release reliability</button>
+        </div>
+        <p class="evidence-search__shortcut">Press <kbd>/</kbd> or <kbd>⌘K</kbd> from anywhere on the site.</p>
+      </section>
     </section>
 
-    <section class="evidence-search__console" aria-label="Evidence search console">
-      <form class="evidence-search__form" action="/search.html" method="get" role="search" data-evidence-search-form>
-        <label for="evidence-query">Search published evidence</label>
-        <div class="evidence-search__input-row">
-          <span aria-hidden="true">QUERY /</span>
-          <input id="evidence-query" name="q" type="search" maxlength="160" autocomplete="off" spellcheck="false" placeholder="PostGIS, release hardening, SwiftUI…" data-evidence-search-input>
-          <button type="submit">Search <span aria-hidden="true">→</span></button>
-        </div>
-      </form>
-      <div class="evidence-search__suggestions" aria-label="Example searches">
-        <span>Try:</span>
-        <button type="button" data-search-suggestion="Android leadership">Android leadership</button>
-        <button type="button" data-search-suggestion="Rust UniFFI">Rust + UniFFI</button>
-        <button type="button" data-search-suggestion="privacy">Privacy</button>
-        <button type="button" data-search-suggestion="release reliability">Release reliability</button>
-      </div>
-      <p class="evidence-search__shortcut">Press <kbd>/</kbd> or <kbd>⌘K</kbd> from any published route.</p>
-    </section>
+    <noscript>
+      <section class="evidence-search__noscript" aria-labelledby="search-noscript-title">
+        <h2 id="search-noscript-title">Search needs JavaScript. The work does not.</h2>
+        <p>Browse the same public material through the <a href="/work.html">portfolio</a>, <a href="/resume.html">résumé</a>, <a href="/about.html">profile</a>, and <a href="/blog/">writing archive</a>.</p>
+      </section>
+    </noscript>
 
     <section class="evidence-search__results" aria-labelledby="results-title">
       <header>
         <div>
-          <p>[RETURN SIGNAL]</p>
-          <h2 id="results-title">Published matches</h2>
+          <p>[PUBLISHED MATCHES]</p>
+          <h2 id="results-title" tabindex="-1">Search results</h2>
         </div>
-        <p data-evidence-search-status role="status" aria-live="polite">Enter a query to scan the public field.</p>
+        <p data-evidence-search-status role="status" aria-live="polite">Set a destination to scan the published field.</p>
       </header>
       <ol data-evidence-search-results></ol>
-      <p class="evidence-search__empty" data-evidence-search-empty>Try a capability, project, technology, or delivery concern.</p>
+      <p class="evidence-search__empty" data-evidence-search-empty>Try a capability, system, project, or delivery outcome.</p>
     </section>
 
     <aside class="evidence-search__scope" aria-labelledby="scope-title">
-      <p>[INDEX BOUNDARY]</p>
-      <h2 id="scope-title">Published pages only.</h2>
+      <p>[MAP BOUNDARY]</p>
+      <h2 id="scope-title">Only what Andrew has published.</h2>
       <ul>
         <li><strong>Portfolio</strong><span>Production systems, projects, and case studies.</span></li>
         <li><strong>Profile evidence</strong><span>About, skills, résumé, and public proof links.</span></li>
         <li><strong>Writing</strong><span>Only article bodies emitted by the published-post build.</span></li>
       </ul>
-      <p>The index is generated from the site’s explicit publication allowlist. It does not read the authoring database, hidden entries, experiments, contact forms, or local files.</p>
+      <p>The index comes from an explicit publication list. It never reads draft entries, experiments, contact submissions, authoring data, or local files.</p>
     </aside>
-
-    <noscript>
-      <section class="evidence-search__noscript" aria-labelledby="search-noscript-title">
-        <h2 id="search-noscript-title">Search needs JavaScript; the evidence does not.</h2>
-        <p>Browse the same public material directly through the <a href="/work.html">portfolio</a>, <a href="/resume.html">résumé</a>, <a href="/about.html">profile</a>, and <a href="/blog/">writing archive</a>.</p>
-      </section>
-    </noscript>
   </main>
 
-  <footer class="search-footer">
+  <footer class="search-footer" id="site-footer">
     <span>© Andrew Concepcion</span>
     <a href="/signals.html">[signals]</a>
     <a href="/contact.html">[contact]</a>
   </footer>
-  <script src="/assets/js/evidence-search.js?v=20260812-1" defer></script>
+  <script src="/assets/js/evidence-search.js?v=20260820-focus4" defer></script>
 </body>
 </html>

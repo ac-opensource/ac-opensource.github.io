@@ -252,7 +252,7 @@ function injectSharedSiteTools(html, relativePath) {
     throw new Error(`Cannot add shared discovery controls to ${relativePath}: missing <head> or </body>.`);
   }
   const headAssets = [
-    `<link href="/assets/css/site-search.css?v=20260812-2" rel="stylesheet" ${SHARED_SEARCH_MARKER}>`,
+    `<link href="/assets/css/site-search.css?v=20260820-aesthetic1" rel="stylesheet" ${SHARED_SEARCH_MARKER}>`,
     `<script src="/assets/js/site-search.js?v=20260812-2" defer ${SHARED_SEARCH_MARKER}></script>`
   ].join("\n");
   return String(html).includes('/assets/css/site-search.css')

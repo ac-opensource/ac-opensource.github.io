@@ -599,6 +599,7 @@ function testCheckedInBoundaries() {
   assert.match(contactHtml, /does not open an email client or claim a stored message/);
   assert.doesNotMatch(contactHtml, /action="mailto:/);
   assert.match(contactHtml, /data-contact-submit disabled/);
+  assert.match(contactHtml, /class="payload-bay__trap" aria-hidden="true" inert/);
   assert.match(contactHtml, /href="mailto:aarconcepcion@gmail\.com\?subject=Portfolio%20enquiry"/);
   const configuredContact = injectContactRuntimeHtml(contactHtml, {
     version: 1,

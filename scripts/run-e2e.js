@@ -6,6 +6,7 @@ const { buildSite, DEFAULT_OUTPUT_ROOT } = require("./build-site");
 
 const HOST = "127.0.0.1";
 const MIME_TYPES = {
+  ".avif": "image/avif",
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
   ".jpg": "image/jpeg",

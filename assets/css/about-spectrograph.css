@@ -1953,7 +1953,10 @@ a.is-stellar-source {
 
 /* Cross-route source focus remains legible without turning the page into boxes. */
 
-.stellar-focus-active .is-stellar-muted { opacity: 0.19 !important; filter: grayscale(0.75); }
+.stellar-focus-active .is-stellar-muted {
+  opacity: 1 !important;
+  filter: grayscale(0.88) saturate(0.42);
+}
 .stellar-focus-active .is-stellar-related { opacity: 1 !important; filter: none; }
 .stellar-focus-active .is-stellar-source { color: var(--stellar-blue-deep) !important; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.3em; }
 .profile-map-evidence tbody tr.is-stellar-related { border-top-color: var(--stellar-blue); background: transparent; box-shadow: none; }
@@ -2231,6 +2234,12 @@ a.is-stellar-source {
   transition: color 160ms ease, opacity 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
+.stellar-tree__branch-label[hidden],
+.stellar-spectrum__node.stellar-tree__signal[hidden],
+.stellar-tree__root[hidden] {
+  display: none !important;
+}
+
 [data-stellar-spectrum][data-tree-motion="idle-rotation"] .stellar-tree__branch-label,
 [data-stellar-spectrum][data-tree-motion="idle-rotation"] .stellar-spectrum__node.stellar-tree__signal,
 [data-stellar-spectrum][data-tree-motion="idle-rotation"] .stellar-tree__root {
@@ -2403,6 +2412,45 @@ a.is-stellar-source {
   padding: 0 0 0 0.65rem;
   overflow-x: auto;
   scrollbar-width: thin;
+}
+
+.stellar-atlas .stellar-spectrum__readout-meta:focus-visible {
+  outline: 2px solid var(--stellar-blue);
+  outline-offset: 0.2rem;
+}
+
+.stellar-spectrum__horizontal-cue { display: none; }
+
+@media (max-width: 480px) {
+  .stellar-atlas .stellar-spectrum__readout-meta .stellar-spectrum__horizontal-cue,
+  .stellar-spectrum__source-tabs > .stellar-spectrum__horizontal-cue {
+    position: sticky;
+    z-index: 3;
+    right: -0.1rem;
+    display: grid;
+    flex: 0 0 2.4rem;
+    min-width: 2.4rem;
+    height: auto;
+    min-height: 2rem;
+    align-self: stretch;
+    place-items: center end;
+    margin-left: -2.4rem;
+    border: 0;
+    padding: 0 0.35rem 0 1rem;
+    color: #b9d7ff;
+    background: linear-gradient(90deg, rgba(4, 15, 36, 0), rgba(4, 15, 36, 0.96) 52%);
+    font: 700 0.72rem/1 "Space Grotesk", ui-monospace, monospace;
+    letter-spacing: 0;
+    opacity: 1;
+    pointer-events: none;
+    text-transform: none;
+    transition: opacity 140ms ease;
+  }
+
+  .stellar-atlas [data-rail-overflow="false"] > .stellar-spectrum__horizontal-cue,
+  .stellar-atlas [data-rail-end="true"] > .stellar-spectrum__horizontal-cue {
+    opacity: 0;
+  }
 }
 
 .stellar-atlas .stellar-spectrum__readout-meta span {
@@ -3033,14 +3081,22 @@ body[data-universe-region="about"] :is(#site-nav, #site-nav-mobile) .site-nav-li
 /* The scene owns a larger transparent render plane than its layout slot. This
    lets rotated or highly zoomed branches continue naturally into the shared
    page surface instead of being sheared off at an artificial panel edge. */
-.about-opening .stellar-tree__canvas,
-.about-opening .stellar-tree__controls-layer {
+.about-opening .stellar-tree__canvas {
   top: calc(-1 * var(--stellar-overscan-top));
   right: auto;
   bottom: auto;
   left: calc(-1 * var(--stellar-overscan-inline));
   width: calc(100% + var(--stellar-overscan-inline) + var(--stellar-overscan-inline));
   height: calc(100% + var(--stellar-overscan-top) + var(--stellar-overscan-bottom));
+}
+
+/* Keep operable labels inside the interaction region while the decorative
+   nebula continues across the shared page surface. */
+.about-opening .stellar-tree__controls-layer {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: clip;
 }
 
 /* The generated method paragraph is intentionally retained as a data hook,
@@ -3901,4 +3957,44 @@ html[data-about-theme="light"] .stellar-tree__root.is-open { color: var(--stella
     color: #174f8d !important;
     text-decoration: underline !important;
   }
+}
+
+/* Production's unobtrusive camera rail and spatial field, with legible labels. */
+.stellar-tree__guide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  color: var(--stellar-muted);
+  font: 500 0.65rem/1.5 "Space Grotesk", sans-serif;
+  letter-spacing: 0.025em;
+  pointer-events: none;
+}
+.about-opening .stellar-tree__camera button:focus-visible { outline: 2px solid var(--stellar-blue); outline-offset: 2px; }
+.about-opening .stellar-tree__controls-layer { overflow: visible; }
+.stellar-tree__leader-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.stellar-tree__leader-layer line { stroke: var(--stellar-muted); stroke-width: 0.65; opacity: 0.35; }
+.about-opening .stellar-spectrum__node.stellar-tree__signal .stellar-spectrum__node-label {
+  display: block;
+  pointer-events: none;
+  top: calc(50% + var(--label-y, 0px));
+  left: calc(50% + var(--label-x, 16px));
+  right: auto;
+  transform: translateY(-50%);
+  max-width: 9rem;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--about-base) 76%, transparent);
+  font-size: 0.62rem;
+  line-height: 1.35;
+  text-align: left;
+}
+@media (max-width: 720px) {
+  .stellar-tree__guide { font-size: 0.6rem; }
+  .about-opening .stellar-spectrum__node.stellar-tree__signal .stellar-spectrum__node-label { max-width: 7rem; font-size: 0.57rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stellar-tree__controls-layer * { transition: none !important; }
+  [data-tree-motion-toggle] { display: none !important; }
 }
