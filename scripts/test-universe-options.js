@@ -336,15 +336,22 @@ async function verifySpiralGalaxyArchive(browser) {
     assert(!focus.hidden && focus.inside && focus.direct === `/blog/${encodeURIComponent(selectedSlug)}.html`,
       `Spiral Galaxy selected-entry bubble is not usable at ${viewport.label}: ${JSON.stringify(focus)}.`);
 
-    await page.fill("#galaxy-search", "photography");
     if (viewport.reducedMotion !== "reduce") {
-      await page.waitForTimeout(viewport.width <= 920 ? 80 : 180);
-      const duringTyping = await page.evaluate(() => ({
-        choreography: document.querySelector(".galaxy-hero").classList.contains("is-encounter-choreography"),
-        state: document.querySelector(".galaxy-hero").dataset.merger
-      }));
+      // Schedule the observation with the input event so host/Playwright latency
+      // cannot consume the narrow-layout 120 ms debounce before sampling it.
+      const duringTyping = await page.evaluate((delay) => {
+        const input = document.querySelector("#galaxy-search");
+        input.value = "photography";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        return new Promise((resolve) => setTimeout(() => resolve({
+          choreography: document.querySelector(".galaxy-hero").classList.contains("is-encounter-choreography"),
+          state: document.querySelector(".galaxy-hero").dataset.merger
+        }), delay));
+      }, viewport.width <= 760 ? 80 : 180);
       assert(duringTyping.state === "archive" && !duringTyping.choreography,
         `Spiral Galaxy commits a search before the typing pause at ${viewport.label}: ${JSON.stringify(duringTyping)}.`);
+    } else {
+      await page.fill("#galaxy-search", "photography");
     }
     await page.waitForTimeout(viewport.reducedMotion === "reduce" ? 80 : 380);
     const filteredEntries = await page.locator(".galaxy-entry:not([hidden])").count();
