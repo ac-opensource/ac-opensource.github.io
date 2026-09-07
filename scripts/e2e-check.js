@@ -261,16 +261,19 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     }, progress);
   }
 
-  async function resumeUniverseTransition(targetPage) {
+  async function finishUniverseTransition(targetPage) {
     await targetPage.evaluate(async () => {
       const animations = document.getAnimations({ subtree: true })
         .filter((animation) => (
           animation.effect?.pseudoElement?.startsWith('::view-transition')
             && animation.playState === 'paused'
         ));
-      animations.forEach((animation) => animation.play());
-      // play() queues a task; start the completion budget after playback begins.
-      await Promise.all(animations.map((animation) => animation.ready));
+      // These animations were paused only to inspect deterministic snapshots.
+      // Complete that controlled timeline after its assertions, then verify cleanup.
+      await Promise.all(animations.map((animation) => {
+        animation.finish();
+        return animation.finished;
+      }));
     });
   }
 
@@ -688,11 +691,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && integratedBigBang.visualOpacity > integratedBigBang.copyOpacity,
     `Sky navigation to Work does not integrate the Big Bang with target acquisition: ${JSON.stringify(integratedBigBang)}`
   );
-  await resumeUniverseTransition(integratedBigBangPage);
+  await finishUniverseTransition(integratedBigBangPage);
   await integratedBigBangPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
     null,
-    { timeout: 3500 }
+    { timeout: 3500, polling: 100 }
   );
   const integratedBigBangSettled = await integratedBigBangPage.evaluate((sessionKey) => ({
     loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
@@ -3816,7 +3819,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && visualFirstAbout.headerOpacity >= 0.95,
     `About acquisition must reveal its curved-path landmark before content and preserve the header: ${JSON.stringify(visualFirstAbout)}`
   );
-  await resumeUniverseTransition(perspectiveTransitionPage);
+  await finishUniverseTransition(perspectiveTransitionPage);
 
   const arrivedAboutHandle = await perspectiveTransitionPage.waitForFunction(() => {
     const perspective = window.UniversePerspective?.snapshot();
@@ -3852,7 +3855,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `About does not reacquire focus at its own depth in the shared field: ${JSON.stringify(arrivedAbout)}`
   );
 
-  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
+  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200, polling: 100 });
   await perspectiveTransitionPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 3000 });
   const settledAbout = await perspectiveTransitionPage.evaluate(() => ({
     canvasCount: document.querySelectorAll('.stellar-tree__canvas').length,
@@ -3915,8 +3918,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && Math.abs(reverseSharedNavigation.groupHeight - reverseSharedNavigation.liveHeight) <= 1,
     `The shared map drifts away from its clickable viewport position during reverse travel: ${JSON.stringify(reverseSharedNavigation)}`
   );
-  await resumeUniverseTransition(perspectiveTransitionPage);
-  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
+  await finishUniverseTransition(perspectiveTransitionPage);
+  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200, polling: 100 });
   await waitForWorkEntrance(perspectiveTransitionPage);
   await expandUniverseRouteMap(perspectiveTransitionPage);
   const logsRoute = perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="threads"]');
@@ -3970,11 +3973,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && arrivedLogs.visualTransitionName === 'universe-target-visual',
     `Light-to-light routes do not preserve angular and depth travel through the shared sky: ${JSON.stringify(arrivedLogs)}`
   );
-  await resumeUniverseTransition(perspectiveTransitionPage);
+  await finishUniverseTransition(perspectiveTransitionPage);
   await perspectiveTransitionPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
     null,
-    { timeout: 3200 }
+    { timeout: 3200, polling: 100 }
   );
   const settledLogsMap = await perspectiveTransitionPage.evaluate(() => {
     const map = document.querySelector('[data-universe-route-map]');
