@@ -4098,6 +4098,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await reducedTransitionContext.close();
 
+  const stalledFramePage = await navigationBrowser.newPage({ viewport: { width: 1280, height: 900 } });
+  await stalledFramePage.goto(BASE_URL + '/', { waitUntil: 'networkidle' });
+  await stalledFramePage.evaluate(() => { window.requestAnimationFrame = () => 0; });
+  await stalledFramePage.locator('#site-nav a[href="/about.html"]').click({ noWaitAfter: true });
+  await stalledFramePage.waitForURL((url) => url.pathname === '/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' });
+  await assert(new URL(stalledFramePage.url()).pathname === '/about.html', 'Native navigation waits indefinitely for stalled animation frames');
+  await stalledFramePage.close();
+
   await navigationBrowser.close();
 
   const priorityVisualCases = [
@@ -4188,7 +4196,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     try {
       await headerPage.waitForURL((url) => url.pathname === expected, { timeout: 5000, waitUntil: 'domcontentloaded' });
     } catch (error) {
-      console.error('Header navigation state:', { expected, url: headerPage.url(), state: await headerPage.evaluate(() => ({ root: { ...document.documentElement.dataset }, perspective: window.UniversePerspective?.snapshot() })) });
+      console.error('Header navigation state:', { expected, url: headerPage.url() });
+      console.error(await headerPage.evaluate(() => ({ root: { ...document.documentElement.dataset }, perspective: window.UniversePerspective?.snapshot() })).catch((diagnosticError) => diagnosticError.message));
       throw error;
     }
     const current = new URL(headerPage.url()).pathname;

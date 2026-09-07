@@ -556,14 +556,19 @@
 
     if (root.dataset.universeCrossDocument === "true") {
       event.preventDefault();
-      window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
-        if (generation !== travelGeneration) return;
+      let navigationStarted = false;
+      const navigate = () => {
+        if (navigationStarted || generation !== travelGeneration) return;
+        navigationStarted = true;
         try {
           window.location.assign(targetUrl.href);
         } catch (_error) {
           clearTravelState({ keepLast: false, generation });
         }
-      }));
+      };
+      // Give departure styles two frames, but never block navigation on rendering.
+      schedule(navigate, 120);
+      window.requestAnimationFrame(() => window.requestAnimationFrame(navigate));
       return;
     }
 
