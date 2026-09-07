@@ -1139,6 +1139,72 @@ body[data-universe-region="resume"] #site-topbar {
   }
 }
 
+/* Screen reading layout: keep the full record compact and easy to scan. */
+@media screen {
+  .resume-dossier { width: min(100%, 82rem); padding-top: 8rem !important; }
+  .resume-dossier::before, .resume-dossier::after { opacity: 0.4; }
+  .resume-dossier__identity { min-height: 0; gap: 4rem !important; padding-bottom: 3rem; }
+  .resume-dossier__identity > article { padding-top: 1rem !important; }
+  .resume-dossier__identity h1 { max-width: none; font-size: clamp(3.4rem, 6.5vw, 6rem) !important; line-height: 0.98 !important; letter-spacing: -0.065em !important; }
+  .resume-dossier__identity h1 > span { display: block; }
+  .resume-dossier__identity > article > p { font-size: 1.1rem !important; line-height: 1.7 !important; }
+  .resume-dossier__identity > article::after { margin-top: 2.5rem; }
+  .resume-dossier__identity > section { margin-top: 0; }
+  .resume-dossier__identity > section .space-y-5 > div { padding: 0.65rem 0 !important; }
+  .resume-dossier__summary { min-height: 0; padding: 2.5rem 0; margin-bottom: 2.5rem !important; gap: 3rem; align-items: start; }
+  .resume-dossier__summary > article { flex: 1; width: auto; }
+  .resume-dossier__summary > article > p { font-size: 1.1rem !important; line-height: 1.75 !important; letter-spacing: 0; }
+  .resume-dossier__summary > section { position: static; width: 30%; }
+  .resume-local-map a strong { font-size: 0.65rem; }
+  .resume-signal-console { min-height: 0; padding: 2rem 0; margin-bottom: 4rem; }
+  .resume-signal-console__intro h2 { max-width: none; font-size: clamp(1.5rem, 3vw, 2.25rem); line-height: 1.15; letter-spacing: -0.04em; }
+  .resume-signal-console__intro > p:last-child { max-width: 48rem; }
+  .resume-signal-console__controls { margin-top: 1.5rem; }
+  .resume-signal-console__chips { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .resume-signal-console__chips::before, .signal-chip::before { display: none; }
+  .signal-chip:nth-child(n) { margin-left: 0 !important; padding: 0.75rem 1rem; border: 1px solid var(--resume-line); border-radius: 4px; font-size: 0.68rem; }
+  .signal-chip[aria-pressed="true"] { background: var(--resume-blue); color: white; border-color: var(--resume-blue); }
+  .resume-signal-console__actions, .resume-signal-console__status { position: static; width: auto; text-align: left; justify-content: flex-start; }
+  .resume-signal-console__status { margin-top: 0.5rem; }
+  #core-skills, #experience, #projects { min-height: 0; margin-bottom: 5rem !important; }
+  #core-skills > div:first-child, #experience > div:first-child, #projects > div:first-child { margin-bottom: 2rem !important; }
+  #core-skills > div:first-child h2, #experience > div:first-child h2, #projects > div:first-child h2 { font-size: clamp(2rem, 3.5vw, 3rem) !important; line-height: 1.05; letter-spacing: -0.05em !important; }
+  .resume-skills-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); min-height: 0; gap: 1.5rem !important; }
+  .resume-skills-grid::before, .resume-skill::before { display: none; }
+  .resume-skill { width: auto; min-height: 0; padding: 1.5rem 0 !important; align-self: start !important; border-top: 1px solid var(--resume-line) !important; }
+  #experience, #projects { grid-template-columns: minmax(12rem, 0.6fr) minmax(0, 1.8fr); gap: 3rem; }
+  #experience > div:first-child, #projects > div:first-child { top: 9rem; }
+  .resume-role:nth-child(n), .resume-project:nth-child(n) { min-height: 0; margin-left: 0 !important; padding: 2.25rem 0 2.25rem 2rem !important; border-bottom: 1px solid var(--resume-faint) !important; }
+  .resume-role:first-child, .resume-project:first-child { padding-top: 0.5rem !important; }
+  .resume-role::before, .resume-project::before { top: 2.5rem; transform: none; }
+  .resume-role:first-child::before, .resume-project:first-child::before { top: 0.5rem; }
+  .resume-role::after, .resume-project::after { display: none; }
+  .resume-role > div:first-child { grid-template-columns: 1fr; gap: 0.75rem !important; }
+  .resume-role > div:first-child > div:first-child > div:first-child { max-width: none; font-size: 1.65rem !important; line-height: 1.15; }
+  .resume-role > div:first-child > div:last-child { order: -1; }
+  .resume-role li { color: #505b52 !important; font-size: 0.95rem; }
+  .resume-evidence-boundary { font-size: 0.65rem; align-items: center; }
+  .resume-project > div:first-child { font-size: 1.7rem !important; }
+  .resume-dossier[data-active-signal]:not([data-active-signal=""]) [data-signals] { opacity: 1; }
+  .resume-dossier[data-active-signal]:not([data-active-signal=""]) li[data-signal-match="true"] { background: var(--resume-blue-soft); border-radius: 3px; }
+  .resume-dossier[data-active-signal]:not([data-active-signal=""]) .resume-role[data-signal-match="true"] { transform: none; }
+}
+@media screen and (max-width: 980px) {
+  .resume-dossier__summary > section { width: auto; margin-top: 1.5rem; }
+  #experience, #projects { grid-template-columns: 1fr; gap: 0; }
+}
+@media screen and (max-width: 760px) {
+  .resume-dossier { padding-top: 7rem !important; }
+  .resume-dossier__identity { gap: 1.5rem !important; }
+  .resume-dossier__identity h1 { font-size: clamp(2.75rem, 12vw, 4.5rem) !important; }
+  .resume-dossier__identity > section { gap: 0; padding: 1.5rem 0 0 !important; }
+  .resume-dossier__identity > section .space-y-5 { grid-template-columns: 1fr; gap: 0; }
+  .resume-skills-grid { grid-template-columns: 1fr; gap: 0 !important; }
+  .resume-local-map a strong { font-size: 0.55rem; }
+  .resume-role:nth-child(n), .resume-project:nth-child(n) { padding-left: 1.5rem !important; }
+  .resume-signal-console { margin-top: 0; }
+}
+
 @media print {
   @page {
     margin: 12mm;

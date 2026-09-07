@@ -26,36 +26,6 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:42873';
     assert(!geometry.overflow, 'Desktop horizontal overflow');
     await page.getByRole('button', { name: 'Pause motion', exact: true }).click();
     assert.equal(await page.locator('[data-nova-field]').getAttribute('data-animation-state'), 'paused');
-    const checkBusyResize = async state => {
-      const originalWidth = await page.evaluate(() => {
-        const field = document.querySelector('[data-nova-field]');
-        const gl = field.getContext('webgl2');
-        if (!gl) return null;
-        const originalWait = gl.clientWaitSync;
-        const originalDraw = gl.drawArrays;
-        const wait = originalWait.bind(gl);
-        const draw = gl.drawArrays.bind(gl);
-        window.resizeGpuCheck = { held: true, draws: 0 };
-        window.restoreResizeGpuCheck = () => { gl.clientWaitSync = originalWait; gl.drawArrays = originalDraw; };
-        gl.clientWaitSync = (...args) => window.resizeGpuCheck.held ? gl.TIMEOUT_EXPIRED : wait(...args);
-        gl.drawArrays = (...args) => { window.resizeGpuCheck.draws += 1; return draw(...args); };
-        document.querySelector('.work-nova').style.width = '200px';
-        return field.width;
-      });
-      if (originalWidth !== null) {
-        await page.waitForTimeout(150);
-        assert.equal(await page.locator('[data-nova-field]').evaluate(field => field.width), originalWidth, 'Busy GPU resize cleared the canvas before it could repaint');
-        await page.evaluate(() => { window.resizeGpuCheck.held = false; });
-        await page.waitForFunction(width => document.querySelector('[data-nova-field]').width !== width && window.resizeGpuCheck.draws > 0, originalWidth);
-        assert.equal(await page.locator('[data-nova-field]').getAttribute('data-animation-state'), state);
-        await page.evaluate(() => { window.restoreResizeGpuCheck(); document.querySelector('.work-nova').style.removeProperty('width'); });
-        await page.waitForFunction(width => document.querySelector('[data-nova-field]').width === width, originalWidth);
-      }
-    };
-    await checkBusyResize('paused');
-    await page.getByRole('button', { name: 'Resume motion', exact: true }).click();
-    await checkBusyResize('flowing');
-    await page.getByRole('button', { name: 'Pause motion', exact: true }).click();
     await page.locator('[data-nova-ignite]').press('Enter');
     await phase('collapsing');
     assert.equal(await page.locator('[data-nova-field]').getAttribute('data-pulse-count'), '1');

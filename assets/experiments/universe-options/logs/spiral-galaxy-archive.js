@@ -85,6 +85,9 @@
     startedAt: 0,
     stars: [],
     starSprites: [],
+    nucleusSprite: null,
+    gpu: null,
+    rendererInitialized: false,
     width: 0
   };
 
@@ -261,7 +264,7 @@
   function createParticle(random, index, arms, { compact = false, remnant = false } = {}) {
     const radius = Math.pow(random(), remnant ? 0.88 : 0.82);
     const brightness = random();
-    return {
+    const particle = {
       alpha: 0.42 + random() * 0.52,
       // Narrow, irregular strands leave dark lanes between the luminous arms.
       angleJitter: (random() - 0.5) * (0.12 + radius * 0.22)
@@ -274,6 +277,11 @@
       tone: random(),
       variant: index % 3
     };
+    particle.fade = Math.min(1, (1.06 - radius) * 6);
+    particle.spriteIndex = (particle.tone < 0.12 ? 2 : particle.tone < 0.42 ? 1 : 0) * 3 + particle.variant;
+    particle.spriteSize = 8 + particle.size * 11;
+    particle.frequency = 1 / Math.pow(radius * radius + 0.25 * 0.25, 0.75);
+    return particle;
   }
 
   function buildStarSprites() {
@@ -305,6 +313,240 @@
     );
   }
 
+  function createGpuRenderer() {
+    const canvas = document.createElement("canvas");
+    let gl;
+    const shaders = [];
+    let program;
+    let buffer;
+    let texture;
+    let staticBuffer;
+    try {
+      gl = canvas.getContext("webgl", { alpha: true, antialias: false, depth: false,
+        stencil: false, premultipliedAlpha: true, preserveDrawingBuffer: false });
+      if (!gl) return null;
+      const compile = (type, source) => {
+        const shader = gl.createShader(type);
+        shaders.push(shader);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error("Galaxy shader compilation failed");
+        return shader;
+      };
+      program = gl.createProgram();
+      gl.attachShader(program, compile(gl.VERTEX_SHADER, `
+        attribute vec2 position;
+        attribute vec2 uv;
+        attribute float opacity;
+        attribute vec4 orbit;
+        attribute vec3 anchor;
+        uniform vec2 viewport;
+        uniform vec4 field;
+        uniform float elapsed;
+        uniform float reduced;
+        uniform float orbital;
+        varying vec2 textureUv;
+        varying float alpha;
+        void main() {
+          vec2 point = position;
+          alpha = opacity;
+          if (orbital > 0.5) {
+            point += anchor.xy;
+            if (anchor.z > 0.5) point += field.xy;
+            if (anchor.z > 1.5) {
+              float angle = orbit.x - elapsed * 0.012 * orbit.z;
+              point += vec2(cos(angle), sin(angle)) * orbit.y * field.zw;
+              alpha *= mix(0.9 + sin(elapsed * 0.45 + orbit.w) * 0.1, 1.0, reduced);
+            } else if (anchor.z < 0.5) {
+              alpha *= mix(0.85 + sin(elapsed * 0.7 + orbit.w) * 0.15, 1.0, reduced);
+            }
+          }
+          gl_Position = vec4(point / viewport * vec2(2.0, -2.0) + vec2(-1.0, 1.0), 0.0, 1.0);
+          textureUv = uv;
+        }`));
+      gl.attachShader(program, compile(gl.FRAGMENT_SHADER, `
+        precision mediump float;
+        uniform sampler2D atlas;
+        varying vec2 textureUv;
+        varying float alpha;
+        void main() {
+          vec4 color = texture2D(atlas, textureUv);
+          gl_FragColor = vec4(color.rgb, color.a * alpha);
+        }`));
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error("Galaxy shader linking failed");
+      gl.useProgram(program);
+      buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      // 1,600 sprites includes all wide-screen stars, both galaxies and their nuclei.
+      const vertices = new Float32Array(1600 * 6 * 5);
+      gl.bufferData(gl.ARRAY_BUFFER, vertices.byteLength, gl.DYNAMIC_DRAW);
+      for (const [name, size, offset] of [["position", 2, 0], ["uv", 2, 8], ["opacity", 1, 16]]) {
+        const location = gl.getAttribLocation(program, name);
+        gl.enableVertexAttribArray(location);
+        gl.vertexAttribPointer(location, size, gl.FLOAT, false, 20, offset);
+      }
+      const atlas = document.createElement("canvas");
+      atlas.width = atlas.height = 512;
+      const ctx = atlas.getContext("2d");
+      canvasState.starSprites.flat().forEach((sprite, index) => {
+        ctx.drawImage(sprite, index % 4 * 128, Math.floor(index / 4) * 128, 128, 128);
+      });
+      ctx.drawImage(canvasState.nucleusSprite, 256, 256, 128, 128);
+      // Cell 9 is an antialiased background star; cell 10 is the nucleus glow.
+      ctx.fillStyle = "rgb(195, 216, 239)";
+      ctx.beginPath();
+      ctx.arc(192, 320, 60, 0, Math.PI * 2);
+      ctx.fill();
+      texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlas);
+      gl.enable(gl.BLEND);
+      gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE);
+      const viewport = gl.getUniformLocation(program, "viewport");
+      const orbital = gl.getUniformLocation(program, "orbital");
+      const field = gl.getUniformLocation(program, "field");
+      const elapsed = gl.getUniformLocation(program, "elapsed");
+      const reduced = gl.getUniformLocation(program, "reduced");
+      const orbitLocation = gl.getAttribLocation(program, "orbit");
+      const anchorLocation = gl.getAttribLocation(program, "anchor");
+      staticBuffer = gl.createBuffer();
+      let staticKey = "";
+      let staticCount = 0;
+      let orbitalFrame = false;
+      const bindAttributes = (stride) => {
+        for (const [name, size, offset] of [["position", 2, 0], ["uv", 2, 8], ["opacity", 1, 16]]) {
+          gl.vertexAttribPointer(gl.getAttribLocation(program, name), size, gl.FLOAT, false, stride, offset);
+        }
+      };
+      let count = 0;
+      const corners = [0, 1, 2, 2, 1, 3];
+      const renderer = {
+        begin() {
+          count = 0;
+          orbitalFrame = false;
+          gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+          bindAttributes(20);
+          gl.disableVertexAttribArray(orbitLocation);
+          gl.disableVertexAttribArray(anchorLocation);
+          gl.uniform1f(orbital, 0);
+          if (canvas.width !== elements.canvas.width || canvas.height !== elements.canvas.height) {
+            canvas.width = elements.canvas.width;
+            canvas.height = elements.canvas.height;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+          }
+          gl.uniform2f(viewport, canvasState.width, canvasState.height);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+        },
+        sprite(index, x, y, size, alpha) {
+          if (alpha <= 0 || x + size / 2 < 0 || y + size / 2 < 0
+            || x - size / 2 > canvasState.width || y - size / 2 > canvasState.height) return;
+          const left = x - size / 2, top = y - size / 2;
+          const u = index % 4 / 4, v = Math.floor(index / 4) / 4;
+          // Triangle vertices share the original sprite geometry and UVs.
+          for (const corner of corners) {
+            const right = corner & 1, bottom = corner >> 1;
+            vertices[count++] = left + right * size;
+            vertices[count++] = top + bottom * size;
+            vertices[count++] = u + right / 4;
+            vertices[count++] = v + bottom / 4;
+            vertices[count++] = alpha;
+          }
+        },
+        orbit(companion, centerX, centerY, radiusX, radiusY) {
+          orbitalFrame = true;
+          const key = [canvasState.width, canvasState.height, radiusX, radiusY, companion, canvasState.budget.tier].join(":");
+          gl.bindBuffer(gl.ARRAY_BUFFER, staticBuffer);
+          if (key !== staticKey) {
+            const data = [];
+            const append = (index, size, alpha, angle, radius, frequency, phase, x, y, kind) => {
+              const u = index % 4 / 4, v = Math.floor(index / 4) / 4;
+              for (const corner of corners) {
+                const right = corner & 1, bottom = corner >> 1;
+                data.push((right - 0.5) * size, (bottom - 0.5) * size,
+                  u + right / 4, v + bottom / 4, alpha,
+                  angle, radius, frequency, phase, x, y, kind);
+              }
+            };
+            for (const star of canvasState.stars) {
+              append(9, star.radius * 128 / 60, star.alpha * 0.48, 0, 0, 0, star.phase,
+                star.x * canvasState.width, star.y * canvasState.height, 0);
+            }
+            const particles = companion ? canvasState.remnantParticles : canvasState.particles;
+            for (const particle of particles) {
+              const angle = companion ? particle.arm * Math.PI + particle.radius * 7.3 - 1.08
+                : particle.arm * Math.PI * 2 / geometry.arms + particle.radius * geometry.twist + geometry.phase;
+              append(particle.spriteIndex, particle.spriteSize, particle.alpha * particle.fade,
+                angle + particle.angleJitter, particle.radius + particle.radialJitter,
+                particle.frequency, particle.phase, 0, 0, 2);
+            }
+            const radius = Math.min(radiusX, radiusY) * 0.4;
+            append(10, radius * 2, 1, 0, 0, 0, 0, 0, 0, 1);
+            append(0, radius * 0.65, 1, 0, 0, 0, 0, 0, 0, 1);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+            staticCount = data.length / 12;
+            staticKey = key;
+          }
+          bindAttributes(48);
+          gl.enableVertexAttribArray(orbitLocation);
+          gl.vertexAttribPointer(orbitLocation, 4, gl.FLOAT, false, 48, 20);
+          gl.enableVertexAttribArray(anchorLocation);
+          gl.vertexAttribPointer(anchorLocation, 3, gl.FLOAT, false, 48, 36);
+          gl.uniform1f(orbital, 1);
+          gl.uniform1f(elapsed, canvasState.elapsed);
+          gl.uniform1f(reduced, reducedMotion.matches ? 1 : 0);
+          gl.uniform4f(field, centerX, centerY, radiusX, radiusY * (companion ? 0.78 : 1));
+          gl.drawArrays(gl.TRIANGLES, 0, staticCount);
+        },
+        flush() {
+          if (orbitalFrame) return;
+          gl.bufferSubData(gl.ARRAY_BUFFER, 0, vertices.subarray(0, count));
+          gl.drawArrays(gl.TRIANGLES, 0, count / 5);
+        }
+      };
+      canvas.className = "galaxy-sky";
+      canvas.setAttribute("aria-hidden", "true");
+      canvas.addEventListener("webglcontextlost", (event) => {
+        event.preventDefault();
+        // Fall back immediately, including when paused or showing a settled search.
+        canvasState.gpu = null;
+        canvas.remove();
+        elements.hero.dataset.galaxyRenderer = "canvas";
+        drawGalaxyIfVisible();
+      }, { once: true });
+      elements.canvas.after(canvas);
+      shaders.forEach((shader) => gl.deleteShader(shader));
+      elements.hero.dataset.galaxyRenderer = "webgl";
+      return renderer;
+    } catch (_error) {
+      if (!gl) return null;
+      shaders.forEach((shader) => gl.deleteShader(shader));
+      if (program) gl.deleteProgram(program);
+      if (buffer) gl.deleteBuffer(buffer);
+      if (staticBuffer) gl.deleteBuffer(staticBuffer);
+      if (texture) gl.deleteTexture(texture);
+      return null;
+    }
+  }
+
+  function buildNucleusSprite() {
+    const sprite = document.createElement("canvas");
+    sprite.width = sprite.height = 256;
+    const context = sprite.getContext("2d");
+    const glow = context.createRadialGradient(128, 128, 0, 128, 128, 128);
+    glow.addColorStop(0, "rgba(248, 251, 255, 0.8)");
+    glow.addColorStop(0.09, "rgba(226, 239, 255, 0.38)");
+    glow.addColorStop(0.3, "rgba(163, 195, 235, 0.12)");
+    glow.addColorStop(1, "rgba(122, 166, 214, 0)");
+    context.fillStyle = glow;
+    context.fillRect(0, 0, 256, 256);
+    return sprite;
+  }
+
   function performanceBudgetFor(width) {
     if (width <= 480) {
       return { companion: 80, dpr: 1, fps: 24, impact: 28, particles: 300, remnant: 180, stars: 90, tier: "phone" };
@@ -323,6 +565,12 @@
     const compact = canvasState.width < 760;
     const budget = canvasState.budget || performanceBudgetFor(canvasState.width);
     if (!canvasState.starSprites.length) canvasState.starSprites = buildStarSprites();
+    if (!canvasState.nucleusSprite) canvasState.nucleusSprite = buildNucleusSprite();
+    if (!canvasState.rendererInitialized) {
+      canvasState.rendererInitialized = true;
+      canvasState.gpu = createGpuRenderer();
+      if (!canvasState.gpu) elements.hero.dataset.galaxyRenderer = "canvas";
+    }
     canvasState.stars = Array.from({ length: budget.stars }, () => ({
       alpha: 0.16 + random() * 0.7,
       phase: random() * Math.PI * 2,
@@ -394,13 +642,18 @@
     context.globalCompositeOperation = "lighter";
     particles.forEach((particle) => {
       const point = pointFor(particle);
-      const fade = Math.min(1, (1.06 - particle.radius) * 6);
+      const fade = particle.fade;
       const shimmer = reducedMotion.matches ? 1 : 0.9 + Math.sin(time * 0.00045 + particle.phase) * 0.1;
       const tidalX = distortion * Math.sin(particle.phase + particle.radius * 9) * (0.2 + particle.radius) * 20;
       const tidalY = distortion * Math.cos(particle.phase * 0.7 + particle.radius * 7) * (0.2 + particle.radius) * 11;
       const tone = particle.tone < 0.12 ? 2 : particle.tone < 0.42 ? 1 : 0;
-      const size = 8 + particle.size * 11;
-      context.globalAlpha = particle.alpha * fade * shimmer * alphaMultiplier;
+      const size = particle.spriteSize;
+      const alpha = particle.alpha * fade * shimmer * alphaMultiplier;
+      if (canvasState.gpu) {
+        canvasState.gpu.sprite(particle.spriteIndex, point.x + tidalX, point.y + tidalY, size, alpha);
+        return;
+      }
+      context.globalAlpha = alpha;
       context.drawImage(canvasState.starSprites[tone][particle.variant],
         point.x + tidalX - size / 2, point.y + tidalY - size / 2, size, size);
     });
@@ -411,9 +664,10 @@
     const base = companion
       ? particle.arm * Math.PI + particle.radius * 7.3 - 1.08
       : particle.arm * Math.PI * 2 / geometry.arms + particle.radius * geometry.twist + geometry.phase;
-    // Differential circular motion in a softened potential; the time scale is slow at rest.
-    const frequency = 1 / Math.pow(particle.radius * particle.radius + 0.25 * 0.25, 0.75);
-    return base + particle.angleJitter + canvasState.elapsed * 0.012 * frequency;
+    // The arms wind toward increasing angles outward, so orbit toward decreasing
+    // angles to keep the arms trailing. The time scale is slow at rest.
+    const frequency = particle.frequency ?? 1 / Math.pow(particle.radius * particle.radius + 0.25 * 0.25, 0.75);
+    return base + particle.angleJitter - canvasState.elapsed * 0.012 * frequency;
   }
 
   function startEncounter() {
@@ -421,7 +675,8 @@
     if (!window.GalaxyDynamics || !canvasState.particles.length) return;
     const seeds = (particles, companion) => particles.map((particle) => ({
       radius: Math.max(0.06, particle.radius + particle.radialJitter),
-      angle: orbitalAngle(particle, companion)
+      angle: orbitalAngle(particle, companion),
+      spin: -1
     }));
     merger.encounter = new window.GalaxyDynamics.Encounter(
       seeds(canvasState.particles, false), seeds(canvasState.companionParticles, true)
@@ -499,13 +754,13 @@
     context.save();
     context.globalCompositeOperation = "lighter";
     context.globalAlpha = alpha;
-    const glow = context.createRadialGradient(x, y, 0, x, y, radius);
-    glow.addColorStop(0, "rgba(248, 251, 255, 0.8)");
-    glow.addColorStop(0.09, "rgba(226, 239, 255, 0.38)");
-    glow.addColorStop(0.3, "rgba(163, 195, 235, 0.12)");
-    glow.addColorStop(1, "rgba(122, 166, 214, 0)");
-    context.fillStyle = glow;
-    context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    if (canvasState.gpu) {
+      canvasState.gpu.sprite(10, x, y, radius * 2, alpha);
+      canvasState.gpu.sprite(0, x, y, radius * 0.65, alpha);
+      context.restore();
+      return;
+    }
+    context.drawImage(canvasState.nucleusSprite, x - radius, y - radius, radius * 2, radius * 2);
     const size = radius * 0.65;
     context.drawImage(canvasState.starSprites[0][0], x - size / 2, y - size / 2, size, size);
     context.restore();
@@ -558,8 +813,13 @@
       const distance = Math.hypot(star.x, star.y, star.z);
       const visibility = Math.min(1, Math.max(0, (7 - distance) / 3)) * (1 - blend) + blend;
       const tone = particle.tone < 0.12 ? 2 : particle.tone < 0.42 ? 1 : 0;
-      const size = (8 + particle.size * 11) * (0.72 + zoom * 0.28);
-      context.globalAlpha = particle.alpha * visibility * (star.galaxy === 1 ? Math.min(1, reveal * 3) : 1);
+      const size = particle.spriteSize * (0.72 + zoom * 0.28);
+      const alpha = particle.alpha * visibility * (star.galaxy === 1 ? Math.min(1, reveal * 3) : 1);
+      if (canvasState.gpu) {
+        canvasState.gpu.sprite(particle.spriteIndex, point.x, point.y, size, alpha);
+        return;
+      }
+      context.globalAlpha = alpha;
       context.drawImage(canvasState.starSprites[tone][particle.variant], point.x - size / 2, point.y - size / 2, size, size);
     });
     context.restore();
@@ -605,13 +865,27 @@
       parallax.x = 0;
       parallax.y = 0;
     }
-    elements.hero.style.setProperty("--parallax-x", `${parallax.x.toFixed(2)}px`);
-    elements.hero.style.setProperty("--parallax-y", `${parallax.y.toFixed(2)}px`);
+    for (const axis of ["x", "y"]) {
+      const value = `${parallax[axis].toFixed(2)}px`;
+      if (elements.hero.style.getPropertyValue(`--parallax-${axis}`) !== value) {
+        elements.hero.style.setProperty(`--parallax-${axis}`, value);
+      }
+    }
+    canvasState.gpu?.begin();
     context.setTransform(canvasState.dpr, 0, 0, canvasState.dpr, 0, 0);
-    context.clearRect(0, 0, canvasState.width, canvasState.height);
+    if (!canvasState.gpu || state.selected || canvasState.hadSelection) {
+      context.clearRect(0, 0, canvasState.width, canvasState.height);
+    }
+    canvasState.hadSelection = Boolean(state.selected);
     const clock = canvasState.elapsed * 1000;
-    canvasState.stars.forEach((star) => {
+    const gpuOrbit = canvasState.gpu && !(canvasState.merger.target && canvasState.merger.encounter && !reducedMotion.matches);
+    if (!gpuOrbit) canvasState.stars.forEach((star) => {
       const pulse = reducedMotion.matches ? 1 : 0.85 + Math.sin(clock * 0.0007 + star.phase) * 0.15;
+      if (canvasState.gpu) {
+        canvasState.gpu.sprite(9, star.x * canvasState.width, star.y * canvasState.height,
+          star.radius * 128 / 60, star.alpha * pulse * 0.48);
+        return;
+      }
       context.beginPath();
       context.fillStyle = `rgba(195, 216, 239, ${star.alpha * pulse * 0.48})`;
       context.arc(star.x * canvasState.width, star.y * canvasState.height, star.radius, 0, Math.PI * 2);
@@ -624,18 +898,24 @@
     if (merger.target && merger.encounter && !reducedMotion.matches) {
       drawEncounter(context, delta, centerX, centerY, radiusX, radiusY);
     } else {
-      elements.hero.classList.remove("has-stellar-encounter");
-      elements.hero.dataset.encounterPhase = merger.target ? "remnant" : "archive";
+      if (elements.hero.classList.contains("has-stellar-encounter")) elements.hero.classList.remove("has-stellar-encounter");
+      const phase = merger.target ? "remnant" : "archive";
+      if (elements.hero.dataset.encounterPhase !== phase) elements.hero.dataset.encounterPhase = phase;
       drawSelectedArm(context, centerX, centerY, radiusX, radiusY, merger.target);
-      const particles = merger.target ? canvasState.remnantParticles : canvasState.particles;
-      drawParticleSet(context, particles, (particle) => {
-        const angle = orbitalAngle(particle, Boolean(merger.target));
-        const radius = particle.radius + particle.radialJitter;
-        return { x: centerX + Math.cos(angle) * radius * radiusX,
-          y: centerY + Math.sin(angle) * radius * radiusY * (merger.target ? 0.78 : 1) };
-      }, clock);
-      drawNucleus(context, centerX, centerY, Math.min(radiusX, radiusY) * 0.4);
+      if (gpuOrbit) {
+        canvasState.gpu.orbit(Boolean(merger.target), centerX, centerY, radiusX, radiusY);
+      } else {
+        const particles = merger.target ? canvasState.remnantParticles : canvasState.particles;
+        drawParticleSet(context, particles, (particle) => {
+          const angle = orbitalAngle(particle, Boolean(merger.target));
+          const radius = particle.radius + particle.radialJitter;
+          return { x: centerX + Math.cos(angle) * radius * radiusX,
+            y: centerY + Math.sin(angle) * radius * radiusY * (merger.target ? 0.78 : 1) };
+        }, clock);
+        drawNucleus(context, centerX, centerY, Math.min(radiusX, radiusY) * 0.4);
+      }
     }
+    canvasState.gpu?.flush();
     if (elements.phase) {
       const labels = { archive: "Stars in orbit", approach: "Two galaxies approaching", "first-passage": "First passage",
         "tidal-tails": "Tidal tails", coalescence: "Cores coalescing", remnant: "A shared galaxy" };

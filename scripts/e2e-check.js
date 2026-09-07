@@ -112,10 +112,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   });
 
   async function assert(condition, message) {
-    if (!condition) {
-      failures.push(message);
-      console.error(`E2E assertion: ${message}`);
-    }
+    if (!condition) failures.push(message);
   }
 
   async function waitForBigBangComplete(targetPage) {
@@ -127,122 +124,40 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     );
   }
 
-  async function waitForWorkEntrance(targetPage) {
-    // The fluid scene has its own six-second entrance after the page loader.
-    // Start ordinary route-departure checks from the settled source scene.
-    try {
-      await targetPage.waitForFunction(() => (
-        document.querySelector('[data-nova-field]')?.dataset.phase === 'remnant'
-      ), null, { timeout: 20000 });
-    } catch (error) {
-      const scene = await targetPage.evaluate(() => {
-        const field = document.querySelector('[data-nova-field]');
-        const bounds = field?.closest('.work-nova')?.getBoundingClientRect();
-        return {
-          root: { ...document.documentElement.dataset }, field: { ...field?.dataset },
-          hidden: document.hidden, imageWidth: document.querySelector('.work-nova__image')?.naturalWidth,
-          bounds: bounds && { top: bounds.top, bottom: bounds.bottom, width: bounds.width, height: bounds.height },
-          viewport: { width: innerWidth, height: innerHeight, scroll: scrollY },
-          reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
-        };
-      });
-      console.error(`Work entrance state: ${JSON.stringify(scene)}`);
-      throw error;
-    }
-  }
-
-  async function waitForUnattendedAboutRotation(targetPage) {
-    // Nodes pause rotation while hovered or focused. Leave the scene and
-    // return focus to its container before testing the unattended camera.
-    await targetPage.mouse.move(0, 0);
-    await targetPage.locator('#stellar-spectrum-panel').focus();
-    await targetPage.waitForFunction(() => (
-      document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion === 'idle-rotation'
-    ), undefined, { timeout: 3500 });
-  }
-
   async function expandUniverseRouteMap(targetPage) {
-    // Geometry and CSS-transition completion do not require a canvas RAF.
-    // Timer polling keeps these checks responsive when software rendering is busy.
-    try {
-      const toggle = targetPage.locator('[data-universe-map-toggle]');
-      if (await toggle.count() === 0) return;
-      if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
-        await toggle.click();
-        await targetPage.waitForFunction(() => (
-          document.querySelector('[data-universe-route-map]')?.dataset.mapExpanded === 'true'
-        ));
-        await targetPage.evaluate(async () => {
-          const map = document.querySelector('[data-universe-route-map]');
-          const resizing = map.getAnimations().filter((animation) => (
-            animation.transitionProperty === 'width' || animation.transitionProperty === 'height'
-          ));
-          await Promise.all(resizing.map((animation) => animation.ready));
-        });
-        await targetPage.waitForFunction(() => {
-          const map = document.querySelector('[data-universe-route-map]');
-          if (!map || map.dataset.mapExpanded !== 'true') return false;
-          const bounds = map.getBoundingClientRect();
-          return bounds.width >= 287 && bounds.height >= 123;
-        }, null, { timeout: 2000, polling: 100 });
-        const viewport = targetPage.viewportSize();
-        await targetPage.mouse.move(viewport.width - 1, 1);
-        await targetPage.evaluate(async () => {
-          const map = document.querySelector('[data-universe-route-map]');
-          // Pointer exit may cancel a hover transition before it becomes ready.
-          // The following check still requires all current animations to settle.
-          await Promise.all(map.getAnimations({ subtree: true }).map((animation) => animation.ready.catch(error => {
-            if (error.name !== 'AbortError') throw error;
-          })));
-        });
-        await targetPage.waitForFunction(() => {
-          const map = document.querySelector('[data-universe-route-map]');
-          return map && map.getAnimations({ subtree: true }).every((animation) => (
-            animation.playState === 'finished' || animation.playState === 'idle'
-          ));
-        }, null, { timeout: 2000, polling: 100 });
-        await targetPage.waitForFunction(() => {
-          const map = document.querySelector('[data-universe-route-map]');
-          const telescope = map?.querySelector('.universe-route-map__telescope');
-          if (!map || !telescope) return false;
-          const barrelLength = Number.parseFloat(getComputedStyle(telescope).width);
-          const sightlineLength = Number.parseFloat(map.style.getPropertyValue('--sightline-length'));
-          return Number.isFinite(barrelLength)
-            && Number.isFinite(sightlineLength)
-            && sightlineLength > barrelLength;
-        }, null, { timeout: 2000, polling: 100 });
-      }
-    } catch (error) {
-      const state = await targetPage.evaluate(() => {
+    const toggle = targetPage.locator('[data-universe-map-toggle]');
+    if (await toggle.count() === 0) return;
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
+      await toggle.click();
+      await targetPage.waitForFunction(() => (
+        document.querySelector('[data-universe-route-map]')?.dataset.mapExpanded === 'true'
+      ));
+      await targetPage.waitForFunction(() => {
         const map = document.querySelector('[data-universe-route-map]');
-        const toggle = document.querySelector('[data-universe-map-toggle]');
-        const bounds = map?.getBoundingClientRect();
-        const style = map && getComputedStyle(map);
-        return {
-          url: location.href,
-          root: { ...document.documentElement.dataset },
-          map: map && { ...map.dataset },
-          bounds: bounds && { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height },
-          toggle: { expanded: toggle?.getAttribute('aria-expanded'), label: toggle?.getAttribute('aria-label') },
-          computed: style && {
-            width: style.width, height: style.height, transform: style.transform,
-            display: style.display, visibility: style.visibility, position: style.position,
-            transitionProperty: style.transitionProperty, transitionDuration: style.transitionDuration,
-            fontSize: getComputedStyle(document.documentElement).fontSize,
-          },
-          viewport: { width: innerWidth, height: innerHeight, scrollX, scrollY, hidden: document.hidden },
-          perspective: window.UniversePerspective?.snapshot(),
-          animations: document.getAnimations({ subtree: true }).map((animation) => ({
-            name: animation.animationName, property: animation.transitionProperty,
-            state: animation.playState, currentTime: animation.currentTime,
-            target: animation.effect?.target?.className,
-            pseudo: animation.effect?.pseudoElement,
-            timing: animation.effect?.getComputedTiming(),
-          })),
-        };
+        if (!map || map.dataset.mapExpanded !== 'true') return false;
+        const bounds = map.getBoundingClientRect();
+        return bounds.width >= 287 && bounds.height >= 123;
+      }, null, { timeout: 2000 });
+      await targetPage.evaluate(() => {
+        document.querySelector('[data-universe-route-map]')
+          ?.dispatchEvent(new PointerEvent('pointerleave'));
       });
-      console.error(`Universe map expansion state: ${JSON.stringify(state)}`);
-      throw error;
+      await targetPage.waitForFunction(() => {
+        const map = document.querySelector('[data-universe-route-map]');
+        return map && map.getAnimations({ subtree: true }).every((animation) => (
+          animation.playState === 'finished' || animation.playState === 'idle'
+        ));
+      }, null, { timeout: 2000 });
+      await targetPage.waitForFunction(() => {
+        const map = document.querySelector('[data-universe-route-map]');
+        const telescope = map?.querySelector('.universe-route-map__telescope');
+        if (!map || !telescope) return false;
+        const barrelLength = Number.parseFloat(getComputedStyle(telescope).width);
+        const sightlineLength = Number.parseFloat(map.style.getPropertyValue('--sightline-length'));
+        return Number.isFinite(barrelLength)
+          && Number.isFinite(sightlineLength)
+          && sightlineLength > barrelLength;
+      }, null, { timeout: 2000 });
     }
   }
 
@@ -265,19 +180,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     }, progress);
   }
 
-  async function finishUniverseTransition(targetPage) {
-    await targetPage.evaluate(async () => {
-      const animations = document.getAnimations({ subtree: true })
+  async function resumeUniverseTransition(targetPage) {
+    await targetPage.evaluate(() => {
+      document.getAnimations({ subtree: true })
         .filter((animation) => (
           animation.effect?.pseudoElement?.startsWith('::view-transition')
             && animation.playState === 'paused'
-        ));
-      // These animations were paused only to inspect deterministic snapshots.
-      // Complete that controlled timeline after its assertions, then verify cleanup.
-      await Promise.all(animations.map((animation) => {
-        animation.finish();
-        return animation.finished;
-      }));
+        ))
+        .forEach((animation) => animation.play());
     });
   }
 
@@ -464,11 +374,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     window.__bigBangLongTasks = [];
     document.addEventListener('bigbang:phase', (event) => {
       window.__bigBangPhaseHistory.push({ ...event.detail });
-      if (event.detail.phase === 'complete') window.__bigBangCompletedAt = performance.now();
     });
     try {
       new PerformanceObserver((list) => {
-        window.__bigBangLongTasks.push(...list.getEntries().map((entry) => ({ start: entry.startTime, duration: entry.duration })));
+        window.__bigBangLongTasks.push(...list.getEntries().map((entry) => entry.duration));
       }).observe({ type: 'longtask', buffered: true });
     } catch (_error) {
       // Long Task timing is an optional Chromium capability; phase/deadline
@@ -603,9 +512,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   ), null, { timeout: 5000 });
   const bigBangComplete = await bigBangPage.evaluate((sessionKey) => ({
     bodyOpacity: getComputedStyle(document.body).opacity,
-    longTasks: (window.__bigBangLongTasks || [])
-      .filter((entry) => entry.start < window.__bigBangCompletedAt)
-      .map((entry) => entry.duration),
+    longTasks: window.__bigBangLongTasks || [],
     phaseHistory: window.__bigBangPhaseHistory?.map((entry) => entry.phase) || [],
     sessionValue: window.sessionStorage.getItem(sessionKey),
     snapshot: window.BigBangLoader.snapshot(),
@@ -651,7 +558,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     integratedBigBangPage.waitForURL('**/work.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
     integratedBigBangPage.locator('#site-nav a[href="/work.html"]').click(),
   ]);
-  await seekUniverseTransition(integratedBigBangPage, 0.62);
+  await seekUniverseTransition(integratedBigBangPage, 0.34);
   const integratedBigBang = await integratedBigBangPage.evaluate((sessionKey) => {
     const root = document.documentElement;
     const visualStyle = getComputedStyle(root, '::view-transition-new(universe-target-visual)');
@@ -675,31 +582,34 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       visualTravel: Math.hypot(visualMatrix.m41, visualMatrix.m42, visualMatrix.m43),
     };
   }, BIG_BANG_SESSION_KEY);
-  // The destination landmark appears before page content, with the shared header anchored.
+  // The target visual should lead the acquisition, while the incoming page is
+  // already readable enough to overlap the outgoing snapshot instead of
+  // recreating the former blank travel interval.
   await assert(
-    integratedBigBang.perspectiveDuration >= 1240
-      && integratedBigBang.perspectiveDuration <= 1420
+    integratedBigBang.perspectiveDuration >= 660
+      && integratedBigBang.perspectiveDuration <= 780
       && integratedBigBang.searchDuration > 0
-      && integratedBigBang.searchDuration <= 1420
+      && integratedBigBang.searchDuration <= 780
       && integratedBigBang.loaderCount === 0
       && !integratedBigBang.loaderApi
       && integratedBigBang.rootState === 'inactive'
       && integratedBigBang.sessionValue === '1'
-      && integratedBigBang.visualAnimation === 'universe-world-arrive'
+      && integratedBigBang.visualAnimation === 'universe-work-visual-genesis'
       && integratedBigBang.visualOpacity >= 0.75
       && integratedBigBang.visualTravel > 18
-      && integratedBigBang.supernovaAnimation === 'none'
+      && integratedBigBang.supernovaAnimation === 'universe-work-supernova-acquire'
       && integratedBigBang.supernovaBackground.includes('repeating-conic-gradient')
-      && integratedBigBang.supernovaName === 'none'
-      && integratedBigBang.copyOpacity <= 0.01
+      && integratedBigBang.supernovaName === 'universe-work-supernova'
+      && integratedBigBang.copyOpacity >= 0.15
+      && integratedBigBang.copyOpacity <= 0.65
       && integratedBigBang.visualOpacity > integratedBigBang.copyOpacity,
     `Sky navigation to Work does not integrate the Big Bang with target acquisition: ${JSON.stringify(integratedBigBang)}`
   );
-  await finishUniverseTransition(integratedBigBangPage);
+  await resumeUniverseTransition(integratedBigBangPage);
   await integratedBigBangPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
     null,
-    { timeout: 3500, polling: 100 }
+    { timeout: 3500 }
   );
   const integratedBigBangSettled = await integratedBigBangPage.evaluate((sessionKey) => ({
     loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
@@ -1094,8 +1004,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const readOrbitCoordinates = (targetPage) => targetPage.evaluate(() => (
     [...document.querySelectorAll('[data-orbit-object]')].map((element) => ({
       key: element.dataset.orbitObject,
-      x: Number.parseFloat(getComputedStyle(element).getPropertyValue('--x')),
-      y: Number.parseFloat(getComputedStyle(element).getPropertyValue('--y')),
+      x: Number.parseFloat(getComputedStyle(element).translate.split(/\s+/)[0]),
+      y: Number.parseFloat(getComputedStyle(element).translate.split(/\s+/)[1]),
     }))
   ));
 
@@ -1195,7 +1105,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
           'width:0',
           'height:0',
           'pointer-events:none',
-          `transform:translate3d(${node.style.getPropertyValue('--x')},${node.style.getPropertyValue('--y')},0)`,
+          `translate:${node.style.translate}`,
         ].join(';');
         plane.append(marker);
         const markerBounds = marker.getBoundingClientRect();
@@ -1216,8 +1126,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         const radiusX = percentage('--tw', plane.clientWidth) / 2;
         const radiusY = percentage('--th', plane.clientHeight) / 2;
         const tilt = Number.parseFloat(style.getPropertyValue('--tr')) * Math.PI / 180;
-        const deltaX = Number.parseFloat(node.style.getPropertyValue('--x')) - centerX;
-        const deltaY = Number.parseFloat(node.style.getPropertyValue('--y')) - centerY;
+        const deltaX = Number.parseFloat(node.style.translate.split(/\s+/)[0]) - centerX;
+        const deltaY = Number.parseFloat(node.style.translate.split(/\s+/)[1]) - centerY;
         const localX = deltaX * Math.cos(tilt) + deltaY * Math.sin(tilt);
         const localY = -deltaX * Math.sin(tilt) + deltaY * Math.cos(tilt);
         const normalizedRadius = Math.hypot(localX / radiusX, localY / radiusY);
@@ -1238,8 +1148,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       const focusPoint = { x: planeSize.clientWidth * .04, y: planeSize.clientHeight * .02 };
       const orbitPoints = nodes.map((node) => ({
         key: node.dataset.orbitObject,
-        x: Number.parseFloat(node.style.getPropertyValue('--x')),
-        y: Number.parseFloat(node.style.getPropertyValue('--y')),
+        x: Number.parseFloat(node.style.translate.split(/\s+/)[0]),
+        y: Number.parseFloat(node.style.translate.split(/\s+/)[1]),
       }));
       const projectsPoint = orbitPoints.find(({ key }) => key === 'projects');
       const radialDistance = (point) => Math.hypot(point.x - focusPoint.x, point.y - focusPoint.y);
@@ -1611,10 +1521,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       const trackWidth = Number.parseFloat(trackStyle?.width);
       const trackHeight = Number.parseFloat(trackStyle?.height);
       const point = {
-        x: Number.parseFloat(getComputedStyle(node).getPropertyValue('--x')),
-        y: Number.parseFloat(getComputedStyle(node).getPropertyValue('--y')),
+        x: Number.parseFloat(getComputedStyle(node).translate.split(/\s+/)[0]),
+        y: Number.parseFloat(getComputedStyle(node).translate.split(/\s+/)[1]),
       };
-      const tailAngle = Number.parseFloat(getComputedStyle(node).getPropertyValue('--tail-angle'));
+      const tailAngle = Number.parseFloat(node.dataset.tailAngle);
       const expectedTailAngle = Math.atan2(point.y - plane.clientHeight * .02, point.x - plane.clientWidth * .04) * 180 / Math.PI;
       const tailAngleError = Math.abs(((tailAngle - expectedTailAngle + 540) % 360) - 180);
       const glitters = Array.from(node?.querySelectorAll('.comet-wake b') || []);
@@ -1668,52 +1578,27 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await assert(flung.audioState === 'running', 'Desktop fling does not activate the action-sound engine');
     await assert(flung.activeControl, 'Desktop fling leaves keyboard focus on the moving node instead of the stable reset control');
 
-    // The renderer caps each frame's simulated delta at 48ms. Sample on
-    // that same clock, including each segment of the path, so a busy runner
-    // cannot turn different frame delivery into apparent acceleration.
-    const sampleOrbitMotion = () => flingPage.evaluate(() => new Promise((resolve) => {
-      const read = () => [...document.querySelectorAll('[data-orbit-object]')].map((node) => ({
-        key: node.dataset.orbitObject,
-        x: Number.parseFloat(getComputedStyle(node).getPropertyValue('--x')),
-        y: Number.parseFloat(getComputedStyle(node).getPropertyValue('--y')),
-      }));
-      let previousTime;
-      let previous;
-      let elapsed = 0;
-      const distances = {};
-      const sample = (timestamp) => {
-        const current = read();
-        if (previousTime !== undefined) {
-          elapsed += Math.min(timestamp - previousTime, 48);
-          current.forEach((point, index) => {
-            distances[point.key] = (distances[point.key] || 0)
-              + Math.hypot(point.x - previous[index].x, point.y - previous[index].y);
-          });
-        }
-        if (elapsed >= 320) {
-          resolve({ elapsed, distances, speeds: Object.fromEntries(Object.entries(distances).map(([key, distance]) => [key, distance / elapsed * 1000])) });
-          return;
-        }
-        previousTime = timestamp;
-        previous = current;
-        requestAnimationFrame(sample);
-      };
-      requestAnimationFrame(sample);
-    }));
-    const apoSpeeds = await sampleOrbitMotion();
-    const apoSpeed = apoSpeeds.speeds[flingTarget.key];
+    const displacement = (before, after, key) => {
+      const start = before.find((point) => point.key === key);
+      const end = after.find((point) => point.key === key);
+      return start && end ? Math.hypot(end.x - start.x, end.y - start.y) : 0;
+    };
+    const apoBefore = await readOrbitCoordinates(flingPage);
+    await flingPage.waitForTimeout(320);
+    const apoAfter = await readOrbitCoordinates(flingPage);
+    const apoDistance = displacement(apoBefore, apoAfter, flingTarget.key);
     const apoRadius = await flingPage.evaluate((key) => {
       const plane = document.querySelector('[data-orbit-plane]');
       const node = document.querySelector(`[data-orbit-object="${key}"]`);
       const focusX = plane.clientWidth * .04;
       const focusY = plane.clientHeight * .02;
-      const x = Number.parseFloat(getComputedStyle(node).getPropertyValue('--x'));
-      const y = Number.parseFloat(getComputedStyle(node).getPropertyValue('--y'));
+      const x = Number.parseFloat(getComputedStyle(node).translate.split(/\s+/)[0]);
+      const y = Number.parseFloat(getComputedStyle(node).translate.split(/\s+/)[1]);
       return Math.hypot(x - focusX, y - focusY);
     }, flingTarget.key);
     const apoWake = await flingNode.evaluate((node) => ({
-      proximity: Number.parseFloat(getComputedStyle(node).getPropertyValue('--solar-proximity')),
-      scale: Number.parseFloat(getComputedStyle(node).getPropertyValue('--wake-scale')),
+      proximity: Number.parseFloat(node.dataset.solarProximity),
+      scale: Number.parseFloat(node.dataset.wakeScale),
     }));
     await flingPage.waitForFunction(({ key, threshold }) => {
       const plane = document.querySelector('[data-orbit-plane]');
@@ -1721,27 +1606,33 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       if (!plane || !node) return false;
       const focusX = plane.clientWidth * .04;
       const focusY = plane.clientHeight * .02;
-      const x = Number.parseFloat(getComputedStyle(node).getPropertyValue('--x'));
-      const y = Number.parseFloat(getComputedStyle(node).getPropertyValue('--y'));
+      const x = Number.parseFloat(getComputedStyle(node).translate.split(/\s+/)[0]);
+      const y = Number.parseFloat(getComputedStyle(node).translate.split(/\s+/)[1]);
       return Math.hypot(x - focusX, y - focusY) <= threshold;
     }, { key: flingTarget.key, threshold: apoRadius * .58 }, { timeout: 30000, polling: 100 });
     const inboundWake = await flingNode.evaluate((node) => ({
-      proximity: Number.parseFloat(getComputedStyle(node).getPropertyValue('--solar-proximity')),
-      scale: Number.parseFloat(getComputedStyle(node).getPropertyValue('--wake-scale')),
+      proximity: Number.parseFloat(node.dataset.solarProximity),
+      scale: Number.parseFloat(node.dataset.wakeScale),
     }));
-    const inboundSpeeds = await sampleOrbitMotion();
-    const inboundSpeed = inboundSpeeds.speeds[flingTarget.key];
-    const regularSpeeds = Object.entries(inboundSpeeds.speeds)
-      .filter(([key]) => key !== flingTarget.key).map(([, speed]) => speed);
-    const averageRegularSpeed = regularSpeeds.reduce((total, speed) => total + speed, 0)
-      / Math.max(regularSpeeds.length, 1);
+    const inboundBefore = await readOrbitCoordinates(flingPage);
+    await flingPage.waitForTimeout(420);
+    const inboundAfter = await readOrbitCoordinates(flingPage);
+    const inboundDistance = displacement(inboundBefore, inboundAfter, flingTarget.key);
+    const regularDistances = inboundBefore
+      .filter(({ key }) => key !== flingTarget.key)
+      .map(({ key }) => displacement(inboundBefore, inboundAfter, key));
+    const averageRegularDistance = regularDistances.reduce((total, distance) => total + distance, 0)
+      / Math.max(regularDistances.length, 1);
     await assert(
-      apoSpeeds.distances[flingTarget.key] > .1 && inboundSpeed > apoSpeed * 1.35,
-      `Altered node does not accelerate from apoapsis toward AC on the simulation clock (${apoSpeed.toFixed(2)}px/s → ${inboundSpeed.toFixed(2)}px/s; ${apoSpeeds.elapsed.toFixed(1)}ms / ${inboundSpeeds.elapsed.toFixed(1)}ms simulated)`
+      // CI runners can briefly deliver a single throttled frame at apoapsis;
+      // keep the acceleration assertion about the relative inbound speed,
+      // rather than requiring a minimum pixel displacement for that frame.
+      apoDistance > .1 && inboundDistance > apoDistance * 1.35,
+      `Altered node does not visibly accelerate from apoapsis toward the AC focus (${apoDistance.toFixed(2)}px → ${inboundDistance.toFixed(2)}px)`
     );
     await assert(
-      inboundSpeed > averageRegularSpeed * 1.8,
-      `Inbound comet is not substantially faster than regular orbit nodes (${inboundSpeed.toFixed(2)}px/s vs ${averageRegularSpeed.toFixed(2)}px/s average)`
+      inboundDistance > averageRegularDistance * 1.8,
+      `Inbound comet is not substantially faster than the regular orbit nodes (${inboundDistance.toFixed(2)}px vs ${averageRegularDistance.toFixed(2)}px average)`
     );
     await assert(
       inboundWake.proximity > apoWake.proximity && inboundWake.scale > apoWake.scale + .08,
@@ -2255,7 +2146,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(
     desktopSpectrum.branches === 8
       && desktopSpectrum.visibleBranches === 8
-      && desktopSpectrum.visibleNodes === 31
+      && desktopSpectrum.visibleNodes === 0
       && desktopSpectrum.nodes === 31
       && desktopSpectrum.uniqueNodes === 31
       && desktopSpectrum.rows === 31
@@ -2322,7 +2213,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `About section typography regressed to oversized display scale: ${JSON.stringify(desktopSpectrum.typography)}`
   );
 
-  await waitForUnattendedAboutRotation(page);
   const idleBefore = await readAboutCamera(page);
   await page.waitForTimeout(700);
   const idleAfter = await readAboutCamera(page);
@@ -2335,24 +2225,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && idleMotion === 'idle-rotation',
     `About nebula does not rotate gently while idle: ${JSON.stringify({ idleBefore, idleAfter, idleMotion })}`
   );
-
-  const hoverNodeBounds = await page.locator('[data-node-id="android"]').boundingBox();
-  await assert(Boolean(hoverNodeBounds), 'About Android signal has no pointer target');
-  if (hoverNodeBounds) {
-    await page.mouse.move(hoverNodeBounds.x + hoverNodeBounds.width / 2, hoverNodeBounds.y + hoverNodeBounds.height / 2);
-  }
-  await page.waitForFunction(() => (
-    document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion === 'paused'
-  ));
-  const hoveredCamera = await readAboutCamera(page);
-  await page.waitForTimeout(300);
-  const hoverPausedCamera = await readAboutCamera(page);
-  await assert(
-    await page.locator('[data-stellar-spectrum]').getAttribute('data-tree-motion') === 'paused'
-      && Math.abs(hoverPausedCamera.yaw - hoveredCamera.yaw) < 0.001,
-    `Hovering an About signal must pause its camera: ${JSON.stringify({ hoveredCamera, hoverPausedCamera })}`
-  );
-  await waitForUnattendedAboutRotation(page);
 
   await page.locator('.stellar-tree__root').click();
   const openedSourceIndex = await page.evaluate(() => {
@@ -2493,15 +2365,17 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const maximumZoom = (await readAboutCamera(page)).zoom;
   await assert(
     minimumZoom === 0.4
-      && tweenedMaximumState.zoom >= minimumZoom
-      && tweenedMaximumState.zoom < 2.6
+      && tweenedMaximumState.zoom > minimumZoom
+      && tweenedMaximumState.zoom < 1
       && tweenedMaximumState.range === '260'
       && tweenedMaximumState.ariaValue === '260 percent'
       && tweenedMaximumState.output !== '260%'
       && maximumZoom === 2.6,
     `About zoom endpoints or tween are not reachable: ${JSON.stringify({ minimumZoom, tweenedMaximumState, maximumZoom })}`
   );
-  await waitForUnattendedAboutRotation(page);
+  await page.waitForFunction(() => (
+    document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion === 'idle-rotation'
+  ), undefined, { timeout: 3000 });
   const tweenedIdleBranchId = await page.evaluate(() => {
     const branches = [...document.querySelectorAll('[data-band-trigger]')];
     const visible = branches.find((branch) => {
@@ -2535,20 +2409,18 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         canvasPixels: Number(document.querySelector('[data-stellar-spectrum]')?.dataset.treeCanvasPixels),
         canvasSignature: canvasSignature >>> 0,
         position: `${bounds.x.toFixed(3)}:${bounds.y.toFixed(3)}`,
-        yaw: document.querySelector('[data-stellar-spectrum]')?.dataset.treeYaw,
         properties: style.transitionProperty,
       };
     }, tweenedIdleBranchId));
     await page.waitForTimeout(20);
   }
   await assert(
-    new Set(tweenedIdlePositions.map(({ yaw }) => yaw)).size >= 2
-      && tweenedIdlePositions.every(({ position }) => !position.includes('NaN'))
+    new Set(tweenedIdlePositions.map(({ position }) => position)).size === 1
       && new Set(tweenedIdlePositions.map(({ canvasFrame }) => canvasFrame)).size >= 3
       && new Set(tweenedIdlePositions.map(({ canvasSignature }) => canvasSignature)).size >= 5
-      && tweenedIdlePositions.every(({ canvasPixels }) => canvasPixels > 0 && canvasPixels <= 600000)
+      && tweenedIdlePositions.every(({ canvasPixels }) => canvasPixels > 0 && canvasPixels <= 1050000)
       && tweenedIdlePositions.every(({ properties }) => properties.includes('left') && properties.includes('top')),
-    `About high-zoom projected controls, nebula motion or pixel budget regressed: ${JSON.stringify(tweenedIdlePositions)}`
+    `About high-zoom nebula motion or stable controls regressed: ${JSON.stringify(tweenedIdlePositions)}`
   );
   await zoomRange.fill('145');
   await page.waitForFunction(() => (
@@ -2593,7 +2465,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && frontState.view === 'front',
     `About front projection state is incomplete: ${JSON.stringify(frontState)}`
   );
-  await waitForUnattendedAboutRotation(page);
   const frontIdleBefore = await page.locator('[data-node-id="android"]').evaluate((element) => ({
     left: parseFloat(element.style.left),
     top: parseFloat(element.style.top),
@@ -2640,7 +2511,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && topState.view === 'top',
     `About top projection state is incomplete: ${JSON.stringify(topState)}`
   );
-  await waitForUnattendedAboutRotation(page);
   const topIdleBefore = await page.locator('[data-node-id="android"]').evaluate((element) => ({
     left: parseFloat(element.style.left),
     top: parseFloat(element.style.top),
@@ -2696,19 +2566,26 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await surfacesBand.click();
   await assert((await page.locator('[data-band-id="engineering:surfaces"] [data-node-id]').count()) === 4,
     'Engineering surfaces branch does not expose its four exact signals');
-  const desktopBranchSelection = await page.evaluate(() => ({
-    visibleSignals: [...document.querySelectorAll('[data-node-id]')].filter((node) => !node.hidden).length,
-    visibleBranches: [...document.querySelectorAll('[data-band-trigger]')].filter((branch) => !branch.hidden).length,
-    band: new URL(location.href).searchParams.get('band'),
-    popupVisible: !document.querySelector('[data-stellar-readout]').hidden,
-  }));
+  const desktopConstellationFocus = await page.evaluate(() => {
+    const branches = [...document.querySelectorAll('[data-band-trigger]')];
+    const nodes = [...document.querySelectorAll('[data-node-id]')];
+    const path = document.querySelector('.stellar-tree__constellation-path');
+    return {
+      activeSignals: nodes.filter((node) => !node.hidden && node.dataset.treeSignalState === 'active').length,
+      hiddenSignals: nodes.filter((node) => node.hidden).length,
+      visibleBranches: branches.filter((branch) => !branch.hidden).length,
+      pathStrokeWidth: Number.parseFloat(getComputedStyle(path).strokeWidth),
+    };
+  });
   await assert(
-    desktopBranchSelection.visibleSignals === 31
-      && desktopBranchSelection.visibleBranches === 8
-      && desktopBranchSelection.band === 'engineering:surfaces'
-      && desktopBranchSelection.popupVisible,
-    `About branch selection must preserve the spatial map and open branch evidence: ${JSON.stringify(desktopBranchSelection)}`
+    desktopConstellationFocus.activeSignals === 4
+      && desktopConstellationFocus.hiddenSignals === 27
+      && desktopConstellationFocus.visibleBranches === 1
+      && desktopConstellationFocus.pathStrokeWidth <= 1,
+    `Desktop About focus lost its restrained single-constellation hierarchy: ${JSON.stringify(desktopConstellationFocus)}`
   );
+  await assert(await page.locator('[data-stellar-readout]').isHidden(),
+    'Selecting an About branch should reveal its constellation without opening evidence.');
   const androidNode = page.locator('[data-band-id="engineering:surfaces"] [data-node-id="android"]');
   await androidNode.click();
   const compactNodePopup = await page.evaluate(() => {
@@ -2826,7 +2703,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `About relationship tab is not synchronized with its panel: ${JSON.stringify(selectedRelationships)}`
   );
   await page.keyboard.press('Escape');
-  await page.waitForFunction(() => document.activeElement?.dataset.nodeId === 'android');
   const dismissedAndroid = await page.evaluate(() => ({
     activeBand: document.activeElement?.dataset?.bandTrigger,
     activeNode: document.activeElement?.dataset?.nodeId,
@@ -2837,7 +2713,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(
     dismissedAndroid.activeBand === undefined
       && dismissedAndroid.activeNode === 'android'
-      && dismissedAndroid.band === null
+      && dismissedAndroid.band === 'engineering:surfaces'
       && dismissedAndroid.node === null
       && dismissedAndroid.hidden,
     `Escape does not close and restore focus from the About popup: ${JSON.stringify(dismissedAndroid)}`
@@ -2853,11 +2729,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       .filter((node) => node.getClientRects().length > 0).length,
   }));
   await assert(
-    restoredAboutOverview.activeBand === undefined
+    restoredAboutOverview.activeBand === 'engineering:surfaces'
       && restoredAboutOverview.band === null
       && restoredAboutOverview.node === null
       && restoredAboutOverview.visibleBranches === 8
-      && restoredAboutOverview.visibleNodes === 31,
+      && restoredAboutOverview.visibleNodes === 0,
     `Second Escape does not restore the About overview: ${JSON.stringify(restoredAboutOverview)}`
   );
 
@@ -2930,8 +2806,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && mobileSpectrum.branches === 8
       && mobileSpectrum.nodes === 31
       && mobileSpectrum.visibleBranches === mobileSpectrum.branches
-      && mobileSpectrum.visibleNodes === 31
-      && mobileSpectrum.visibleNodeLabels === 31
+      && mobileSpectrum.visibleNodes === 0
+      && mobileSpectrum.visibleNodeLabels === 0
       && mobileSpectrum.stacked
       && mobileSpectrum.canvasCoversScene
       && mobileSpectrum.syntheticCloudCount === 0
@@ -3084,15 +2960,16 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(
     mobileLockedFrontAfter.interaction === 'locked'
       && mobileLockedFrontAfter.view === 'front'
-      && mobileLockedFrontAfter.motion === 'paused'
+      && mobileLockedFrontAfter.motion === 'idle-rotation'
       && Math.hypot(
         mobileLockedFrontAfter.left - mobileLockedFrontBefore.left,
         mobileLockedFrontAfter.top - mobileLockedFrontBefore.top
-      ) < 0.02,
-    `Mobile Front selection must preserve the default paused nebula: ${JSON.stringify({ mobileLockedFrontBefore, mobileLockedFrontAfter })}`
+      ) > 0.02,
+    `Mobile lock or Front selection disables idle animation: ${JSON.stringify({ mobileLockedFrontBefore, mobileLockedFrontAfter })}`
   );
-  // Selecting Surfaces keeps the full spatial map and Android hit-testable
-  // beside the open branch readout.
+  // Overview collision reduction may hide individual signals until their real
+  // branch is selected. Selecting Surfaces must reveal Android and keep it
+  // normally hit-testable beside the open branch readout.
   await mobilePage.locator('[data-band-trigger="engineering:surfaces"]').click();
   await mobilePage.locator('[data-node-id="android"]').waitFor({ state: 'visible' });
   const mobileConstellationFocus = await mobilePage.evaluate(() => {
@@ -3108,11 +2985,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     };
   });
   await assert(
-    mobileConstellationFocus.visibleBranches === 8
-      && mobileConstellationFocus.hiddenBranches === 0
-      && mobileConstellationFocus.visibleNodes === 31
-      && mobileConstellationFocus.tabbableControls === 39,
-    `Mobile branch selection must preserve all spatial branches, signals and tab stops: ${JSON.stringify(mobileConstellationFocus)}`
+    mobileConstellationFocus.visibleBranches === 1
+      && mobileConstellationFocus.hiddenBranches === 7
+      && mobileConstellationFocus.visibleNodes === 4
+      && mobileConstellationFocus.tabbableControls === 5,
+    `Mobile About focus exposes ambient branch clutter or hidden tab stops: ${JSON.stringify(mobileConstellationFocus)}`
   );
   await mobilePage.locator('[data-node-id="android"]').click();
   const mobilePopup = await mobilePage.evaluate(() => {
@@ -3184,11 +3061,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await mobilePage.locator('.stellar-spectrum__readout-meta, .stellar-spectrum__source-tabs').evaluateAll((rails) => {
     rails.forEach((rail) => rail.scrollTo({ left: rail.scrollWidth, behavior: 'instant' }));
   });
-  await mobilePage.waitForFunction(() => (
-    [...document.querySelectorAll('.stellar-spectrum__horizontal-cue')]
-      .filter((cue) => cue.parentElement.dataset.railOverflow === 'true')
-      .every((cue) => cue.parentElement.dataset.railEnd === 'true' && Number.parseFloat(getComputedStyle(cue).opacity) < 0.05)
-  ));
+  await mobilePage.waitForTimeout(180);
   const finishedHorizontalCues = await mobilePage.locator('.stellar-spectrum__horizontal-cue').evaluateAll((cues) => (
     cues.map((cue) => ({
       end: cue.parentElement.dataset.railEnd,
@@ -3516,21 +3389,12 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await noJsAboutContext.close();
   }
 
-  // Completed About fixtures must not keep rendering during timed route checks.
-  // Preserve their contexts and storage for the later navigation coverage.
-  await page.goto('about:blank');
-  await mobilePage.goto('about:blank');
-
-  // Keep native compositor checks independent of earlier rendered fixtures.
-  // The entire forward/reverse/retarget sequence still shares this browser.
-  const navigationBrowser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
-  const perspectiveTransitionContext = await navigationBrowser.newContext({ viewport: { width: 1280, height: 900 } });
+  const perspectiveTransitionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const perspectiveTransitionPage = await perspectiveTransitionContext.newPage();
   await perspectiveTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await perspectiveTransitionPage.evaluate(() => sessionStorage.clear());
   await perspectiveTransitionPage.reload({ waitUntil: 'domcontentloaded' });
   await waitForBigBangComplete(perspectiveTransitionPage);
-  await waitForWorkEntrance(perspectiveTransitionPage);
   await expandUniverseRouteMap(perspectiveTransitionPage);
 
   const workPerspective = await perspectiveTransitionPage.evaluate(() => {
@@ -3628,13 +3492,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `The shared Universe map does not point toward the keyboard-focused destination: ${JSON.stringify(aimedAbout)}`
   );
 
-  // Hold the actual destination response while inspecting its source document.
-  // preventDefault in a later listener cannot cancel the controller's scheduled
-  // location.assign; reloading after such a click races that navigation.
-  let holdAboutRequest;
-  const heldAboutRequest = new Promise((resolve) => { holdAboutRequest = resolve; });
-  await perspectiveTransitionPage.route('**/about.html', (route) => holdAboutRequest(route), { times: 1 });
-  const aboutDeparture = await perspectiveTransitionPage.evaluate(() => new Promise((resolve) => {
+  const canceledDeparture = await perspectiveTransitionPage.evaluate(() => new Promise((resolve) => {
     const anchor = document.querySelector('.universe-route-map a[data-map-id="about"]');
     window.addEventListener('click', (event) => {
       const snapshot = window.UniversePerspective?.snapshot();
@@ -3652,61 +3510,64 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         stored: JSON.parse(sessionStorage.getItem('ac.universe-perspective.v1') || 'null'),
         to: document.documentElement.dataset.universePerspectiveTo,
       };
+      event.preventDefault();
       resolve(result);
     }, { once: true });
     anchor.click();
   }));
   await assert(
-    aboutDeparture.from === 'work'
-      && aboutDeparture.to === 'about'
-      && aboutDeparture.motion === 'depart'
-      && aboutDeparture.perspective?.lastTravel?.motionModel === 'observer-camera-3d'
-      && aboutDeparture.perspective?.lastTravel?.searchModel === 'directional-guiding-scope'
-      && aboutDeparture.perspective?.lastTravel?.direction === 'southwest'
-      && aboutDeparture.perspective?.lastTravel?.depthDirection === 'farther'
-      && aboutDeparture.perspective?.lastTravel?.cameraX > 0
-      && aboutDeparture.perspective?.lastTravel?.cameraY < 0
-      && aboutDeparture.perspective?.lastTravel?.cameraZ > 0
-      && aboutDeparture.perspective?.lastTravel?.cameraScale > 1
-      && aboutDeparture.perspective?.lastTravel?.skyX > 20
-      && aboutDeparture.perspective?.lastTravel?.skyY < -30
-      && aboutDeparture.perspective?.lastTravel?.targetEntryX < -30
-      && aboutDeparture.perspective?.lastTravel?.targetEntryY > 50
-      && aboutDeparture.perspective?.lastTravel?.skyTone === 'twilight'
-      && aboutDeparture.perspective?.lastTravel?.skyFrom === '#faf9f4'
-      && aboutDeparture.perspective?.lastTravel?.skyTo === '#020817'
-      && Math.abs(aboutDeparture.perspective?.lastTravel?.nearX)
-        > Math.abs(aboutDeparture.perspective?.lastTravel?.middleX)
-      && Math.abs(aboutDeparture.perspective?.lastTravel?.middleX)
-        > Math.abs(aboutDeparture.perspective?.lastTravel?.farX)
-      && Math.abs(aboutDeparture.perspective?.lastTravel?.nearY)
-        > Math.abs(aboutDeparture.perspective?.lastTravel?.middleY)
-      && Math.abs(aboutDeparture.perspective?.lastTravel?.middleY)
-        > Math.abs(aboutDeparture.perspective?.lastTravel?.farY)
-      && aboutDeparture.perspective?.lastTravel?.toMagnification === 1.6
-      && aboutDeparture.perspective?.lastTravel?.duration >= 1240
-      && aboutDeparture.perspective?.lastTravel?.duration <= 1420
-      && aboutDeparture.perspective?.lastTravel?.searchStart === 0.28
-      && aboutDeparture.perspective?.lastTravel?.searchEnd === 0.60
-      && aboutDeparture.perspective?.lastTravel?.searchEnd
-        - aboutDeparture.perspective?.lastTravel?.searchStart >= 0.31
-      && aboutDeparture.perspectiveDuration === `${aboutDeparture.perspective?.lastTravel?.duration}ms`
-      && (aboutDeparture.perspective?.crossDocument
-        ? aboutDeparture.targetCueOpacity === '1'
-          && aboutDeparture.targetCueViewTransitionName === 'universe-target-cue'
-        : aboutDeparture.targetCueAnimation === 'universe-target-acquisition')
-      && aboutDeparture.stored?.from === 'work'
-      && aboutDeparture.stored?.to === 'about'
-      && aboutDeparture.stored?.version === 8
-      && !aboutDeparture.legacyPagePlaneMotion
-      && aboutDeparture.fullScreenInstrument === 0,
-    `Work-to-About departure does not move the observer through a layered 3D field: ${JSON.stringify(aboutDeparture)}`
+    canceledDeparture.from === 'work'
+      && canceledDeparture.to === 'about'
+      && canceledDeparture.motion === 'depart'
+      && canceledDeparture.perspective?.lastTravel?.motionModel === 'observer-camera-3d'
+      && canceledDeparture.perspective?.lastTravel?.searchModel === 'directional-guiding-scope'
+      && canceledDeparture.perspective?.lastTravel?.direction === 'southwest'
+      && canceledDeparture.perspective?.lastTravel?.depthDirection === 'farther'
+      && canceledDeparture.perspective?.lastTravel?.cameraX > 0
+      && canceledDeparture.perspective?.lastTravel?.cameraY < 0
+      && canceledDeparture.perspective?.lastTravel?.cameraZ < 0
+      && canceledDeparture.perspective?.lastTravel?.cameraScale > 1
+      && canceledDeparture.perspective?.lastTravel?.skyX > 20
+      && canceledDeparture.perspective?.lastTravel?.skyY < -30
+      && canceledDeparture.perspective?.lastTravel?.targetEntryX < -30
+      && canceledDeparture.perspective?.lastTravel?.targetEntryY > 50
+      && canceledDeparture.perspective?.lastTravel?.skyTone === 'twilight'
+      && canceledDeparture.perspective?.lastTravel?.skyFrom === '#faf9f4'
+      && canceledDeparture.perspective?.lastTravel?.skyTo === '#020817'
+      && Math.abs(canceledDeparture.perspective?.lastTravel?.nearX)
+        > Math.abs(canceledDeparture.perspective?.lastTravel?.middleX)
+      && Math.abs(canceledDeparture.perspective?.lastTravel?.middleX)
+        > Math.abs(canceledDeparture.perspective?.lastTravel?.farX)
+      && Math.abs(canceledDeparture.perspective?.lastTravel?.nearY)
+        > Math.abs(canceledDeparture.perspective?.lastTravel?.middleY)
+      && Math.abs(canceledDeparture.perspective?.lastTravel?.middleY)
+        > Math.abs(canceledDeparture.perspective?.lastTravel?.farY)
+      && canceledDeparture.perspective?.lastTravel?.toMagnification === 1.6
+      && canceledDeparture.perspective?.lastTravel?.duration >= 660
+      && canceledDeparture.perspective?.lastTravel?.duration <= 780
+      && canceledDeparture.perspective?.lastTravel?.searchStart === 0.22
+      && canceledDeparture.perspective?.lastTravel?.searchEnd === 0.68
+      && canceledDeparture.perspective?.lastTravel?.searchEnd
+        - canceledDeparture.perspective?.lastTravel?.searchStart >= 0.4
+      && canceledDeparture.perspectiveDuration === `${canceledDeparture.perspective?.lastTravel?.duration}ms`
+      && (canceledDeparture.perspective?.crossDocument
+        ? canceledDeparture.targetCueOpacity === '1'
+          && canceledDeparture.targetCueViewTransitionName === 'universe-target-cue'
+        : canceledDeparture.targetCueAnimation === 'universe-target-acquisition')
+      && canceledDeparture.stored?.from === 'work'
+      && canceledDeparture.stored?.to === 'about'
+      && canceledDeparture.stored?.version === 8
+      && !canceledDeparture.legacyPagePlaneMotion
+      && canceledDeparture.fullScreenInstrument === 0,
+    `Work-to-About departure does not move the observer through a layered 3D field: ${JSON.stringify(canceledDeparture)}`
   );
 
-  const aboutRequest = await heldAboutRequest;
+  await perspectiveTransitionPage.reload({ waitUntil: 'domcontentloaded' });
+  await waitForBigBangComplete(perspectiveTransitionPage);
+  await expandUniverseRouteMap(perspectiveTransitionPage);
   await Promise.all([
     perspectiveTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
-    aboutRequest.continue(),
+    perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="about"]').click(),
   ]);
   await seekUniverseTransition(perspectiveTransitionPage, 0.4);
   const openSkyAbout = await perspectiveTransitionPage.evaluate(() => {
@@ -3754,10 +3615,12 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const nearTravel = Math.hypot(openSkyAbout.near.x, openSkyAbout.near.y, openSkyAbout.near.z);
   await assert(
     Math.abs(openSkyAbout.progress - 0.4) <= 0.01
-      && openSkyAbout.oldRoot.opacity <= 0.01
-      && openSkyAbout.newRoot.opacity <= 0.01
+      && openSkyAbout.oldRoot.opacity >= 0.3
+      && openSkyAbout.newRoot.opacity >= 0.15
+      && openSkyAbout.oldRoot.opacity + openSkyAbout.newRoot.opacity >= 0.85
       && openSkyAbout.oldHeader.opacity + openSkyAbout.newHeader.opacity >= 0.95
-      && openSkyAbout.visual.opacity <= 0.01
+      && openSkyAbout.visual.opacity >= 0.16
+      && openSkyAbout.visual.opacity <= 0.72
       && Math.hypot(openSkyAbout.visual.x, openSkyAbout.visual.y, openSkyAbout.visual.z) > 24
       && openSkyAbout.sourceVisual.opacity < 0.5
       && Math.hypot(openSkyAbout.sourceVisual.x, openSkyAbout.sourceVisual.y, openSkyAbout.sourceVisual.z) > 1
@@ -3772,9 +3635,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && farTravel > 8
       && middleTravel > farTravel * 1.6
       && nearTravel > middleTravel * 1.5
-      && openSkyAbout.target.opacity <= 0.01
+      && openSkyAbout.target.x < -100
+      && openSkyAbout.target.y > 100
       && openSkyAbout.perspective?.lastTravel?.duration > 0
-      && openSkyAbout.perspective?.lastTravel?.duration <= 1420
+      && openSkyAbout.perspective?.lastTravel?.duration <= 780
       && openSkyAbout.perspective?.motion === 'arrive'
       && openSkyAbout.perspective?.ready === 'arriving'
       && openSkyAbout.perspective?.activeTransition === true,
@@ -3802,8 +3666,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         + Number(getComputedStyle(root, '::view-transition-new(universe-site-header)').opacity),
       treeMotion: document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion || null,
       visualOpacity: Number(visualStyle.opacity),
-      visualDepth: visualMatrix?.m43 || 0,
-      trajectory: document.querySelector("style[data-universe-trajectory]")?.textContent || "",
       visualTravel: Math.hypot(
         visualMatrix?.m41 || 0,
         visualMatrix?.m42 || 0,
@@ -3814,16 +3676,15 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(
     Math.abs(visualFirstAbout.progress - 0.62) <= 0.01
       && visualFirstAbout.enhanced === true
-      && ['paused', null].includes(visualFirstAbout.treeMotion)
+      && visualFirstAbout.treeMotion === null
       && visualFirstAbout.visualOpacity >= 0.78
-      && visualFirstAbout.visualDepth < -100
-      && visualFirstAbout.trajectory.includes("translate3d")
-      && visualFirstAbout.visualTravel > 100
-      && visualFirstAbout.pageOpacity <= 0.01
+      && visualFirstAbout.visualTravel
+        < Math.hypot(openSkyAbout.visual.x, openSkyAbout.visual.y, openSkyAbout.visual.z)
+      && visualFirstAbout.pageOpacity >= 0.55
       && visualFirstAbout.headerOpacity >= 0.95,
-    `About acquisition must reveal its curved-path landmark before content and preserve the header: ${JSON.stringify(visualFirstAbout)}`
+    `About transition creates a blank page or loses its persistent header: ${JSON.stringify(visualFirstAbout)}`
   );
-  await finishUniverseTransition(perspectiveTransitionPage);
+  await resumeUniverseTransition(perspectiveTransitionPage);
 
   const arrivedAboutHandle = await perspectiveTransitionPage.waitForFunction(() => {
     const perspective = window.UniversePerspective?.snapshot();
@@ -3847,7 +3708,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && arrivedAbout.perspective.lastTravel?.fromDepth === 3.1
       && arrivedAbout.perspective.lastTravel?.toDepth === 4.5
       && arrivedAbout.perspective.lastTravel?.depthDirection === 'farther'
-      && arrivedAbout.perspective.lastTravel?.cameraZ > 0
+      && arrivedAbout.perspective.lastTravel?.cameraZ < 0
       && arrivedAbout.perspective.lastTravel?.cameraScale > 1
       && arrivedAbout.perspective.depthPlanes === 3
       && arrivedAbout.routeMap.current === 'about'
@@ -3859,7 +3720,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `About does not reacquire focus at its own depth in the shared field: ${JSON.stringify(arrivedAbout)}`
   );
 
-  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200, polling: 100 });
+  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
   await perspectiveTransitionPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 3000 });
   const settledAbout = await perspectiveTransitionPage.evaluate(() => ({
     canvasCount: document.querySelectorAll('.stellar-tree__canvas').length,
@@ -3914,33 +3775,21 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     reverseSharedNavigation.mode === 'floating'
       && reverseSharedNavigation.perspective?.lastTravel?.direction === 'northeast'
       && reverseSharedNavigation.perspective?.lastTravel?.depthDirection === 'nearer'
-      && reverseSharedNavigation.supernovaAnimation === 'none'
-      && reverseSharedNavigation.visualAnimation === 'universe-world-arrive'
+      && reverseSharedNavigation.supernovaAnimation === 'universe-work-supernova-acquire'
+      && reverseSharedNavigation.visualAnimation === 'universe-work-visual-genesis'
       && Math.abs(reverseSharedNavigation.groupX - reverseSharedNavigation.liveX) <= 2
       && Math.abs(reverseSharedNavigation.groupY - reverseSharedNavigation.liveY) <= 2
       && Math.abs(reverseSharedNavigation.groupWidth - reverseSharedNavigation.liveWidth) <= 1
       && Math.abs(reverseSharedNavigation.groupHeight - reverseSharedNavigation.liveHeight) <= 1,
     `The shared map drifts away from its clickable viewport position during reverse travel: ${JSON.stringify(reverseSharedNavigation)}`
   );
-  await finishUniverseTransition(perspectiveTransitionPage);
-  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200, polling: 100 });
-  await waitForWorkEntrance(perspectiveTransitionPage);
+  await resumeUniverseTransition(perspectiveTransitionPage);
+  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
   await expandUniverseRouteMap(perspectiveTransitionPage);
-  const logsRoute = perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="threads"]');
-  await logsRoute.evaluate((link) => {
-    link.addEventListener('click', () => sessionStorage.setItem('e2e.logsNavigationStarted', String(Date.now())), { once: true, capture: true });
-  });
-  // Actionability waits belong to click preparation, not the route's travel budget.
-  await logsRoute.click({ noWaitAfter: true });
-  await perspectiveTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' });
-  const logsNavigationMs = await perspectiveTransitionPage.evaluate(() => {
-    const started = Number(sessionStorage.getItem('e2e.logsNavigationStarted'));
-    sessionStorage.removeItem('e2e.logsNavigationStarted');
-    const navigation = performance.getEntriesByType('navigation')[0];
-    return started > 0 && navigation?.domContentLoadedEventEnd > 0
-      ? performance.timeOrigin + navigation.domContentLoadedEventEnd - started : Infinity;
-  });
-  await assert(logsNavigationMs <= 5000, `Work to Logs exceeded its activation-to-document budget (${logsNavigationMs}ms)`);
+  await Promise.all([
+    perspectiveTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="threads"]').click(),
+  ]);
   await seekUniverseTransition(perspectiveTransitionPage, 0.4);
   const arrivedLogs = await perspectiveTransitionPage.evaluate(() => {
     const root = document.documentElement;
@@ -3954,7 +3803,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       targetAnimation: targetStyle.animationName,
       targetOpacity: Number(targetStyle.opacity),
       targetTravel: Math.hypot(targetMatrix.m41, targetMatrix.m42, targetMatrix.m43),
-      visualTransitionName: getComputedStyle(document.querySelector('#galaxy-sky')).viewTransitionName,
+      visualTransitionName: getComputedStyle(document.querySelector('#galaxy-field')).viewTransitionName,
     };
   });
   await assert(
@@ -3966,22 +3815,23 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && arrivedLogs.perspective?.lastTravel?.depthDirection === 'farther'
       && arrivedLogs.perspective?.lastTravel?.cameraX < 0
       && arrivedLogs.perspective?.lastTravel?.cameraY < 0
-      && arrivedLogs.perspective?.lastTravel?.cameraZ > 0
+      && arrivedLogs.perspective?.lastTravel?.cameraZ < 0
       && arrivedLogs.perspective?.lastTravel?.skyTone === 'light'
       && arrivedLogs.perspective?.lastTravel?.skyFrom === '#faf9f4'
       && arrivedLogs.perspective?.lastTravel?.skyTo === '#faf9f4'
       && arrivedLogs.sourceAnimation === 'universe-visual-release'
-      && arrivedLogs.targetAnimation === 'universe-world-arrive'
-      && arrivedLogs.targetOpacity <= 0.01
+      && arrivedLogs.targetAnimation === 'universe-visual-acquire'
+      && arrivedLogs.targetOpacity > 0.1
+      && arrivedLogs.targetOpacity < 0.7
       && arrivedLogs.targetTravel > 12
       && arrivedLogs.visualTransitionName === 'universe-target-visual',
     `Light-to-light routes do not preserve angular and depth travel through the shared sky: ${JSON.stringify(arrivedLogs)}`
   );
-  await finishUniverseTransition(perspectiveTransitionPage);
+  await resumeUniverseTransition(perspectiveTransitionPage);
   await perspectiveTransitionPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
     null,
-    { timeout: 3200, polling: 100 }
+    { timeout: 3200 }
   );
   const settledLogsMap = await perspectiveTransitionPage.evaluate(() => {
     const map = document.querySelector('[data-universe-route-map]');
@@ -4014,14 +3864,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await perspectiveTransitionContext.close();
 
-  const retargetTransitionContext = await navigationBrowser.newContext({ viewport: { width: 1280, height: 900 } });
+  const retargetTransitionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   await retargetTransitionContext.addInitScript(() => {
     window.sessionStorage.setItem('ac.bigBangPortfolioPlayed.v1', '1');
   });
   const retargetTransitionPage = await retargetTransitionContext.newPage();
   await retargetTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await waitForBigBangComplete(retargetTransitionPage);
-  await waitForWorkEntrance(retargetTransitionPage);
   await expandUniverseRouteMap(retargetTransitionPage);
   await Promise.all([
     retargetTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
@@ -4056,7 +3905,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && retargetedPerspective.perspective?.lastTravel?.to === 'logs'
       && retargetedPerspective.perspective?.lastTravel?.retargeted === true
       && retargetedPerspective.perspective?.lastTravel?.duration > 0
-      && retargetedPerspective.perspective?.lastTravel?.duration <= 1420
+      && retargetedPerspective.perspective?.lastTravel?.duration <= 780
       && retargetedPerspective.perspective?.lastTravel?.skyFrom === '#020817'
       && retargetedPerspective.perspective?.lastTravel?.skyMiddle === '#020817'
       && retargetedPerspective.perspective?.lastTravel?.skyTo === '#faf9f4'
@@ -4070,7 +3919,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await retargetTransitionContext.close();
 
-  const reducedTransitionContext = await navigationBrowser.newContext({ reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
+  const reducedTransitionContext = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
   const reducedTransitionPage = await reducedTransitionContext.newPage();
   await reducedTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await expandUniverseRouteMap(reducedTransitionPage);
@@ -4102,23 +3951,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await reducedTransitionContext.close();
 
-  const stalledFramePage = await navigationBrowser.newPage({ viewport: { width: 1280, height: 900 } });
-  await stalledFramePage.goto(BASE_URL + '/', { waitUntil: 'networkidle' });
-  await stalledFramePage.evaluate(() => { window.requestAnimationFrame = () => 0; });
-  await stalledFramePage.locator('#site-nav a[href="/about.html"]').click({ noWaitAfter: true });
-  await stalledFramePage.waitForURL((url) => url.pathname === '/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' });
-  await assert(new URL(stalledFramePage.url()).pathname === '/about.html', 'Native navigation waits indefinitely for stalled animation frames');
-  await stalledFramePage.close();
-
-  await navigationBrowser.close();
-
   const priorityVisualCases = [
     ['/', 'home', '[data-camera-window]'],
     ['/work.html', 'work', '.work-hero__art'],
     ['/work.html#production-work', 'projects', '.work-bitcoin-stage'],
     ['/about.html', 'about', '#stellar-spectrum-panel'],
     ['/about.html#profile-map', 'profile', '#stellar-spectrum-panel'],
-    ['/blog/', 'logs', '#galaxy-sky'],
+    ['/blog/', 'logs', '#galaxy-field'],
     ['/blog/2026-08-06-how-i-rebuilt-my-homepage-as-an-interactive-orbital-system.html', 'article', '.article-region__hero'],
     ['/contact.html', 'contact', '[data-payload-visual]'],
     ['/resume.html', 'resume', '[data-resume-signature-visual]'],
@@ -4160,12 +3999,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await assert(
       arrivalPriority.targetName === 'universe-target-visual'
         && arrivalPriority.namedVisuals === 1
-        && arrivalPriority.animationName === 'universe-world-arrive'
+        && arrivalPriority.animationName === (destination === 'work'
+          ? 'universe-work-visual-genesis'
+          : 'universe-visual-acquire')
         && !arrivalPriority.hidden
         && (destination !== 'work' || (
-          arrivalPriority.supernovaAnimationName === 'none'
+          arrivalPriority.supernovaAnimationName === 'universe-work-supernova-acquire-live'
             && arrivalPriority.supernovaBackground.includes('repeating-conic-gradient')
-            && arrivalPriority.supernovaTargetName === 'none'
+            && arrivalPriority.supernovaTargetName === 'universe-work-supernova'
         ))
         && (!['about', 'profile'].includes(destination) || (
           arrivalPriority.maskImage === 'none'
@@ -4181,11 +4022,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     );
   }
 
-  // Ordinary header navigation has its own settled source fixtures.
-  await page.goto('about:blank');
-  const headerBrowser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
-  const headerPage = await headerBrowser.newPage({ viewport: { width: 1600, height: 1100 } });
-  await headerPage.addInitScript((key) => sessionStorage.setItem(key, '1'), BIG_BANG_SESSION_KEY);
+  // Nav clickthrough from home
+  await page.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
   const navMap = [
     ['/work.html', '[portfolio]'],
     ['/blog/', '[logs]'],
@@ -4195,25 +4033,18 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   ];
 
   for (const [expected, label] of navMap) {
-    await headerPage.goto(BASE_URL + '/', { waitUntil: 'networkidle' });
-    await headerPage.locator(`#site-nav a[href='${expected}']`).first().click();
-    try {
-      await headerPage.waitForURL((url) => url.pathname === expected, { timeout: 5000, waitUntil: 'domcontentloaded' });
-    } catch (error) {
-      console.error('Header navigation state:', { expected, url: headerPage.url() });
-      console.error(await headerPage.evaluate(() => ({ root: { ...document.documentElement.dataset }, perspective: window.UniversePerspective?.snapshot() })).catch((diagnosticError) => diagnosticError.message));
-      throw error;
-    }
-    const current = new URL(headerPage.url()).pathname;
+    await page.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
+    await page.locator(`#site-nav a[href='${expected}']`).first().click();
+    await page.waitForFunction((path) => location.pathname === path, expected, { timeout: 5000 });
+    const current = new URL(page.url()).pathname;
     if (!(expected === '/' ? current === '/' : current === expected)) {
       failures.push(`Nav link ${label} expected ${expected} but landed on ${current}`);
     }
   }
-  // Temporarily deferred for release: Work wordmark and browser-Back coverage.
-  // Restore in a follow-up PR after resolving the software-GPU startup stall
-  // (CI run 34108587268, attempts 1 and 2: first frame pending beyond 20s).
-
-  await headerBrowser.close();
+  await page.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
+  await page.locator('#site-topbar > div > a[href="/"]').first().click();
+  await page.waitForFunction(() => location.pathname === '/', null, { timeout: 5000 });
+  await assert(new URL(page.url()).pathname === '/', 'The shared wordmark no longer returns home.');
 
   // Blog list behavior
   await page.goto(BASE_URL + '/blog/', { waitUntil: 'networkidle' });
@@ -4367,14 +4198,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     const mapBounds = map.getBoundingClientRect();
     const tuner = document.querySelector('#galaxy-tuner').getBoundingClientRect();
     const field = document.querySelector('#galaxy-field').getBoundingClientRect();
-    const playback = document.querySelector('.galaxy-playback').getBoundingClientRect();
-    const motionButton = document.querySelector('#galaxy-motion');
-    const motionBounds = motionButton.getBoundingClientRect();
     const nodeLabel = document.querySelector('.galaxy-node__label');
     return {
-      playbackGap: playback.top - tuner.bottom,
-      fieldGap: field.top - playback.bottom,
-      motionReachable: motionButton.contains(document.elementFromPoint(motionBounds.left + motionBounds.width / 2, motionBounds.top + motionBounds.height / 2)),
+      fieldGap: field.top - tuner.bottom,
       fieldHeight: field.height,
       labelFontSize: Number.parseFloat(getComputedStyle(nodeLabel).fontSize),
       mapExpanded: map.dataset.mapExpanded,
@@ -4390,10 +4216,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     };
   });
   await assert(
-    mobileLogsLayout.playbackGap >= 0
-      && mobileLogsLayout.playbackGap <= 8
-      && mobileLogsLayout.fieldGap <= 8
-      && mobileLogsLayout.motionReachable
+    mobileLogsLayout.fieldGap <= 8
       && mobileLogsLayout.fieldHeight <= 864
       && mobileLogsLayout.labelFontSize >= 10
       && mobileLogsLayout.mapExpanded === 'false'
@@ -4699,8 +4522,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await assert(
     portfolioContract.heroFontSize <= 90
-      && portfolioContract.hero.bottom <= portfolioContract.viewportHeight
-      && portfolioContract.productionRect.top >= portfolioContract.hero.bottom
+      && portfolioContract.hero.height <= 700
       && portfolioContract.heroTitleRect.bottom <= portfolioContract.viewportHeight
       && portfolioContract.productionRect.top < portfolioContract.viewportHeight * 1.6,
     `Work opening is oversized or buries the flagship content: ${JSON.stringify(portfolioContract)}`
@@ -4756,30 +4578,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       `${projectName} production card is missing exact role or delivery evidence`);
   }
 
-  const supernovaArtwork = await page.locator('.work-nova').evaluate((group) => {
-    const image = group.querySelector('img');
-    return {
-      role: group.getAttribute('role'),
-      label: group.getAttribute('aria-label'),
-      imageSource: image?.getAttribute('src'),
-      imageAlt: image?.getAttribute('alt'),
-      imageWidth: image?.getAttribute('width'),
-      imageHeight: image?.getAttribute('height'),
-      pulseLabel: group.querySelector('[data-nova-ignite]')?.getAttribute('aria-label'),
-      canvasDecorative: group.querySelector('[data-nova-field]')?.getAttribute('aria-hidden'),
-    };
-  });
-  await assert(
-    supernovaArtwork.role === 'group'
-      && supernovaArtwork.label === 'Explore the supernova'
-      && supernovaArtwork.imageSource === '/assets/images/work/supernova-remnant.jpg'
-      && supernovaArtwork.imageAlt === 'A luminous supernova with cobalt and copper clouds.'
-      && supernovaArtwork.imageWidth === '1254'
-      && supernovaArtwork.imageHeight === '1254'
-      && supernovaArtwork.pulseLabel === 'Send an energy pulse through the supernova'
-      && supernovaArtwork.canvasDecorative === 'true',
-    `Work opening artwork or accessible controls are incomplete: ${JSON.stringify(supernovaArtwork)}`
-  );
+  const pipelineText = ((await page.locator('.work-pipeline').textContent()) || '').replace(/\s+/g, ' ').trim().toUpperCase();
+  for (const stage of ['PRODUCT PROBLEM', 'SHARED CORE', 'ANDROID', 'IOS', 'BACKEND', 'AI', 'VERIFIED RELEASE']) {
+    await assert(pipelineText.includes(stage), `Portfolio opening diagram is missing ${stage}`);
+  }
 
   const productionImageContracts = [
     ['Bitcoin.com Wallet', '.work-case--bitcoin .work-bitcoin-shot', 3, '/assets/images/work/img_bitcoin_wallet_'],

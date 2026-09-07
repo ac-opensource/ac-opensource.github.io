@@ -134,6 +134,7 @@ body {
 .work-hero__brief-signal {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.35rem 0.75rem;
   margin-top: 0.8rem;
   color: var(--work-muted);

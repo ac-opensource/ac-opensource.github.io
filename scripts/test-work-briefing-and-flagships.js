@@ -166,17 +166,12 @@ async function verifyBrowser(workDossiers) {
     await page.goto(`${origin}/work.html`, { waitUntil: "domcontentloaded" });
     await page.evaluate(() => {
       window.__briefScrollSamples = [];
-      // Measure from keyboard activation, excluding Playwright focus/transport
-      // latency while retaining the real Enter key and native anchor behavior.
-      document.querySelector('a[href="#briefing"]').addEventListener("keydown", (event) => {
-        if (event.key !== "Enter") return;
-        window.__briefScrollStartedAt = performance.now();
-        const sample = () => {
-          window.__briefScrollSamples.push({ at: performance.now(), y: scrollY });
-          if (performance.now() - window.__briefScrollStartedAt < 1500) requestAnimationFrame(sample);
-        };
-        sample();
-      }, { capture: true, once: true });
+      window.__briefScrollStartedAt = performance.now();
+      const sample = () => {
+        window.__briefScrollSamples.push({ at: performance.now(), y: scrollY });
+        if (performance.now() - window.__briefScrollStartedAt < 1500) requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
     });
     await page.locator('a[href="#briefing"]').focus();
     await page.keyboard.press("Enter");

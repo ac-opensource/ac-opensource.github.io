@@ -138,6 +138,8 @@
   let stageIsVisible = true;
   let scanTimer = 0;
   let treeScene = null;
+  let butterflyRenderer;
+  let butterflyCanvas;
   let popupReturnTarget = null;
   let rootMarkerElement = null;
   let evidenceBackdropElement = null;
@@ -433,7 +435,6 @@
           sections[index].hidden = !active;
         });
         if (focus) tabs[nextIndex].focus();
-        if (readoutElement.contains(tabList)) positionPopup();
       };
 
       tabs.forEach((tab, index) => {
@@ -710,9 +711,9 @@
     button.setAttribute("aria-label", `${node.label}; ${MATURITY_LABELS[node.maturity] || node.maturity}; ${node.evidenceRefs.length} cited source${node.evidenceRefs.length === 1 ? "" : "s"}`);
     button.append(element("span", "stellar-spectrum__node-mark"), element("span", "stellar-spectrum__node-label", node.label));
     button.addEventListener("pointerenter", () => noteCameraInteraction(60000));
-    button.addEventListener("pointerleave", () => noteCameraInteraction());
+    button.addEventListener("pointerleave", () => noteCameraInteraction(250));
     button.addEventListener("focus", () => noteCameraInteraction(60000));
-    button.addEventListener("blur", () => noteCameraInteraction());
+    button.addEventListener("blur", () => noteCameraInteraction(250));
     button.addEventListener("click", () => {
       const closing = state.nodeId === node.id;
       popupReturnTarget = { type: "node", id: node.id };
@@ -1122,7 +1123,7 @@
     trigger.type = "button";
     trigger.dataset.bandTrigger = band.id;
     trigger.setAttribute("aria-pressed", String(active));
-    trigger.setAttribute("aria-label", `${band.dataset.label}, ${band.axis.label}; ${band.nodes.length} signals`);
+    trigger.setAttribute("aria-label", `${band.dataset.label}, ${band.axis.label}; ${band.nodes.length} equal signal points`);
     trigger.append(
       element("span", "stellar-tree__branch-dataset", band.dataset.label),
       element("strong", "", band.axis.label),
@@ -1181,10 +1182,82 @@
     });
   }
 
+  // Bipolar shells occupy real XYZ space: broad hollow lobes, curled ribs,
+  // inner blue gas, and a luminous waist. Reuse the original soft cloud sprites.
+  function butterflyCloudParticles() {
+    const random = randomFromSeed(hashSeed("butterfly-nebula-v1"));
+    const particles = [];
+    for (const side of [-1, 1]) {
+      for (let index = 0; index < 2300; index += 1) {
+        const t = Math.pow(random(), 0.8);
+        const angle = random() * Math.PI * 2;
+        const rib = Math.sin(angle * 7 + t * 8) * 0.16 + Math.sin(angle * 13 - t * 12) * 0.07;
+        const flare = Math.pow(Math.sin(t * Math.PI * 0.68), 0.85) * 4.8;
+        const shell = random() > 0.22;
+        const radius = flare * (shell ? 0.87 + random() * 0.18 + rib : Math.sqrt(random()) * 0.8);
+        const along = side * t * (side > 0 ? 11.7 : 10.7) * (1 + Math.sin(angle * 3 + side * 2) * t * 0.09);
+        const across = Math.cos(angle + t * 0.32) * radius;
+        const depth = Math.sin(angle + t * 0.32) * radius;
+        const warm = shell && Math.sin(angle * 3 + t * 8) > -0.3;
+        const color = warm ? (index % 3 ? "#eaa66e" : "#c65a48") : index % 3 ? "#7ca9e0" : "#aa97e5";
+        const taper = Math.min(1, (1 - t) * (3.6 + Math.sin(angle * 3 + side) * 1.3));
+        particles.push({
+          x: along * 0.88 - across * 0.48,
+          y: 0.6 + along * 0.48 + across * 0.88,
+          z: depth + side * Math.sin(t * 3) * 0.8,
+          size: (shell ? 0.21 : 0.29) * (0.6 + random() * 0.9),
+          alpha: (shell ? 0.09 : 0.038) * (0.5 + random() * 0.6) * taper,
+          aspect: 0.65 + random() * 0.7,
+          rotation: angle + t,
+          variant: Math.floor(random() * 5),
+          layer: !shell ? "haze" : index % 11 === 0 ? "shadow" : index % 5 === 0 ? "rim" : "body",
+          color
+        });
+      }
+    }
+    // Narrow, continuous filaments give the broad gas a second scale of detail.
+    // Each filament curls around a lobe in XYZ rather than drawing screen lines.
+    for (const side of [-1, 1]) {
+      for (let ribIndex = 0; ribIndex < 18; ribIndex += 1) {
+        const phase = random() * Math.PI * 2;
+        const extent = 0.68 + random() * 0.28;
+        for (let step = 0; step < 72; step += 1) {
+          const t = 0.06 + step / 72 * extent;
+          const angle = phase + t * 0.7 + Math.sin(t * 11 + phase) * 0.09;
+          const flare = Math.pow(Math.sin(t * Math.PI * 0.68), 0.85) * 4.8;
+          const radius = flare * (0.94 + Math.sin(angle * 7 + t * 8) * 0.16 + Math.sin(angle * 13 - t * 12) * 0.07);
+          const along = side * t * (side > 0 ? 11.7 : 10.7) * (1 + Math.sin(angle * 3 + side * 2) * t * 0.09);
+          const across = Math.cos(angle + t * 0.32) * radius;
+          const depth = Math.sin(angle + t * 0.32) * radius;
+          particles.push({x:along*.88-across*.48,y:.6+along*.48+across*.88,z:depth+side*Math.sin(t*3)*.8,
+            size:.055+random()*.025,alpha:.11*Math.sin(step/72*Math.PI),aspect:.55,rotation:angle+t,
+            variant:ribIndex%5,layer:"rim",color:ribIndex%3 ? "#91bddd" : "#e4b484"});
+        }
+      }
+    }
+    for (let index = 0; index < 90; index += 1) {
+      const angle = random() * Math.PI * 2;
+      const radius = Math.sqrt(random()) * 0.7;
+      particles.push({x:Math.cos(angle)*radius,y:0.6+Math.sin(angle)*radius,z:(random()-.5)*1.1,
+        size:0.1+random()*.12,alpha:.09,aspect:1,rotation:angle,variant:index%5,layer:"rim",color:"#dce8ff"});
+    }
+    return particles;
+  }
+
   function buildTreeGeometry(visibleBands) {
-    const rootPoint = worldPoint({ x: 500, y: 752, z: 0 });
-    const engineeringJunction = worldPoint(state.scan === "combined" ? { x: 374, y: 655, z: 105 } : { x: 500, y: 655, z: 105 });
-    const interestsJunction = worldPoint(state.scan === "combined" ? { x: 626, y: 655, z: -92 } : { x: 500, y: 655, z: -92 });
+    const rootPoint = { x: 0, y: 0, z: 0 };
+    const engineeringJunction = { x: -1.5, y: -1.2, z: .5 };
+    const interestsJunction = { x: 1.5, y: 1.2, z: -.5 };
+    const lobeAnchors = {
+      "engineering:surfaces": [-2.3,-4.6,.5],
+      "engineering:languages": [-4.3,-2.6,-.8],
+      "engineering:craft": [-2.5,-1.7,1.2],
+      "engineering:delivery": [-.9,-3.4,-1],
+      "interests:place": [2.2,1.8,.6],
+      "interests:observation": [4.1,3.6,-.7],
+      "interests:reflection": [2.1,5.1,1],
+      "interests:building": [.6,3.4,-1]
+    };
     const paths = [];
     const controlPoints = new Map([["root", rootPoint]]);
     const pointByNode = new Map();
@@ -1204,7 +1277,8 @@
     visibleBands.forEach((band, bandIndex) => {
       const layout = TREE_LAYOUT[band.id];
       if (!layout || layout.leaves.length !== band.nodes.length) return;
-      const anchor = worldPoint(layout.anchor, band.datasetKey);
+      const [x,y,z] = lobeAnchors[band.id];
+      const anchor = { x: x * 1.32, y: y * 1.18, z: z * 1.3 };
       const junction = band.datasetKey === "engineering" ? engineeringJunction : interestsJunction;
       controlPoints.set(`band:${band.id}`, anchor);
       addPath(
@@ -1217,7 +1291,12 @@
       );
 
       band.nodes.forEach((node, nodeIndexInBand) => {
-        const point = worldPoint(layout.leaves[nodeIndexInBand], band.datasetKey);
+        const angle = nodeIndexInBand / band.nodes.length * Math.PI * 2 + .4;
+        const point = {
+          x: anchor.x + Math.cos(angle) * (band.nodes.length > 4 ? 1.7 : 1.35),
+          y: anchor.y + Math.sin(angle) * 1.4,
+          z: anchor.z + Math.sin(angle * 2) * .85
+        };
         pointByNode.set(node.id, point);
         controlPoints.set(`node:${node.id}`, point);
         addPath(
@@ -1243,15 +1322,7 @@
       addPath("filament", `edge:${edge.id}`, curveBetween(source, target, 0.12, 0.34, 18), active ? "#d5e9ff" : "#6c8fb5", active ? 0.018 : 0.008, active ? 0.62 : 0.045, edge.maturity);
     }));
 
-    const cloudParticles = [];
-    paths.filter((path) => path.kind !== "filament").forEach((path) => {
-      const specification = path.kind === "trunk"
-        ? { count: 220, radius: 0.72, size: 0.19, alpha: 0.13 }
-        : path.kind === "limb"
-          ? { count: 125, radius: 0.54, size: 0.16, alpha: 0.095 }
-          : { count: 25, radius: 0.27, size: 0.09, alpha: 0.072 };
-      cloudParticles.push(...pathParticles(path, specification.count, specification.radius, specification.size, specification.alpha, path.id));
-    });
+    const cloudParticles = butterflyCloudParticles();
 
     const random = randomFromSeed(hashSeed(`stars:${state.scan}`));
     const stars = Array.from({ length: 260 }, (_, index) => ({
@@ -1507,13 +1578,29 @@
     }
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     context.clearRect(0, 0, width, height);
+    context.globalAlpha = 1;
+    context.globalCompositeOperation = "source-over";
 
+    if (butterflyRenderer === undefined) {
+      butterflyCanvas = document.createElement("canvas");
+      butterflyCanvas.addEventListener("butterflyready", () => drawTreeScene(), { once: true });
+      butterflyRenderer = window.createAboutButterflyField?.(butterflyCanvas) || null;
+    }
+    const axes = [{ x: 1, y: 0, z: 0 }, { x: 0, y: 1, z: 0 }, { x: 0, y: 0, z: 1 }]
+      .flatMap((axis) => { const rotated = rotateTreePoint(axis); return [rotated.x, rotated.y, rotated.z]; });
+    const butterflyReady = butterflyRenderer?.draw({
+      width, height,centerX:canvasOffsetX+sceneWidth*.5,centerY:canvasOffsetY+sceneOriginY,
+      baseScale:Math.min(sceneWidth/8.6,sceneHeight/18.5)*state.zoom*1.25,axes,
+      lightTheme:document.documentElement.dataset.aboutTheme === "light"
+    });
+    if (butterflyReady) context.drawImage(butterflyCanvas,0,0,width,height);
+    root.dataset.treeMaterial = butterflyReady ? "butterfly-raymarched-volume" : "procedural";
     const drawables = [];
     geometry.stars.forEach((star) => {
       const projected = projectCanvasPoint(star);
       if (projected.visible) drawables.push({ type: "star", projected, star, depth: projected.depth - 8 });
     });
-    geometry.cloudParticles.forEach((particle) => {
+    (butterflyReady ? [] : geometry.cloudParticles).forEach((particle) => {
       const projected = projectCanvasPoint(particle);
       if (projected.visible) drawables.push({ type: "cloud", projected, particle, depth: projected.depth });
     });
@@ -1560,7 +1647,7 @@
       } else {
         const { path, first, last } = drawable;
         const baseScale = Math.min(sceneWidth / 8.6, sceneHeight / 18.5) * state.zoom;
-        context.globalAlpha = path.kind === "filament" ? path.alpha : path.alpha * 0.2;
+        context.globalAlpha = path.kind === "filament" ? path.alpha * 0.5 : path.alpha * 0.015;
         context.strokeStyle = path.color;
         context.lineWidth = clamp(path.width * baseScale * ((first.scale + last.scale) / 2) * 0.58, 0.35, path.kind === "trunk" ? 2.8 : path.kind === "limb" ? 1.9 : 1.05);
         context.setLineDash(path.maturity === "shipped" ? [] : path.maturity === "published" ? [5, 6] : [2, 7]);
@@ -1576,14 +1663,6 @@
     const projectedControls = new Map();
     geometry.controlPoints.forEach((point, key) => {
       const projected = projectControlPoint(point);
-      // Keep off-screen stars in the artwork, but not as hit targets over
-      // surrounding text when the camera is zoomed or rotated.
-      if (key.startsWith("node:")) {
-        const centerX = projected.x - controlsOffsetX;
-        const centerY = projected.y - controlsOffsetY;
-        projected.visible &&= centerX >= 22 && centerX <= sceneWidth - 22
-          && centerY >= 22 && centerY <= sceneHeight - 22;
-      }
       projectedControls.set(key, projected);
       const control = controls.get(key);
       if (!control) return;
@@ -1619,13 +1698,13 @@
     const stageBounds = stageElement.getBoundingClientRect();
     const controlsBounds = treeScene.controlsLayer.getBoundingClientRect();
     const stageWidth = stageElement.clientWidth;
-    const stageHeight = stageElement.clientHeight;
+    const stageHeight = treeScene.viewport.clientHeight;
     const inset = 12;
     const viewportInset = 8;
     const topbarBottom = document.getElementById("site-topbar")?.getBoundingClientRect().bottom || 0;
     const viewportTop = clamp(Math.max(viewportInset, topbarBottom + viewportInset) - stageBounds.top, inset, stageHeight - inset);
     const viewportBottom = clamp(window.innerHeight - viewportInset - stageBounds.top, inset, stageHeight - inset);
-    const availableViewportHeight = Math.max(1, Math.min(stageHeight - inset * 2, viewportBottom - viewportTop));
+    const availableViewportHeight = Math.max(1, viewportBottom - viewportTop);
     readoutElement.style.setProperty("--popup-available-height", `${availableViewportHeight}px`);
     const popupWidth = readoutElement.offsetWidth || 330;
     const popupHeight = Math.min(readoutElement.offsetHeight || 300, stageHeight - inset * 2, availableViewportHeight);
