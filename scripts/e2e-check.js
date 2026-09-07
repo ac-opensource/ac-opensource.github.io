@@ -172,6 +172,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         await targetPage.waitForFunction(() => (
           document.querySelector('[data-universe-route-map]')?.dataset.mapExpanded === 'true'
         ));
+        await targetPage.evaluate(async () => {
+          const map = document.querySelector('[data-universe-route-map]');
+          const resizing = map.getAnimations().filter((animation) => (
+            animation.transitionProperty === 'width' || animation.transitionProperty === 'height'
+          ));
+          await Promise.all(resizing.map((animation) => animation.ready));
+        });
         await targetPage.waitForFunction(() => {
           const map = document.querySelector('[data-universe-route-map]');
           if (!map || map.dataset.mapExpanded !== 'true') return false;
@@ -253,13 +260,15 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   }
 
   async function resumeUniverseTransition(targetPage) {
-    await targetPage.evaluate(() => {
-      document.getAnimations({ subtree: true })
+    await targetPage.evaluate(async () => {
+      const animations = document.getAnimations({ subtree: true })
         .filter((animation) => (
           animation.effect?.pseudoElement?.startsWith('::view-transition')
             && animation.playState === 'paused'
-        ))
-        .forEach((animation) => animation.play());
+        ));
+      animations.forEach((animation) => animation.play());
+      // play() queues a task; start the completion budget after playback begins.
+      await Promise.all(animations.map((animation) => animation.ready));
     });
   }
 
@@ -3503,7 +3512,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await page.goto('about:blank');
   await mobilePage.goto('about:blank');
 
-  const perspectiveTransitionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  // Keep native compositor checks independent of earlier rendered fixtures.
+  // The entire forward/reverse/retarget sequence still shares this browser.
+  const navigationBrowser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+  const perspectiveTransitionContext = await navigationBrowser.newContext({ viewport: { width: 1280, height: 900 } });
   const perspectiveTransitionPage = await perspectiveTransitionContext.newPage();
   await perspectiveTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await perspectiveTransitionPage.evaluate(() => sessionStorage.clear());
@@ -3993,7 +4005,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await perspectiveTransitionContext.close();
 
-  const retargetTransitionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const retargetTransitionContext = await navigationBrowser.newContext({ viewport: { width: 1280, height: 900 } });
   await retargetTransitionContext.addInitScript(() => {
     window.sessionStorage.setItem('ac.bigBangPortfolioPlayed.v1', '1');
   });
@@ -4049,7 +4061,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
   await retargetTransitionContext.close();
 
-  const reducedTransitionContext = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
+  const reducedTransitionContext = await navigationBrowser.newContext({ reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
   const reducedTransitionPage = await reducedTransitionContext.newPage();
   await reducedTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await expandUniverseRouteMap(reducedTransitionPage);
@@ -4080,6 +4092,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `Reduced-motion navigation is not a static, usable sky map: ${JSON.stringify(reducedPerspective)}`
   );
   await reducedTransitionContext.close();
+
+  await navigationBrowser.close();
 
   const priorityVisualCases = [
     ['/', 'home', '[data-camera-window]'],
