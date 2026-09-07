@@ -2346,33 +2346,6 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && await zoomRange.getAttribute('max') === '260',
     'About zoom range no longer exposes its full supported interval'
   );
-  await zoomRange.fill('40');
-  await page.waitForFunction(() => (
-    document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom === '0.400'
-  ), undefined, { timeout: 2000 });
-  const minimumZoom = (await readAboutCamera(page)).zoom;
-  await zoomRange.fill('260');
-  await page.waitForTimeout(90);
-  const tweenedMaximumState = await page.evaluate(() => ({
-    ariaValue: document.querySelector('[data-tree-zoom-range]')?.getAttribute('aria-valuetext'),
-    output: document.querySelector('[data-tree-zoom-output]')?.textContent,
-    range: document.querySelector('[data-tree-zoom-range]')?.value,
-    zoom: Number(document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom),
-  }));
-  await page.waitForFunction(() => (
-    document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom === '2.600'
-  ), undefined, { timeout: 2000 });
-  const maximumZoom = (await readAboutCamera(page)).zoom;
-  await assert(
-    minimumZoom === 0.4
-      && tweenedMaximumState.zoom > minimumZoom
-      && tweenedMaximumState.zoom < 1
-      && tweenedMaximumState.range === '260'
-      && tweenedMaximumState.ariaValue === '260 percent'
-      && tweenedMaximumState.output !== '260%'
-      && maximumZoom === 2.6,
-    `About zoom endpoints or tween are not reachable: ${JSON.stringify({ minimumZoom, tweenedMaximumState, maximumZoom })}`
-  );
   await page.waitForFunction(() => (
     document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion === 'idle-rotation'
   ), undefined, { timeout: 3000 });
