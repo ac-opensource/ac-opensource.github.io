@@ -127,8 +127,10 @@
     frame = 0;
     if (!canRun()) { previous = 0; return; }
     // Paint each display frame: interval gates can drop 60 Hz callbacks to 30 Hz.
-    const dt = previous ? Math.min(.1,(now-previous)/1000) : 0;
-    elapsed += dt;
+    const activeSeconds = previous ? Math.max(0,(now-previous)/1000) : 0;
+    // Keep the sequence on active elapsed time even when rendering is slow.
+    elapsed += activeSeconds;
+    const dt = Math.min(.1,activeSeconds);
     previous = now;
     const follow = 1-Math.exp(-5*dt);
     pointerX += (targetX-pointerX)*follow;

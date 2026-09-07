@@ -130,9 +130,25 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   async function waitForWorkEntrance(targetPage) {
     // The fluid scene has its own six-second entrance after the page loader.
     // Start ordinary route-departure checks from the settled source scene.
-    await targetPage.waitForFunction(() => (
-      document.querySelector('[data-nova-field]')?.dataset.phase === 'remnant'
-    ), null, { timeout: 20000 });
+    try {
+      await targetPage.waitForFunction(() => (
+        document.querySelector('[data-nova-field]')?.dataset.phase === 'remnant'
+      ), null, { timeout: 20000 });
+    } catch (error) {
+      const scene = await targetPage.evaluate(() => {
+        const field = document.querySelector('[data-nova-field]');
+        const bounds = field?.closest('.work-nova')?.getBoundingClientRect();
+        return {
+          root: { ...document.documentElement.dataset }, field: { ...field?.dataset },
+          hidden: document.hidden, imageWidth: document.querySelector('.work-nova__image')?.naturalWidth,
+          bounds: bounds && { top: bounds.top, bottom: bounds.bottom, width: bounds.width, height: bounds.height },
+          viewport: { width: innerWidth, height: innerHeight, scroll: scrollY },
+          reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+        };
+      });
+      console.error(`Work entrance state: ${JSON.stringify(scene)}`);
+      throw error;
+    }
   }
 
   async function waitForUnattendedAboutRotation(targetPage) {
@@ -3427,6 +3443,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     );
     await noJsAboutContext.close();
   }
+
+  // Completed About fixtures must not keep rendering during timed route checks.
+  // Preserve their contexts and storage for the later navigation coverage.
+  await page.goto('about:blank');
+  await mobilePage.goto('about:blank');
 
   const perspectiveTransitionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const perspectiveTransitionPage = await perspectiveTransitionContext.newPage();
