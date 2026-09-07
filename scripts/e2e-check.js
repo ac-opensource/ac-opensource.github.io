@@ -4182,7 +4182,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   for (const [expected, label] of navMap) {
     await page.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
     await page.locator(`#site-nav a[href='${expected}']`).first().click();
-    await page.waitForFunction((path) => location.pathname === path, expected, { timeout: 5000 });
+    await page.waitForURL((url) => url.pathname === expected, { timeout: 5000, waitUntil: 'domcontentloaded' });
     const current = new URL(page.url()).pathname;
     if (!(expected === '/' ? current === '/' : current === expected)) {
       failures.push(`Nav link ${label} expected ${expected} but landed on ${current}`);
@@ -4190,7 +4190,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   }
   await page.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await page.locator('#site-topbar > div > a[href="/"]').first().click();
-  await page.waitForFunction(() => location.pathname === '/', null, { timeout: 5000 });
+  await page.waitForURL((url) => url.pathname === '/', { timeout: 5000, waitUntil: 'domcontentloaded' });
   await assert(new URL(page.url()).pathname === '/', 'The shared wordmark no longer returns home.');
 
   // Blog list behavior
