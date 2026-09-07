@@ -3976,7 +3976,6 @@ html[data-about-theme="light"] .stellar-tree__root.is-open { color: var(--stella
 .stellar-tree__leader-layer line { stroke: var(--stellar-muted); stroke-width: 0.65; opacity: 0.35; }
 .about-opening .stellar-spectrum__node.stellar-tree__signal .stellar-spectrum__node-label {
   display: block;
-  pointer-events: none;
   top: calc(50% + var(--label-y, 0px));
   left: calc(50% + var(--label-x, 16px));
   right: auto;

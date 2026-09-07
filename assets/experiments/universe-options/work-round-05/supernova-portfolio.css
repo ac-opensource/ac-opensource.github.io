@@ -400,6 +400,6 @@
   .work-nova__field, .work-nova__image { width: 175%; height: 175%; }
 }
 
-.work-nova__footer { background: none; color: #fff; mix-blend-mode: difference; }
+.work-nova__footer { min-height: 44px; padding-block: .35rem; background: var(--supernova-paper); color: #526757; border-radius: .5rem; }
 .work-nova__footer button { color: inherit; }
 .work-supernova-theme:has(.work-nova) .work-signals { background: linear-gradient(180deg, transparent, rgba(250,249,244,.94) 2rem, #faf9f4); }

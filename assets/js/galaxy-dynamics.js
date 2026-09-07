@@ -50,8 +50,9 @@
           const speed = Math.sqrt(core.mass * radius * radius / Math.pow(radius * radius + SOFTENING * SOFTENING, 1.5));
           const x = Math.cos(angle) * radius;
           const y = Math.sin(angle) * radius;
-          const vx = -Math.sin(angle) * speed;
-          const vy = Math.cos(angle) * speed;
+          const spin = seed.spin === -1 ? -1 : 1;
+          const vx = -Math.sin(angle) * speed * spin;
+          const vy = Math.cos(angle) * speed * spin;
           this.particles.push({
             x: core.x + x, y: core.y + y * Math.cos(tilt), z: y * Math.sin(tilt),
             vx: core.vx + vx, vy: core.vy + vy * Math.cos(tilt), vz: vy * Math.sin(tilt),

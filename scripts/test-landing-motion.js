@@ -15,7 +15,7 @@ async function main() {
       if (process.env.EVIDENCE_DIR) {
         await page.screenshot({ path: `${process.env.EVIDENCE_DIR}/landing-${viewport.width}.png` });
       }
-      const positions = () => page.locator('.orbit-node').evaluateAll(nodes => nodes.map(n => n.style.getPropertyValue('--x')));
+      const positions = () => page.locator('.orbit-node').evaluateAll(nodes => nodes.map(n => n.style.translate));
       const before = await positions();
       await page.waitForTimeout(180);
       assert.notDeepEqual(await positions(), before, 'Orbits should advance');

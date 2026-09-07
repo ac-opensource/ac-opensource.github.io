@@ -427,7 +427,7 @@ button { color: inherit; }
 
 .galaxy-core__disk--near { width: 26%; height: 26%; }
 .galaxy-hero.has-stellar-encounter .galaxy-core { opacity: 0; }
-.galaxy-hero[data-galaxy-activity="paused"] .galaxy-core__lens { animation-play-state: paused; }
+.galaxy-hero:not([data-galaxy-activity="running"]) .galaxy-core__lens { animation-play-state: paused; }
 
 .galaxy-playback {
   position: absolute;
@@ -883,7 +883,7 @@ body.has-universe-route-map.has-integrated-universe-route-map { padding-bottom: 
   .galaxy-categories button[data-saved-filter]::before { display: none; }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 767px) {
   html { scroll-behavior: auto; }
   html[data-galaxy-focus-framing="true"] { scroll-behavior: auto !important; }
   .option-nav { min-height: 5.65rem; padding-inline: 1rem; }
@@ -894,7 +894,7 @@ body.has-universe-route-map.has-integrated-universe-route-map { padding-bottom: 
   .galaxy-hero::after {
     background: linear-gradient(180deg, #060b11 0%, rgba(6, 11, 17, 0.85) 26%, transparent 49%, rgba(6, 11, 17, 0.3) 100%);
   }
-  .galaxy-copy { position: relative; top: auto; left: auto; width: 100%; padding: 7.2rem 1.1rem 0; }
+  .galaxy-copy { position: relative; top: auto; left: auto; width: 100%; padding: 9rem 1.1rem 0; }
   .galaxy-intro { width: 100%; }
   .galaxy-intro h1 { max-width: 9ch; font-size: clamp(3rem, 14vw, 4.35rem); }
   .galaxy-intro__lede { max-width: 34rem; font-size: 0.88rem; }

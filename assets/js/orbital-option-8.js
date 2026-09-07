@@ -406,10 +406,12 @@
     const focusX = state.width * .04;
     const focusY = state.height * .02;
     const awayFromFocus = Math.atan2(point.y - focusY, point.x - focusX) * 180 / Math.PI;
-    node.style.setProperty("--tail-angle", `${awayFromFocus.toFixed(3)}deg`);
+    const angle = `${awayFromFocus.toFixed(3)}deg`;
+    node.dataset.tailAngle = angle;
+    return angle;
   };
 
-  const syncCometWake = (node, point, previousPoint = null, orbitDirection = 1) => {
+  const syncCometWake = (node, point) => {
     if (cometWake.parentElement !== node) node.append(cometWake);
     const focusX = state.width * .04;
     const focusY = state.height * .02;
@@ -420,22 +422,14 @@
     const distanceRatio = clamp((solarDistance - scale * .045) / (scale * .73), 0, 1);
     const proximity = 1 - distanceRatio;
     const wakeScale = .64 + proximity * .78;
-    let dustSide = -Math.sign(orbitDirection || 1);
-
-    if (previousPoint) {
-      const velocityX = point.x - previousPoint.x;
-      const velocityY = point.y - previousPoint.y;
-      const orbitalCross = radialX * velocityY - radialY * velocityX;
-      if (Math.abs(orbitalCross) > .01) dustSide = -Math.sign(orbitalCross);
-    }
-
-    syncTailDirection(node, point);
-    node.style.setProperty("--wake-scale", wakeScale.toFixed(3));
-    node.style.setProperty("--wake-inverse", (1 / wakeScale).toFixed(3));
-    node.style.setProperty("--wake-intensity", (.72 + proximity * .28).toFixed(3));
-    node.style.setProperty("--solar-proximity", proximity.toFixed(3));
-    node.style.setProperty("--dust-angle", `${(dustSide * (2.5 + proximity * 4.5)).toFixed(3)}deg`);
-    node.style.setProperty("--dust-bend", `${(dustSide * (5 + proximity * 11)).toFixed(3)}px`);
+    const angle = syncTailDirection(node, point);
+    const renderedScale = wakeScale.toFixed(3);
+    node.dataset.wakeScale = renderedScale;
+    // Keep the wake independent of the responsive counter-rotation on node children.
+    cometWake.style.setProperty("transform", `translate(0,-50%) rotate(${angle}) scaleX(${renderedScale})`, "important");
+    node.dataset.solarProximity = proximity.toFixed(3);
+    // The wake declares its own inverse, intensity and dust constants in CSS.
+    // Writing shadowed copies on the node only invalidated its animated subtree.
   };
 
   const renderedLayers = new WeakMap();
@@ -448,8 +442,7 @@
       const node = nodeByKey.get(profile.key);
       const point = points[index];
       const custom = state.customOrbits.get(profile.key);
-      node.style.setProperty("--x", `${point.x.toFixed(2)}px`);
-      node.style.setProperty("--y", `${point.y.toFixed(2)}px`);
+      node.style.translate = `${point.x.toFixed(2)}px ${point.y.toFixed(2)}px`;
       // Layer changes only when a body crosses a depth band. Avoid dirtying
       // its entire subtree with unchanged inherited custom properties.
       if (renderedLayers.get(node) !== point.layer) {
@@ -457,8 +450,7 @@
         renderedLayers.set(node, point.layer);
       }
       if (custom && !(state.drag?.active && state.drag.key === profile.key)) {
-        syncCometWake(node, point, custom.previousPoint, custom.direction);
-        custom.previousPoint = point;
+        syncCometWake(node, point);
       }
     });
   };
@@ -881,10 +873,10 @@
     nodeByKey.get(keys[index])?.focus({ preventScroll: true });
   };
 
-  const nodePoint = (node) => ({
-    x: Number.parseFloat(node.style.getPropertyValue("--x")) || 0,
-    y: Number.parseFloat(node.style.getPropertyValue("--y")) || 0,
-  });
+  const nodePoint = (node) => {
+    const [x, y] = node.style.translate.split(" ").map(Number.parseFloat);
+    return { x: x || 0, y: y || 0 };
+  };
 
   // Calibrate the camera at the grabbed node. Two tiny, synchronous probes give
   // a local screen-space basis that already includes tilt, scale and perspective.
@@ -895,12 +887,11 @@
       return { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 };
     };
     const origin = center();
-    node.style.setProperty("--x", `${point.x + probe}px`);
+    node.style.translate = `${point.x + probe}px ${point.y}px`;
     const xProbe = center();
-    node.style.setProperty("--x", `${point.x}px`);
-    node.style.setProperty("--y", `${point.y + probe}px`);
+    node.style.translate = `${point.x}px ${point.y + probe}px`;
     const yProbe = center();
-    node.style.setProperty("--y", `${point.y}px`);
+    node.style.translate = `${point.x}px ${point.y}px`;
 
     const xAxis = { x: (xProbe.x - origin.x) / probe, y: (xProbe.y - origin.y) / probe };
     const yAxis = { x: (yProbe.x - origin.x) / probe, y: (yProbe.y - origin.y) / probe };
@@ -965,11 +956,11 @@
 
     const finish = () => {
       node.classList.remove("is-resetting");
-      node.style.removeProperty("--tail-angle");
-      node.style.removeProperty("--wake-scale");
+      delete node.dataset.tailAngle;
+      delete node.dataset.wakeScale;
       node.style.removeProperty("--wake-inverse");
       node.style.removeProperty("--wake-intensity");
-      node.style.removeProperty("--solar-proximity");
+      delete node.dataset.solarProximity;
       node.style.removeProperty("--dust-angle");
       node.style.removeProperty("--dust-bend");
       if (state.selected !== key && !node.matches(":hover") && document.activeElement !== node) state.held.delete(key);
@@ -1013,7 +1004,6 @@
       majorRatio: majorRadius / Math.max(scale, 1),
       minorRatio: minorRadius / Math.max(scale, 1),
       period: clamp(34 - speed * .009, 18, 34),
-      previousPoint: null,
       tilt: tiltRadians * 180 / Math.PI,
     };
 
@@ -1099,12 +1089,11 @@
     drag.node.setAttribute("aria-grabbed", "true");
     root.dataset.dragging = drag.key;
     const delta = pointerDeltaToPlane(drag.basis, clientX, clientY);
-    const previousPoint = drag.point;
     drag.point = {
       x: clamp(drag.startPoint.x + delta.x, state.width * -.54, state.width * .54),
       y: clamp(drag.startPoint.y + delta.y, state.height * -.5, state.height * .5),
     };
-    syncCometWake(drag.node, drag.point, previousPoint);
+    syncCometWake(drag.node, drag.point);
     const time = performance.now();
     drag.samples.push({ ...drag.point, time });
     drag.samples = drag.samples.filter((sample) => time - sample.time <= 140);

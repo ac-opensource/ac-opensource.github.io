@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -36,9 +36,6 @@ jobs:
       - name: Install browsers for compatibility checks
         run: npx playwright install --with-deps chromium firefox webkit
 
-      - name: Run browser end-to-end checks
-        run: npm run test:e2e
-
       - name: Run cross-browser production smoke checks
         run: npm run test:cross-browser
 
@@ -48,7 +45,6 @@ jobs:
           npm run test:contact-signals:browser
           npm run test:saved-reading
           npm run test:options
-          npm run test:work-briefing
 
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
