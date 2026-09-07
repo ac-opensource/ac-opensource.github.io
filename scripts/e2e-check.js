@@ -164,39 +164,72 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   async function expandUniverseRouteMap(targetPage) {
     // Geometry and CSS-transition completion do not require a canvas RAF.
     // Timer polling keeps these checks responsive when software rendering is busy.
-    const toggle = targetPage.locator('[data-universe-map-toggle]');
-    if (await toggle.count() === 0) return;
-    if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
-      await toggle.click();
-      await targetPage.waitForFunction(() => (
-        document.querySelector('[data-universe-route-map]')?.dataset.mapExpanded === 'true'
-      ));
-      await targetPage.waitForFunction(() => {
-        const map = document.querySelector('[data-universe-route-map]');
-        if (!map || map.dataset.mapExpanded !== 'true') return false;
-        const bounds = map.getBoundingClientRect();
-        return bounds.width >= 287 && bounds.height >= 123;
-      }, null, { timeout: 2000, polling: 100 });
-      await targetPage.evaluate(() => {
-        document.querySelector('[data-universe-route-map]')
-          ?.dispatchEvent(new PointerEvent('pointerleave'));
-      });
-      await targetPage.waitForFunction(() => {
-        const map = document.querySelector('[data-universe-route-map]');
-        return map && map.getAnimations({ subtree: true }).every((animation) => (
-          animation.playState === 'finished' || animation.playState === 'idle'
+    try {
+      const toggle = targetPage.locator('[data-universe-map-toggle]');
+      if (await toggle.count() === 0) return;
+      if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
+        await toggle.click();
+        await targetPage.waitForFunction(() => (
+          document.querySelector('[data-universe-route-map]')?.dataset.mapExpanded === 'true'
         ));
-      }, null, { timeout: 2000, polling: 100 });
-      await targetPage.waitForFunction(() => {
+        await targetPage.waitForFunction(() => {
+          const map = document.querySelector('[data-universe-route-map]');
+          if (!map || map.dataset.mapExpanded !== 'true') return false;
+          const bounds = map.getBoundingClientRect();
+          return bounds.width >= 287 && bounds.height >= 123;
+        }, null, { timeout: 2000, polling: 100 });
+        await targetPage.evaluate(() => {
+          document.querySelector('[data-universe-route-map]')
+            ?.dispatchEvent(new PointerEvent('pointerleave'));
+        });
+        await targetPage.waitForFunction(() => {
+          const map = document.querySelector('[data-universe-route-map]');
+          return map && map.getAnimations({ subtree: true }).every((animation) => (
+            animation.playState === 'finished' || animation.playState === 'idle'
+          ));
+        }, null, { timeout: 2000, polling: 100 });
+        await targetPage.waitForFunction(() => {
+          const map = document.querySelector('[data-universe-route-map]');
+          const telescope = map?.querySelector('.universe-route-map__telescope');
+          if (!map || !telescope) return false;
+          const barrelLength = Number.parseFloat(getComputedStyle(telescope).width);
+          const sightlineLength = Number.parseFloat(map.style.getPropertyValue('--sightline-length'));
+          return Number.isFinite(barrelLength)
+            && Number.isFinite(sightlineLength)
+            && sightlineLength > barrelLength;
+        }, null, { timeout: 2000, polling: 100 });
+      }
+    } catch (error) {
+      const state = await targetPage.evaluate(() => {
         const map = document.querySelector('[data-universe-route-map]');
-        const telescope = map?.querySelector('.universe-route-map__telescope');
-        if (!map || !telescope) return false;
-        const barrelLength = Number.parseFloat(getComputedStyle(telescope).width);
-        const sightlineLength = Number.parseFloat(map.style.getPropertyValue('--sightline-length'));
-        return Number.isFinite(barrelLength)
-          && Number.isFinite(sightlineLength)
-          && sightlineLength > barrelLength;
-      }, null, { timeout: 2000, polling: 100 });
+        const toggle = document.querySelector('[data-universe-map-toggle]');
+        const bounds = map?.getBoundingClientRect();
+        const style = map && getComputedStyle(map);
+        return {
+          url: location.href,
+          root: { ...document.documentElement.dataset },
+          map: map && { ...map.dataset },
+          bounds: bounds && { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height },
+          toggle: { expanded: toggle?.getAttribute('aria-expanded'), label: toggle?.getAttribute('aria-label') },
+          computed: style && {
+            width: style.width, height: style.height, transform: style.transform,
+            display: style.display, visibility: style.visibility, position: style.position,
+            transitionProperty: style.transitionProperty, transitionDuration: style.transitionDuration,
+            fontSize: getComputedStyle(document.documentElement).fontSize,
+          },
+          viewport: { width: innerWidth, height: innerHeight, scrollX, scrollY, hidden: document.hidden },
+          perspective: window.UniversePerspective?.snapshot(),
+          animations: document.getAnimations({ subtree: true }).map((animation) => ({
+            name: animation.animationName, property: animation.transitionProperty,
+            state: animation.playState, currentTime: animation.currentTime,
+            target: animation.effect?.target?.className,
+            pseudo: animation.effect?.pseudoElement,
+            timing: animation.effect?.getComputedTiming(),
+          })),
+        };
+      });
+      console.error(`Universe map expansion state: ${JSON.stringify(state)}`);
+      throw error;
     }
   }
 
