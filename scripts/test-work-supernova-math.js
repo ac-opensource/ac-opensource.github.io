@@ -3,6 +3,17 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const source = fs.readFileSync(path.join(__dirname, '../assets/js/work-supernova-field.js'), 'utf8');
+const entryBody = source.match(/const entryReady = \(\) => \{([\s\S]*?)\n  \};/);
+assert(entryBody, 'Locate the actual navigation gate');
+const entryReady = new Function('document', entryBody[1]);
+for (const motion of [undefined, 'arrive']) {
+  assert(entryReady({ documentElement: { dataset: { universeMotion: motion } } }),
+    'The supernova must begin immediately on direct load and during navigation arrival');
+}
+assert(!entryReady({ documentElement: { dataset: { universeMotion: 'depart' } } }));
+for (const bigBang of ['pending', 'running', 'revealing']) {
+  assert(!entryReady({ documentElement: { dataset: { bigBang, universeMotion: 'arrive' } } }));
+}
 const renderBody = source.match(/const render = \(\) => \{([\s\S]*?)\n  \};\n  const tick/);
 assert(renderBody, 'Locate the actual render function to exercise the uploaded pulse uniforms');
 const render = new Function('gl', 'uniforms', 'elapsed', 'pulseStart', 'field', 'pointerX', 'pointerY', renderBody[1]);

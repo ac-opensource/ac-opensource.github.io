@@ -563,6 +563,7 @@ function buildStaticPostHtml({ post, previous, next }) {
   const sourceCurrent = isWorkDeepDive ? ' aria-current="page"' : "";
   const blogCurrent = isWorkDeepDive ? "" : ' aria-current="page"';
 
+  const auroraArticle = post.slug === "case-study-bitcoin-wallet-multichain-android-systems";
   const heroPanelHtml = buildArticleHeroPanel({
     mode: debrief.mode,
     post,
@@ -612,7 +613,7 @@ function buildStaticPostHtml({ post, previous, next }) {
 
   return `${GENERATED_PAGE_MARKER}
 <!DOCTYPE html>
-<html class="light" lang="en"><head>
+<html data-logs-theme="dark" class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg"/>
@@ -646,8 +647,12 @@ ${articleTagsMeta}
 <link rel="preload" href="/assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
 <link href="/assets/css/site-fonts.css?v=20260819-local1" rel="stylesheet"/>
 <link href="/assets/css/article-debrief.css?v=20260820-hierarchy1" rel="stylesheet"/>
+${auroraArticle ? '<link href="/assets/css/article-aurora.css?v=20260908-1" rel="stylesheet"/>' : ""}
 <link href="/assets/css/universe-field-map.css?v=20260819-safe1" rel="stylesheet"/>
 <link href="/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1" rel="stylesheet" data-universe-perspective-styles/>
+<link href="/assets/css/logs-theme.css?v=20260908-toggle1" rel="stylesheet"/>
+<link href="/assets/css/logs-surface.css?v=20260908-toggle1" rel="stylesheet"/>
+<script src="/assets/js/logs-theme.js?v=20260908-toggle1"></script>
 <script src="/assets/js/universe-theme-transition.js?v=20260820-fast-travel1"></script>
 <script id="tailwind-config">
   tailwind.config = {
@@ -759,7 +764,7 @@ ${articleTagsMeta}
 </style>
 <script type="application/ld+json">${structuredData}</script>
 </head>
-<body class="article-debrief-page bg-background text-on-surface font-body antialiased" data-universe-region="article" data-article-mode="${escapeHtml(debrief.mode)}">
+<body class="${auroraArticle ? "article-aurora-page " : ""}article-debrief-page bg-background text-on-surface font-body antialiased" data-universe-region="article" data-article-mode="${escapeHtml(debrief.mode)}">
 <a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 bg-surface-container-lowest border border-outline px-4 py-3 font-label text-xs uppercase tracking-widest text-on-surface focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-tertiary">Skip to content</a>
 <header id="site-topbar" class="fixed top-0 left-0 w-full z-50 bg-[#FAF9F4]/85 backdrop-blur-xl border-b border-stone-200/40">
   <div class="max-w-7xl mx-auto px-6 py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
@@ -783,6 +788,7 @@ ${articleTagsMeta}
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
+${auroraArticle ? '<canvas class="article-aurora" aria-hidden="true"></canvas><script src="/assets/js/article-aurora.js?v=20260908-1" defer></script>' : ""}
 <main id="main-content" class="article-region-main">
 <article class="article-debrief article-region" data-article-debrief data-debrief-variant="${escapeHtml(debrief.variant)}" data-article-mode="${escapeHtml(debrief.mode)}">
 <header class="article-region__header">
@@ -797,6 +803,7 @@ ${articleTagsMeta}
     <h1 id="post-title">${escapeHtml(title)}</h1>
     <p id="post-summary">${escapeHtml(summary)}</p>
     <div id="post-actions" class="article-region__actions">
+      ${auroraArticle ? '<button type="button" data-aurora-pause hidden aria-pressed="false">Pause aurora</button>' : ""}
       <button id="share-post-button" type="button" hidden>Share</button>
       <button id="bookmark-post-button" type="button" hidden>Bookmark</button>
       <a href="/blog/rss.xml">RSS</a>

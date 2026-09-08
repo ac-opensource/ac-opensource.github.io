@@ -172,7 +172,8 @@
   let targetX = .5, targetY = .5, pointerX = .5, pointerY = .5;
   const entryReady = () => {
     const root = document.documentElement;
-    return !['pending','running','revealing'].includes(root.dataset.bigBang) && !root.dataset.universeMotion;
+    // Begin the collapse during arrival, alongside the navigation animation.
+    return !['pending','running','revealing'].includes(root.dataset.bigBang) && root.dataset.universeMotion !== 'depart';
   };
   const canRun = () => ready && visible && !document.hidden && !paused && !suppressed() && !lost && entryReady();
   const render = () => {

@@ -468,11 +468,15 @@ html.article-js .article-region[data-article-mode="case-study"] .article-region_
 .article-region__body .code-block {
   overflow-x: auto;
   padding: 1.4rem;
-  background: #1a1c1e;
-  color: #dee3e9;
+  background: #f0f2ed;
+  color: var(--article-ink);
   font: 400 0.88rem/1.65 "Space Grotesk", monospace;
   box-shadow: inset 3px 0 0 var(--article-blue);
 }
+
+.article-region__body .code-keyword { color: #245ba5; }
+.article-region__body .code-type { color: #a33d39; }
+.article-region__body .code-func { color: #385d4c; }
 
 .article-region__adjacent {
   display: grid;

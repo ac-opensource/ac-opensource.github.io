@@ -115,14 +115,14 @@ button { color: inherit; }
 .galaxy-archive { position: relative; }
 
 .galaxy-hero {
-  color-scheme: dark;
-  --ink: #eff4fa;
-  --muted: #aebac8;
-  --faint: #97a7ba;
-  --line: rgba(175, 201, 230, 0.17);
-  --line-strong: rgba(175, 201, 230, 0.32);
-  --blue: #accfff;
-  --space: #060b11;
+  color-scheme: light;
+  --ink: #243248;
+  --muted: #4f6074;
+  --faint: #596b80;
+  --line: rgba(55, 81, 112, 0.22);
+  --line-strong: rgba(55, 81, 112, 0.38);
+  --blue: #245ba4;
+  --space: #faf9f4;
   color: var(--ink);
   --merger-x: 0px;
   --merger-y: 0px;
@@ -133,7 +133,7 @@ button { color: inherit; }
   overflow: clip;
   isolation: isolate;
   background:
-    radial-gradient(ellipse 65% 85% at 72% 52%, #101c2a 0%, #080f18 44%, transparent 76%),
+    radial-gradient(ellipse 65% 85% at 72% 52%, #e3ebef 0%, #f0f3f3 44%, transparent 76%),
     var(--space);
 }
 
@@ -141,7 +141,7 @@ button { color: inherit; }
   position: absolute;
   z-index: 0;
   inset: 0;
-  background: radial-gradient(ellipse at 70% 52%, transparent 30%, rgba(2, 5, 9, 0.4) 100%);
+  background: radial-gradient(ellipse at 70% 52%, transparent 30%, rgba(220, 228, 233, 0.4) 100%);
   content: "";
   pointer-events: none;
 }
@@ -150,7 +150,7 @@ button { color: inherit; }
   position: absolute;
   z-index: 1;
   inset: 0;
-  background: linear-gradient(90deg, #060b11 0%, rgba(6, 11, 17, 0.96) 25%, rgba(6, 11, 17, 0.15) 46%, transparent 70%);
+  background: linear-gradient(90deg, #faf9f4 0%, rgba(250, 249, 244, 0.96) 25%, rgba(250, 249, 244, 0.15) 46%, transparent 70%);
   content: "";
   pointer-events: none;
 }
@@ -505,7 +505,7 @@ button { color: inherit; }
 .galaxy-node::after {
   width: calc(var(--node-size) * 0.28);
   height: calc(var(--node-size) * 0.28);
-  background: #f8fbff;
+  background: #245ba4;
   box-shadow: 0 0 0.65rem var(--node-color), 0 0 1.4rem var(--node-color);
 }
 
@@ -513,12 +513,12 @@ button { color: inherit; }
   position: absolute;
   z-index: 2;
   width: clamp(6.25rem, 7.6vw, 8.5rem);
-  color: #c5d1e1;
+  color: #334b66;
   font: 600 clamp(0.625rem, 0.68vw, 0.68rem)/1.2 var(--display);
   letter-spacing: 0.01em;
   pointer-events: none;
   text-align: left;
-  text-shadow: 0 1px 3px #060b11, 0 0 0.65rem #060b11, 0 0 0.3rem #060b11;
+  text-shadow: 0 1px 3px #faf9f4, 0 0 0.65rem #faf9f4, 0 0 0.3rem #faf9f4;
 }
 
 .galaxy-node[data-label-side="right"] .galaxy-node__label {
@@ -573,8 +573,8 @@ button { color: inherit; }
   overflow: auto;
   padding: 1.15rem 1.2rem 1.25rem;
   border: 1px solid rgba(40, 100, 199, 0.46);
-  background: rgba(9, 18, 29, 0.97);
-  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.4);
+  background: rgba(250, 249, 244, 0.97);
+  box-shadow: 0 1.5rem 5rem rgba(36, 50, 72, 0.16);
   backdrop-filter: blur(18px);
 }
 
@@ -846,10 +846,10 @@ body.has-universe-route-map.has-integrated-universe-route-map { padding-bottom: 
 }
 
 .galaxy-hero .galaxy-categories button[data-category]:is(:hover, :focus-visible, [aria-pressed="true"]) {
-  color: color-mix(in srgb, var(--node-color, var(--blue)) 30%, white);
+  color: color-mix(in srgb, var(--node-color, var(--blue)) 30%, #243248);
 }
 
-.galaxy-categories button[data-saved-filter][aria-pressed="true"] .galaxy-saved-filter__count { color: #060b11; }
+.galaxy-categories button[data-saved-filter][aria-pressed="true"] .galaxy-saved-filter__count { color: #faf9f4; }
 
 @media (forced-colors: active) {
   .galaxy-sky, .galaxy-core, .galaxy-hero__stars { display: none; }
@@ -892,7 +892,7 @@ body.has-universe-route-map.has-integrated-universe-route-map { padding-bottom: 
   .option-nav nav a { font-size: 0.49rem; }
   .galaxy-hero { min-height: 0; padding-bottom: 2.5rem; }
   .galaxy-hero::after {
-    background: linear-gradient(180deg, #060b11 0%, rgba(6, 11, 17, 0.85) 26%, transparent 49%, rgba(6, 11, 17, 0.3) 100%);
+    background: linear-gradient(180deg, #faf9f4 0%, rgba(250, 249, 244, 0.85) 26%, transparent 49%, rgba(250, 249, 244, 0.3) 100%);
   }
   .galaxy-copy { position: relative; top: auto; left: auto; width: 100%; padding: 9rem 1.1rem 0; }
   .galaxy-intro { width: 100%; }
@@ -1025,3 +1025,8 @@ body.has-universe-route-map.has-integrated-universe-route-map { padding-bottom: 
 
 /* Particle-bound nodes use compositor translation during the short search encounter. */
 .galaxy-hero.is-encounter-choreography .galaxy-node { transition: none; will-change: translate, opacity; }
+
+/* Translate luminous canvas artwork into ink on the light archive surface. */
+.galaxy-sky,
+.galaxy-hero__stars,
+.galaxy-core { filter: invert(1) hue-rotate(180deg); }

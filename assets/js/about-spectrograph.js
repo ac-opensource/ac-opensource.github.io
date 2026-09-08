@@ -118,7 +118,7 @@
   const mobileTreeInteraction = window.matchMedia("(max-width: 720px)");
   if (!bandsElement || !readoutElement || !statusElement || !stageElement || !evidenceDetails) return;
 
-  let motionPaused = mobileTreeInteraction.matches;
+  let motionPaused = false;
   const motionButton = root.querySelector("[data-tree-motion-toggle]");
   function syncMotionButton() {
     if (!motionButton) return;
@@ -159,7 +159,7 @@
   let popupSettleTimer = 0;
   const IDLE_ROTATION_DELAY = 2200;
   const IDLE_ROTATION_SPEED = 0.000026;
-  const CANVAS_PIXEL_BUDGET = 600000;
+  const CANVAS_PIXEL_BUDGET = 2000000;
   const zoomMotionScale = () => Math.sqrt(Math.max(1, state.zoom));
   const idleRotationFrameInterval = () => (mobileTreeInteraction.matches ? 72 : 60) / zoomMotionScale();
   const state = {
@@ -1459,13 +1459,25 @@
   function sizeTreeCanvasSurface(canvas, viewport) {
     const opening = root.querySelector(".about-opening") || document.querySelector(".about-opening");
     if (!opening) return;
-    const openingBounds = opening.getBoundingClientRect();
-    const viewportBounds = viewport.getBoundingClientRect();
-    const lowerOverflow = Math.max(window.innerHeight, viewportBounds.height * 0.75);
-    canvas.style.left = `${-viewportBounds.left}px`;
-    canvas.style.top = `${openingBounds.top - viewportBounds.top}px`;
+    // Arrival animations transform the main and stage. Their visual bounds
+    // are temporary; cached canvas offsets must use the resting layout instead.
+    const layoutPosition = (element) => {
+      let left = 0;
+      let top = 0;
+      for (let current = element; current; current = current.offsetParent) {
+        left += current.offsetLeft;
+        top += current.offsetTop;
+      }
+      return { left, top };
+    };
+    const openingPosition = layoutPosition(opening);
+    const viewportPosition = layoutPosition(viewport);
+    const upperOverflow = Math.max(window.innerHeight, viewport.clientHeight * 0.75);
+    const lowerOverflow = upperOverflow;
+    canvas.style.left = `${-viewportPosition.left}px`;
+    canvas.style.top = `${openingPosition.top - viewportPosition.top - upperOverflow}px`;
     canvas.style.width = `${Math.max(1, document.documentElement.clientWidth)}px`;
-    canvas.style.height = `${Math.max(openingBounds.height, viewportBounds.height, 1) + lowerOverflow}px`;
+    canvas.style.height = `${Math.max(opening.offsetHeight, viewport.clientHeight, 1) + upperOverflow + lowerOverflow}px`;
   }
 
   // Keep stars on their actual projected branches; only nudge the text.
