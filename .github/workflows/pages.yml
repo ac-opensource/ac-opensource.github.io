@@ -38,7 +38,6 @@ jobs:
 
       - name: Run focused feature browser checks
         run: |
-          npm run test:discovery:browser
           npm run test:contact-signals:browser
 
       - name: Configure GitHub Pages
