@@ -77,6 +77,8 @@
     merger: { progress: 0, target: 0, signature: "", encounter: null, sprites: [] },
     lastDraw: 0,
     elapsed: 0,
+    lastOrbitLayout: 0,
+    lastOrbitFocus: 0,
     paused: false,
     mergerOffset: { x: 0, y: 0 },
     parallax: { x: 0, y: 0, targetX: 0, targetY: 0 },
@@ -627,7 +629,7 @@
       const progress = 0.04 + step / 84 * 0.94;
       const point = mergerProgress > 0.5
         ? remnantPoint(progress, arm, centerX, centerY, radiusX * 0.92, radiusY * 0.78)
-        : spiralPoint(progress, arm, centerX, centerY, radiusX, radiusY);
+        : spiralPoint(progress, arm, centerX, centerY, radiusX, radiusY, orbitalOffset(progress));
       if (step === 0) context.moveTo(point.x, point.y);
       else context.lineTo(point.x, point.y);
     }
@@ -668,6 +670,33 @@
     // angles to keep the arms trailing. The time scale is slow at rest.
     const frequency = particle.frequency ?? 1 / Math.pow(particle.radius * particle.radius + 0.25 * 0.25, 0.75);
     return base + particle.angleJitter - canvasState.elapsed * 0.012 * frequency;
+  }
+
+  function orbitalOffset(radius) {
+    return orbitalAngle({ arm: 0, radius, angleJitter: 0 })
+      - (radius * geometry.twist + geometry.phase);
+  }
+
+  function updateOrbitingNodes() {
+    if (canvasState.merger.target || elements.hero.classList.contains("is-node-choreography")) return;
+    const width = canvasState.field.radiusX / geometry.radiusX;
+    const height = canvasState.field.radiusY / geometry.radiusY;
+    posts.forEach((post, index) => {
+      const node = nodeElements.get(post.slug);
+      const position = nodePosition(index, posts.length);
+      const x = (position.x - parseFloat(node.style.getPropertyValue("--node-x"))) * width / 100;
+      const y = (position.y - parseFloat(node.style.getPropertyValue("--node-y"))) * height / 100;
+      node.style.translate = `${x.toFixed(2)}px ${y.toFixed(2)}px`;
+    });
+    // Keep labels readable and the open preview anchored without measuring every frame.
+    if (canvasState.elapsed - canvasState.lastOrbitLayout >= 1.5) {
+      canvasState.lastOrbitLayout = canvasState.elapsed;
+      scheduleLabelCollisions({ updateFocus: true });
+    }
+    if (state.selected && canvasState.elapsed - canvasState.lastOrbitFocus >= 0.1) {
+      canvasState.lastOrbitFocus = canvasState.elapsed;
+      positionFocus();
+    }
   }
 
   function startEncounter() {
@@ -857,6 +886,7 @@
       ? Math.min(0.1, Math.max(0, (time - canvasState.lastDraw) / 1000)) : 0;
     canvasState.lastDraw = time;
     canvasState.elapsed += delta;
+    updateOrbitingNodes();
     const parallax = canvasState.parallax;
     if (!reducedMotion.matches && !canvasState.paused) {
       parallax.x += (parallax.targetX - parallax.x) * 0.075;
@@ -995,7 +1025,7 @@
     const ring = Math.floor(index / geometry.arms);
     const progress = rings <= 1 ? 0.5 : (ring + 0.32) / (rings - 0.2);
     const radius = 0.3 + progress * 0.65;
-    const point = spiralPoint(radius, arm, geometry.centerX * 100, geometry.centerY * 100, geometry.radiusX * 100, geometry.radiusY * 100);
+    const point = spiralPoint(radius, arm, geometry.centerX * 100, geometry.centerY * 100, geometry.radiusX * 100, geometry.radiusY * 100, orbitalOffset(radius));
     return {
       angle: point.angle,
       arm,

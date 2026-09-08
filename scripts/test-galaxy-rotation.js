@@ -24,3 +24,22 @@ for (const companion of [false, true]) {
   }
 }
 console.log("Galaxy rotation passed: trailing arms and consistent encounter spin at inner, middle, and outer radii.");
+
+for (const name of ["spiralPoint", "orbitalOffset", "nodePosition"]) {
+  const implementation = source.match(new RegExp(`function ${name}\\([^]*?\\n  \\}`));
+  if (implementation) vm.runInContext(implementation[0], context);
+}
+for (let index = 0; index < 28; index += 1) {
+  for (const elapsed of [0, 10, 120]) {
+    const result = vm.runInContext(`canvasState.elapsed = ${elapsed}; (() => {
+      const node = nodePosition(${index}, 28);
+      const angle = orbitalAngle({ arm: node.arm, radius: node.progress, angleJitter: 0 });
+      return { node, angle, x: 50 + Math.cos(angle) * node.progress * 49,
+        y: 52 + Math.sin(angle) * node.progress * 43 };
+    })()`, context);
+    assert(Math.abs(result.node.angle - result.angle) < 1e-10, "Nodes must share the stars' orbital angle and clock");
+    assert(Math.abs(result.node.x - Math.max(6, Math.min(94, result.x))) < 1e-10);
+    assert(Math.abs(result.node.y - Math.max(6, Math.min(94, result.y))) < 1e-10);
+  }
+}
+console.log("All 28 article nodes follow their stellar orbit at initial, intermediate, and long-running times.");

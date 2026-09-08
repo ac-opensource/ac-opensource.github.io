@@ -1208,6 +1208,20 @@ a.is-stellar-source {
   margin-top: clamp(2rem, 3.5vw, 3.25rem);
 }
 
+/* A feathered reading surface keeps moving bright filaments below the copy
+   without introducing a hard rectangular edge into the nebula. */
+.about-opening .about-origin__prose::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -0.25rem -0.5rem;
+  border-radius: 1rem;
+  background: #080f1c;
+  box-shadow: 0 0 1.5rem 1.25rem #080f1c;
+  opacity: 0.72;
+  pointer-events: none;
+}
+
 .about-opening .about-origin__prose p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.65; }
 .about-opening .about-origin__prose p::before { margin-bottom: 0.65rem; }
 
@@ -3024,6 +3038,8 @@ body[data-universe-region="about"] :is(#site-nav, #site-nav-mobile) .site-nav-li
 }
 
 .about-opening .about-origin__prose {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.9rem;
@@ -3033,7 +3049,7 @@ body[data-universe-region="about"] :is(#site-nav, #site-nav-mobile) .site-nav-li
 .about-opening .about-origin__prose p {
   max-width: 34rem;
   margin: 0;
-  color: var(--stellar-muted);
+  color: #fff;
   font-size: clamp(0.88rem, 1.05vw, 1rem);
   line-height: 1.68;
 }
@@ -3996,4 +4012,15 @@ html[data-about-theme="light"] .stellar-tree__root.is-open { color: var(--stella
 @media (prefers-reduced-motion: reduce) {
   .stellar-tree__controls-layer * { transition: none !important; }
   [data-tree-motion-toggle] { display: none !important; }
+}
+
+/* Keep secondary labels readable on the default light surface. */
+html[data-about-theme="light"] .about-origin h1 span:nth-child(3) {
+  color: var(--stellar-blue);
+}
+html[data-about-theme="light"] :is(.stellar-tree__branch-dataset, .stellar-tree__branch-count) {
+  color: color-mix(in srgb, var(--band-tone) 30%, #243248);
+}
+html[data-about-theme="light"] .stellar-tree__root span {
+  color: var(--stellar-muted);
 }

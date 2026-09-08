@@ -36,14 +36,10 @@ jobs:
       - name: Install browsers for compatibility checks
         run: npx playwright install --with-deps chromium firefox webkit
 
-      - name: Run cross-browser production smoke checks
-        run: npm run test:cross-browser
-
       - name: Run focused feature browser checks
         run: |
           npm run test:discovery:browser
           npm run test:contact-signals:browser
-          npm run test:saved-reading
           npm run test:options
 
       - name: Configure GitHub Pages

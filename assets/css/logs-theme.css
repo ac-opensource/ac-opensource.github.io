@@ -1,0 +1,109 @@
+/* Article dark palette. Light mode keeps the original debrief styles; print
+   keeps the existing paper palette regardless of the selected screen theme. */
+@media screen {
+  html[data-logs-theme="dark"] body.article-debrief-page {
+    --article-canvas: #101715;
+    --article-paper: rgba(24, 35, 31, 0.94);
+    --article-ink: #e5ebe3;
+    --article-muted: #aab9ae;
+    --article-line: rgba(181, 207, 189, 0.3);
+    --article-faint: rgba(181, 207, 189, 0.14);
+    --article-blue: #99bfff;
+    --article-blue-soft: rgba(153, 191, 255, 0.12);
+    --article-rust: #e4ab89;
+    --article-green: #a0d1ac;
+    color-scheme: dark;
+    background: radial-gradient(ellipse 50% 30% at 76% 8%, rgba(83, 124, 185, 0.1), transparent 74%), var(--article-canvas);
+    color: var(--article-ink);
+  }
+
+  html[data-logs-theme="dark"] .article-debrief-page #site-topbar {
+    background: rgba(16, 23, 21, 0.94);
+    border-color: var(--article-faint);
+  }
+
+  html[data-logs-theme="dark"] .article-debrief-page #site-topbar a,
+  html[data-logs-theme="dark"] .article-debrief-page #site-footer > div {
+    color: var(--article-muted);
+  }
+
+  html[data-logs-theme="dark"] .article-debrief-page #site-topbar a[href="/"],
+  html[data-logs-theme="dark"] .article-debrief-page .text-on-surface {
+    color: var(--article-ink);
+  }
+
+  html[data-logs-theme="dark"] .article-debrief-page #site-topbar a:hover,
+  html[data-logs-theme="dark"] .article-debrief-page #site-topbar a[aria-current="page"],
+  html[data-logs-theme="dark"] .article-debrief-page #site-footer a:hover,
+  html[data-logs-theme="dark"] .article-debrief-page .text-tertiary {
+    color: var(--article-blue);
+  }
+
+  html[data-logs-theme="dark"] .article-debrief-page #site-footer {
+    background: var(--article-canvas);
+    border-color: var(--article-faint);
+  }
+
+  html[data-logs-theme="dark"] .article-debrief-page #site-nav-mobile {
+    border-color: var(--article-faint);
+  }
+
+  html[data-logs-theme="dark"] .article-debrief-page .text-secondary {
+    color: var(--article-muted);
+  }
+
+  html[data-logs-theme="dark"] .article-debrief-page :is(.bg-surface-container-lowest, .bg-surface-container-low, .bg-surface-container-high) {
+    background: var(--article-paper);
+  }
+
+  html[data-logs-theme="dark"] .article-region__hero figcaption {
+    background: rgba(16, 23, 21, 0.94);
+  }
+
+  html[data-logs-theme="dark"] .article-region__body pre,
+  html[data-logs-theme="dark"] .article-region__body .code-block {
+    background: #19231f;
+    color: var(--article-ink);
+  }
+
+  html[data-logs-theme="dark"] .article-region__body .code-keyword { color: #99bfff; }
+  html[data-logs-theme="dark"] .article-region__body .code-type { color: #ffada6; }
+  html[data-logs-theme="dark"] .article-region__body .code-func { color: #b7d9be; }
+
+  html[data-logs-theme="dark"] .article-region__body a.bg-primary {
+    background: var(--article-blue);
+    color: #101715;
+  }
+
+  html[data-logs-theme="dark"] .article-region[data-article-mode="technical"] .article-region__hero,
+  html[data-logs-theme="dark"] .article-region[data-article-mode="case-study"] .work-post-hero--gallery {
+    background: var(--article-paper);
+  }
+
+  html[data-logs-theme="dark"] .article-region[data-article-mode="photography"] .article-region__title {
+    background: linear-gradient(90deg, rgba(16, 23, 21, 0.98), rgba(16, 23, 21, 0.86) 78%, transparent);
+  }
+
+  html[data-logs-theme="dark"] body.article-aurora-page {
+    --article-blue: #a0d9bc;
+    --article-green: #a0d9bc;
+    --article-rust: #c5a9e7;
+    background: radial-gradient(ellipse at 80% 12%, #19352c 0, transparent 48%), var(--article-canvas);
+  }
+
+  html[data-logs-theme="dark"] .article-aurora { filter: none; opacity: 0.65; }
+
+  html[data-logs-theme="dark"] .article-aurora-page .article-region__title {
+    background: radial-gradient(ellipse at 30% 40%, rgba(16, 23, 21, 0.86), transparent 75%);
+  }
+
+  html[data-logs-theme="dark"] .article-aurora-page .article-trajectory--mobile {
+    background: var(--article-paper);
+  }
+}
+
+@media screen and (max-width: 640px) {
+  html[data-logs-theme="dark"] .article-region[data-article-mode="photography"] .article-region__title {
+    background: transparent;
+  }
+}

@@ -255,7 +255,7 @@ html[data-universe-motion] .universe-depth-field__supernova {
   left: 50%;
   display: block;
   border-radius: 50%;
-  content: none;
+  content: "";
   pointer-events: none;
   transform: translate(-50%, -50%);
 }
@@ -309,25 +309,12 @@ html[data-universe-motion]::view-transition-new(root) {
   animation: universe-field-acquire var(--universe-perspective-duration) var(--universe-perspective-ease) both;
 }
 
-/* Reserve About's real scene before its asynchronous data arrives so the
-   browser captures a stable landmark. Its live contents can then fill in.
-   The hidden attribute still provides the normal fallback after travel. */
-html.no-js[data-universe-motion="arrive"] [data-camera-window] {
-  display: grid;
-}
-html[data-universe-motion="arrive"] #stellar-spectrum-panel[hidden] {
-  display: block !important;
-}
-html[data-universe-motion] #stellar-spectrum-panel .stellar-tree__toolbar {
-  visibility: hidden;
-}
-
 html[data-universe-motion="arrive"][data-universe-perspective-to="home"] [data-camera-window],
 html[data-universe-motion="arrive"][data-universe-perspective-to="work"] .work-hero__art,
 html[data-universe-motion="arrive"][data-universe-perspective-to="projects"] .work-bitcoin-stage,
 html[data-universe-motion="arrive"][data-universe-perspective-to="about"] #stellar-spectrum-panel,
 html[data-universe-motion="arrive"][data-universe-perspective-to="profile"] #stellar-spectrum-panel,
-html[data-universe-motion="arrive"][data-universe-perspective-to="logs"] .galaxy-sky,
+html[data-universe-motion="arrive"][data-universe-perspective-to="logs"] #galaxy-field,
 html[data-universe-motion="arrive"][data-universe-perspective-to="article"] .article-region__hero,
 html[data-universe-motion="arrive"][data-universe-perspective-to="contact"] [data-payload-visual],
 html[data-universe-motion="arrive"][data-universe-perspective-to="resume"] [data-resume-signature-visual],
@@ -336,18 +323,70 @@ html[data-universe-motion="arrive"][data-universe-perspective-to="search"] .evid
   view-transition-name: universe-target-visual;
 }
 
+html[data-universe-motion="arrive"][data-universe-perspective-to="work"] .universe-depth-field__supernova {
+  opacity: 1;
+  view-transition-name: universe-work-supernova;
+}
+
 html[data-universe-motion="depart"][data-universe-perspective-from="home"] [data-camera-window],
 html[data-universe-motion="depart"][data-universe-perspective-from="work"] .work-hero__art,
 html[data-universe-motion="depart"][data-universe-perspective-from="projects"] .work-bitcoin-stage,
 html[data-universe-motion="depart"][data-universe-perspective-from="about"] #stellar-spectrum-panel,
 html[data-universe-motion="depart"][data-universe-perspective-from="profile"] #stellar-spectrum-panel,
-html[data-universe-motion="depart"][data-universe-perspective-from="logs"] .galaxy-sky,
+html[data-universe-motion="depart"][data-universe-perspective-from="logs"] #galaxy-field,
 html[data-universe-motion="depart"][data-universe-perspective-from="article"] .article-region__hero,
 html[data-universe-motion="depart"][data-universe-perspective-from="contact"] [data-payload-visual],
 html[data-universe-motion="depart"][data-universe-perspective-from="resume"] [data-resume-signature-visual],
 html[data-universe-motion="depart"][data-universe-perspective-from="signals"] .signals-hero__telemetry,
 html[data-universe-motion="depart"][data-universe-perspective-from="search"] .evidence-search__console {
   view-transition-name: universe-source-visual;
+}
+
+/* The rendered spiral is a sibling of the interactive field. Capture both
+   layers so the stars and their entry nodes travel together. */
+html[data-universe-motion="arrive"][data-universe-perspective-to="logs"] #galaxy-sky {
+  view-transition-name: universe-target-galaxy;
+}
+
+html[data-universe-motion="depart"][data-universe-perspective-from="logs"] #galaxy-sky {
+  view-transition-name: universe-source-galaxy;
+}
+
+html[data-universe-motion="arrive"][data-universe-perspective-to="logs"] .galaxy-sky:not(#galaxy-sky) {
+  view-transition-name: universe-target-galaxy-gpu;
+}
+
+html[data-universe-motion="depart"][data-universe-perspective-from="logs"] .galaxy-sky:not(#galaxy-sky) {
+  view-transition-name: universe-source-galaxy-gpu;
+}
+
+::view-transition-group(universe-target-galaxy-gpu),
+::view-transition-group(universe-source-galaxy-gpu),
+::view-transition-group(universe-target-galaxy),
+::view-transition-group(universe-source-galaxy) {
+  z-index: 9995;
+  overflow: visible;
+  animation-duration: var(--universe-perspective-duration);
+  animation-timing-function: var(--universe-perspective-ease);
+}
+
+::view-transition-old(universe-target-galaxy-gpu),
+::view-transition-new(universe-source-galaxy-gpu),
+::view-transition-old(universe-target-galaxy),
+::view-transition-new(universe-source-galaxy) {
+  display: none;
+}
+
+html[data-universe-motion]::view-transition-new(universe-target-galaxy-gpu),
+html[data-universe-motion]::view-transition-new(universe-target-galaxy) {
+  animation: universe-visual-acquire var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+  transform-origin: center;
+}
+
+html[data-universe-motion]::view-transition-old(universe-source-galaxy-gpu),
+html[data-universe-motion]::view-transition-old(universe-source-galaxy) {
+  animation: universe-visual-release var(--universe-perspective-duration) var(--universe-perspective-ease) both;
+  transform-origin: center;
 }
 
 ::view-transition-group(universe-target-visual) {
@@ -371,8 +410,12 @@ html[data-universe-motion="depart"][data-universe-perspective-from="search"] .ev
 }
 
 html[data-universe-motion]::view-transition-new(universe-target-visual) {
-  animation: universe-world-arrive var(--universe-perspective-duration) linear both;
+  animation: universe-visual-acquire var(--universe-perspective-duration) var(--universe-perspective-ease) both;
   transform-origin: center;
+}
+
+html[data-universe-motion][data-universe-perspective-to="work"]::view-transition-new(universe-target-visual) {
+  animation-name: universe-work-visual-genesis;
 }
 
 ::view-transition-group(universe-source-visual) {
@@ -391,7 +434,7 @@ html[data-universe-motion]::view-transition-new(universe-target-visual) {
 }
 
 html[data-universe-motion]::view-transition-old(universe-source-visual) {
-  animation: universe-visual-release var(--universe-perspective-duration) linear both;
+  animation: universe-visual-release var(--universe-perspective-duration) var(--universe-perspective-ease) both;
   transform-origin: center;
 }
 
@@ -412,6 +455,10 @@ html[data-universe-motion]::view-transition-old(universe-source-visual) {
   isolation: auto;
   perspective: 1400px;
   transform-style: preserve-3d;
+}
+
+html[data-universe-motion][data-universe-perspective-to="work"]::view-transition-new(universe-work-supernova) {
+  animation: universe-work-supernova-acquire var(--universe-perspective-duration) var(--universe-perspective-ease) both;
 }
 
 ::view-transition-group(universe-depth-far),
@@ -503,31 +550,13 @@ html[data-universe-cross-document="false"][data-universe-motion] {
   overflow: hidden;
 }
 
-/* Browsers without snapshot transitions keep the same shared backdrop.
-   Content sits above it, with navigation remaining in its normal fixed layer. */
-html[data-universe-cross-document="false"][data-universe-motion] .universe-depth-field {
-  z-index: 0;
-  background: var(--universe-sky-from);
-}
-html[data-universe-cross-document="false"][data-universe-motion] main {
-  position: relative;
-  z-index: 1;
-}
-html[data-universe-cross-document="false"][data-universe-motion="arrive"] .universe-depth-field {
-  animation: universe-fallback-sky var(--universe-perspective-duration) linear both;
-}
-@keyframes universe-fallback-sky {
-  0%, 28% { background-color: var(--universe-sky-from); }
-  54%, 100% { background-color: var(--universe-sky-to); }
-}
-
-html[data-universe-cross-document="false"][data-universe-motion="depart"] main {
+html[data-universe-cross-document="false"][data-universe-motion="depart"] body {
   transform-origin: var(--universe-focus-x) var(--universe-focus-y);
   animation: universe-camera-fallback-depart var(--universe-perspective-duration) var(--universe-perspective-ease) both;
   will-change: filter, opacity, transform;
 }
 
-html[data-universe-cross-document="false"][data-universe-motion="arrive"] main {
+html[data-universe-cross-document="false"][data-universe-motion="arrive"] body {
   transform-origin: var(--universe-focus-x) var(--universe-focus-y);
   animation: universe-camera-fallback-arrive var(--universe-perspective-duration) var(--universe-perspective-ease) both;
   will-change: filter, opacity, transform;
@@ -539,14 +568,23 @@ html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-u
 html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="about"] #stellar-spectrum-panel,
 html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="profile"] #stellar-spectrum-panel,
 html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="logs"] .galaxy-sky,
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="logs"] #galaxy-field,
 html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="article"] .article-region__hero,
 html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="contact"] [data-payload-visual],
 html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="resume"] [data-resume-signature-visual],
 html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="signals"] .signals-hero__telemetry,
 html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="search"] .evidence-search__console {
-  animation: universe-world-arrive var(--universe-perspective-duration) linear both;
+  animation: universe-visual-acquire var(--universe-perspective-duration) var(--universe-perspective-ease) both;
   transform-origin: center;
   will-change: opacity, transform;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="work"] .work-hero__art {
+  animation-name: universe-work-visual-genesis;
+}
+
+html[data-universe-cross-document="false"][data-universe-motion="arrive"][data-universe-perspective-to="work"] .universe-depth-field__supernova {
+  animation: universe-work-supernova-acquire-live var(--universe-perspective-duration) var(--universe-perspective-ease) both;
 }
 
 html[data-universe-cross-document="false"][data-universe-motion] .universe-depth-field__plane--far {
@@ -565,59 +603,283 @@ html[data-universe-cross-document="false"][data-universe-motion] .universe-depth
   animation: universe-target-acquisition-fallback var(--universe-perspective-duration) var(--universe-perspective-ease) both;
 }
 
-/* One journey: release the old world, cross open sky, acquire its landmark,
-   then resolve the readable surface. The navigation remains anchored. */
-/* One restrained camera move: the source recedes, the field changes depth,
-   and the destination approaches without a separate transition effect. */
 @keyframes universe-field-release {
-  0% { opacity: 1; }
-  14%, 100% { opacity: 0; }
+  0%, 18% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  72%, 100% {
+    opacity: 0;
+  }
 }
+
 @keyframes universe-field-acquire {
-  0%, 86% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  14% {
+    opacity: 0.1;
+  }
+  42% {
+    opacity: 0.55;
+  }
+  72%, 100% {
+    opacity: 1;
+  }
 }
-@keyframes universe-search-sky {
-  0%, 28% { background-color: var(--universe-sky-from); }
-  54%, 100% { background-color: var(--universe-sky-to); }
-}
-@keyframes universe-visual-release {
-  0% { opacity: 1; transform: translate(0, 0) scale(1); }
-  18% { opacity: 0.85; }
-  28% { opacity: 0.7; transform: translate(var(--universe-release-x), var(--universe-release-y)) scale(0.006); }
-  34%, 100% { opacity: 0; transform: translate(var(--universe-release-x), var(--universe-release-y)) scale(0.002); }
-}
-@keyframes universe-world-arrive {
-  0%, 56% { opacity: 0; transform: translate(var(--universe-landmark-x, 0px), var(--universe-landmark-y, 0px)) scale(0.003); }
-  62% { opacity: 1; transform: translate(var(--universe-landmark-x, 0px), var(--universe-landmark-y, 0px)) scale(0.012); }
-  74% { opacity: 1; transform: translate(calc(var(--universe-landmark-x, 0px) * 0.88), calc(var(--universe-landmark-y, 0px) * 0.88)) scale(0.12); }
-  86% { opacity: 1; transform: translate(calc(var(--universe-landmark-x, 0px) * 0.48), calc(var(--universe-landmark-y, 0px) * 0.48)) scale(0.52); }
-  97%, 100% { opacity: 1; transform: translate(0, 0) scale(1); }
-}
+
 @keyframes universe-camera-depth-far {
-  0% { opacity: 0; transform: perspective(1400px) translate3d(0, 0, 0); }
-  40% { opacity: 0.22; transform: perspective(1400px) translate3d(calc(var(--universe-far-x) * 0.4 - var(--universe-curve-x) * 0.06), calc(var(--universe-far-y) * 0.4 - var(--universe-curve-y) * 0.06), var(--universe-far-z)); }
-  90%, 100% { opacity: 0; transform: perspective(1400px) translate3d(var(--universe-far-x), var(--universe-far-y), var(--universe-far-z)); }
+  0%, 6% {
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1);
+  }
+  68%, 100% {
+    transform: perspective(1400px) translate3d(var(--universe-far-x), var(--universe-far-y), var(--universe-far-z)) scale(1.012);
+  }
 }
+
 @keyframes universe-camera-depth-middle {
-  0% { opacity: 0; transform: perspective(1400px) translate3d(0, 0, 0); }
-  42% { opacity: 0.26; transform: perspective(1400px) translate3d(calc(var(--universe-middle-x) * 0.4 - var(--universe-curve-x) * 0.14), calc(var(--universe-middle-y) * 0.4 - var(--universe-curve-y) * 0.14), var(--universe-middle-z)); }
-  86%, 100% { opacity: 0; transform: perspective(1400px) translate3d(var(--universe-middle-x), var(--universe-middle-y), var(--universe-middle-z)); }
+  0%, 6% {
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1);
+  }
+  68%, 100% {
+    transform: perspective(1400px) translate3d(var(--universe-middle-x), var(--universe-middle-y), var(--universe-middle-z)) scale(1.035);
+  }
 }
+
 @keyframes universe-camera-depth-near {
-  0% { opacity: 0; transform: perspective(1400px) translate3d(0, 0, 0); }
-  44% { opacity: 0.18; transform: perspective(1400px) translate3d(calc(var(--universe-near-x) * 0.4 - var(--universe-curve-x) * 0.24), calc(var(--universe-near-y) * 0.4 - var(--universe-curve-y) * 0.24), var(--universe-near-z)); }
-  82%, 100% { opacity: 0; transform: perspective(1400px) translate3d(var(--universe-near-x), var(--universe-near-y), var(--universe-near-z)); }
+  0%, 6% {
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1);
+  }
+  68%, 100% {
+    transform: perspective(1400px) translate3d(var(--universe-near-x), var(--universe-near-y), var(--universe-near-z)) scale(1.07);
+  }
 }
+
+@keyframes universe-search-sky {
+  0%, 6% {
+    background-color: var(--universe-sky-from);
+  }
+  56% {
+    background-color: var(--universe-sky-middle);
+  }
+  68%, 100% {
+    background-color: var(--universe-sky-to);
+  }
+}
+
+@keyframes universe-visual-acquire {
+  0%, 10% {
+    opacity: 0;
+    transform:
+      perspective(1400px)
+      translate3d(
+        var(--universe-target-entry-x),
+        var(--universe-target-entry-y),
+        var(--universe-camera-z)
+      )
+      scale(var(--universe-target-start-scale))
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+  20% {
+    opacity: 0.12;
+  }
+  38% {
+    opacity: 0.42;
+  }
+  54% {
+    opacity: 0.78;
+  }
+  68%, 100% {
+    opacity: 1;
+    transform:
+      perspective(1400px)
+      translate3d(0, 0, 0)
+      scale(1)
+      rotateX(0)
+      rotateY(0);
+  }
+}
+
+@keyframes universe-visual-release {
+  0%, 8% {
+    opacity: 1;
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0);
+  }
+  26% {
+    opacity: 0.48;
+  }
+  46%, 100% {
+    opacity: 0;
+    transform:
+      perspective(1400px)
+      translate3d(
+        var(--universe-source-exit-x),
+        var(--universe-source-exit-y),
+        var(--universe-source-exit-z)
+      )
+      scale(0.9)
+      rotateX(var(--universe-source-tilt-x))
+      rotateY(var(--universe-source-tilt-y));
+  }
+}
+
+@keyframes universe-work-visual-genesis {
+  0%, 10% {
+    opacity: 0;
+    transform:
+      perspective(1400px)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z))
+      scale(0.025)
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+  19% {
+    opacity: 0.9;
+    transform:
+      perspective(1400px)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z))
+      scale(0.055)
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+  36% {
+    opacity: 1;
+    transform:
+      perspective(1400px)
+      translate3d(
+        var(--universe-target-entry-x),
+        var(--universe-target-entry-y),
+        var(--universe-camera-z)
+      )
+      scale(0.34)
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+  56% {
+    opacity: 1;
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1.08) rotateX(0) rotateY(0);
+  }
+  68%, 100% {
+    opacity: 1;
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0);
+  }
+}
+
+@keyframes universe-work-supernova-acquire {
+  0%, 10% {
+    opacity: 0;
+    transform: translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z)) scale(0.03);
+  }
+  19% {
+    opacity: 0.4;
+    transform: translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z)) scale(0.08);
+  }
+  30% {
+    opacity: 1;
+    transform: translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z)) scale(0.32);
+  }
+  48% {
+    opacity: 0.82;
+    transform: translate3d(0, 0, 0) scale(2.35);
+  }
+  62% {
+    opacity: 0.18;
+    transform: translate3d(0, 0, 0) scale(4.4);
+  }
+  68%, 100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(5.2);
+  }
+}
+
+@keyframes universe-work-supernova-acquire-live {
+  0%, 10% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z))
+      scale(0.03);
+  }
+  19% {
+    opacity: 0.4;
+    transform:
+      translate(-50%, -50%)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z))
+      scale(0.08);
+  }
+  30% {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), var(--universe-camera-z))
+      scale(0.32);
+  }
+  48% {
+    opacity: 0.82;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(2.35);
+  }
+  62% {
+    opacity: 0.18;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(4.4);
+  }
+  68%, 100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(5.2);
+  }
+}
+
 @keyframes universe-target-acquisition {
-  0%, 54% { opacity: 0; transform: scale(0.2); }
-  62% { opacity: 0.28; transform: scale(1); }
-  80%, 100% { opacity: 0; transform: scale(3); }
+  0%, 16% {
+    opacity: 0;
+    transform: translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), 0) scale(var(--universe-target-start-scale));
+  }
+  30% {
+    opacity: 0.18;
+  }
+  60% {
+    opacity: 0.72;
+  }
+  68% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  78% {
+    opacity: 0.46;
+  }
+  88%, 100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
+
 @keyframes universe-target-acquisition-fallback {
-  0%, 54% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
-  62% { opacity: 0.28; transform: translate(-50%, -50%) scale(1); }
-  80%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(3); }
+  0%, 16% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      translate3d(var(--universe-target-entry-x), var(--universe-target-entry-y), 0)
+      scale(var(--universe-target-start-scale));
+  }
+  30% {
+    opacity: 0.18;
+  }
+  60% {
+    opacity: 0.72;
+  }
+  68% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(1);
+  }
+  78% {
+    opacity: 0.46;
+  }
+  88%, 100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(1);
+  }
 }
 
 @keyframes universe-hud-release {
@@ -626,18 +888,40 @@ html[data-universe-cross-document="false"][data-universe-motion] .universe-depth
 }
 
 @keyframes universe-hud-acquire {
-  0% { opacity: 0; }
-  24%, 100% { opacity: 1; }
+  0%, 62% { opacity: 0; }
+  82%, 100% { opacity: 1; }
 }
 
 @keyframes universe-camera-fallback-depart {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0);
+  }
+  to {
+    opacity: 0.35;
+    transform:
+      perspective(1400px)
+      translate3d(var(--universe-observer-x), var(--universe-observer-y), var(--universe-observer-z))
+      scale(var(--universe-camera-scale))
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
 }
+
 @keyframes universe-camera-fallback-arrive {
-  0% { opacity: 0; }
-  34% { opacity: 0.15; }
-  100% { opacity: 1; }
+  from {
+    opacity: 0.35;
+    transform:
+      perspective(1400px)
+      translate3d(var(--universe-observer-x), var(--universe-observer-y), var(--universe-observer-z))
+      scale(var(--universe-camera-scale))
+      rotateX(var(--universe-camera-tilt-x))
+      rotateY(var(--universe-camera-tilt-y));
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1400px) translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0);
+  }
 }
 
 /* Shared compact header contract. Route-specific styles may change color and
@@ -726,7 +1010,6 @@ html[data-universe-cross-document="false"][data-universe-motion] .universe-depth
     display: none !important;
   }
 
-  html[data-universe-motion] main,
   ::view-transition-group(root),
   ::view-transition-old(root),
   ::view-transition-new(root),
@@ -742,6 +1025,18 @@ html[data-universe-cross-document="false"][data-universe-motion] .universe-depth
   ::view-transition-group(universe-target-cue),
   ::view-transition-old(universe-target-cue),
   ::view-transition-new(universe-target-cue),
+  ::view-transition-group(universe-target-galaxy-gpu),
+  ::view-transition-old(universe-target-galaxy-gpu),
+  ::view-transition-new(universe-target-galaxy-gpu),
+  ::view-transition-group(universe-source-galaxy-gpu),
+  ::view-transition-old(universe-source-galaxy-gpu),
+  ::view-transition-new(universe-source-galaxy-gpu),
+  ::view-transition-group(universe-target-galaxy),
+  ::view-transition-old(universe-target-galaxy),
+  ::view-transition-new(universe-target-galaxy),
+  ::view-transition-group(universe-source-galaxy),
+  ::view-transition-old(universe-source-galaxy),
+  ::view-transition-new(universe-source-galaxy),
   ::view-transition-group(universe-target-visual),
   ::view-transition-old(universe-target-visual),
   ::view-transition-new(universe-target-visual),

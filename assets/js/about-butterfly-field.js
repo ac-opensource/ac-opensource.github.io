@@ -28,10 +28,10 @@
         float discriminant=b*b-c;
         if(discriminant<0.){gl_FragColor=vec4(0);return;}
         float start=max(0.,-b-sqrt(discriminant)),end=-b+sqrt(discriminant);
-        float stride=(end-start)/84.;
+        float stride=(end-start)/128.;
         float distance=start+stride*.5;
         vec3 accumulated=vec3(0);float opacity=0.;
-        for(int i=0;i<84;i++){
+        for(int i=0;i<128;i++){
           vec3 p=eye+ray*distance;
           float axial=dot(p.xy,vec2(.681,.732));
           vec3 q=vec3(dot(p.xy,vec2(-.732,.681)),p.z,axial);
@@ -104,7 +104,10 @@
     return {
       draw({width,height,centerX,centerY,baseScale,axes,lightTheme}){
         if(disposed||lost||gl.isContextLost()||!(width>0&&height>0&&baseScale>0))return false;
-        const ratio=Math.min(window.devicePixelRatio||1,Math.sqrt(250000/(width*height)));
+        // Preserve filament detail across the full overscan surface, with a
+        // smaller mobile budget while rotation remains enabled.
+        const pixelBudget=window.matchMedia("(max-width: 720px)").matches?800000:1500000;
+        const ratio=Math.min(window.devicePixelRatio||1,Math.sqrt(pixelBudget/(width*height)));
         const w=Math.max(1,Math.floor(width*ratio)),h=Math.max(1,Math.floor(height*ratio));
         if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
         gl.viewport(0,0,w,h);gl.useProgram(program);gl.disable(gl.BLEND);

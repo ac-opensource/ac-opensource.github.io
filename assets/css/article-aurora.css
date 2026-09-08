@@ -1,0 +1,36 @@
+/* Scoped to the Wallet case study; the generated article remains the source. */
+body.article-aurora-page {
+  --article-canvas: #faf9f4;
+  --article-paper: rgba(255, 255, 252, .9);
+  --article-ink: #283b36;
+  --article-muted: #586d65;
+  --article-line: rgba(47, 102, 83, .28);
+  --article-faint: rgba(47, 102, 83, .14);
+  --article-blue: #246954;
+  --article-blue-soft: rgba(47, 122, 95, .1);
+  --article-green: #246954;
+  --article-rust: #735298;
+  color-scheme: light;
+  background: radial-gradient(ellipse at 80% 12%, #e4efe7 0, transparent 48%), var(--article-canvas);
+  color: var(--article-ink);
+  isolation: isolate;
+}
+.article-aurora { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; filter: invert(1) hue-rotate(180deg); opacity: .65; }
+body.article-aurora-page #site-topbar { background: rgba(250, 249, 244, .94); }
+.article-aurora-page #site-topbar a,
+.article-aurora-page footer a { color: var(--article-muted); }
+.article-aurora-page #site-topbar a:hover,
+.article-aurora-page #site-topbar a[aria-current="page"] { color: var(--article-blue); }
+.article-aurora-page .article-region__header::before { display: none; }
+.article-aurora-page .article-region__title h1 { text-shadow: none; }
+.article-aurora-page .article-region__title { background: radial-gradient(ellipse at 30% 40%, rgba(250,249,244,.86), transparent 75%); }
+.article-aurora-page .article-region__reading { background: var(--article-paper); padding: clamp(1rem, 3vw, 3rem); border: 1px solid var(--article-faint); border-radius: 1rem; }
+.article-aurora-page .article-region__hero { filter: drop-shadow(0 20px 50px rgba(40,65,52,.14)); }
+.article-aurora-page .article-trajectory--mobile { background: #f0f4ed; }
+.article-aurora-page footer { position: relative; background: var(--article-canvas); color: var(--article-muted); }
+@media print {
+  .article-aurora { display: none; }
+  body.article-aurora-page { --article-ink: #202820; --article-muted: #495349; --article-blue: #235d4d; --article-line: #ccd5cc; --article-faint: #dde4dd; background: white; color: #202820; }
+  .article-aurora-page .article-region__reading, .article-aurora-page .article-region__title { background: none; }
+  .article-aurora-page .article-region__title h1 { text-shadow: none; }
+}
