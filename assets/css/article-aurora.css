@@ -1,4 +1,4 @@
-/* Scoped to the Wallet case study; the generated article remains the source. */
+/* Shared aurora treatment for published articles and the authoring preview. */
 body.article-aurora-page {
   --article-canvas: #faf9f4;
   --article-paper: rgba(255, 255, 252, .9);
