@@ -157,7 +157,7 @@
   let treeInteractionLocked = mobileTreeInteraction.matches;
   let sourceTabsSequence = 0;
   let popupSettleTimer = 0;
-  const IDLE_ROTATION_DELAY = 2200;
+  const IDLE_ROTATION_DELAY = 250;
   const IDLE_ROTATION_SPEED = 0.000026;
   const CANVAS_PIXEL_BUDGET = 2000000;
   const zoomMotionScale = () => Math.sqrt(Math.max(1, state.zoom));
