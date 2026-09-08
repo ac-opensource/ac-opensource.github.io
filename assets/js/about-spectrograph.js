@@ -161,7 +161,6 @@
   const IDLE_ROTATION_SPEED = 0.000026;
   const CANVAS_PIXEL_BUDGET = 2000000;
   const zoomMotionScale = () => Math.sqrt(Math.max(1, state.zoom));
-  const idleRotationFrameInterval = () => (mobileTreeInteraction.matches ? 72 : 60) / zoomMotionScale();
   const state = {
     scan: root.dataset.stellarDefault || "combined",
     bandId: null,
@@ -793,10 +792,10 @@
     if (canRotate) {
       if (root.dataset.treeMotion !== "idle-rotation") root.dataset.treeMotion = "idle-rotation";
       const elapsed = idleRotationTimestamp ? timestamp - idleRotationTimestamp : 0;
-      if (elapsed >= idleRotationFrameInterval()) {
+      // Follow the display clock; elapsed time keeps rotation speed independent of refresh rate.
+      if (elapsed > 0) {
         const boundedElapsed = Math.min(100, elapsed);
         const zoomAdjustedSpeed = IDLE_ROTATION_SPEED / zoomMotionScale();
-        root.style.setProperty("--stellar-idle-tween-duration", `${Math.ceil(idleRotationFrameInterval() * 1.35)}ms`);
         idleRotationTimestamp = timestamp;
         if (state.projection === "free") {
           state.yaw = normalizeAngle(state.yaw + boundedElapsed * zoomAdjustedSpeed);
@@ -1485,18 +1484,27 @@
     const { controls, leaderLayer } = treeScene;
     leaderLayer.setAttribute("viewBox", `0 0 ${width} ${height}`);
     width = Math.max(180, width - 76);
-    leaderLayer.replaceChildren();
     const occupied = [];
+    // Measure once per layout, before writing any label positions. Reading a
+    // branch's size after moving the preceding branch forces layout per branch.
     treeScene.labelSizes ||= new Map();
+    for (const [key, point] of projected) {
+      if (!point.visible || treeScene.labelSizes.has(key)) continue;
+      const control = controls.get(key);
+      const target = key.startsWith("node:")
+        ? control.querySelector(".stellar-spectrum__node-label") : control;
+      treeScene.labelSizes.set(key, { w: target.offsetWidth, h: target.offsetHeight });
+    }
+    treeScene.leaderLines ||= [];
+    let leaderCount = 0;
     for (const [key, point] of projected) {
       if (key.startsWith("node:") || !point.visible) continue;
       const control = controls.get(key);
-      const w = control.offsetWidth;
-      const h = control.offsetHeight;
+      const { w, h } = treeScene.labelSizes.get(key);
       const originX = clamp(point.x - w / 2, 4, Math.max(4, width - w - 4));
       const originY = clamp(point.y - h / 2, width <= 720 ? 146 : 94, height - h - 8);
       let best;
-      for (const dx of [0, -w - 8, w + 8]) {
+      branchPlacement: for (const dx of [0, -w - 8, w + 8]) {
         for (const dy of [0, -h - 8, h + 8, -2 * (h + 8), 2 * (h + 8)]) {
           const x = clamp(originX + dx, 4, Math.max(4, width - w - 4));
           const y = clamp(originY + dy, width <= 720 ? 146 : 94, height - h - 8);
@@ -1505,6 +1513,7 @@
             * Math.max(0, Math.min(y + h + 4, box.y + box.h) - Math.max(y - 4, box.y)), 0);
           const score = overlap * 100 + Math.hypot(dx, dy);
           if (!best || score < best.score) best = { x, y, score };
+          if (score === 0) break branchPlacement;
         }
       }
       const { x, y } = best;
@@ -1520,14 +1529,9 @@
     for (const [key, point] of nodes) {
       const control = controls.get(key);
       const label = control.querySelector(".stellar-spectrum__node-label");
-      let size = treeScene.labelSizes.get(key);
-      if (!size) {
-        size = { w: label.offsetWidth, h: label.offsetHeight };
-        treeScene.labelSizes.set(key, size);
-      }
-      const { w, h } = size;
+      const { w, h } = treeScene.labelSizes.get(key);
       let best;
-      for (const dy of [0, -18, 18, -36, 36, -54, 54, -72, 72, -90, 90]) {
+      nodePlacement: for (const dy of [0, -18, 18, -36, 36, -54, 54, -72, 72, -90, 90]) {
         for (const side of [1, -1]) {
           const x = clamp(point.x + (side === 1 ? 16 : -w - 16), 4, Math.max(4, width - w - 4));
           const y = clamp(point.y + dy - h / 2, width <= 720 ? 146 : 94, height - h - 8);
@@ -1536,19 +1540,28 @@
             * Math.max(0, Math.min(y + h + 3, box.y + box.h) - Math.max(y - 3, box.y)), 0);
           const score = overlap * 100 + Math.abs(dy) + (side === -1 ? 3 : 0);
           if (!best || score < best.score) best = { x, y, w, h, score };
+          if (score === 0) break nodePlacement;
         }
       }
       occupied.push(best);
       label.style.setProperty("--label-x", `${best.x - point.x}px`);
       label.style.setProperty("--label-y", `${best.y + h / 2 - point.y}px`);
       if (Math.abs(best.y + h / 2 - point.y) > 12) {
-        const line = document.createElementNS(SVG_NS, "line");
+        let line = treeScene.leaderLines[leaderCount++];
+        if (!line) {
+          line = document.createElementNS(SVG_NS, "line");
+          treeScene.leaderLines.push(line);
+          leaderLayer.append(line);
+        }
+        line.removeAttribute("display");
         line.setAttribute("x1", point.x);
         line.setAttribute("y1", point.y);
         line.setAttribute("x2", clamp(point.x, best.x, best.x + w));
         line.setAttribute("y2", best.y + h / 2);
-        leaderLayer.append(line);
       }
+    }
+    for (let index = leaderCount; index < treeScene.leaderLines.length; index++) {
+      treeScene.leaderLines[index].setAttribute("display", "none");
     }
   }
 
@@ -2015,6 +2028,11 @@
       resizeObserver
     };
     resizeObserver?.observe(viewport);
+    document.fonts?.ready.then(() => {
+      if (treeScene?.viewport !== viewport) return;
+      treeScene.labelSizes = null;
+      drawTreeScene();
+    });
     bindTreeRotation(canvas);
     drawTreeScene();
   }

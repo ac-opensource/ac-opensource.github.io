@@ -70,10 +70,8 @@
     companionParticles: [],
     dpr: 1,
     field: { centerX: 0, centerY: 0, radiusX: 0, radiusY: 0 },
-    frameInterval: 1000 / 45,
     height: 0,
     intersectsViewport: true,
-    lastFrame: 0,
     merger: { progress: 0, target: 0, signature: "", encounter: null, sprites: [] },
     lastDraw: 0,
     elapsed: 0,
@@ -551,15 +549,15 @@
 
   function performanceBudgetFor(width) {
     if (width <= 480) {
-      return { companion: 80, dpr: 1, fps: 24, impact: 28, particles: 300, remnant: 180, stars: 90, tier: "phone" };
+      return { companion: 80, dpr: 1, impact: 28, particles: 300, remnant: 180, stars: 90, tier: "phone" };
     }
     if (width < 760) {
-      return { companion: 130, dpr: 1, fps: 30, impact: 48, particles: 430, remnant: 260, stars: 140, tier: "compact" };
+      return { companion: 130, dpr: 1, impact: 48, particles: 430, remnant: 260, stars: 140, tier: "compact" };
     }
     if (width < 1200) {
-      return { companion: 160, dpr: 1.25, fps: 30, impact: 72, particles: 500, remnant: 350, stars: 220, tier: "medium" };
+      return { companion: 160, dpr: 1.25, impact: 72, particles: 500, remnant: 350, stars: 220, tier: "medium" };
     }
-    return { companion: 200, dpr: 1.25, fps: 30, impact: 96, particles: 600, remnant: 400, stars: 280, tier: "wide" };
+    return { companion: 200, dpr: 1.25, impact: 96, particles: 600, remnant: 400, stars: 280, tier: "wide" };
   }
 
   function buildCanvasScene() {
@@ -595,10 +593,9 @@
     const previousTier = canvasState.budget?.tier;
     canvasState.budget = performanceBudgetFor(canvasState.width);
     canvasState.dpr = Math.min(window.devicePixelRatio || 1, canvasState.budget.dpr);
-    canvasState.frameInterval = 1000 / canvasState.budget.fps;
     elements.hero.dataset.galaxyBudget = canvasState.budget.tier;
     elements.hero.dataset.galaxyDpr = canvasState.dpr.toFixed(2);
-    elements.hero.dataset.galaxyFps = String(canvasState.budget.fps);
+    elements.hero.dataset.galaxyFramePacing = "display";
     elements.hero.dataset.galaxyParticleBudget = String(
       canvasState.budget.particles + canvasState.budget.companion + canvasState.budget.remnant
     );
@@ -889,8 +886,10 @@
     updateOrbitingNodes();
     const parallax = canvasState.parallax;
     if (!reducedMotion.matches && !canvasState.paused) {
-      parallax.x += (parallax.targetX - parallax.x) * 0.075;
-      parallax.y += (parallax.targetY - parallax.y) * 0.075;
+      // Match the former 30 fps easing without speeding up on high-refresh displays.
+      const easing = 1 - Math.pow(1 - 0.075, delta * 30);
+      parallax.x += (parallax.targetX - parallax.x) * easing;
+      parallax.y += (parallax.targetY - parallax.y) * easing;
     } else if (reducedMotion.matches) {
       parallax.x = 0;
       parallax.y = 0;
@@ -962,10 +961,7 @@
   function animateGalaxy(time) {
     canvasState.animationFrame = 0;
     if (!shouldAnimateGalaxy()) return;
-    if (time - canvasState.lastFrame >= canvasState.frameInterval) {
-      canvasState.lastFrame = time;
-      drawGalaxy(time);
-    }
+    drawGalaxy(time);
     canvasState.animationFrame = window.requestAnimationFrame(animateGalaxy);
   }
 
@@ -1001,7 +997,6 @@
   function startGalaxy() {
     stopGalaxy();
     canvasState.startedAt = performance.now();
-    canvasState.lastFrame = 0;
     resizeCanvas();
     syncGalaxyActivity({ drawStaticFrame: false });
   }

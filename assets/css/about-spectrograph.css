@@ -2259,8 +2259,6 @@ a.is-stellar-source {
 [data-stellar-spectrum][data-tree-motion="idle-rotation"] .stellar-tree__root {
   will-change: left, top;
   transition:
-    left var(--stellar-idle-tween-duration, 180ms) linear,
-    top var(--stellar-idle-tween-duration, 180ms) linear,
     color 160ms ease,
     opacity 160ms ease,
     background-color 160ms ease,
