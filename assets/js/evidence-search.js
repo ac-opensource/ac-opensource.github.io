@@ -23,6 +23,7 @@
   var pendingQuery = null;
   var pendingReveal = false;
   var ready = false;
+  var loading = false;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   var routeMotionTimer = 0;
 
@@ -194,26 +195,29 @@
     var canonical = query.trim();
     var tokens = tokensFor(canonical);
     results.replaceChildren();
-    input.value = query;
+    if (!options.preserveInput) input.value = query;
     if (options.history !== false) syncQueryUrl(canonical);
     if (!canonical) {
       pendingQuery = ready ? null : "";
+      pendingReveal = false;
       empty.hidden = false;
       empty.textContent = "Try a capability, system, project, or delivery outcome.";
       status.textContent = ready ? "Set a destination to scan the published field." : "Loading the published route field…";
       clearRouteMotion();
       setPhase(ready ? "idle" : "loading");
       if (options.reveal) input.focus({ preventScroll: true });
+      if (!ready) loadIndex();
       return;
     }
     if (!ready) {
       pendingQuery = canonical;
-      pendingReveal = pendingReveal || options.reveal === true;
+      pendingReveal = options.reveal === true;
       empty.hidden = false;
       empty.textContent = "Preparing the published route index…";
       status.textContent = "Loading the published route field…";
       clearRouteMotion();
       setPhase("loading");
+      loadIndex();
       return;
     }
     pendingQuery = null;
@@ -288,38 +292,43 @@
     input.focus({ preventScroll: true });
   }
 
-  fetch(INDEX_URL, { credentials: "same-origin", cache: "no-cache" })
-    .then(function (response) {
-      if (!response.ok) throw new Error("Published index request failed.");
-      return response.json();
-    })
-    .then(function (payload) {
-      if (!payload || payload.version !== 1 || !Array.isArray(payload.documents)) {
-        throw new Error("Published index format is invalid.");
-      }
-      documents = payload.documents.filter(function (record) {
-        return record && /^\/(?!\/)/.test(record.url) && Array.isArray(record.sections);
-      });
-      ready = true;
-      if (pendingQuery !== null || initialQuery) {
+  function loadIndex() {
+    if (loading || ready) return;
+    loading = true;
+    fetch(INDEX_URL, { credentials: "same-origin", cache: "no-cache" })
+      .then(function (response) {
+        if (!response.ok) throw new Error("Published index request failed.");
+        return response.json();
+      })
+      .then(function (payload) {
+        if (!payload || payload.version !== 1 || !Array.isArray(payload.documents)) {
+          throw new Error("Published index format is invalid.");
+        }
+        documents = payload.documents.filter(function (record) {
+          return record && /^\/(?!\/)/.test(record.url) && Array.isArray(record.sections);
+        });
+        loading = false;
+        ready = true;
         var revealPendingResults = pendingReveal;
         pendingReveal = false;
-        render(pendingQuery !== null ? pendingQuery : initialQuery, {
+        // Readiness may arrive while the visitor is editing their next query.
+        render(pendingQuery || "", {
           history: false,
-          reveal: revealPendingResults
+          preserveInput: true,
+          reveal: revealPendingResults && input.value.trim() === pendingQuery
         });
-      } else {
-        status.textContent = "Set a destination to scan the published field.";
-        setPhase("idle");
-      }
-    })
-    .catch(function () {
-      ready = false;
-      clearRouteMotion();
-      results.replaceChildren();
-      empty.hidden = false;
-      empty.textContent = "The published index is unavailable. Browse Portfolio, About, Résumé, or Logs directly.";
-      status.textContent = "Search index unavailable.";
-      setPhase("error");
-    });
+      })
+      .catch(function () {
+        loading = false;
+        ready = false;
+        clearRouteMotion();
+        results.replaceChildren();
+        empty.hidden = false;
+        empty.textContent = "The published index is unavailable. Submit your search to retry, or browse Portfolio, About, Résumé, or Logs directly.";
+        status.textContent = "Search index unavailable.";
+        setPhase("error");
+      });
+  }
+
+  render(initialQuery, { history: false });
 })();
