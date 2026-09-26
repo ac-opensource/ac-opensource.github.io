@@ -14,6 +14,7 @@
   let travelGeneration = 0;
   let arrivalGeneration = null;
   let lastTravel = null;
+  let pendingDeparture = null;
 
   const DESTINATIONS = Object.freeze({
     home: Object.freeze({ key: "home", label: "Dashboard", mapId: "home", x: 50, y: 52, depth: 1, magnification: 1 }),
@@ -328,6 +329,7 @@
     if (generation !== null && generation !== travelGeneration) return;
     clearTimers();
     transitionInFlight = false;
+    pendingDeparture = null;
     activeViewTransition = null;
     root.dataset.universePerspective = "ready";
     delete root.dataset.universeMotion;
@@ -433,6 +435,17 @@
     }));
   }
 
+  function completeDeparture(generation) {
+    if (!pendingDeparture || generation !== travelGeneration || pendingDeparture.generation !== generation) return;
+    const href = pendingDeparture.href;
+    pendingDeparture = null;
+    try {
+      window.location.assign(href);
+    } catch (_error) {
+      clearTravelState({ keepLast: false, generation });
+    }
+  }
+
   function beginDeparture(event, anchor, targetUrl, destination, { proxied = false } = {}) {
     const retargeted = transitionInFlight;
     const generation = ++travelGeneration;
@@ -456,28 +469,17 @@
       return;
     }
 
+    event.preventDefault();
+    pendingDeparture = { generation, href: targetUrl.href };
     if (root.dataset.universeCrossDocument === "true") {
-      event.preventDefault();
       window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
-        if (generation !== travelGeneration) return;
-        try {
-          window.location.assign(targetUrl.href);
-        } catch (_error) {
-          clearTravelState({ keepLast: false, generation });
-        }
+        completeDeparture(generation);
       }));
       return;
     }
 
-    event.preventDefault();
     const departureDelay = Math.round((travel.duration || FALLBACK_DEPARTURE_MS) * 0.56);
-    schedule(() => {
-      try {
-        window.location.assign(targetUrl.href);
-      } catch (_error) {
-        clearTravelState({ keepLast: false, generation });
-      }
-    }, departureDelay);
+    schedule(() => completeDeparture(generation), departureDelay);
     schedule(() => clearTravelState({ generation }), departureDelay + 1200);
   }
 
@@ -550,6 +552,8 @@
   function settleForMotionPreference() {
     if (!motionIsReduced()) return;
     skipActiveTransition();
+    // Stop the visual delay without dropping the navigation already intercepted.
+    completeDeparture(travelGeneration);
     clearTravelState({ keepLast: false });
   }
 

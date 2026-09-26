@@ -13,7 +13,7 @@ const {
 const {
   injectBigBangLoader,
   localizeProductionFonts,
-  minifyPublishedRouteStyles
+  minifyPublishedStyles
 } = require("./build-site");
 const { DEFAULT_DB_PATH, openDatabase } = require("./lib/blog-db");
 const {
@@ -133,13 +133,17 @@ function main() {
   const routeStylePaths = [
     "assets/css/about-spectrograph.css",
     "assets/css/orbital-option-8.css",
-    "assets/css/work-portfolio.css"
+    "assets/css/work-portfolio.css",
+    "assets/css/shared-navigation.css",
+    "assets/experiments/nested/new-route.css"
   ];
   const routeStyleFixture = `
     /* Non-critical authoring whitespace must not reach the render path. */
     .route-card {
       color: rgb(40, 100, 199);
       margin: calc(1rem + 2px);
+      --route-color: rgb(40, 100, 199);
+      color: var(--route-color);
     }
     @media (prefers-reduced-motion: reduce) {
       .route-card { animation: none !important; }
@@ -151,15 +155,36 @@ function main() {
       fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
       fs.writeFileSync(absolutePath, routeStyleFixture, "utf8");
     }
-    minifyPublishedRouteStyles(routeStyleRoot);
+    const compiledTailwindPath = path.join(routeStyleRoot, "assets/css/tailwind.css");
+    fs.writeFileSync(compiledTailwindPath, ".compiled { color: red; }", "utf8");
+    minifyPublishedStyles(routeStyleRoot);
+    if (fs.readFileSync(compiledTailwindPath, "utf8") !== ".compiled { color: red; }") {
+      throw new Error("The already-compiled Tailwind output must not be processed again.");
+    }
     for (const relativePath of routeStylePaths) {
       const optimized = fs.readFileSync(path.join(routeStyleRoot, relativePath), "utf8");
       if (Buffer.byteLength(optimized) >= Buffer.byteLength(routeStyleFixture)
         || !optimized.includes(".route-card{")
         || !optimized.includes("@media (prefers-reduced-motion:reduce)")
-        || !optimized.includes("animation:none!important")) {
+        || !optimized.includes("animation:none!important")
+        || !optimized.includes("--route-color:")
+        || !optimized.includes("color:var(--route-color)")) {
         throw new Error(`Published route stylesheet optimization changed or failed to compact ${relativePath}.`);
       }
+    }
+    const invalidPath = path.join(routeStyleRoot, "assets/css/invalid.css");
+    const invalidCss = ".broken { color: red;";
+    fs.writeFileSync(invalidPath, invalidCss, "utf8");
+    let optimizationError;
+    try {
+      minifyPublishedStyles(routeStyleRoot);
+    } catch (error) {
+      optimizationError = error;
+    }
+    if (!optimizationError?.message.includes("assets/css/invalid.css")
+      || fs.readFileSync(invalidPath, "utf8") !== invalidCss
+      || fs.existsSync(`${invalidPath}.minifying-${process.pid}`)) {
+      throw new Error("Invalid published CSS must fail with its path and preserve the original file.");
     }
   } finally {
     fs.rmSync(routeStyleRoot, { recursive: true, force: true });
@@ -305,7 +330,7 @@ function main() {
       || !firstPostPage.includes('/assets/js/article-debrief.js?v=20260807-regions1')
       || !firstPostPage.includes('/assets/css/universe-field-map.css?v=20260819-safe1')
       || !firstPostPage.includes('/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1')
-      || !firstPostPage.includes('/assets/js/universe-theme-transition.js?v=20260820-fast-travel1')
+      || !firstPostPage.includes('/assets/js/universe-theme-transition.js?v=20260926-motion-lifecycle1')
       || !firstPostPage.includes('/assets/js/universe-field-map.js?v=20260809-guide9')) {
       throw new Error("Generated articles are missing their region and shared navigation assets.");
     }

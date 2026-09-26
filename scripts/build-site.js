@@ -26,11 +26,6 @@ const SITE_FONT_PRELOADS = Object.freeze([
   "/assets/fonts/manrope-latin-variable.woff2",
   "/assets/fonts/space-grotesk-latin-variable.woff2"
 ]);
-const MINIFIED_ROUTE_STYLESHEETS = Object.freeze([
-  "assets/css/about-spectrograph.css",
-  "assets/css/orbital-option-8.css",
-  "assets/css/work-portfolio.css"
-]);
 
 function isWithin(parent, child) {
   const relative = path.relative(parent, child);
@@ -123,7 +118,7 @@ function assertNoForbiddenOutput(stagingRoot) {
   }
 }
 
-function walkHtmlFiles(root) {
+function walkFilesWithExtension(root, extension) {
   const files = [];
   const pending = [root];
   while (pending.length) {
@@ -131,7 +126,7 @@ function walkHtmlFiles(root) {
     for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
       const absolutePath = path.join(current, entry.name);
       if (entry.isDirectory()) pending.push(absolutePath);
-      else if (entry.isFile() && entry.name.endsWith(".html")) files.push(absolutePath);
+      else if (entry.isFile() && path.extname(entry.name) === extension) files.push(absolutePath);
     }
   }
   return files.sort();
@@ -224,7 +219,7 @@ function injectBigBangLoader(html, relativePath) {
 }
 
 function compileTailwind(stagingRoot) {
-  for (const htmlPath of walkHtmlFiles(stagingRoot)) {
+  for (const htmlPath of walkFilesWithExtension(stagingRoot, ".html")) {
     const relativePath = path.relative(stagingRoot, htmlPath);
     const transformed = localizeProductionFonts(
       injectSharedSiteTools(
@@ -259,26 +254,20 @@ function compileTailwind(stagingRoot) {
   }
 }
 
-function minifyPublishedRouteStyles(stagingRoot) {
-  for (const relativePath of MINIFIED_ROUTE_STYLESHEETS) {
-    const inputPath = path.join(stagingRoot, relativePath);
-    if (!fs.existsSync(inputPath)) {
-      throw new Error(`Cannot optimize missing published stylesheet: ${relativePath}`);
-    }
-
+function minifyPublishedStyles(stagingRoot) {
+  const processor = postcss([
+    lazyCssnano()({
+      preset: ["default", { colormin: false, cssDeclarationSorter: false }]
+    })
+  ]);
+  // Discover only staged public assets, including the published experiments.
+  // Tailwind has already been minified by its compiler.
+  for (const inputPath of walkFilesWithExtension(stagingRoot, ".css")) {
+    const relativePath = path.relative(stagingRoot, inputPath).split(path.sep).join("/");
+    if (relativePath === "assets/css/tailwind.css") continue;
     const outputPath = `${inputPath}.minifying-${process.pid}`;
     try {
-      const optimized = postcss([
-        lazyCssnano()({
-          preset: [
-            "default",
-            {
-              colormin: false,
-              cssDeclarationSorter: false
-            }
-          ]
-        })
-      ]).process(fs.readFileSync(inputPath, "utf8"), {
+      const optimized = processor.process(fs.readFileSync(inputPath, "utf8"), {
         from: inputPath,
         map: false,
         to: outputPath
@@ -362,7 +351,7 @@ function populateStagingDirectory(stagingRoot, { dbPath } = {}) {
 
   fs.unlinkSync(manifestPath);
   compileTailwind(stagingRoot);
-  minifyPublishedRouteStyles(stagingRoot);
+  minifyPublishedStyles(stagingRoot);
   fs.writeFileSync(path.join(stagingRoot, ".nojekyll"), "", "utf8");
   assertNoForbiddenOutput(stagingRoot);
 
@@ -422,7 +411,7 @@ module.exports = {
   assertReplaceableOutput,
   buildSite,
   compileTailwind,
-  minifyPublishedRouteStyles,
+  minifyPublishedStyles,
   injectBigBangLoader,
   injectSharedSiteTools,
   localizeProductionFonts,

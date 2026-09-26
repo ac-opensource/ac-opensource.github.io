@@ -652,7 +652,7 @@ ${articleTagsMeta}
 <link href="/assets/css/logs-theme.css?v=20260908-toggle1" rel="stylesheet"/>
 <link href="/assets/css/logs-surface.css?v=20260908-toggle1" rel="stylesheet"/>
 <script src="/assets/js/logs-theme.js?v=20260908-toggle1"></script>
-<script src="/assets/js/universe-theme-transition.js?v=20260820-fast-travel1"></script>
+<script src="/assets/js/universe-theme-transition.js?v=20260926-motion-lifecycle1"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
