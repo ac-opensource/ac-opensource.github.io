@@ -1,0 +1,252 @@
+/*
+ * Logs search console (blog index only, .galaxy-tuner--console): a contained
+ * field, quick subjects, category pills keyed to the galaxy's node colours,
+ * and a direct path from the galaxy to the matching entries.
+ */
+.galaxy-tuner--console {
+  margin-top: clamp(1.4rem, 3.4vh, 2.4rem);
+}
+
+.galaxy-tuner--console .galaxy-tuner__heading {
+  position: static;
+  width: auto;
+  height: auto;
+  min-height: 1.9rem;
+  align-items: center;
+  margin-bottom: 0.55rem;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+}
+
+.galaxy-tuner--console .galaxy-tuner__heading output {
+  margin-left: auto;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* With a search or filter active, the count becomes the way to the results. */
+.galaxy-tuner--console .galaxy-tuner__heading:has(.galaxy-results-link:not([hidden])) output {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.galaxy-tuner--console .galaxy-tuner__search {
+  position: relative;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3rem;
+  padding: 0 0.35rem 0 0.9rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, var(--space-soft, #f2f5f4) 72%, transparent);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.galaxy-tuner--console .galaxy-tuner__search:focus-within {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 22%, transparent);
+}
+
+.galaxy-tuner__icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: none;
+  color: var(--muted);
+  transition: color 180ms ease;
+}
+
+.galaxy-tuner--console .galaxy-tuner__search:focus-within .galaxy-tuner__icon {
+  color: var(--blue);
+}
+
+.galaxy-tuner--console .galaxy-tuner__search input,
+.galaxy-tuner--console .galaxy-tuner__search input:focus {
+  padding: 0.78rem 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+/* The console provides its own clear control. */
+.galaxy-tuner--console .galaxy-tuner__search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.galaxy-tuner--console .galaxy-tuner__search button[type="reset"] {
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  border-radius: 0.4rem;
+  color: var(--muted);
+  font: 600 0.68rem/1 var(--display);
+  letter-spacing: 0.08em;
+}
+
+.galaxy-tuner--console .galaxy-tuner__search button[type="reset"]:hover,
+.galaxy-tuner--console .galaxy-tuner__search button[type="reset"]:focus-visible {
+  background: color-mix(in srgb, var(--blue) 12%, transparent);
+  color: var(--ink);
+}
+
+/* Clear appears only once there is something to clear. */
+.galaxy-tuner--console .galaxy-tuner__search:has(input:placeholder-shown) button[type="reset"] {
+  visibility: hidden;
+}
+
+/* ---------- Quick subjects ---------- */
+.galaxy-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.galaxy-suggestions > span {
+  margin-right: 0.25rem;
+  color: var(--faint);
+  font: 600 0.68rem/1 var(--display);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.galaxy-suggestions button {
+  min-height: 2rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: 500 0.8rem/1 var(--sans);
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+}
+
+.galaxy-suggestions button:hover,
+.galaxy-suggestions button:focus-visible {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.galaxy-suggestions button[aria-pressed="true"] {
+  border-color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 14%, transparent);
+  color: var(--ink);
+}
+
+/* ---------- Category pills, dotted in each category's node colour ---------- */
+.galaxy-hero .galaxy-tuner--console .galaxy-categories {
+  gap: 0.4rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.galaxy-hero .galaxy-tuner--console .galaxy-categories button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0.45rem;
+  background: transparent;
+  color: var(--muted);
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+}
+
+.galaxy-hero .galaxy-tuner--console .galaxy-categories button[data-category]::before {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--node-color, var(--blue));
+  box-shadow: 0 0 0.5rem color-mix(in srgb, var(--node-color, var(--blue)) 60%, transparent);
+  content: "";
+  opacity: 1;
+}
+
+.galaxy-hero .galaxy-tuner--console .galaxy-categories button[data-category="all"]::before {
+  background: conic-gradient(#2864c7, #7187b2, #5887c9, #385f92, #2864c7);
+}
+
+.galaxy-hero .galaxy-tuner--console .galaxy-categories button::after {
+  content: none;
+}
+
+.galaxy-hero .galaxy-tuner--console .galaxy-categories button:is(:hover, :focus-visible) {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.galaxy-hero .galaxy-tuner--console .galaxy-categories button[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--node-color, var(--blue)) 70%, var(--ink));
+  background: color-mix(in srgb, var(--node-color, var(--blue)) 18%, transparent);
+  color: var(--ink);
+}
+
+/* Saved reading: a bookmark glyph drawn with a mask, so it adds no text. */
+.galaxy-hero .galaxy-tuner--console .galaxy-categories button[data-saved-filter] {
+  margin-left: 0;
+}
+
+.galaxy-hero .galaxy-tuner--console .galaxy-categories button[data-saved-filter]::before {
+  width: 0.6rem;
+  height: 0.8rem;
+  margin: 0;
+  background: currentColor;
+  content: "";
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 16'%3E%3Cpath d='M1 1h10v14l-5-3.6L1 15z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 16'%3E%3Cpath d='M1 1h10v14l-5-3.6L1 15z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.galaxy-hero .galaxy-tuner--console .galaxy-saved-filter__count {
+  min-width: 1.3rem;
+  min-height: 1.3rem;
+  font-size: 0.66rem;
+}
+
+/* ---------- From the galaxy to the matching entries ---------- */
+.galaxy-results-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 1.9rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  background: var(--blue);
+  color: var(--space);
+  font: 600 0.68rem/1 var(--display);
+  letter-spacing: 0.07em;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: filter 160ms ease, translate 200ms ease;
+}
+
+.galaxy-results-link:hover,
+.galaxy-results-link:focus-visible {
+  filter: brightness(1.08);
+  translate: 0 -1px;
+}
+
+.galaxy-results-link:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .galaxy-results-link { transition: none; }
+  .galaxy-results-link:hover,
+  .galaxy-results-link:focus-visible { translate: none; }
+}
+
+@media print {
+  .galaxy-suggestions,
+  .galaxy-results-link { display: none !important; }
+}

@@ -7,17 +7,17 @@ const CHECK_EXTERNAL_LINKS = process.env.CHECK_EXTERNAL_LINKS === '1';
 const BIG_BANG_SESSION_KEY = 'ac.bigBangPortfolioPlayed.v1';
 const siteRoot = path.resolve(__dirname, '..', process.env.SITE_ROOT || '.');
 const postsManifestPath = path.join(siteRoot, 'blog', 'posts.json');
-const homepageSocialImageUrl = 'https://ac-opensource.github.io/assets/images/og/home-orbital-dashboard-hero.png';
+const homepageSocialImageUrl = 'https://ac-opensource.github.io/assets/images/og/home-orbital-20260908.png';
 const socialPreviewContracts = [
-  { path: '/', canonicalUrl: 'https://ac-opensource.github.io/', image: 'home-orbital-dashboard-hero.png' },
-  { path: '/work.html', canonicalUrl: 'https://ac-opensource.github.io/work.html', image: 'work-delivery-system.png' },
+  { path: '/', canonicalUrl: 'https://ac-opensource.github.io/', image: 'home-orbital-20260908.png' },
+  { path: '/work.html', canonicalUrl: 'https://ac-opensource.github.io/work.html', image: 'work-supernova-20260908.png' },
   { path: '/blog/', canonicalUrl: 'https://ac-opensource.github.io/blog/', image: 'logs-spiral-galaxy.png' },
-  { path: '/about.html', canonicalUrl: 'https://ac-opensource.github.io/about.html', image: 'about-stellar-tree.png' },
-  { path: '/contact.html', canonicalUrl: 'https://ac-opensource.github.io/contact.html', image: 'contact-payload-integration.png' },
-  { path: '/resume.html', canonicalUrl: 'https://ac-opensource.github.io/resume.html', image: 'resume-flight-recorder.png' },
+  { path: '/about.html', canonicalUrl: 'https://ac-opensource.github.io/about.html', image: 'about-butterfly-nebula-20260908.png' },
+  { path: '/contact.html', canonicalUrl: 'https://ac-opensource.github.io/contact.html', image: 'contact-payload-integration-20260908.png' },
+  { path: '/resume.html', canonicalUrl: 'https://ac-opensource.github.io/resume.html', image: 'resume-flight-recorder-20260908.png' },
   { path: '/signals.html', canonicalUrl: 'https://ac-opensource.github.io/signals.html', image: 'signals-registry.png' },
   { path: '/search.html', canonicalUrl: 'https://ac-opensource.github.io/search.html', image: 'search-evidence-field.png' },
-  { path: '/skills-graph.html', canonicalUrl: 'https://ac-opensource.github.io/about.html#profile-map', image: 'about-stellar-tree.png' },
+  { path: '/skills-graph.html', canonicalUrl: 'https://ac-opensource.github.io/about.html#profile-map', image: 'about-butterfly-nebula-20260908.png' },
 ].map((contract) => ({
   ...contract,
   imagePath: path.join(siteRoot, 'assets', 'images', 'og', contract.image),
@@ -4169,7 +4169,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     await assert(filteredCount > 0, 'Category filter returned zero posts unexpectedly');
   }
 
-  const firstTitle = await page.locator('#blog-feed article:not([hidden]) h3').first().textContent();
+  const firstTitle = await page.locator('#blog-feed article:not([hidden]) :is(h3, h4)').first().textContent();
   const searchToken = (firstTitle || '').split(/\s+/).find((word) => word.length > 4) || 'mobile';
   await page.fill('#galaxy-search', searchToken);
   await page.waitForTimeout(540);
@@ -4274,7 +4274,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
 
   // Blog post behavior
-  const firstBlogEntryLink = page.locator('#blog-feed article:not([hidden]) h3 a[href$=".html"]').first();
+  const firstBlogEntryLink = page.locator('#blog-feed article:not([hidden]) :is(h3, h4) a[href$=".html"]').first();
   await Promise.all([
     page.waitForURL('**/blog/*.html', { waitUntil: 'domcontentloaded', timeout: 5000 }),
     firstBlogEntryLink.click(),

@@ -21,6 +21,17 @@ const FALLBACK_HERO_IMAGE = "/blog/images/new-zealand-aurora.png";
 const GENERATED_PAGE_MARKER = "<!-- generated: scripts/build-static-blog-pages.js -->";
 const BLOG_STRUCTURED_DATA_START = "<!-- generated: blog-collection-jsonld:start -->";
 const BLOG_STRUCTURED_DATA_END = "<!-- generated: blog-collection-jsonld:end -->";
+const BLOG_FEATURED_START = "<!-- generated: blog-featured:start -->";
+const BLOG_FEATURED_END = "<!-- generated: blog-featured:end -->";
+// Curated "Start here" picks for the Logs index, shown in this order.
+const FEATURED_POST_SLUGS = Object.freeze([
+  "2026-04-07-one-rust-core-across-android-and-ios",
+  "2026-04-30-agents-that-leave-receipts",
+  "2026-07-22-its-not-okay-to-stay-not-okay"
+]);
+// Logs thumbnails render at most 12rem wide on desktop and 19rem on phones.
+const ENTRY_THUMBNAIL_SIZES = "(max-width: 767px) 19rem, 12rem";
+const FEATURED_IMAGE_SIZES = "(max-width: 767px) calc(100vw - 2.2rem), 26rem";
 const GENERATED_MANIFEST_NAME = path.join(".site-build", "generated-blog-pages.json");
 const GENERATOR_ID = "ac-opensource-static-blog-v1";
 const LLMS_TEMPLATE_PATH = path.join(ROOT_DIR, "llms.txt");
@@ -292,49 +303,129 @@ function postPath(slug) {
   return `/blog/${encodeURIComponent(slug)}.html`;
 }
 
-function buildBlogIndexFallback(posts) {
-  const articles = posts
-    .map((post, index) => {
-      const title = String(post.title || "").trim() || "Untitled";
-      const summary = String(post.summary || "").trim() || stripHtml(post.body_html).slice(0, 180);
-      const publishedDate = String(post.published_date || "").trim();
-      const readingTime = String(post.reading_time || "").trim() || "n/a";
-      const heroData = resolvePublicImage(toAssetUrl(post.hero_image), {
-        widths: THUMBNAIL_WIDTHS,
-        sizes: "(min-width: 1024px) 16rem, (min-width: 720px) 32vw, 42vw"
-      });
-      const heroImage = heroData.src || toAssetUrl(post.hero_image);
-      const heroAlt = String(post.hero_alt || `${title} preview`).trim() || `${title} preview`;
-      const heroResponsiveAttributes = heroData.srcset
-        ? ` srcset="${escapeHtml(heroData.srcset)}" sizes="${escapeHtml(heroData.sizes)}"`
-        : "";
-      const topics = Array.isArray(post.topics) ? post.topics : [];
-      const topicsHtml = topics.length
-        ? `<ul class="galaxy-entry__topics" aria-label="Topics">${topics
-            .map((topic) => `<li>${escapeHtml(topic)}</li>`)
-            .join("")}</ul>`
-        : "";
-      const heroHtml = heroImage
-        ? `<a class="galaxy-entry__media" href="${escapeHtml(postPath(post.slug))}" aria-label="Read ${escapeHtml(title)}"><img src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="${index === 0 ? "eager" : "lazy"}" decoding="async"/></a>`
-        : "";
+function buildBlogIndexEntry(post) {
+  const title = String(post.title || "").trim() || "Untitled";
+  const summary = String(post.summary || "").trim() || stripHtml(post.body_html).slice(0, 180);
+  const publishedDate = String(post.published_date || "").trim();
+  const readingTime = String(post.reading_time || "").trim() || "n/a";
+  const heroData = resolvePublicImage(toAssetUrl(post.hero_image), {
+    widths: THUMBNAIL_WIDTHS,
+    sizes: ENTRY_THUMBNAIL_SIZES
+  });
+  const heroImage = heroData.src || toAssetUrl(post.hero_image);
+  const heroAlt = String(post.hero_alt || `${title} preview`).trim() || `${title} preview`;
+  const heroResponsiveAttributes = heroData.srcset
+    ? ` srcset="${escapeHtml(heroData.srcset)}" sizes="${escapeHtml(heroData.sizes)}"`
+    : "";
+  const topics = Array.isArray(post.topics) ? post.topics : [];
+  const topicsHtml = topics.length
+    ? `<ul class="galaxy-entry__topics" aria-label="Topics">${topics
+        .map((topic) => `<li>${escapeHtml(topic)}</li>`)
+        .join("")}</ul>`
+    : "";
+  const heroHtml = heroImage
+    ? `<a class="galaxy-entry__media" href="${escapeHtml(postPath(post.slug))}" aria-label="Read ${escapeHtml(title)}"><img src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="${escapeHtml(heroAlt)}" loading="lazy" decoding="async"/></a>`
+    : "";
 
-      return `<article class="galaxy-entry${heroHtml ? " has-media" : ""}" data-slug="${escapeHtml(post.slug)}" data-blog-slug="${escapeHtml(post.slug)}" data-blog-selected="false" data-has-media="${Boolean(heroHtml)}">
+  return `<article class="galaxy-entry${heroHtml ? " has-media" : ""}" data-slug="${escapeHtml(post.slug)}" data-blog-slug="${escapeHtml(post.slug)}" data-blog-selected="false" data-has-media="${Boolean(heroHtml)}">
   <p class="galaxy-entry__meta">${escapeHtml(visibleCategory(post.category))}<time datetime="${escapeHtml(publishedDate)}">${escapeHtml(publishedDate)}</time><span>${escapeHtml(readingTime)}</span></p>
   <div class="galaxy-entry__body">
-    <h3><a href="${escapeHtml(postPath(post.slug))}">${escapeHtml(title)}</a></h3>
+    <h4><a href="${escapeHtml(postPath(post.slug))}">${escapeHtml(title)}</a></h4>
     <p class="galaxy-entry__summary">${escapeHtml(summary)}</p>
     ${topicsHtml}
   </div>
   ${heroHtml}
 </article>`;
-    })
-    .join("\n");
+}
+
+function buildBlogIndexGroup({ group, title, listId, posts, note = "", compact = false }) {
+  const headingId = `galaxy-group-${group}`;
+  return `<div class="galaxy-group${compact ? " galaxy-group--compact" : ""}" data-galaxy-group="${group}">
+<div class="galaxy-group__header">
+<h3 id="${headingId}" class="galaxy-group__title">${escapeHtml(title)} <span class="galaxy-group__count" data-galaxy-group-count>${posts.length}</span></h3>
+${note ? `<p class="galaxy-group__note">${note}</p>\n` : ""}</div>
+<div id="${listId}" class="galaxy-list${compact ? " galaxy-list--compact" : ""}" aria-labelledby="${headingId}" aria-live="polite">
+${posts.map(buildBlogIndexEntry).join("\n")}
+</div>
+</div>`;
+}
+
+function buildBlogIndexFallback(posts) {
+  const writing = posts.filter((post) => !isWorkPost(post));
+  const caseStudies = posts.filter(isWorkPost);
+  const groups = [
+    buildBlogIndexGroup({ group: "writing", title: "Writing", listId: "galaxy-list", posts: writing })
+  ];
+  if (caseStudies.length) {
+    groups.push(buildBlogIndexGroup({
+      group: "case-studies",
+      title: "Case studies",
+      listId: "galaxy-case-studies",
+      posts: caseStudies,
+      note: 'Short delivery records from client and product work. The same projects, with screenshots, are in the <a href="/work.html">portfolio</a>.',
+      compact: true
+    }));
+  }
 
   return `<section id="blog-feed" aria-label="Published writing" tabindex="-1">
-<div id="galaxy-list" class="galaxy-list" aria-live="polite">
-${articles}
-</div>
+${groups.join("\n")}
 </section>`;
+}
+
+function buildBlogFeaturedBand(posts) {
+  const bySlug = new Map(posts.map((post) => [post.slug, post]));
+  const featured = FEATURED_POST_SLUGS.map((slug) => bySlug.get(slug)).filter(Boolean);
+  if (!featured.length) return "";
+
+  const cards = featured.map((post) => {
+    const title = String(post.title || "").trim() || "Untitled";
+    const summary = String(post.summary || "").trim() || stripHtml(post.body_html).slice(0, 180);
+    const readingTime = String(post.reading_time || "").trim();
+    const heroData = resolvePublicImage(toAssetUrl(post.hero_image), {
+      widths: THUMBNAIL_WIDTHS,
+      sizes: FEATURED_IMAGE_SIZES
+    });
+    const heroImage = heroData.src || toAssetUrl(post.hero_image);
+    const heroResponsiveAttributes = heroData.srcset
+      ? ` srcset="${escapeHtml(heroData.srcset)}" sizes="${escapeHtml(heroData.sizes)}"`
+      : "";
+    const meta = [visibleCategory(post.category), readingTime].filter(Boolean)
+      .map((value) => `<span>${escapeHtml(value)}</span>`)
+      .join("");
+    return `<li class="galaxy-feature" data-slug="${escapeHtml(post.slug)}">
+  <div class="galaxy-feature__media"><img src="${escapeHtml(heroImage)}"${heroResponsiveAttributes} alt="" loading="lazy" decoding="async"/></div>
+  <p class="galaxy-feature__meta">${meta}</p>
+  <h4 class="galaxy-feature__title"><a href="${escapeHtml(postPath(post.slug))}">${escapeHtml(title)}</a></h4>
+  <p class="galaxy-feature__summary">${escapeHtml(summary)}</p>
+</li>`;
+  }).join("\n");
+
+  return `<section id="galaxy-featured" class="galaxy-featured" aria-labelledby="galaxy-featured-title">
+<div class="galaxy-group__header">
+<h3 id="galaxy-featured-title" class="galaxy-group__title">Start here</h3>
+<p class="galaxy-group__note">Three pieces that show the range: mobile architecture, working with agents, and life away from the editor.</p>
+</div>
+<ol class="galaxy-featured__list">
+${cards}
+</ol>
+</section>`;
+}
+
+function replaceBlogFeaturedBand(html, posts, indexPath) {
+  const startIndex = html.indexOf(BLOG_FEATURED_START);
+  const endIndex = html.indexOf(BLOG_FEATURED_END);
+  if (startIndex < 0 && endIndex < 0) return html;
+  if (
+    startIndex < 0 ||
+    endIndex < startIndex ||
+    html.lastIndexOf(BLOG_FEATURED_START) !== startIndex ||
+    html.lastIndexOf(BLOG_FEATURED_END) !== endIndex
+  ) {
+    throw new Error(`Cannot update the featured Logs band in ${indexPath}.`);
+  }
+  const band = buildBlogFeaturedBand(posts);
+  const replacement = `${BLOG_FEATURED_START}\n${band ? `${band}\n` : ""}${BLOG_FEATURED_END}`;
+  return `${html.slice(0, startIndex)}${replacement}${html.slice(endIndex + BLOG_FEATURED_END.length)}`;
 }
 
 function buildBlogIndexStructuredData(posts) {
@@ -406,7 +497,7 @@ function writeBlogIndexFallback(posts, outputBlogDir) {
   const publishedCount = `${posts.length} published ${posts.length === 1 ? "entry" : "entries"}`;
   const socialImageUrl = `${SITE_ORIGIN}${LOGS_SOCIAL_PREVIEW_PATH}`;
   const socialImageAlt = escapeHtml(logsSocialPreviewAlt(posts));
-  const updatedIndexHtml = replaceBlogStructuredData(indexHtml, posts, indexPath)
+  const updatedIndexHtml = replaceBlogFeaturedBand(replaceBlogStructuredData(indexHtml, posts, indexPath), posts, indexPath)
     .replace(feedPattern, buildBlogIndexFallback(posts))
     .replace(/(<span id="(?:archive-total-count|galaxy-total)">)[^<]*(<\/span>)/, `$1${publishedCount}$2`)
     .replace(/(<span id="(?:archive-date-range|galaxy-range)">)[^<]*(<\/span>)/, `$1${yearRange}$2`)
@@ -647,11 +738,11 @@ ${articleTagsMeta}
 <link href="/assets/css/site-fonts.css?v=20260819-local1" rel="stylesheet"/>
 <link href="/assets/css/article-debrief.css?v=20260820-hierarchy1" rel="stylesheet"/>
 <link href="/assets/css/article-aurora.css?v=20260908-1" rel="stylesheet"/>
-<link href="/assets/css/universe-field-map.css?v=20260819-safe1" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20261004-sky1" rel="stylesheet"/>
 <link href="/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1" rel="stylesheet" data-universe-perspective-styles/>
 <link href="/assets/css/logs-theme.css?v=20260908-toggle1" rel="stylesheet"/>
-<link href="/assets/css/logs-surface.css?v=20260908-toggle1" rel="stylesheet"/>
-<script src="/assets/js/logs-theme.js?v=20260908-toggle1"></script>
+<link href="/assets/css/logs-surface.css?v=20261004-header1" rel="stylesheet"/>
+<script src="/assets/js/logs-theme.js?v=20261004-header1"></script>
 <script src="/assets/js/universe-theme-transition.js?v=20260926-motion-lifecycle1"></script>
 <script id="tailwind-config">
   tailwind.config = {
@@ -854,7 +945,7 @@ ${trajectoryHtml.mobile}
   </div>
 </footer>
 <script src="/assets/js/article-debrief.js?v=20260807-regions1"></script>
-<script src="/assets/js/universe-field-map.js?v=20260809-guide9"></script>
+<script src="/assets/js/universe-field-map.js?v=20261004-sky1"></script>
 <script>
   (() => {
     const FORCE_ACTIVE_ROUTE = ${JSON.stringify(navForceRoute)};

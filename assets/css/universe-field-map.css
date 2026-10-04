@@ -45,9 +45,12 @@
   z-index: -2;
   inset: 0;
   border: 1px solid var(--universe-line);
-  border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--universe-canvas) 97%, transparent);
-  box-shadow: 0 0.8rem 2.2rem color-mix(in srgb, var(--universe-ink) 10%, transparent);
+  border-radius: 0.625rem;
+  /* Opaque: page headings must not ghost through the star labels. */
+  background: var(--universe-canvas);
+  box-shadow:
+    0 0.125rem 0.375rem color-mix(in srgb, var(--universe-ink) 6%, transparent),
+    0 0.8rem 2.2rem color-mix(in srgb, var(--universe-ink) 12%, transparent);
   content: "";
   pointer-events: none;
 }
@@ -70,21 +73,30 @@
 .universe-route-map__toggle {
   position: absolute;
   z-index: 20;
-  inset: 0;
+  top: 0;
+  left: 0;
   display: grid;
   width: 2.75rem;
   height: 2.75rem;
   place-content: center;
-  gap: 0.08rem;
+  justify-items: center;
+  gap: 0.25rem;
   padding: 0;
   border: 0;
+  border-radius: 0.625rem;
   background: transparent;
   color: var(--universe-blue);
-  font: 700 0.38rem/1 "Space Grotesk", sans-serif;
-  letter-spacing: 0.12em;
+  font: 700 0.5rem/1 "Space Grotesk", sans-serif;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
   pointer-events: auto;
+  transition: height 240ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+.universe-route-map[data-map-expanded="true"] .universe-route-map__toggle {
+  height: 2.125rem;
+  gap: 0.1875rem;
 }
 
 .universe-route-map__toggle span,
@@ -93,14 +105,21 @@
   font: inherit;
 }
 
+/* Trailing tracking would otherwise push "MAP" left of the plus sign. */
+.universe-route-map__toggle span { margin-right: -0.14em; }
+
 .universe-route-map__toggle b {
   color: var(--universe-ink);
-  font-size: 0.72rem;
-  line-height: 0.75;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 0.5;
+  transition: color 160ms ease;
 }
 
+.universe-route-map__toggle:hover b { color: var(--universe-blue); }
+
 .universe-route-map__toggle:focus-visible {
-  border-radius: 0.5rem;
   outline: 2px solid var(--universe-blue);
   outline-offset: -0.2rem;
 }
@@ -131,12 +150,34 @@
   transition: none !important;
 }
 
+/* Header rule under the readout, and a divider beside the toggle. */
+.universe-route-map__field::before,
+.universe-route-map__field::after {
+  position: absolute;
+  background: var(--universe-line);
+  content: "";
+}
+
+.universe-route-map__field::before {
+  top: 2.125rem;
+  right: 0.5rem;
+  left: 0.5rem;
+  height: 1px;
+}
+
+.universe-route-map__field::after {
+  top: 0.5rem;
+  left: 2.75rem;
+  width: 1px;
+  height: 1.125rem;
+}
+
 .universe-route-map__sky {
   position: absolute;
-  inset: 1.45rem 0.45rem 0.32rem;
-  width: calc(100% - 0.9rem);
-  height: calc(100% - 1.77rem);
-  overflow: visible;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  clip-path: inset(2.125rem 0 0 0);
   pointer-events: none;
 }
 
@@ -147,33 +188,24 @@
   vector-effect: non-scaling-stroke;
 }
 
-.universe-route-map__horizon {
-  stroke-dasharray: 2 5;
-}
-
-.universe-route-map__declination {
-  opacity: 0.48;
-  stroke-dasharray: 1 7;
-}
-
-.universe-route-map__ticks {
-  opacity: 0.72;
+.universe-route-map__rings {
+  opacity: 0.6;
 }
 
 .universe-route-map__readout {
   position: absolute;
   z-index: 5;
-  top: 0.38rem;
-  right: 0.55rem;
-  left: 3.35rem;
+  top: 0;
+  right: 0.75rem;
+  left: 3.25rem;
   display: grid;
+  height: 2.125rem;
   min-width: 0;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.3rem;
+  column-gap: 0.5rem;
+  row-gap: 0.25rem;
+  align-content: center;
   align-items: baseline;
-  padding: 0 0 0.34rem;
-  border-bottom: 1px solid var(--universe-line);
-  background: transparent;
   color: var(--universe-muted);
   text-align: left;
   text-transform: uppercase;
@@ -188,26 +220,43 @@
 }
 
 .universe-route-map__readout small {
-  display: none;
-  font-size: 0.34rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.4375rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  transition: color 160ms ease;
+}
+
+.universe-route-map__readout small::before {
+  width: 0.3125rem;
+  height: 0.3125rem;
+  border-radius: 50%;
+  background: var(--universe-blue);
+  content: "";
+}
+
+.universe-route-map:is([data-slew-state="aiming"], [data-slew-state="slewing"]) .universe-route-map__readout small {
+  color: var(--universe-blue);
 }
 
 .universe-route-map__readout strong {
   color: var(--universe-ink);
-  font-size: 0.5rem;
+  font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
 .universe-route-map__readout b {
-  grid-column: 1 / -1;
   overflow: hidden;
   color: var(--universe-blue);
-  font-size: 0.33rem;
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  font-size: 0.46875rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -225,18 +274,6 @@
   transform: rotate(var(--scope-angle));
   transform-origin: 0 50%;
   transition: width 440ms cubic-bezier(0.2, 0.72, 0.18, 1), opacity 180ms ease, transform 440ms cubic-bezier(0.2, 0.72, 0.18, 1);
-}
-
-.universe-route-map__sightline::after {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  width: 0.52rem;
-  height: 0.52rem;
-  border: 1px solid color-mix(in srgb, var(--universe-blue) 72%, transparent);
-  border-radius: 50%;
-  content: "";
-  transform: translate(50%, -50%);
 }
 
 .universe-route-map__telescope {
@@ -318,107 +355,124 @@
 .universe-route-map__mount::after { transform: rotate(-28deg); }
 .universe-route-map__mount i { transform: none; }
 
+/* Each destination is a label pill anchored on its star: --map-x/--map-y
+   place the star centre, and the label hangs east (or west, for stars near
+   the right edge). The whole pill is the hit area. */
 .universe-route-map a {
+  --star-size: 0.9375rem;
+  --node-inset: 0.1875rem;
   position: absolute;
   z-index: 6;
   top: var(--map-y);
   left: var(--map-x);
-  display: grid;
-  width: 3rem;
-  min-height: 2.75rem;
-  grid-template-rows: 1.2rem auto;
-  place-items: center;
-  padding: 0;
+  display: flex;
+  min-height: 1.5rem;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 0.3125rem;
+  padding: 0 0.4375rem 0 var(--node-inset);
+  border-radius: 999px;
+  background: var(--universe-canvas);
   color: var(--universe-muted);
-  text-align: center;
   text-decoration: none;
-  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  transform: translate(calc(-1 * (var(--node-inset) + var(--star-size) / 2)), -50%);
+  transition: background-color 160ms ease, color 160ms ease;
   pointer-events: auto;
 }
 
-.universe-route-map a::before {
-  position: absolute;
-  z-index: -1;
-  top: 0.06rem;
-  left: 50%;
-  width: 1rem;
-  height: 1rem;
-  border: 1px solid var(--universe-line);
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--universe-canvas) 94%, transparent);
-  content: "";
-  transform: translateX(-50%);
-  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+.universe-route-map a[data-label-side="start"] {
+  flex-direction: row-reverse;
+  padding: 0 var(--node-inset) 0 0.4375rem;
+  transform: translate(calc(-100% + var(--node-inset) + var(--star-size) / 2), -50%);
 }
 
-.universe-route-map a::after {
-  position: absolute;
-  z-index: -2;
-  top: 0.33rem;
-  left: 50%;
-  width: 0.4rem;
-  height: 0.4rem;
-  border: 1px solid transparent;
+.universe-route-map__star {
+  position: relative;
+  display: grid;
+  flex: none;
+  width: var(--star-size);
+  height: var(--star-size);
+  box-sizing: border-box;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--universe-muted) 55%, transparent);
   border-radius: 50%;
-  content: "";
-  transform: translateX(-50%);
-  transition: border-color 180ms ease, transform 180ms ease;
+  background: var(--universe-canvas);
+  color: var(--universe-ink);
+  font-size: 0.4375rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
 }
 
-.universe-route-map a[data-map-id="home"]::before {
+/* Aim reticle: shown on whichever star the telescope is pointed at. */
+.universe-route-map__star::after {
+  position: absolute;
+  inset: -0.25rem;
+  border: 1px dashed var(--universe-blue);
+  border-radius: 50%;
+  content: "";
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 180ms ease, transform 240ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+.universe-route-map a[data-map-id="home"] .universe-route-map__star {
   border-style: dashed;
 }
 
-.universe-route-map a span,
 .universe-route-map a strong {
-  position: relative;
   display: block;
-}
-
-.universe-route-map a span {
-  padding-top: 0.37rem;
-  color: var(--universe-ink);
-  font-size: 0.34rem;
-  font-weight: 700;
+  font-size: 0.59375rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   line-height: 1;
-}
-
-.universe-route-map a strong {
-  max-width: 100%;
-  overflow: hidden;
-  font-size: 0.38rem;
-  font-weight: 650;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  text-overflow: ellipsis;
   text-transform: uppercase;
-  white-space: nowrap;
+  transition: color 160ms ease;
 }
 
-.universe-route-map a:is(:hover, :focus-visible, [data-slew-active="true"])::before,
-.universe-route-map a[aria-current="location"]::before {
+.universe-route-map a:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--universe-blue) 9%, var(--universe-canvas));
+  color: var(--universe-ink);
+}
+
+.universe-route-map a:is(:hover, :focus-visible) .universe-route-map__star {
   border-color: var(--universe-blue);
-  box-shadow: 0 0 0 0.22rem var(--universe-blue-soft);
-  transform: translateX(-50%) scale(1.08);
 }
 
-.universe-route-map a:is(:hover, :focus-visible, [data-slew-active="true"])::after,
-.universe-route-map a[aria-current="location"]::after {
-  border-color: var(--universe-blue);
-  transform: translateX(-50%) scale(1.25);
-}
-
-.universe-route-map a:is(:hover, :focus-visible, [data-slew-active="true"]) span,
-.universe-route-map a[aria-current="location"] span,
-.universe-route-map a:is(:hover, :focus-visible, [data-slew-active="true"]) strong,
-.universe-route-map a[aria-current="location"] strong {
+.universe-route-map a[data-slew-active="true"] {
   color: var(--universe-blue);
 }
 
+.universe-route-map a[data-slew-active="true"] .universe-route-map__star {
+  border-color: var(--universe-blue);
+}
+
+.universe-route-map a[data-slew-active="true"] .universe-route-map__star::after {
+  opacity: 1;
+  transform: none;
+}
+
+/* Current page: a filled star, so "you are here" never reads like a target. */
+.universe-route-map a[aria-current="location"] {
+  color: var(--universe-ink);
+}
+
+.universe-route-map a[aria-current="location"] strong {
+  font-weight: 700;
+}
+
+.universe-route-map a[aria-current="location"] .universe-route-map__star {
+  border-color: var(--universe-blue);
+  background: var(--universe-blue);
+  box-shadow: 0 0 0 0.1875rem var(--universe-blue-soft);
+  color: var(--universe-canvas);
+}
+
 .universe-route-map a:focus-visible {
-  border-radius: 0.3rem;
   outline: 2px solid var(--universe-blue);
-  outline-offset: 0.15rem;
+  outline-offset: 1px;
 }
 
 .universe-route-map[data-slew-state="slewing"] .universe-route-map__barrel {
@@ -491,8 +545,10 @@ body.has-universe-route-map {
   .universe-route-map__telescope,
   .universe-route-map,
   .universe-route-map__field,
-  .universe-route-map a::before,
-  .universe-route-map a::after {
+  .universe-route-map__toggle,
+  .universe-route-map a,
+  .universe-route-map__star,
+  .universe-route-map__star::after {
     transition: none !important;
   }
 }

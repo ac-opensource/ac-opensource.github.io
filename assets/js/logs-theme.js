@@ -6,7 +6,10 @@
   try { if (localStorage.getItem(key) === 'light') theme = 'light'; } catch (_) {}
   root.dataset.logsTheme = theme;
   function mount() {
-    const host = document.querySelector('.galaxy-tuner__heading, .article-region__actions');
+    // Page-level preference: it lives in the site header beside search, not
+    // inside the archive's search console or an article's action row.
+    const header = document.querySelector('#site-topbar [data-site-search-slot]');
+    const host = header || document.querySelector('.galaxy-tuner__heading, .article-region__actions');
     if (!host) return;
     const button = document.createElement('button');
     button.type = 'button';
@@ -15,7 +18,9 @@
     function apply(next) {
       theme = next;
       root.dataset.logsTheme = theme;
-      button.textContent = theme === 'dark' ? 'Light mode' : 'Dark mode';
+      button.textContent = header
+        ? (theme === 'dark' ? '[light]' : '[dark]')
+        : (theme === 'dark' ? 'Light mode' : 'Dark mode');
       button.setAttribute('aria-label', theme === 'dark' ? 'Use light theme' : 'Use dark theme');
       button.setAttribute('aria-pressed', String(theme === 'light'));
     }
@@ -27,7 +32,12 @@
       if (event.key === key) apply(event.newValue === 'light' ? 'light' : 'dark');
     });
     apply(theme);
-    host.append(button);
+    if (header) {
+      button.classList.add('logs-theme-toggle--header');
+      host.prepend(button);
+    } else {
+      host.append(button);
+    }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount, { once: true });
   else mount();

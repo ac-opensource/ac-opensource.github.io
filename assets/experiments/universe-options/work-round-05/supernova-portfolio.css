@@ -384,7 +384,7 @@
 .work-nova[data-renderer="active"] .work-nova__image { visibility: hidden; }
 .work-nova [hidden] { display: none; }
 @media (prefers-reduced-motion: reduce), (forced-colors: active) {
-  .work-nova__surface, .work-nova__field { display: none !important; }
+  .work-nova__surface, .work-nova__field, .work-nova__fx { display: none !important; }
   .work-nova[data-renderer="active"] .work-nova__image { visibility: visible; }
 }
 
@@ -394,10 +394,13 @@
 .work-supernova-theme:has(.work-nova) .work-hero__copy,
 .work-supernova-theme:has(.work-nova) .work-signals { z-index: 4; }
 .work-nova__field,
+.work-nova__fx,
 .work-nova__image { position: absolute; width: 230%; height: 230%; max-width: none; left: 50%; top: 50%; inset-inline-start: 50%; transform: translate(-50%, -50%); }
+/* Detonation light paints normally over the multiplied ink so it can glow on paper. */
+.work-nova__fx { z-index: 2; pointer-events: none; }
 .work-nova__footer { position: relative; z-index: 4; }
 @media (max-width: 700px) {
-  .work-nova__field, .work-nova__image { width: 175%; height: 175%; }
+  .work-nova__field, .work-nova__fx, .work-nova__image { width: 175%; height: 175%; }
 }
 
 .work-nova__footer { min-height: 44px; padding-block: .35rem; background: var(--supernova-paper); color: #526757; border-radius: .5rem; }

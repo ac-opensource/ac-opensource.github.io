@@ -16,7 +16,7 @@ for (const bigBang of ['pending', 'running', 'revealing']) {
 }
 const renderBody = source.match(/const render = \(\) => \{([\s\S]*?)\n  \};\n  const tick/);
 assert(renderBody, 'Locate the actual render function to exercise the uploaded pulse uniforms');
-const render = new Function('gl', 'uniforms', 'elapsed', 'pulseStart', 'field', 'pointerX', 'pointerY', renderBody[1]);
+const render = new Function('gl', 'uniforms', 'elapsed', 'pulseStart', 'field', 'pointerX', 'pointerY', 'fx', renderBody[1]);
 
 // Independent reference: the original shader's collapse, expansion, settle,
 // impact and tension equations before they moved from GLSL into JS.
@@ -40,13 +40,14 @@ const originalPulse = sequence => {
   ];
 };
 
-const uniforms = { time: 'time', sequence: 'sequence', pointer: 'pointer', pulse: 'pulse' };
+const uniforms = { time: 'time', sequence: 'sequence', pointer: 'pointer', pulse: 'pulse', burst: 'burst' };
 const values = {};
 let draws = 0;
 const gl = {
   TRIANGLES: 4,
   uniform1f: (name, value) => { values[name] = value; },
   uniform2f: (name, ...value) => { values[name] = value; },
+  uniform3f: (name, ...value) => { values[name] = value; },
   uniform4f: (name, ...value) => { values[name] = value; },
   drawArrays: (...args) => { assert.deepEqual(args, [4, 0, 6]); draws++; }
 };
@@ -57,7 +58,18 @@ for (const pulseStart of [0, 321.5]) {
     const elapsed = pulseStart + requestedAge;
     const age = Math.min(6, elapsed - pulseStart);
     const field = { dataset: {} };
-    render(gl, uniforms, elapsed, pulseStart, field, .2, .8);
+    const fxAges = [];
+    render(gl, uniforms, elapsed, pulseStart, field, .2, .8, { frame: value => fxAges.push(value) });
+    // The light layer outlives the 6 s field clamp so its embers can finish.
+    assert.deepEqual(fxAges, [elapsed - pulseStart]);
+    const [flash, zoom, split] = values.burst;
+    if (age < 3) {
+      assert.equal(flash, 0, `No flash before detonation at ${age}`);
+      assert(zoom <= 0 && split >= 0, `Collapse streaks inward at ${age}`);
+    } else {
+      assert(flash > 0 && flash <= 1 && zoom >= 0 && split >= 0, `Detonation burst is bounded at ${age}`);
+    }
+    if (age >= 4.5) assert(flash < 1e-3 && zoom < .01 && split < 1e-3, `Burst has decayed by ${age}`);
     const expected = originalPulse(age);
     values.pulse.forEach((value, index) => {
       assert(Number.isFinite(value));

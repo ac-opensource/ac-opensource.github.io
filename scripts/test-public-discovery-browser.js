@@ -175,7 +175,6 @@ async function main() {
 
     await page.locator("[data-evidence-search-input]").fill("");
     await page.locator("[data-evidence-search-form]").evaluate((form) => form.requestSubmit());
-    await page.waitForURL((url) => !url.searchParams.has("q"));
     assert.equal(new URL(page.url()).searchParams.has("q"), false, "Empty search did not clear stale URL state.");
     assert.equal(await page.locator("[data-search-navigation]").getAttribute("data-search-phase"), "idle");
 
