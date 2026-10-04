@@ -328,10 +328,10 @@ function main() {
     }
     if (!/\/assets\/css\/article-debrief\.css\?v=[^"']+/.test(firstPostPage)
       || !firstPostPage.includes('/assets/js/article-debrief.js?v=20260807-regions1')
-      || !firstPostPage.includes('/assets/css/universe-field-map.css?v=20260819-safe1')
+      || !firstPostPage.includes('/assets/css/universe-field-map.css?v=20261004-sky1')
       || !firstPostPage.includes('/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1')
       || !firstPostPage.includes('/assets/js/universe-theme-transition.js?v=20260926-motion-lifecycle1')
-      || !firstPostPage.includes('/assets/js/universe-field-map.js?v=20260809-guide9')) {
+      || !firstPostPage.includes('/assets/js/universe-field-map.js?v=20261004-sky1')) {
       throw new Error("Generated articles are missing their region and shared navigation assets.");
     }
 

@@ -74,7 +74,7 @@ function focusedBlogFallback(posts) {
   );
   return withFallback.replace(
     /(<script src="\/assets\/experiments\/universe-options\/logs\/spiral-galaxy-archive\.js[^"]*"><\/script>)/,
-    '<script>window.__prerenderedGalaxyEntries = [...document.querySelectorAll("#galaxy-list > article")];<\/script>\n$1'
+    '<script>window.__prerenderedGalaxyEntries = [...document.querySelectorAll("#blog-feed .galaxy-list > article")];<\/script>\n$1'
   );
 }
 
@@ -201,7 +201,7 @@ async function verifyPrerenderHydrationIdentity(browser, baseUrl, posts) {
 
   const hydrated = await page.evaluate(() => {
     const original = window.__prerenderedGalaxyEntries || [];
-    const current = [...document.querySelectorAll("#galaxy-list > article")];
+    const current = [...document.querySelectorAll("#blog-feed .galaxy-list > article")];
     const currentBySlug = new Map(current.map((entry) => [entry.dataset.blogSlug, entry]));
     return {
       actionCounts: current.map((entry) => entry.querySelectorAll(":scope .galaxy-entry__actions").length),

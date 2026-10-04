@@ -5,12 +5,17 @@
   const surface = nova?.querySelector('[data-nova-ignite]');
   const pause = document.querySelector('[data-nova-pause]');
   const hint = document.querySelector('[data-nova-hint]');
+  const fxCanvas = nova?.querySelector('[data-nova-fx]');
   if (!field || !image || !surface || !pause) return;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const forced = matchMedia('(forced-colors: active)');
   const connection = navigator.connection;
   const suppressed = () => reduced.matches || forced.matches || connection?.saveData;
+  const idleHint = 'Move to stir. Press to collapse & ignite.';
+  let fx = null;
   const staticView = () => {
+    fx?.hide();
+    if (fxCanvas) fxCanvas.hidden = true;
     field.hidden = true;
     surface.hidden = true;
     pause.hidden = true;
@@ -32,6 +37,7 @@
     uniform vec2 pointer;
     uniform sampler2D noiseLattice;
     uniform vec4 pulse;
+    uniform vec3 burst;
     // The lattice uses the original GPU hash. Only its interpolation remains
     // per pixel; out-of-bounds coordinates retain the procedural path.
     #ifdef GL_FRAGMENT_PRECISION_HIGH
@@ -72,14 +78,34 @@
         vec2 relative=displaced-core;
         displaced=core+mat2(cos(twist),-sin(twist),sin(twist),cos(twist))*relative;
       }
-      vec3 ink=texture2D(artwork,clamp(displaced,0.,1.)).rgb;
+      vec3 ink;
+      // burst: x flash, y signed zoom (negative pulls matter inward), z chromatic split.
+      if(abs(burst.y) > .004 || burst.z > .0005) {
+        vec2 relative=displaced-core;
+        vec2 split=relative*(burst.z+front*.05);
+        ink=vec3(texture2D(artwork,clamp(displaced+split,0.,1.)).r,texture2D(artwork,clamp(displaced,0.,1.)).g,texture2D(artwork,clamp(displaced-split,0.,1.)).b);
+        float weight=1.;
+        for(int tap=1;tap<6;tap++) {
+          float k=float(tap)/5.;
+          float w=1.-k*.6;
+          ink+=texture2D(artwork,clamp(core+relative*(1.-burst.y*k),0.,1.)).rgb*w;
+          weight+=w;
+        }
+        ink/=weight;
+      } else {
+        ink=texture2D(artwork,clamp(displaced,0.,1.)).rgb;
+      }
       float textureEdge=1.-smoothstep(.43,.64,length(displaced-core));
       ink=mix(vec3(.98,.976,.957),ink,textureEdge);
       float density=clamp(1.-dot(ink,vec3(.299,.587,.114)),0.,1.);
       float filament=cloud(displaced*17.+vec2(time*.12,-time*.1));
       float energy=(.5+.5*sin(time*.85-r*19.+filament*5.))*density;
       ink=mix(ink,ink*vec3(.88,1.025,1.09),energy*.35);
-      ink+=vec3(.18,.09,.025)*front*density*.7;
+      // Matter piles up into a copper rim on the shock front.
+      ink=mix(ink,ink*vec3(.8,.6,.46),front*.6);
+      // The detonation burns warm light into the cloud before it cools back to ink.
+      ink=mix(ink,vec3(1.,.82,.55),burst.x*exp(-r*r/.035)*.85);
+      ink*=mix(vec3(1.),vec3(1.,.93,.82),burst.x*.55);
       float glow=exp(-r*r/(.0003+tension*.0012+impact*.012))*(.16+tension*.8+impact*1.2);
       if(impact > 0.) {
         float angle=atan(d.y,d.x);
@@ -118,7 +144,7 @@
   const position = gl.getAttribLocation(program, 'position');
   gl.enableVertexAttribArray(position);
   gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-  const uniforms = Object.fromEntries(['time','sequence','pointer','pulse'].map(name => [name, gl.getUniformLocation(program,name)]));
+  const uniforms = Object.fromEntries(['time','sequence','pointer','pulse','burst'].map(name => [name, gl.getUniformLocation(program,name)]));
   // Bake the original mediump hash once on this GPU (CPU sin is not
   // guaranteed to match shader sin). Two channels preserve 16-bit values;
   // hardware bilinear sampling performs the four-corner interpolation.
@@ -178,7 +204,8 @@
   const canRun = () => ready && visible && !document.hidden && !paused && !suppressed() && !lost && entryReady();
   const render = () => {
     gl.uniform1f(uniforms.time, elapsed);
-    const age = Math.min(6, elapsed-pulseStart);
+    const sequenceAge = elapsed-pulseStart;
+    const age = Math.min(6, sequenceAge);
     gl.uniform1f(uniforms.sequence, age);
     const collapse = Math.min(1, age/3);
     const blast = Math.max(0, Math.min(1, (age-3)/.7));
@@ -186,17 +213,25 @@
     const expansion = .045 + (1.27-.045)*(1-Math.pow(1-blast,4));
     const smoothSettle = settle*settle*(3-2*settle);
     const size = age < 3 ? 1-Math.pow(collapse,2.3)*.955 : expansion+(1-expansion)*smoothSettle;
-    gl.uniform4f(uniforms.pulse, size, age < 3 ? 0 : Math.exp(-(age-3)*2.1), age < 3 ? Math.pow(collapse,3) : 0, blast);
+    const impact = age < 3 ? 0 : Math.exp(-(age-3)*2.1);
+    const tension = age < 3 ? Math.pow(collapse,3) : 0;
+    gl.uniform4f(uniforms.pulse, size, impact, tension, blast);
+    // Zoom blur streaks matter inward during collapse and outward on detonation.
+    const flash = age < 3 ? 0 : Math.exp(-(age-3)/.16);
+    gl.uniform3f(uniforms.burst, flash, age < 3 ? -tension*.09 : impact*.17, tension*.004+impact*.014);
     const phase = age < 3 ? 'collapsing' : age < 3.7 ? 'exploding' : age < 6 ? 'settling' : 'remnant';
     if (field.dataset.phase !== phase) field.dataset.phase = phase;
     gl.uniform2f(uniforms.pointer, pointerX, pointerY);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+    fx?.frame(sequenceAge);
   };
   const tick = now => {
     frame = 0;
     if (!canRun()) { previous = 0; return; }
     // Paint each display frame: interval gates can drop 60 Hz callbacks to 30 Hz.
-    const dt = previous ? Math.min(.1,(now-previous)/1000) : 0;
+    // Time-based, so slow GPUs drop frames instead of stretching the sequence;
+    // pause, visibility and resume still restart from dt = 0.
+    const dt = previous ? Math.min(.25,(now-previous)/1000) : 0;
     elapsed += dt;
     previous = now;
     const follow = 1-Math.exp(-5*dt);
@@ -226,6 +261,7 @@
     const ratio = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(750000 / Math.max(1,bounds.width*bounds.height)));
     const width = Math.max(1,Math.floor(bounds.width*ratio));
     const height = Math.max(1,Math.floor(bounds.height*ratio));
+    fx?.resize();
     if (field.width === width && field.height === height) return;
     field.width = width; field.height = height;
     gl.viewport(0,0,width,height);
@@ -246,11 +282,13 @@
     gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,image);
     ready = true;
     field.hidden = false;
+    hint.textContent = idleHint;
+    fx = window.WorkSupernovaFx?.create({ canvas: fxCanvas, nova, hint, idleHint, compact: () => matchMedia('(max-width: 700px)').matches }) || null;
+    fx?.reset(0);
     resize(); render();
     surface.hidden = false; pause.hidden = false;
     nova.dataset.renderer = 'active';
     document.documentElement.dataset.workSupernova = 'interactive';
-    hint.textContent = 'Move to stir. Press to collapse & ignite.';
     sync();
   };
   surface.addEventListener('pointermove', event => {
@@ -267,6 +305,7 @@
     if (elapsed-pulseStart < 6) { sync(); return; }
     pulseStart=elapsed;
     field.dataset.pulseCount=String(Number(field.dataset.pulseCount || 0)+1);
+    fx?.reset(Number(field.dataset.pulseCount));
     sync();
   });
   pause.addEventListener('click', () => {
@@ -280,7 +319,7 @@
       field.hidden=false; surface.hidden=false; pause.hidden=false;
       nova.dataset.renderer='active';
       document.documentElement.dataset.workSupernova='interactive';
-      hint.textContent='Move to stir. Press to collapse & ignite.';
+      hint.textContent=idleHint;
       sync();
     } else if (!ready && !lost) {
       initialize();

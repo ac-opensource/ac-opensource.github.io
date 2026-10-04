@@ -3,14 +3,17 @@
 
   if (document.querySelector("[data-universe-route-map]")) return;
 
+  // x/y place each star's centre inside the expanded 288×124 sky. They keep the
+  // perspective camera's relative bearings while giving every label pill its
+  // own non-overlapping hit area; Threads hangs its label to the west of its star.
   const destinations = [
-    { id: "home", number: "00", label: "Home", href: "/", x: "55%", y: "57%", depth: 1, magnification: "1.0×" },
-    { id: "about", number: "01", label: "About", href: "/about.html", x: "22%", y: "69%", depth: 4.5, magnification: "1.6×" },
-    { id: "profile", number: "02", label: "Skills", href: "/about.html#profile-map", x: "35%", y: "38%", depth: 7.4, magnification: "3.2×" },
-    { id: "work", number: "03", label: "Work", href: "/work.html", x: "50%", y: "31%", depth: 3.1, magnification: "2.4×" },
-    { id: "projects", number: "04", label: "Production", href: "/work.html#production-work", x: "70%", y: "47%", depth: 8.8, magnification: "5.6×" },
-    { id: "threads", number: "05", label: "Threads", href: "/blog/", x: "88%", y: "69%", depth: 6.5, magnification: "2.8×" },
-    { id: "contact", number: "06", label: "Contact", href: "/contact.html", x: "74%", y: "78%", depth: 4, magnification: "1.8×" },
+    { id: "home", number: "00", label: "Home", href: "/", x: "47.9%", y: "60.5%", depth: 1, magnification: "1.0×" },
+    { id: "about", number: "01", label: "About", href: "/about.html", x: "24.3%", y: "66.1%", depth: 4.5, magnification: "1.6×" },
+    { id: "profile", number: "02", label: "Skills", href: "/about.html#profile-map", x: "20.1%", y: "41.9%", depth: 7.4, magnification: "3.2×" },
+    { id: "work", number: "03", label: "Work", href: "/work.html", x: "46.5%", y: "37.9%", depth: 3.1, magnification: "2.4×" },
+    { id: "projects", number: "04", label: "Production", href: "/work.html#production-work", x: "68.1%", y: "40.3%", depth: 8.8, magnification: "5.6×" },
+    { id: "threads", number: "05", label: "Threads", href: "/blog/", x: "94.4%", y: "62.9%", depth: 6.5, magnification: "2.8×", labelSide: "start" },
+    { id: "contact", number: "06", label: "Contact", href: "/contact.html", x: "59%", y: "83.1%", depth: 4, magnification: "1.8×" },
   ];
   const CARRIED_EXPANSION_KEY = "ac.universe-field-map.carry-expanded.v1";
   const byId = new Map(destinations.map((destination) => [destination.id, destination]));
@@ -46,10 +49,9 @@
       <span>MAP</span><b aria-hidden="true">+</b>
     </button>
     <span class="universe-route-map__field" id="universe-route-map-field" data-universe-map-field aria-hidden="true">
-      <svg class="universe-route-map__sky" viewBox="0 0 380 128" preserveAspectRatio="none" aria-hidden="true">
-        <path class="universe-route-map__horizon" d="M20 103 Q190 -1 360 103" />
-        <path class="universe-route-map__declination" d="M48 87 Q190 28 334 84" />
-        <path class="universe-route-map__ticks" d="M70 74v6M118 49v6M166 34v6M214 34v6M262 49v6M310 74v6" />
+      <svg class="universe-route-map__sky" viewBox="0 0 288 124" preserveAspectRatio="xMinYMax slice" aria-hidden="true">
+        <path class="universe-route-map__rings" d="M78 107A58 58 0 0 0 20 49M136 107A116 116 0 0 0 20 -9M194 107A174 174 0 0 0 20 -67M252 107A232 232 0 0 0 20 -125" />
+        <path class="universe-route-map__ticks" d="M78 104v6M136 104v6M194 104v6M252 104v6" />
       </svg>
       <span class="universe-route-map__readout" aria-hidden="true">
         <small data-universe-slew-state-label>LOCKED</small>
@@ -78,7 +80,8 @@
     link.dataset.magnification = destination.magnification;
     link.style.setProperty("--map-x", destination.x);
     link.style.setProperty("--map-y", destination.y);
-    link.innerHTML = `<span>${destination.number}</span><strong>${destination.label}</strong>`;
+    if (destination.labelSide) link.dataset.labelSide = destination.labelSide;
+    link.innerHTML = `<span class="universe-route-map__star" aria-hidden="true">${destination.number}</span><strong>${destination.label}</strong>`;
     link.setAttribute("aria-label", `${destination.label}, depth ${destination.depth.toFixed(1)}, magnification ${destination.magnification}`);
     if (destination.id === currentId) link.setAttribute("aria-current", "location");
     field.append(link);
@@ -144,16 +147,17 @@
     const mount = nav.querySelector(".universe-route-map__mount");
     if (!target || !mount || !nav.isConnected) return;
 
-    const targetBounds = target.getBoundingClientRect();
+    const starBounds = (target.querySelector(".universe-route-map__star") || target).getBoundingClientRect();
     const mountBounds = mount.getBoundingClientRect();
+    // The telescope and sightline pivot on the top of the mount ring.
     const startX = mountBounds.left + mountBounds.width / 2;
-    const startY = mountBounds.top + mountBounds.height * 0.36;
-    const endX = targetBounds.left + targetBounds.width / 2;
-    const endY = targetBounds.top + Math.min(13, targetBounds.height * 0.3);
+    const startY = mountBounds.top;
+    const endX = starBounds.left + starBounds.width / 2;
+    const endY = starBounds.top + starBounds.height / 2;
     const deltaX = endX - startX;
     const deltaY = endY - startY;
     const angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
-    const sightlineLength = Math.max(26, Math.hypot(deltaX, deltaY) - 5);
+    const sightlineLength = Math.max(26, Math.hypot(deltaX, deltaY) - starBounds.width / 2 - 2);
     const bearing = bearingFor(deltaX, deltaY);
 
     nav.dataset.slewTarget = destination.id;
@@ -186,8 +190,13 @@
   }
 
   nav.querySelectorAll("[data-map-id]").forEach((link) => {
-    const aim = () => pointAt(link.dataset.mapId, "aiming", false);
-    link.addEventListener("pointerenter", aim);
+    // Aim on real pointer movement, not pointerenter: while the map grows,
+    // stars slide under a resting cursor and would otherwise steal the lock.
+    const aim = () => {
+      if (nav.dataset.slewTarget === link.dataset.mapId && nav.dataset.slewState === "aiming") return;
+      pointAt(link.dataset.mapId, "aiming", false);
+    };
+    link.addEventListener("pointermove", aim);
     link.addEventListener("focus", () => pointAt(link.dataset.mapId, "aiming", true));
     link.addEventListener("click", () => pointAt(link.dataset.mapId, "slewing", false));
   });

@@ -13,31 +13,34 @@
   <meta property="og:locale" content="en_US"/>
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://ac-opensource.github.io/work.html"/>
-  <meta property="og:title" content="Mobile Engineering Portfolio | Andrew Concepcion"/>
-  <meta property="og:description" content="Selected production work across crypto, streaming, banking, payments, telecom, mobile, backend, technical leadership, and agent-first delivery."/>
-  <meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/work-delivery-system.png"/>
+  <meta property="og:title" content="Selected Engineering Work | Andrew Concepcion"/>
+  <meta property="og:description" content="Explore Bitcoin.com Wallet, ITVX, and more: production case studies spanning mobile apps, shared Rust systems, payments, and technical leadership."/>
+  <meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/work-supernova-20260908.png"/>
   <meta property="og:image:type" content="image/png"/>
   <meta property="og:image:width" content="1200"/>
   <meta property="og:image:height" content="630"/>
-  <meta property="og:image:alt" content="Andrew Concepcion's production engineering portfolio with a delivery system orbiting mobile, backend, and AI-assisted work"/>
+  <meta property="og:image:alt" content="Andrew Concepcion’s engineering portfolio introduction beside a blue and gold supernova remnant"/>
   <meta name="twitter:card" content="summary_large_image"/>
-  <meta name="twitter:title" content="Mobile Engineering Portfolio | Andrew Concepcion"/>
-  <meta name="twitter:description" content="Selected production work across crypto, streaming, banking, payments, telecom, mobile, backend, technical leadership, and agent-first delivery."/>
-  <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/work-delivery-system.png"/>
-  <meta name="twitter:image:alt" content="Andrew Concepcion's production engineering portfolio with a delivery system orbiting mobile, backend, and AI-assisted work"/>
+  <meta name="twitter:title" content="Selected Engineering Work | Andrew Concepcion"/>
+  <meta name="twitter:description" content="Explore Bitcoin.com Wallet, ITVX, and more: production case studies spanning mobile apps, shared Rust systems, payments, and technical leadership."/>
+  <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/work-supernova-20260908.png"/>
+  <meta name="twitter:image:alt" content="Andrew Concepcion’s engineering portfolio introduction beside a blue and gold supernova remnant"/>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
   <link href="/assets/css/neural-background.css?v=20260812-reduced1" rel="stylesheet"/>
   <link href="/assets/css/work-portfolio.css?v=20260812-brief3-20260820-refine1-loop3" rel="stylesheet"/>
-  <link href="/assets/experiments/universe-options/work-round-05/supernova-portfolio.css?v=20260907-nova6" rel="stylesheet"/>
+  <link href="/assets/experiments/universe-options/work-round-05/supernova-portfolio.css?v=20261003-detonate1" rel="stylesheet"/>
+  <link href="/assets/css/work-motion.css?v=20261003-motion1" rel="stylesheet"/>
   <link href="/assets/css/route-signal-handoff.css?v=20260806-t3" rel="stylesheet"/>
-  <link href="/assets/css/universe-field-map.css?v=20260819-safe1" rel="stylesheet"/>
+  <link href="/assets/css/universe-field-map.css?v=20261004-sky1" rel="stylesheet"/>
   <link href="/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1" rel="stylesheet" data-universe-perspective-styles/>
   <script src="/assets/js/universe-theme-transition.js?v=20260926-motion-lifecycle1"></script>
   <script src="/assets/js/route-signal-handoff.js?v=20260812-motion1" defer></script>
-  <script src="/assets/js/work-supernova-field.js?v=20260907-nova6" defer></script>
+  <script src="/assets/js/work-supernova-fx.js?v=20261003-detonate1" defer></script>
+  <script src="/assets/js/work-supernova-field.js?v=20261003-detonate1" defer></script>
   <script src="/assets/experiments/universe-options/work-round-05/supernova-portfolio.js?v=20260907-nova6" defer></script>
   <script src="/assets/js/work-briefing.js?v=20260812-brief3-20260820-refine1-loop2" defer></script>
+  <script src="/assets/js/work-motion.js?v=20261003-motion1" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -147,6 +150,7 @@
           <div class="work-nova" role="group" aria-label="Explore the supernova">
             <img class="work-nova__image" src="/assets/images/work/supernova-remnant.jpg" width="1254" height="1254" alt="A luminous supernova with cobalt and copper clouds." fetchpriority="high" decoding="async"/>
             <canvas class="work-nova__field" data-nova-field aria-hidden="true" hidden></canvas>
+            <canvas class="work-nova__fx" data-nova-fx aria-hidden="true" hidden></canvas>
             <button class="work-nova__surface" type="button" data-nova-ignite aria-label="Send an energy pulse through the supernova" hidden></button>
           </div>
           <figcaption class="work-nova__footer">
@@ -567,7 +571,7 @@
     </div>
   </footer>
 
-  <script src="/assets/js/universe-field-map.js?v=20260809-guide9"></script>
+  <script src="/assets/js/universe-field-map.js?v=20261004-sky1"></script>
   <script>
     (() => {
       const path = window.location.pathname.replace(/\/index\.html$/, "/");

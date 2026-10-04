@@ -30,6 +30,13 @@
 
   if (Object.values(elements).some((element) => !element)) return;
 
+  // Optional on the production Logs page: case studies get their own list and
+  // a curated "Start here" band sits above the archive. Experiments omit both.
+  const caseStudyList = document.getElementById("galaxy-case-studies");
+  const featuredBand = document.getElementById("galaxy-featured");
+  const entryLists = [elements.list, caseStudyList].filter(Boolean);
+  const entryHeadingTag = elements.list.closest("[data-galaxy-group]") ? "h4" : "h3";
+
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const mobileLayout = window.matchMedia("(max-width: 760px)");
   const categoryColors = Object.freeze({
@@ -88,13 +95,18 @@
     nucleusSprite: null,
     gpu: null,
     rendererInitialized: false,
+    // 1 is a formed galaxy; logs-motion.js can replay its formation from 0.
+    formation: 1,
     width: 0
   };
+  const FORMATION_SECONDS = 3.6;
 
   const normalize = (value) => String(value || "").trim().toLocaleLowerCase("en-US");
   const articleUrl = (post) => `/blog/${encodeURIComponent(post.slug)}.html`;
   const displayCategory = (category) => category === "work" ? "portfolio" : String(category || "writing");
   const timestamp = (value) => Number.isFinite(Date.parse(value)) ? Date.parse(value) : 0;
+  const isCaseStudy = (post) => post.category === "work" || post.slug.startsWith("case-study-");
+  const listFor = (post) => (caseStudyList && isCaseStudy(post) ? caseStudyList : elements.list);
 
   function bindBrowseHandoff() {
     const link = document.querySelector('.galaxy-ledger__browse[href="#blog-feed"]');
@@ -345,18 +357,43 @@
         uniform float elapsed;
         uniform float reduced;
         uniform float orbital;
+        uniform float formation;
         varying vec2 textureUv;
         varying float alpha;
+        // Keep in step with formationPose() in the canvas fallback.
+        float settleAt(float radius) {
+          if (formation >= 1.0) return 1.0;
+          float local = clamp((formation - radius * 0.45) / 0.55, 0.0, 1.0);
+          return local * local * (3.0 - 2.0 * local);
+        }
         void main() {
           vec2 point = position;
           alpha = opacity;
           if (orbital > 0.5) {
+            float settle = anchor.z > 1.5 ? settleAt(orbit.y) : 1.0;
+            float bulge = smoothstep(0.02, 0.4, formation);
+            if (anchor.z > 1.5) point *= mix(2.1, 1.0, settle);
+            else if (anchor.z > 0.5) point *= mix(0.35, 1.0, bulge);
             point += anchor.xy;
             if (anchor.z > 0.5) point += field.xy;
             if (anchor.z > 1.5) {
               float angle = orbit.x - elapsed * 0.012 * orbit.z;
-              point += vec2(cos(angle), sin(angle)) * orbit.y * field.zw;
+              float radius = orbit.y;
+              vec2 axes = field.zw;
+              if (settle < 1.0) {
+                // A diffuse, turbulent cloud contracts, spins up along the orbit
+                // direction, and flattens into the disk; stars light inside-out.
+                float cloud = 0.45 + orbit.y * 0.85 + 0.35 * fract(orbit.w * 1.618);
+                angle += (mod(orbit.w - angle, 6.2831853) + 6.2831853 * (0.6 + (1.0 - orbit.y) * 0.6)) * (1.0 - settle);
+                radius = mix(cloud, orbit.y, settle) + (1.0 - settle) * 0.05 * sin(orbit.w * 3.0 + elapsed * 1.1);
+                axes.y = mix(field.z, field.w, settle);
+                alpha *= (mix(0.16, 1.0, settle) + 0.55 * smoothstep(0.55, 0.85, settle) * (1.0 - smoothstep(0.85, 1.0, settle)))
+                  * smoothstep(0.0, 0.12, formation);
+              }
+              point += vec2(cos(angle), sin(angle)) * radius * axes;
               alpha *= mix(0.9 + sin(elapsed * 0.45 + orbit.w) * 0.1, 1.0, reduced);
+            } else if (anchor.z > 0.5) {
+              alpha *= bulge;
             } else if (anchor.z < 0.5) {
               alpha *= mix(0.85 + sin(elapsed * 0.7 + orbit.w) * 0.15, 1.0, reduced);
             }
@@ -412,6 +449,7 @@
       const field = gl.getUniformLocation(program, "field");
       const elapsed = gl.getUniformLocation(program, "elapsed");
       const reduced = gl.getUniformLocation(program, "reduced");
+      const formation = gl.getUniformLocation(program, "formation");
       const orbitLocation = gl.getAttribLocation(program, "orbit");
       const anchorLocation = gl.getAttribLocation(program, "anchor");
       staticBuffer = gl.createBuffer();
@@ -499,6 +537,7 @@
           gl.uniform1f(orbital, 1);
           gl.uniform1f(elapsed, canvasState.elapsed);
           gl.uniform1f(reduced, reducedMotion.matches ? 1 : 0);
+          gl.uniform1f(formation, companion ? 1 : canvasState.formation);
           gl.uniform4f(field, centerX, centerY, radiusX, radiusY * (companion ? 0.78 : 1));
           gl.drawArrays(gl.TRIANGLES, 0, staticCount);
         },
@@ -646,8 +685,8 @@
       const tidalX = distortion * Math.sin(particle.phase + particle.radius * 9) * (0.2 + particle.radius) * 20;
       const tidalY = distortion * Math.cos(particle.phase * 0.7 + particle.radius * 7) * (0.2 + particle.radius) * 11;
       const tone = particle.tone < 0.12 ? 2 : particle.tone < 0.42 ? 1 : 0;
-      const size = particle.spriteSize;
-      const alpha = particle.alpha * fade * shimmer * alphaMultiplier;
+      const size = particle.spriteSize * (point.scale ?? 1);
+      const alpha = particle.alpha * fade * shimmer * alphaMultiplier * (point.alpha ?? 1);
       if (canvasState.gpu) {
         canvasState.gpu.sprite(particle.spriteIndex, point.x + tidalX, point.y + tidalY, size, alpha);
         return;
@@ -672,6 +711,52 @@
   function orbitalOffset(radius) {
     return orbitalAngle({ arm: 0, radius, angleJitter: 0 })
       - (radius * geometry.twist + geometry.phase);
+  }
+
+  // Galaxy formation, shared with the WebGL vertex shader: a diffuse, turbulent
+  // cloud contracts, spins up along the orbit direction, flattens into the
+  // inclined disk, and its stars light from the core outward.
+  function formationSettle(radius) {
+    if (canvasState.formation >= 1) return 1;
+    const local = Math.min(1, Math.max(0, (canvasState.formation - radius * 0.45) / 0.55));
+    return local * local * (3 - 2 * local);
+  }
+
+  function formationPose(particle, angle, radius, radiusX, radiusY) {
+    const settle = formationSettle(radius);
+    if (settle >= 1) return null;
+    const turn = Math.PI * 2;
+    const cloud = 0.45 + radius * 0.85 + 0.35 * ((particle.phase * 1.618) % 1);
+    const lag = ((particle.phase - angle) % turn + turn) % turn;
+    const ignite = Math.min(1, Math.max(0, (settle - 0.55) / 0.3));
+    const fade = Math.min(1, Math.max(0, (settle - 0.85) / 0.15));
+    const fadeIn = Math.min(1, canvasState.formation / 0.12);
+    return {
+      angle: angle + (lag + turn * (0.6 + (1 - radius) * 0.6)) * (1 - settle),
+      radius: cloud + (radius - cloud) * settle + (1 - settle) * 0.05 * Math.sin(particle.phase * 3 + canvasState.elapsed * 1.1),
+      radiusY: radiusX + (radiusY - radiusX) * settle,
+      alpha: (0.16 + 0.84 * settle + 0.55 * ignite * ignite * (3 - 2 * ignite) * (1 - fade * fade * (3 - 2 * fade))) * fadeIn * fadeIn * (3 - 2 * fadeIn),
+      scale: 2.1 - 1.1 * settle
+    };
+  }
+
+  function setFormation(value) {
+    canvasState.formation = Math.min(1, Math.max(0, value));
+    elements.hero.style.setProperty("--galaxy-formation", canvasState.formation.toFixed(4));
+    if (canvasState.formation >= 1 && elements.hero.dataset.galaxyFormation === "forming") {
+      elements.hero.dataset.galaxyFormation = "formed";
+    }
+  }
+
+  function beginFormation() {
+    if (reducedMotion.matches || canvasState.merger.target || elements.hero.dataset.merger === "remnant") return;
+    elements.hero.dataset.galaxyFormation = "forming";
+    setFormation(0);
+    syncGalaxyActivity();
+  }
+
+  function completeFormation() {
+    if (canvasState.formation < 1) setFormation(1);
   }
 
   function updateOrbitingNodes() {
@@ -883,6 +968,7 @@
       ? Math.min(0.1, Math.max(0, (time - canvasState.lastDraw) / 1000)) : 0;
     canvasState.lastDraw = time;
     canvasState.elapsed += delta;
+    if (canvasState.formation < 1) setFormation(canvasState.formation + delta / FORMATION_SECONDS);
     updateOrbitingNodes();
     const parallax = canvasState.parallax;
     if (!reducedMotion.matches && !canvasState.paused) {
@@ -938,10 +1024,17 @@
         drawParticleSet(context, particles, (particle) => {
           const angle = orbitalAngle(particle, Boolean(merger.target));
           const radius = particle.radius + particle.radialJitter;
+          const pose = merger.target ? null : formationPose(particle, angle, radius, radiusX, radiusY);
+          if (pose) {
+            return { x: centerX + Math.cos(pose.angle) * pose.radius * radiusX,
+              y: centerY + Math.sin(pose.angle) * pose.radius * pose.radiusY, alpha: pose.alpha, scale: pose.scale };
+          }
           return { x: centerX + Math.cos(angle) * radius * radiusX,
             y: centerY + Math.sin(angle) * radius * radiusY * (merger.target ? 0.78 : 1) };
         }, clock);
-        drawNucleus(context, centerX, centerY, Math.min(radiusX, radiusY) * 0.4);
+        const bulgeLinear = Math.min(1, Math.max(0, (canvasState.formation - 0.02) / 0.38));
+        const bulge = merger.target ? 1 : bulgeLinear * bulgeLinear * (3 - 2 * bulgeLinear);
+        drawNucleus(context, centerX, centerY, Math.min(radiusX, radiusY) * 0.4 * (0.35 + 0.65 * bulge), bulge);
       }
     }
     canvasState.gpu?.flush();
@@ -1414,7 +1507,7 @@
 
     const body = document.createElement("div");
     body.className = "galaxy-entry__body";
-    const heading = document.createElement("h3");
+    const heading = document.createElement(entryHeadingTag);
     const headingLink = text("a", "", post.title);
     headingLink.href = articleUrl(post);
     heading.append(headingLink);
@@ -1449,22 +1542,41 @@
   function syncEntries() {
     entryElements.clear();
     const existingEntries = new Map();
-    [...elements.list.querySelectorAll(":scope > article")].forEach((entry) => {
-      const slug = String(entry.dataset.blogSlug || entry.dataset.slug || "").trim();
-      if (slug && !existingEntries.has(slug)) existingEntries.set(slug, entry);
+    entryLists.forEach((list) => {
+      [...list.querySelectorAll(":scope > article")].forEach((entry) => {
+        const slug = String(entry.dataset.blogSlug || entry.dataset.slug || "").trim();
+        if (slug && !existingEntries.has(slug)) existingEntries.set(slug, entry);
+      });
     });
 
-    const orderedEntries = posts.map((post) => {
+    const orderedEntries = new Map(entryLists.map((list) => [list, []]));
+    posts.forEach((post) => {
       const existing = existingEntries.get(post.slug);
-      return existing ? enhanceEntry(existing, post) : createEntry(post);
+      orderedEntries.get(listFor(post)).push(existing ? enhanceEntry(existing, post) : createEntry(post));
     });
-    const expectedEntries = new Set(orderedEntries);
-    [...elements.list.children].forEach((child) => {
-      if (!expectedEntries.has(child)) child.remove();
+    const expectedEntries = new Set([...orderedEntries.values()].flat());
+    entryLists.forEach((list) => {
+      [...list.children].forEach((child) => {
+        if (!expectedEntries.has(child)) child.remove();
+      });
     });
-    orderedEntries.forEach((entry, index) => {
-      const current = elements.list.children[index];
-      if (current !== entry) elements.list.insertBefore(entry, current || null);
+    orderedEntries.forEach((entries, list) => {
+      entries.forEach((entry, index) => {
+        const current = list.children[index];
+        if (current !== entry) list.insertBefore(entry, current || null);
+      });
+    });
+  }
+
+  function syncGroups(visibleSlugs, filtered) {
+    if (featuredBand) featuredBand.hidden = filtered;
+    entryLists.forEach((list) => {
+      const group = list.closest("[data-galaxy-group]");
+      if (!group) return;
+      const visibleCount = posts.filter((post) => listFor(post) === list && visibleSlugs.has(post.slug)).length;
+      group.hidden = visibleCount === 0;
+      const count = group.querySelector("[data-galaxy-group-count]");
+      if (count) count.textContent = String(visibleCount);
     });
   }
 
@@ -1505,7 +1617,7 @@
   }
 
   function updateBookmarkControls() {
-    elements.list.querySelectorAll("button[data-bookmark-slug]").forEach((button) => {
+    entryLists.flatMap((list) => [...list.querySelectorAll("button[data-bookmark-slug]")]).forEach((button) => {
       const bookmarked = bookmarks.has(button.dataset.bookmarkSlug);
       button.setAttribute("aria-pressed", String(bookmarked));
       button.textContent = bookmarked ? "Bookmarked" : "Bookmark";
@@ -1668,9 +1780,9 @@
       ? document.activeElement.closest(".galaxy-entry")
       : null;
     const activeSlug = String(activeEntry?.dataset.slug || "");
-    const previouslyVisibleSlugs = posts
-      .map((post) => post.slug)
-      .filter((slug) => !entryElements.get(slug)?.hidden);
+    // Entries read top to bottom across the writing and case-study lists.
+    const listOrder = entryLists.flatMap((list) => [...list.querySelectorAll(":scope > article")].map((entry) => entry.dataset.slug));
+    const previouslyVisibleSlugs = listOrder.filter((slug) => !entryElements.get(slug)?.hidden);
     const activeVisibleIndex = previouslyVisibleSlugs.indexOf(activeSlug);
     const needsSavedFocusHandoff = state.savedOnly
       && activeVisibleIndex >= 0
@@ -1680,6 +1792,8 @@
       writeUrl("replaceState");
     }
     const filtered = state.category !== "all" || state.savedOnly || Boolean(normalize(state.query));
+    // A search or filter owns the galaxy: land any formation at once.
+    if (filtered) completeFormation();
     const wasFiltered = elements.hero.dataset.merger === "remnant";
     const canChoreograph = !filtered && hasRendered && !reducedMotion.matches && !canvasState.paused && typeof Element.prototype.animate === "function";
     const fieldRect = canChoreograph ? elements.field.getBoundingClientRect() : null;
@@ -1721,9 +1835,11 @@
       }
     });
     entryElements.forEach((entry, slug) => { entry.hidden = !visibleSlugs.has(slug); });
+    syncGroups(visibleSlugs, filtered);
     let savedFocusTarget = null;
     if (needsSavedFocusHandoff) {
-      const nextSlug = visible[activeVisibleIndex]?.slug || visible[activeVisibleIndex - 1]?.slug || "";
+      const visibleInListOrder = listOrder.filter((slug) => visibleSlugs.has(slug));
+      const nextSlug = visibleInListOrder[activeVisibleIndex] || visibleInListOrder[activeVisibleIndex - 1] || "";
       savedFocusTarget = nextSlug
         ? entryElements.get(nextSlug)?.querySelector("button[data-bookmark-slug]")
         : null;
@@ -1882,7 +1998,7 @@
       render();
     });
     elements.categories.addEventListener("scroll", syncCategoryRailAffordance, { passive: true });
-    elements.list.addEventListener("click", (event) => {
+    entryLists.forEach((list) => list.addEventListener("click", (event) => {
       const share = event.target.closest("button[data-share-slug]");
       if (share) {
         sharePost(share.dataset.shareSlug, share);
@@ -1890,7 +2006,7 @@
       }
       const bookmark = event.target.closest("button[data-bookmark-slug]");
       if (bookmark) toggleBookmark(bookmark.dataset.bookmarkSlug);
-    });
+    }));
     elements.nodes.addEventListener("click", (event) => {
       const node = event.target.closest("button[data-slug]");
       if (!node) return;
@@ -1940,7 +2056,12 @@
       updateBookmarkControls();
       render();
     });
-    reducedMotion.addEventListener?.("change", syncGalaxyActivity);
+    reducedMotion.addEventListener?.("change", () => {
+      if (reducedMotion.matches) completeFormation();
+      syncGalaxyActivity();
+    });
+    // Page choreography (logs-motion.js) asks for a formation replay on arrival.
+    elements.hero.addEventListener("galaxy:form", beginFormation);
   }
 
   async function loadPosts() {

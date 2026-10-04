@@ -40,8 +40,6 @@ body[data-universe-region="about"] {
   --universe-blue-soft: rgba(126, 182, 255, 0.15);
 }
 
-body[data-universe-region="about"] .universe-route-map a::before { background: var(--about-base); }
-
 .about-universe:has(.stellar-spectrum__readout:not([hidden])) {
   z-index: 49;
 }

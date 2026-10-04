@@ -56,6 +56,23 @@ html[data-logs-theme="dark"] .galaxy-categories button[data-saved-filter][aria-p
   html[data-logs-theme="dark"] .galaxy-hero::after { background: linear-gradient(180deg, #060b11 0%, rgba(6,11,17,.85) 26%, transparent 49%, rgba(6,11,17,.3) 100%); }
 }
 }
+/* In the site header the toggle reads like the neighbouring [search /] link. */
+#site-topbar .logs-theme-toggle--header {
+  display: inline-flex;
+  min-height: 1.5rem;
+  align-items: center;
+  margin-right: 1.1rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+#site-topbar .logs-theme-toggle--header:hover,
+#site-topbar .logs-theme-toggle--header:focus-visible { color: var(--blue, #1f5cba); }
 @media print { .logs-theme-toggle { display: none; } }
 html[data-logs-theme="light"] #site-topbar :is(a, button) { color: #52635d; }
 html[data-logs-theme="light"] #site-topbar a[aria-current="page"] { color: #246954; }
