@@ -488,6 +488,36 @@ html[data-work-motion="on"] .work-archive-card:focus-within .work-monogram {
   scale: 1.08;
 }
 
+/* ---------- "fail" breaks when the shock wave reaches it ----------
+ * work-supernova-fx.js adds .is-glitching and drives the jitter and the torn
+ * red/cyan channels with WAAPI; these layers exist only while it glitches.
+ */
+/* The headline sets every span to display: block; the word stays inline. */
+.work-hero__title .work-fail {
+  position: relative;
+  display: inline-block;
+}
+
+.work-fail.is-glitching::before,
+.work-fail.is-glitching::after {
+  position: absolute;
+  inset: 0;
+  content: attr(data-text);
+  content: attr(data-text) / "";
+  clip-path: inset(50% 0 50% 0);
+  mix-blend-mode: multiply;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.work-fail.is-glitching::before { color: #e0473d; }
+.work-fail.is-glitching::after { color: #1aa6c9; }
+
+@media (prefers-reduced-motion: reduce), (forced-colors: active) {
+  .work-fail.is-glitching::before,
+  .work-fail.is-glitching::after { display: none; }
+}
+
 /* Printing never waits for an entrance. */
 @media print {
   html[data-work-motion="on"] :is([data-wm-scope], [data-wm-scope] *, .work-cta *) {
