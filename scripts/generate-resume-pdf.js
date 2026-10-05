@@ -7,7 +7,9 @@ const ROOT_DIR = path.join(__dirname, "..");
 const HOST = "127.0.0.1";
 const OUTPUT_PATH = path.join(ROOT_DIR, "resume_concepcion_andrew.pdf");
 const PREVIEW_PATH = path.join(require("os").tmpdir(), "resume-preview.png");
-// Capture the résumé exactly as the desktop page reads: one continuous page.
+// The PDF has its own card layout, separate from the web résumé at
+// /resume.html, captured as one continuous desktop-width page.
+const SOURCE_PATH = "/applications/resume.html";
 const PAGE_WIDTH = 1440;
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
@@ -160,12 +162,11 @@ async function main() {
     browser = await chromium.launch({ headless: true });
     const page = await browser.newPage({ viewport: { width: PAGE_WIDTH, height: 2200 } });
     await page.emulateMedia({ media: "screen", colorScheme: "light", reducedMotion: "reduce" });
-    await page.goto(`http://${HOST}:${port}/resume.html?phone=all`, { waitUntil: "networkidle" });
+    await page.goto(`http://${HOST}:${port}${SOURCE_PATH}`, { waitUntil: "networkidle" });
     await page.evaluate(async () => {
       const base = document.createElement("base");
       base.href = "https://ac-opensource.github.io/";
       document.head.prepend(base);
-      document.body.classList.add("pdf-export");
       if (document.fonts?.ready) await document.fonts.ready;
     });
     const pageHeight = await page.evaluate(() => Math.ceil(Math.max(
