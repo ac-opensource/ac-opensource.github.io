@@ -171,9 +171,12 @@ if (process.env.E2E_TRACE) {
   // two-frame stability check. Click where the label is now, as a pointer
   // user would, after confirming the label itself receives that point.
   async function clickDriftingControl(targetPage, locator, name) {
-    await locator.scrollIntoViewIfNeeded();
     const target = await locator.evaluate((element) => {
-      const bounds = element.getBoundingClientRect();
+      let bounds = element.getBoundingClientRect();
+      if (bounds.top < 0 || bounds.left < 0 || bounds.bottom > innerHeight || bounds.right > innerWidth) {
+        element.scrollIntoView({ block: 'center', inline: 'center' });
+        bounds = element.getBoundingClientRect();
+      }
       const x = bounds.left + bounds.width / 2;
       const y = bounds.top + bounds.height / 2;
       const hit = document.elementFromPoint(x, y);
@@ -2670,13 +2673,30 @@ if (process.env.E2E_TRACE) {
     `Dragging from Top did not enter a freely rotated view: ${JSON.stringify({ topDragPoint, freeFromTopDrag })}`
   );
 
+  // Idle rotation resumes 250ms after the reset, so read the camera inside
+  // the same click dispatch instead of racing the next rotation frames.
+  await page.evaluate(() => {
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('[data-tree-reset]')) return;
+      const spectrum = document.querySelector('[data-stellar-spectrum]');
+      window.__aboutResetState = {
+        camera: {
+          pitch: Number(spectrum.dataset.treePitch),
+          roll: Number(spectrum.dataset.treeRoll),
+          view: spectrum.dataset.treeView,
+          yaw: Number(spectrum.dataset.treeYaw),
+          zoom: Number(spectrum.dataset.treeZoom),
+        },
+        controls: {
+          output: document.querySelector('[data-tree-zoom-output]')?.textContent,
+          range: document.querySelector('[data-tree-zoom-range]')?.value,
+          urlProjection: new URL(location.href).searchParams.get('projection'),
+        },
+      };
+    }, { once: true });
+  });
   await page.locator('[data-tree-reset]').click();
-  const resetCamera = await readAboutCamera(page);
-  const resetControls = await page.evaluate(() => ({
-    output: document.querySelector('[data-tree-zoom-output]')?.textContent,
-    range: document.querySelector('[data-tree-zoom-range]')?.value,
-    urlProjection: new URL(location.href).searchParams.get('projection'),
-  }));
+  const { camera: resetCamera, controls: resetControls } = await page.evaluate(() => window.__aboutResetState);
   await assert(
     resetCamera.view === 'free'
       && Math.abs(resetCamera.yaw - (-0.14)) < 0.001

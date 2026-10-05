@@ -493,8 +493,9 @@
   }
 
   // Web fonts swap in after the landmarks are first measured on a cold visit,
-  // reflowing the hero under its locks. Re-measure the same elements once the
-  // fonts settle so the handoff still lands on the live interface.
+  // reflowing the hero under its locks. Re-measure the same elements when a
+  // font load settles and once more at the handoff, so the reveal always lands
+  // on the live interface (at most 18 rect reads each time).
   function syncLandmarkGeometry() {
     if (!state.active || state.revealStarted || !state.overlay) return;
     const origin = resolveOrigin(state.profile);
@@ -552,6 +553,7 @@
 
   function finish(reason, moveFocus) {
     clearPhaseTimers();
+    document.fonts?.removeEventListener?.("loadingdone", syncLandmarkGeometry);
     state.matterRenderer?.destroy();
     state.matterRenderer = null;
     state.overlay?.remove();
@@ -580,6 +582,7 @@
   function reveal(reason, options) {
     if (!state.active || state.revealStarted || !state.overlay) return;
     const settings = options || {};
+    syncLandmarkGeometry();
     state.revealStarted = true;
     clearPhaseTimers();
     root.dataset.bigBang = "revealing";
@@ -647,9 +650,7 @@
     root.dataset.bigBang = "running";
     root.append(state.overlay);
     emit("singularity", reason);
-    if (document.fonts && document.fonts.status === "loading") {
-      document.fonts.ready.then(syncLandmarkGeometry);
-    }
+    document.fonts?.addEventListener?.("loadingdone", syncLandmarkGeometry);
 
     window.requestAnimationFrame(function () {
       state.overlay?.classList.add("is-visible");
