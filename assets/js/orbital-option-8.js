@@ -7,6 +7,7 @@
   const overview = root.querySelector("[data-overview]");
   const plane = root.querySelector("[data-orbit-plane]");
   const cameraWindow = root.querySelector("[data-camera-window]");
+  const cameraRig = root.querySelector("[data-camera-rig]");
   const nodes = [...root.querySelectorAll("[data-orbit-object]")];
   const tracks = [...root.querySelectorAll("[data-track]")];
   const mapControls = [...root.querySelectorAll("[data-map-target]")];
@@ -32,7 +33,7 @@
   const facetStatus = root.querySelector("[data-facet-status]");
 
   if (
-    !overview || !plane || !cameraWindow || nodes.length !== 6 || tracks.length !== 6 || mapControls.length !== 6 ||
+    !overview || !plane || !cameraWindow || !cameraRig || nodes.length !== 6 || tracks.length !== 6 || mapControls.length !== 6 ||
     details.length !== 6 || !mapHome || !detailLayer || !backdrop || !closeButton ||
     !viewToggle || !motionToggle || !resetToggle || !previewPanel || previewArticles.length !== 6 ||
     !previousFacet || !nextFacet || !facetPosition || !facetStatus
@@ -53,10 +54,12 @@
   const motionIsReduced = () => reducedMotionQuery.matches;
   const shortQuery = window.matchMedia("(orientation: landscape) and (max-height: 560px) and (max-width: 1000px)");
   const phoneQuery = window.matchMedia("(max-width: 767px)");
+  const readingFlowQuery = window.matchMedia("(max-width: 1100px), (max-height: 800px)");
   // Compact describes the available geometry only. It scales the same orbital
   // model; it never freezes motion or replaces the ellipses with a carousel.
   const compactQuery = window.matchMedia("(max-width: 1100px)");
   const nodeByKey = new Map(nodes.map((node) => [node.dataset.orbitObject, node]));
+  const nodeLabelByKey = new Map(nodes.map((node) => [node.dataset.orbitObject, node.querySelector(".node-label")]));
   const trackByKey = new Map(tracks.map((track) => [track.dataset.track, track]));
   const detailByKey = new Map(details.map((detail) => [detail.dataset.facetDetail, detail]));
   const projectLogoImages = [...(detailByKey.get("projects")?.querySelectorAll("img[data-src]") || [])];
@@ -122,6 +125,7 @@
     focusAfterTransition: null,
     facetGesture: null,
     pendingFacet: null,
+    labelTransitionUntil: 0,
   };
 
   const cometParticlePalette = [
@@ -304,9 +308,32 @@
     }
   };
 
+  let labelProjection = null;
+  const labelGeometry = new Map();
+  const labelPlacements = new Map();
+  const updateLabelProjection = () => {
+    const matrix = new DOMMatrix(getComputedStyle(cameraRig).transform);
+    const inverse = matrix.inverse();
+    inverse.m41 = inverse.m42 = inverse.m43 = 0;
+    const counter = inverse.toString();
+    nodeLabelByKey.forEach((label) => label.style.setProperty("--label-counter", counter));
+    labelProjection = {
+      matrix,
+      width: cameraWindow.clientWidth,
+      height: cameraWindow.clientHeight,
+      perspective: Number.parseFloat(getComputedStyle(cameraWindow).perspective) || 1450,
+      measuredAt: performance.now(),
+    };
+  };
   const measure = () => {
     state.width = plane.clientWidth;
     state.height = plane.clientHeight;
+    labelPlacements.clear();
+    nodeLabelByKey.forEach((label, key) => {
+      const icon = nodeByKey.get(key).querySelector(".sculpture");
+      labelGeometry.set(key, { width: label.offsetWidth, height: label.offsetHeight, icon: Math.max(icon.offsetWidth, icon.offsetHeight) });
+    });
+    updateLabelProjection();
   };
 
   const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
@@ -434,6 +461,98 @@
 
   const renderedLayers = new WeakMap();
 
+  const setLabelProperty = (label, property, value) => {
+    if (label.style.getPropertyValue(property) !== value) label.style.setProperty(property, value);
+  };
+
+  // Caption placement uses cached text sizes and the camera projection. The
+  // moving bodies retain their exact paths, even when captions change sides.
+  const placeNodeLabels = (points) => {
+    if (!labelProjection || state.phase !== "overview") return;
+    const now = performance.now();
+    if (now < state.labelTransitionUntil && now - labelProjection.measuredAt > 80) updateLabelProjection();
+    const { matrix, width, height, perspective } = labelProjection;
+    const projected = points.map((point, index) => {
+      const geometry = labelGeometry.get(profiles[index].key);
+      const z = matrix.m13 * point.x + matrix.m23 * point.y + matrix.m43;
+      const scale = perspective / (perspective - z);
+      const x = width / 2 + (matrix.m11 * point.x + matrix.m21 * point.y + matrix.m41) * scale;
+      const y = height / 2 + (matrix.m12 * point.x + matrix.m22 * point.y + matrix.m42) * scale;
+      return { x, y, scale, radius: geometry.icon * scale * .65, width: geometry.width * scale, height: geometry.height * scale };
+    });
+    const occupied = projected.map((point) => ({ left: point.x - point.radius, top: point.y - point.radius, right: point.x + point.radius, bottom: point.y + point.radius }));
+    const originX = state.width * .04;
+    const originY = state.height * .02;
+    const originScale = perspective / (perspective - matrix.m13 * originX - matrix.m23 * originY - matrix.m43);
+    const origin = {
+      x: width / 2 + (matrix.m11 * originX + matrix.m21 * originY + matrix.m41) * originScale,
+      y: height / 2 + (matrix.m12 * originX + matrix.m22 * originY + matrix.m42) * originScale,
+      radius: (state.phone ? 26 : 45) * originScale,
+    };
+    occupied.push({ left: origin.x - origin.radius, top: origin.y - origin.radius, right: origin.x + origin.radius, bottom: origin.y + origin.radius });
+    const overlap = (a, b) => Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+    projected.forEach((point, index) => {
+      const label = nodeLabelByKey.get(profiles[index].key);
+      const halfWidth = point.width / 2;
+      const halfHeight = point.height / 2;
+      const gap = point.radius + 10;
+      const outward = point.x < width / 2 ? -1 : 1;
+      const choices = [
+        { id: outward < 0 ? "left" : "right", x: point.x + outward * (gap + halfWidth), y: point.y },
+        { id: outward < 0 ? "right" : "left", x: point.x - outward * (gap + halfWidth), y: point.y },
+        { id: "above", x: point.x, y: point.y - gap - halfHeight },
+        { id: "below", x: point.x, y: point.y + gap + halfHeight },
+        { id: "above-left", x: point.x - gap - halfWidth, y: point.y - gap - halfHeight },
+        { id: "above-right", x: point.x + gap + halfWidth, y: point.y - gap - halfHeight },
+        { id: "below-left", x: point.x - gap - halfWidth, y: point.y + gap + halfHeight },
+        { id: "below-right", x: point.x + gap + halfWidth, y: point.y + gap + halfHeight },
+        { id: "above-clear", x: point.x, y: point.y - gap - halfHeight - 90 },
+        { id: "below-clear", x: point.x, y: point.y + gap + halfHeight + 90 },
+        { id: "left-clear", x: point.x - gap - halfWidth - 80, y: point.y },
+        { id: "right-clear", x: point.x + gap + halfWidth + 80, y: point.y },
+      ];
+      let best = null;
+      const consider = (choice, preference) => {
+        const x = clamp(choice.x, halfWidth + 12, width - halfWidth - 12);
+        const y = clamp(choice.y, halfHeight + 12, height - halfHeight - 12);
+        const bounds = { left: x - halfWidth, top: y - halfHeight, right: x + halfWidth, bottom: y + halfHeight };
+        const overlapArea = occupied.reduce((total, other) => total + overlap(bounds, other), 0);
+        const score = overlapArea * 1000 + Math.hypot(x - choice.x, y - choice.y) + preference * 12 - (labelPlacements.get(profiles[index].key) === choice.id ? 20 : 0);
+        if (!best || score < best.score) best = { x, y, bounds, overlapArea, score, id: choice.id };
+      };
+      choices.forEach(consider);
+      // At a close encounter, search the remaining reading space rather than
+      // overlapping or hiding a destination. Leaders keep the body associated.
+      if (best.overlapArea > 0) {
+        const left = halfWidth + 12;
+        const top = halfHeight + 12;
+        const right = width - halfWidth - 12;
+        const bottom = height - halfHeight - 12;
+        const columns = Math.max(1, Math.ceil((right - left) / 32));
+        const rows = Math.max(1, Math.ceil((bottom - top) / 32));
+        for (let column = 0; column <= columns; column += 1) {
+          for (let row = 0; row <= rows; row += 1) {
+            const x = left + (right - left) * column / columns;
+            const y = top + (bottom - top) * row / rows;
+            consider({ id: `space-${column}-${row}`, x, y }, choices.length + Math.hypot(x - point.x, y - point.y) / 12);
+          }
+        }
+      }
+      occupied.push({ left: best.bounds.left - 8, top: best.bounds.top - 8, right: best.bounds.right + 8, bottom: best.bounds.bottom + 8 });
+      labelPlacements.set(profiles[index].key, best.id);
+      const x = (best.x - point.x) / point.scale;
+      const y = (best.y - point.y) / point.scale;
+      const distance = Math.hypot(x, y);
+      const geometry = labelGeometry.get(profiles[index].key);
+      const leaderStart = Math.min(geometry.width * distance / (2 * Math.max(Math.abs(x), .01)), geometry.height * distance / (2 * Math.max(Math.abs(y), .01))) + 5;
+      setLabelProperty(label, "--label-x", `${x.toFixed(1)}px`);
+      setLabelProperty(label, "--label-y", `${y.toFixed(1)}px`);
+      setLabelProperty(label, "--label-leader-start", `${leaderStart.toFixed(1)}px`);
+      setLabelProperty(label, "--label-leader-length", `${Math.max(0, distance - leaderStart - geometry.icon / 2 - 5).toFixed(1)}px`);
+      setLabelProperty(label, "--label-leader-angle", `${(Math.atan2(-y, -x) * 180 / Math.PI).toFixed(1)}deg`);
+    });
+  };
+
   const render = () => {
     if (!state.width || !state.height) measure();
     const points = profiles.map(pointOnEllipse);
@@ -453,6 +572,7 @@
         syncCometWake(node, point);
       }
     });
+    placeNodeLabels(points);
   };
 
   const stopFrame = () => {
@@ -521,7 +641,9 @@
   };
 
   const setView = (view, { sound = true } = {}) => {
-    state.view = view === "top" ? "top" : "orbit";
+    const nextView = view === "top" ? "top" : "orbit";
+    if (nextView !== state.view) state.labelTransitionUntil = performance.now() + 1200;
+    state.view = nextView;
     root.dataset.view = state.view;
     const top = state.view === "top";
     viewToggle.setAttribute("aria-pressed", String(top));
@@ -690,6 +812,14 @@
     (focusTarget || closeButton).focus({ preventScroll: true });
   };
 
+  const scrollDetailToStart = ({ immediate = false } = {}) => {
+    if (!readingFlowQuery.matches) return;
+    window.scrollTo({
+      top: root.offsetTop,
+      behavior: immediate || state.reduced ? "auto" : "smooth",
+    });
+  };
+
   const selectFacet = (key, options = {}) => {
     if (!validKey(key)) return;
     const { historyMode = "push", sound = true, immediate = false, opener = null, focusAfterTransition = null } = options;
@@ -698,7 +828,7 @@
     clearTransferState();
     const enteringFromOverview = !state.selected;
     const activeFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    if (state.phone && enteringFromOverview) state.overviewScrollY = window.scrollY;
+    if (enteringFromOverview) state.overviewScrollY = readingFlowQuery.matches ? window.scrollY : 0;
     if (state.selected) state.held.delete(state.selected);
     state.selected = key;
     state.held.add(key);
@@ -718,12 +848,7 @@
     setPhase(immediate || state.reduced ? "focused" : "focusing");
     if (sound) playCue("select");
     startFrame();
-    if (state.phone) {
-      window.scrollTo({
-        top: root.offsetTop,
-        behavior: immediate || state.reduced ? "auto" : "smooth",
-      });
-    }
+    scrollDetailToStart({ immediate });
 
     if (immediate || state.reduced) {
       const focusTarget = state.focusAfterTransition || closeButton;
@@ -751,7 +876,7 @@
     syncSelection();
     startFrame();
     if (restoreFocus && opener?.isConnected) opener.focus({ preventScroll: true });
-    if (state.phone) {
+    if (readingFlowQuery.matches) {
       window.scrollTo({
         top: state.overviewScrollY,
         behavior: state.reduced ? "auto" : "smooth",
@@ -798,6 +923,9 @@
     if (transfer.historyMode) writeHistory(transfer.key, transfer.historyMode);
     overview.inert = true;
     startFrame();
+    // The incoming facet now owns the normal-flow height. Reset the document
+    // at this neutral handoff, while desktop keeps its element scrollers.
+    scrollDetailToStart({ immediate: true });
 
     later(() => {
       if (state.pendingFacet !== transfer || state.phase !== "transferring") return;
@@ -1330,6 +1458,13 @@
   const scheduleResize = () => {
     if (!resizeFrame) resizeFrame = window.requestAnimationFrame(resizeScene);
   };
+  // Responsive detail flow can resize the underlying rig without a window
+  // resize. Keep its parametric coordinates tied to the actual plane size.
+  if ("ResizeObserver" in window) new ResizeObserver(scheduleResize).observe(plane);
+  cameraRig.addEventListener("transitionend", (event) => {
+    if (event.target === cameraRig && event.propertyName === "transform") scheduleResize();
+  });
+  document.fonts?.ready.then(scheduleResize);
   window.addEventListener("resize", scheduleResize, { passive: true });
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) cancelNodeDrag();

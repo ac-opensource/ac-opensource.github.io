@@ -136,13 +136,14 @@ body[data-universe-region="article"] #site-topbar {
   display: none;
 }
 
+/* Keep the action row stable while its buttons hydrate. */
 html.article-js .article-region[data-article-mode="case-study"] .article-region__actions button[hidden] {
   display: inline-flex !important;
   visibility: hidden;
   pointer-events: none;
 }
 
-@media (max-width: 760px) {
+@media (min-width: 481px) and (max-width: 760px) {
   html.article-js body[data-universe-region="article"] .article-region[data-article-mode="case-study"] .article-region__actions {
     padding-left: 3rem !important;
   }
@@ -381,6 +382,30 @@ html.article-js .article-region[data-article-mode="case-study"] .article-region_
 .article-region__body > *:first-child {
   margin-top: 0 !important;
 }
+
+/* Older published bodies carry utility colors. Keep those semantic text roles
+   on the article palette so they remain readable in either screen theme. */
+.article-region__body :is(.text-slate-700, .text-slate-800, .text-slate-900) {
+  color: var(--article-ink);
+}
+
+.article-region__body :is(.text-slate-500, .text-slate-600) {
+  color: var(--article-muted);
+}
+
+.article-region__body :is(.callout, .card) {
+  margin-block: 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 0;
+  border-inline-start: 2px solid var(--article-blue);
+  border-radius: 0;
+  background: var(--article-blue-soft);
+  color: var(--article-ink);
+  box-shadow: none;
+}
+
+.article-region__body :is(.callout, .card) > :first-child { margin-top: 0; }
+.article-region__body :is(.callout, .card) > :last-child { margin-bottom: 0; }
 
 .article-region__body h2,
 .article-region__body h3 {
@@ -750,10 +775,9 @@ html.article-js .article-region[data-article-mode="case-study"] .article-region_
 
 .article-region[data-article-mode="case-study"] .work-post-hero__screen {
   display: block;
-  height: 92%;
-  aspect-ratio: 608 / 1080;
-  overflow: hidden;
-  box-shadow: 0 1.2rem 3rem rgba(44, 55, 49, 0.12);
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
 }
 
 .article-region[data-article-mode="case-study"] .work-post-hero img {
@@ -763,8 +787,7 @@ html.article-js .article-region[data-article-mode="case-study"] .article-region_
   object-fit: contain;
 }
 
-.article-region[data-article-mode="case-study"] .work-post-hero--cover img,
-.article-region[data-article-mode="case-study"] .work-post-hero__screen img {
+.article-region[data-article-mode="case-study"] .work-post-hero--cover img {
   object-fit: cover;
 }
 
@@ -890,7 +913,7 @@ html.article-js .article-region[data-article-mode="case-study"] .article-region_
   .article-region[data-article-mode="personal"],
   .article-region[data-article-mode="travel"],
   .article-region[data-article-mode="photography"] {
-    width: calc(100% - 2.1rem);
+    width: calc(100% - 2.5rem);
   }
 
   .article-region__header::before,

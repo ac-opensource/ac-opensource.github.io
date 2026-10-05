@@ -114,7 +114,7 @@ input { font: inherit; }
   min-height: min(52rem, calc(100svh - 8.5rem));
   place-items: center;
   isolation: isolate;
-  padding: clamp(3.5rem, 8vw, 7.5rem) clamp(1.1rem, 5vw, 5rem);
+  padding: clamp(3.5rem, 8vw, 7.5rem) clamp(1.25rem, 5vw, 5rem);
   overflow: hidden;
 }
 
@@ -285,7 +285,7 @@ input { font: inherit; }
 .lost-signal__routes span,
 .lost-signal__routes small {
   color: var(--faint);
-  font: 600 0.52rem/1.35 var(--display);
+  font: 600 0.6875rem/1.4 var(--display);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }

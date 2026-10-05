@@ -575,11 +575,11 @@ button, input, textarea, select { font: inherit; }
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 1rem 1rem 1.05rem;
-  border: 1px solid var(--line-soft);
-  background: rgba(255, 254, 250, 0.72);
-  box-shadow: inset 3px 0 transparent, 0 7px 20px rgba(37, 46, 41, 0.035);
-  transition: border-color 220ms ease, background 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+  padding: 1rem 0 1.25rem;
+  border: 0;
+  border-top: 1px solid var(--line-soft);
+  background: transparent;
+  transition: border-color 220ms ease;
 }
 
 .bay-node::after {
@@ -594,8 +594,6 @@ button, input, textarea, select { font: inherit; }
 
 .bay-node.is-loaded {
   border-color: rgba(60, 115, 87, 0.48);
-  background: linear-gradient(135deg, rgba(60, 115, 87, 0.12), rgba(31, 92, 186, 0.035) 72%);
-  box-shadow: inset 3px 0 var(--green), 0 9px 22px rgba(60, 115, 87, 0.09);
 }
 
 .bay-node.is-loaded::after {
@@ -720,9 +718,7 @@ button, input, textarea, select { font: inherit; }
 .bay-node.is-loaded .module-state {
   max-height: 2rem;
   margin-top: 0.7rem;
-  padding-block: 0.35rem;
-  border-color: rgba(60, 115, 87, 0.34);
-  background: rgba(255, 254, 250, 0.72);
+  padding: 0;
   opacity: 1;
 }
 
@@ -838,21 +834,20 @@ button, input, textarea, select { font: inherit; }
 
 .payload-bay__ground {
   display: flex;
-  width: min(100% - 2.5rem, 101rem);
+  flex-wrap: wrap;
+  width: min(calc(100% - 2 * clamp(1.25rem, 4vw, 4.5rem)), 101rem);
   min-height: 6.4rem;
   align-items: center;
   gap: clamp(1rem, 3vw, 3rem);
   margin: 0 auto 2rem;
-  padding: 1rem;
-  border: 1px solid var(--line-soft);
-  background: rgba(255, 254, 250, 0.74);
-  box-shadow: 0 10px 28px rgba(37, 46, 41, 0.055);
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--line-soft);
   font-family: var(--display);
 }
 
 .payload-bay__ground > span {
   color: var(--blue);
-  font-size: 0.57rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }

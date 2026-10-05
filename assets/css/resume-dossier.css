@@ -826,6 +826,17 @@ body[data-universe-region="resume"] {
   }
 }
 
+/* Match the shared phone content gutter while preserving the paper layout. */
+@media screen and (max-width: 480px) {
+  .resume-web {
+    width: min(100% - 2.5rem, 76rem);
+  }
+
+  .resume-timeline__item {
+    min-width: 2.3rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
