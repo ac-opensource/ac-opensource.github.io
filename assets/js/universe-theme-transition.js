@@ -17,7 +17,7 @@
   const MOTION_MODEL = "cosmic-camera";
   const PATH_MODEL = "spatial-zoom-orbit";
   const MAX_ARRIVAL_AGE = 8000;
-  const STYLE_HREF = "/assets/css/universe-perspective-navigation.css?v=20261005-cosmic1";
+  const STYLE_HREF = "/assets/css/universe-perspective-navigation.css?v=20261005-spatial5";
   const RHO = 2.2;
   const IRIS_MS = 280;
   const IRIS_CLOSE = 0.72;

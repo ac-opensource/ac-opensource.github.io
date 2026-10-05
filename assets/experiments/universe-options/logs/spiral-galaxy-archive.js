@@ -1358,6 +1358,12 @@
     const startedAt = performance.now();
     elements.field.dataset.labelLayoutState = "running";
     const fieldRect = elements.field.getBoundingClientRect();
+    // The field extends behind the introduction at tablet and desktop sizes.
+    // Reserve the reading/search area as well as other labels when placing text.
+    const protectedRects = [elements.hero.querySelector(".galaxy-copy"), elements.tuner]
+      .filter(Boolean)
+      .map((element) => element.getBoundingClientRect())
+      .filter((rect) => rect.width > 0 && rect.height > 0);
     const narrow = fieldRect.width <= 480;
     const nudges = narrow
       ? [0, -14, 14, -28, 28, -42, 42, -56, 56, -70, 70, -84, 84, -98, 98, -112, 112, -126, 126, -140, 140, -154, 154, -168, 168, -182, 182]
@@ -1382,8 +1388,15 @@
       const candidates = [];
 
       alternatives.forEach((side) => {
-        nudges.forEach((nudge) => {
-          const vertical = side === "left" || side === "right";
+        const vertical = side === "left" || side === "right";
+        const axisStart = vertical ? centerY - labelHeight / 2 : centerX - labelWidth / 2;
+        const labelLength = vertical ? labelHeight : labelWidth;
+        // Edge candidates let labels clear the copy without moving their nodes.
+        const clearanceNudges = protectedRects.flatMap((rect) => [
+          (vertical ? rect.top : rect.left) - 8 - labelLength - axisStart,
+          (vertical ? rect.bottom : rect.right) + 8 - axisStart
+        ]);
+        [...new Set([...nudges, ...clearanceNudges])].forEach((nudge) => {
           const nudgeX = vertical ? 0 : nudge;
           const nudgeY = vertical ? nudge : 0;
           const horizontalGap = nodeSize * 0.52;
@@ -1412,6 +1425,7 @@
             && rect.top >= fieldRect.top + 3
             && rect.bottom <= fieldRect.bottom - 3;
           if (!inBounds) return;
+          if (protectedRects.some((protectedRect) => overlapArea(rect, protectedRect, 4) > 0)) return;
           const sideCost = side === current ? 0 : (side === "left" || side === "right") === (current === "left" || current === "right") ? 1.2 : 2.4;
           candidates.push({
             cost: sideCost + Math.abs(nudge) * 0.012,

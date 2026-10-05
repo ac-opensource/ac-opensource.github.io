@@ -1393,9 +1393,6 @@ body {
 
 .work-public-card__image img {
   width: 100%;
-  border: 1px solid var(--work-line);
-  border-radius: 0.45rem;
-  box-shadow: 0 18px 38px rgba(39, 54, 45, 0.12);
 }
 
 .work-agent-art {
@@ -1671,26 +1668,21 @@ body {
 .work-archive-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.9rem;
+  gap: 2rem 1.5rem;
 }
 
 .work-archive-card {
   display: flex;
-  min-height: 26rem;
   flex-direction: column;
-  border: 1px solid var(--work-line);
-  border-radius: 0.55rem;
-  padding: 1.35rem;
-  background: rgba(255, 255, 252, 0.68);
-  box-shadow: inset 0 1px rgba(255, 255, 255, 0.86);
-  transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+  border-top: 1px solid var(--work-line);
+  padding: 1.25rem 0 0;
+  background: transparent;
+  transition: border-color 180ms ease;
 }
 
 .work-archive-card:hover,
 .work-archive-card:focus-within {
   border-color: rgba(31, 92, 186, 0.27);
-  background: rgba(255, 255, 255, 0.92);
-  transform: translateY(-3px);
 }
 
 .work-archive-card__top {
@@ -1741,11 +1733,12 @@ body {
 .work-archive-card__media {
   position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   height: 9.2rem;
   place-items: center;
   overflow: hidden;
-  margin: 1rem -0.35rem 0;
-  border: 1px solid rgba(70, 83, 74, 0.1);
+  margin: 1rem 0 0;
   border-radius: 0.4rem;
   background:
     radial-gradient(circle at 74% 24%, rgba(31, 92, 186, 0.09), transparent 8rem),
@@ -1753,6 +1746,9 @@ body {
 }
 
 .work-archive-card__media img {
+  display: block;
+  min-width: 0;
+  min-height: 0;
   width: 100%;
   height: 100%;
   transition: transform 220ms ease;
@@ -1773,10 +1769,7 @@ body {
 }
 
 .work-archive-card__media--phone img {
-  width: 5.9rem;
-  height: auto;
-  align-self: start;
-  margin-top: 0.45rem;
+  padding: 0.55rem 0.55rem 1.65rem;
   object-fit: contain;
   filter: drop-shadow(0 12px 18px rgba(35, 42, 38, 0.15));
 }
@@ -1843,14 +1836,14 @@ body {
 }
 
 .work-archive-card h3 {
-  margin-top: 1.15rem;
+  margin: 1.15rem 0 0;
   color: var(--work-ink);
   font: 700 1.38rem/1.1 "Space Grotesk", sans-serif;
   letter-spacing: -0.035em;
 }
 
 .work-archive-card p {
-  margin-top: 0.7rem;
+  margin: 0.7rem 0 1rem;
   color: var(--work-muted);
   font-size: 0.82rem;
   line-height: 1.62;
@@ -2488,7 +2481,7 @@ body {
 
 @media (max-width: 480px) {
   .work-page {
-    padding-inline: 1rem;
+    padding-inline: 1.25rem;
   }
 
   .work-hero {

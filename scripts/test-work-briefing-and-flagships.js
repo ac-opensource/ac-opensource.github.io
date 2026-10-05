@@ -140,7 +140,7 @@ function verifySources() {
       "Briefing motion must wait for the Universe route arrival to settle.");
     assert(!briefing.includes("requestAnimationFrame(() => target.scrollIntoView"),
       "Briefing controller retained a delayed frame-based scroll correction.");
-    assert(work.includes('work-portfolio.css?v=20260812-brief3'), "Work briefing styles lack a current cache key.");
+    assert(work.includes('work-portfolio.css?v=20261005-design1'), "Work briefing styles lack a current cache key.");
     assert(work.includes('work-briefing.js?v=20260812-brief3'), "Work briefing controller lacks a current cache key.");
     return workDossiers;
   } finally {

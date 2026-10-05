@@ -111,7 +111,7 @@ button, input { font: inherit; }
 
 .evidence-search {
   position: relative;
-  width: min(1240px, calc(100% - 2rem));
+  width: min(1240px, calc(100% - 2.5rem));
   margin: 0 auto;
   padding: clamp(1.8rem, 4vw, 3.5rem) 0 7rem;
 }
@@ -330,10 +330,8 @@ button, input { font: inherit; }
   z-index: 5;
   grid-column: 1 / 10;
   margin-top: clamp(2rem, 4vw, 3.5rem);
-  padding: clamp(0.9rem, 2vw, 1.35rem);
-  border: 1px solid var(--search-line-strong);
-  background: rgba(253, 253, 249, 0.96);
-  box-shadow: 0 1.25rem 3.5rem rgba(43, 59, 52, 0.07);
+  padding: 1.25rem 0 0;
+  border-top: 1px solid var(--search-line-strong);
 }
 
 .evidence-search__console::before {
@@ -742,7 +740,7 @@ mark {
   }
 
   .evidence-search {
-    width: min(100% - 1.3rem, 1240px);
+    width: min(100% - 2.5rem, 1240px);
     padding-top: 1.1rem;
   }
 
@@ -779,14 +777,14 @@ mark {
   .evidence-search__console {
     grid-column: 1 / -1;
     margin-top: 1.1rem;
-    padding: 0.72rem;
+    padding: 1rem 0 0;
   }
 
   .evidence-search__console-heading { margin-bottom: 0.55rem; padding-bottom: 0.45rem; }
   .evidence-search__form label { margin-bottom: 0.4rem; }
   .evidence-search__input-row { grid-template-columns: minmax(0, 1fr) auto; min-height: 3.35rem; }
   .evidence-search__input-row > span { display: none; }
-  .evidence-search__input-row input { min-height: 3.2rem; padding-inline: 0.7rem; font-size: 0.92rem; }
+  .evidence-search__input-row input { min-height: 3.2rem; padding-inline: 0.7rem; font-size: 1rem; }
   .evidence-search__input-row button { min-width: 6.1rem; min-height: 2.85rem; padding-inline: 0.7rem; }
   .evidence-search__suggestions { margin-top: 0.55rem; }
   .evidence-search__suggestions > span { flex: 1 0 100%; }

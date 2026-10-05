@@ -2053,3 +2053,257 @@ a { color: inherit; text-underline-offset: 0.22em; }
 [data-orbital-motion="idle"] .project-app-ring,
 [data-orbital-motion="idle"] .project-app-logo img { animation-play-state: paused !important; }
 [data-orbital-motion="idle"] .focus-satellites > * { animation-play-state: running, paused !important; }
+
+/* Labels use the same moving sculpture anchors, with screen-space offsets
+   that keep readable text inside the stage without changing the paths. */
+.camera-window { top:5%; right:0; bottom:18%; left:40%; }
+.camera-rig,
+[data-view="top"] .camera-rig {
+  width:min(calc(100% - 80px),1080px);
+  min-width:0;
+  height:auto;
+  aspect-ratio:1.18;
+}
+.orbit-node,
+.orbit-node--about,
+.orbit-node--profile,
+.orbit-node--threads,
+.orbit-node--contact {
+  --orbit-anchor-x:-50%;
+  --orbit-transform-origin-x:50%;
+  width:78px;
+  min-height:78px;
+  grid-template-columns:1fr;
+  gap:0;
+}
+.orbit-node .sculpture { grid-column:1; grid-row:1; place-self:center; }
+.orbit-node .node-label {
+  position:absolute;
+  top:50%;
+  left:50%;
+  grid-column:1;
+  grid-row:1;
+  width:144px;
+  padding:6px 8px;
+  border:0;
+  background:rgba(250,249,244,.78);
+  box-shadow:none;
+  text-align:center;
+  translate:-50% -50%;
+  transform:var(--label-counter,none) translate3d(var(--label-x,0px),var(--label-y,0px),0) !important;
+  transition:opacity 180ms ease,color 220ms ease;
+}
+.orbit-node .node-label::before {
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:var(--label-leader-length,0px);
+  height:1px;
+  background:var(--line);
+  transform:rotate(var(--label-leader-angle,0deg)) translateX(var(--label-leader-start,0px));
+  transform-origin:0 50%;
+  pointer-events:none;
+}
+.node-label small { font-size:9px; line-height:1.3; }
+.node-label strong { margin-top:5px; font-size:12px; line-height:1.15; }
+.node-label span { font-size:10px; line-height:1.4; }
+.scene-controls button { font-size:10px; }
+.scene-controls [data-orbit-reset] { font-size:10px; }
+.view-toggle small { font-size:9px; }
+.view-toggle strong { font-size:11px; }
+.field-map button { width:66px; min-height:48px; }
+.field-map button span { font-size:9px; }
+.field-map button strong { font-size:9px; line-height:1.2; }
+.scene-readout { font-size:9px; }
+
+/* The copy and orbit have separate lanes on the spacious desktop canvas. */
+.landing-copy { width:min(32vw,440px); }
+.landing-copy h2 { font-size:clamp(42px,4.4vw,64px); line-height:1.02; }
+.landing-copy > p:not(.eyebrow) { font-size:clamp(14px,1.05vw,16px); }
+.landing-copy > a { font-size:11px; line-height:1.4; white-space:normal; }
+.landing-object { left:73%; width:min(34vw,520px); }
+.landing-object figcaption { font-size:11px; line-height:1.4; }
+.focus-satellites {
+  --sat-rx:clamp(140px,14vw,240px);
+  --sat-hx:clamp(70px,7vw,120px);
+  left:73%;
+}
+.focus-satellites > * { padding:12px 14px; }
+.focus-satellites small { font-size:10px; line-height:1.35; }
+.focus-satellites strong { font-size:14px; line-height:1.25; }
+.focus-satellites em { font-size:12px; line-height:1.55; }
+.detail-close small { font-size:10px; }
+.facet-flight-controls button small { font-size:10px; }
+.facet-flight-controls p strong { font-size:11px; }
+.facet-flight-controls p span { font-size:10px; }
+
+@media (min-width:768px) and (max-width:1100px) and (min-height:561px) {
+  .camera-window { top:8%; right:0; bottom:23%; left:44%; }
+  .camera-rig,
+  [data-view="top"] .camera-rig { width:calc(100% - 56px); }
+  .orbit-node { width:56px; min-height:56px; }
+}
+
+@media (max-width:767px) {
+  .scene-identity h1 { font-size:clamp(32px,8.8vw,42px); }
+  .scene-identity .eyebrow { font-size:9px; line-height:1.3; }
+  .scene-identity > p:not(.eyebrow) { font-size:13px; line-height:1.6; }
+  .identity-actions a { font-size:10px; }
+  .scene-controls { top:310px; right:14px; left:14px; }
+  .scene-controls button { min-width:74px; }
+  .scene-controls .view-toggle { min-width:128px; }
+  .scene-controls .view-toggle small { font-size:9px; }
+  .scene-controls .view-toggle strong { font-size:11px; }
+  .camera-window { top:360px; right:0; bottom:auto; left:0; height:520px; overflow:hidden; }
+  .camera-rig,
+  [data-view="top"] .camera-rig { width:calc(100% - 48px); height:500px; aspect-ratio:auto; }
+  .orbit-node { width:44px; min-height:44px; }
+  .orbit-node .node-label { width:120px; }
+  .node-label small { font-size:9px; }
+  .node-label strong { font-size:11px; }
+  .field-map button { width:66px; min-height:48px; }
+  .field-map button span { font-size:9px; }
+  .field-map button strong { font-size:9px; }
+}
+
+/* Small and short viewports need reading space for the explanations. Keep
+   the moving orbital object, then present its focus points as simple rows. */
+@media (max-width:1100px), (max-height:800px) {
+  body { display:block; min-height:100svh; overflow-x:hidden; overflow-y:auto; }
+  .orbital-landing { height:950px; min-height:950px; }
+  .orbital-landing[data-phase="focusing"],
+  .orbital-landing[data-phase="focused"],
+  .orbital-landing[data-phase="transferring"] { height:auto; min-height:0; }
+  .spatial-detail { position:relative; inset:auto; overflow:visible; padding-bottom:202px; }
+  .facet-detail.is-active,
+  [data-active="true"].facet-detail {
+    position:relative;
+    inset:auto;
+    width:100%;
+    height:auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    padding:32px 24px 0;
+    overflow:visible;
+  }
+  .landing-copy,
+  [data-phase="focused"] .landing-copy {
+    position:relative;
+    top:auto;
+    left:auto;
+    width:100%;
+    padding:0;
+    opacity:1;
+    transform:none;
+  }
+  .landing-copy .eyebrow { padding-right:76px; font-size:10px; line-height:1.4; }
+  .landing-copy h2 { max-width:800px; font-size:clamp(32px,5.5vw,54px); line-height:1.04; }
+  .landing-copy > p:not(.eyebrow) { max-width:66ch; margin-top:16px; font-size:14px; line-height:1.65; }
+  .landing-copy > a { min-height:48px; margin-top:20px; padding:10px 16px; font-size:11px; }
+  .landing-object,
+  [data-phase="focused"] .landing-object {
+    position:relative;
+    top:auto;
+    left:auto;
+    width:min(75vw,430px);
+    margin:32px auto 20px;
+    order:2;
+    opacity:1;
+    transform:none;
+  }
+  .landing-object .sculpture { width:min(42vw,240px); height:min(42vw,240px); }
+  .landing-code { font-size:10px; line-height:1.3; }
+  .landing-object figcaption { display:block; font-size:11px; line-height:1.4; }
+  .focus-satellites {
+    position:relative;
+    top:auto;
+    left:auto;
+    width:100%;
+    height:auto;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:24px;
+    margin:24px 0;
+    order:3;
+    pointer-events:auto;
+  }
+  .focus-satellites::before { display:none; }
+  .focus-satellites > *,
+  [data-phase="focused"] .focus-satellites > *,
+  [data-phase="focused"] .focus-satellites > *:nth-child(1),
+  [data-phase="focused"] .focus-satellites > *:nth-child(2),
+  [data-phase="focused"] .focus-satellites > *:nth-child(3) {
+    position:relative;
+    top:auto;
+    left:auto;
+    width:auto;
+    max-width:none;
+    min-height:0;
+    padding:16px 0 0;
+    border-top:1px solid var(--line);
+    background:transparent;
+    backdrop-filter:none;
+    opacity:1;
+    transform:none !important;
+    animation:none !important;
+  }
+  .focus-satellites .project-satellite--primary { width:auto; min-height:0; background:transparent; }
+  .no-js .focus-satellites > * { top:auto; left:auto; }
+  .focus-satellites small { font-size:10px; line-height:1.4; }
+  .focus-satellites strong,
+  .focus-satellites .project-satellite--primary strong { margin-top:7px; font-size:14px; line-height:1.3; }
+  .focus-satellites em { margin-top:8px; font-size:13px; line-height:1.55; }
+  .detail-close { top:16px; right:18px; }
+  .facet-flight-controls {
+    position:relative;
+    right:auto;
+    bottom:auto;
+    width:calc(100% - 48px);
+    min-height:72px;
+    grid-template-columns:64px minmax(0,1fr) 64px;
+    margin:16px auto 0;
+    background:transparent;
+  }
+  .facet-flight-controls p strong { font-size:11px; line-height:1.4; }
+  .facet-flight-controls p span {
+    display:block;
+    max-width:none;
+    overflow:visible;
+    font-size:10px;
+    line-height:1.5;
+    text-overflow:clip;
+    white-space:normal;
+  }
+}
+
+@media (max-width:767px) {
+  .orbital-landing { height:1100px; min-height:1100px; }
+  .facet-detail.is-active,
+  [data-active="true"].facet-detail { padding-inline:18px; }
+  .focus-satellites { grid-template-columns:1fr; gap:20px; }
+  .facet-flight-controls { width:calc(100% - 36px); grid-template-columns:48px minmax(0,1fr) 48px; }
+}
+
+@media (orientation:landscape) and (max-height:560px) and (max-width:1000px) {
+  .orbital-landing { height:720px; min-height:720px; }
+  .scene-identity .eyebrow { font-size:9px; line-height:1.4; }
+  .scene-identity h1 { font-size:clamp(32px,4.2vw,38px); }
+  .scene-identity > p:not(.eyebrow) { display:block; max-width:none; font-size:13px; line-height:1.6; }
+  .identity-actions a { font-size:10px; }
+  .scene-controls { top:8px; right:8px; left:auto; }
+  .camera-window { top:80px; right:0; bottom:180px; left:40%; height:auto; }
+  .camera-rig,
+  [data-view="top"] .camera-rig { width:calc(100% - 48px); height:390px; aspect-ratio:auto; }
+  .orbit-node .node-label { width:120px; }
+  .node-label small { font-size:9px; }
+  .node-label strong { font-size:11px; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  [data-phase="focused"] .focus-satellites > * { opacity:1; animation:none !important; }
+  [data-phase="focused"] .focus-satellites > *:nth-child(1) { transform:translate(-50%,-50%) translate3d(calc(-1 * var(--sat-rx)),calc(-1 * var(--sat-hy)),0); }
+  [data-phase="focused"] .focus-satellites > *:nth-child(2) { transform:translate(-50%,-50%) translate3d(var(--sat-rx),calc(-1 * var(--sat-hy)),0); }
+  [data-phase="focused"] .focus-satellites > *:nth-child(3) { transform:translate(-50%,-50%) translate3d(var(--sat-hx),var(--sat-ry),0); }
+}

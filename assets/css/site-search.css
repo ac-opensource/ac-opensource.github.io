@@ -1,5 +1,8 @@
 [data-site-search-slot] {
   justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* The wordmark already returns home. Keeping Dashboard in the primary rail

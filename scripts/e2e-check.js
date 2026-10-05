@@ -14,7 +14,7 @@ const socialPreviewContracts = [
   { path: '/blog/', canonicalUrl: 'https://ac-opensource.github.io/blog/', image: 'logs-spiral-galaxy.png' },
   { path: '/about.html', canonicalUrl: 'https://ac-opensource.github.io/about.html', image: 'about-butterfly-nebula-20260908.png' },
   { path: '/contact.html', canonicalUrl: 'https://ac-opensource.github.io/contact.html', image: 'contact-payload-integration-20260908.png' },
-  { path: '/resume.html', canonicalUrl: 'https://ac-opensource.github.io/resume.html', image: 'resume-flight-recorder-20260908.png' },
+  { path: '/resume.html', canonicalUrl: 'https://ac-opensource.github.io/resume.html', image: 'resume-web-20261005.png' },
   { path: '/signals.html', canonicalUrl: 'https://ac-opensource.github.io/signals.html', image: 'signals-registry.png' },
   { path: '/search.html', canonicalUrl: 'https://ac-opensource.github.io/search.html', image: 'search-evidence-field.png' },
   { path: '/skills-graph.html', canonicalUrl: 'https://ac-opensource.github.io/about.html#profile-map', image: 'about-butterfly-nebula-20260908.png' },
@@ -1905,75 +1905,72 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await page.goto(BASE_URL + '/resume.html', { waitUntil: 'domcontentloaded' });
   const resumeText = ((await page.locator('main').textContent()) || '').replace(/\s+/g, ' ').trim();
   for (const expectedText of [
-    'AI-Native Software Engineer Bitcoin.com Bitcoin.com Wallet — Self-custody crypto wallet Jun 2024 — Present',
-    'Senior Mobile Developer Candyspace ITVX — Streaming platform Jun 2023 — Jun 2024',
-    'Senior Android Developer Red Airship OCBC — Mobile banking OpenPay — Fintech Jun 2021 — Jun 2023',
-    'Lead Developer InnovationTeam MySTC — Telecom project May 2020 — Jun 2021',
-    'Team Lead iPARA Technologies and Solutions OWTO — Ride-hailing service Jun 2018 — May 2020',
-    'Senior Android Developer YOYO Holdings Pte. Ltd. PopSlide — Rewards platform Jun 2016 — Jun 2018',
-    'Full-Stack Web and Mobile Developer Internet Strategy Branding and Execution (ISBX) WebSafety — Parental controls May 2014 — Jun 2016',
+    'Jun 2024 — Present',
+    'AI-Native Software Engineer Bitcoin.com Bitcoin.com Wallet — Self-custody crypto wallet',
+    'Jun 2023 — Jun 2024',
+    'Senior Mobile Developer Candyspace ITVX — Streaming platform',
+    'Jun 2021 — Jun 2023',
+    'Senior Android Developer Red Airship OCBC — Mobile banking OpenPay — Fintech',
+    'May 2020 — Jun 2021',
+    'Lead Developer InnovationTeam MySTC — Telecom project',
+    'Jun 2018 — May 2020',
+    'Team Lead iPARA Technologies and Solutions OWTO — Ride-hailing service',
+    'Jun 2016 — Jun 2018',
+    'Senior Android Developer YOYO Holdings Pte. Ltd. PopSlide — Rewards platform',
+    'May 2014 — Jun 2016',
+    'Full-Stack Web and Mobile Developer Internet Strategy Branding and Execution (ISBX) WebSafety — Parental controls',
   ]) {
     await assert(resumeText.includes(expectedText), `Resume is missing the experience sequence: ${expectedText}`);
   }
   await assert(!resumeText.includes('Littlepay'), 'Resume still exposes Littlepay');
-  for (const itvxAchievement of ['recommendations panel', 'timeline scrubbing', 'tablet support', 'Simple XML-to-Jackson']) {
+  for (const itvxAchievement of ['recommendations panel', 'timeline scrubbing', 'tablet layouts', 'Simple XML-to-Jackson']) {
     await assert(resumeText.includes(itvxAchievement), `Resume is missing ITVX achievement: ${itvxAchievement}`);
   }
-  const resumeProjectsSection = page.locator('#projects');
-  const resumeProjectHeadings = await resumeProjectsSection.locator('article .font-headline').evaluateAll((headings) =>
-    headings.map((heading) => (heading.textContent || '').replace(/\s+/g, ' ').trim())
-  );
-  await assert(
-    JSON.stringify(resumeProjectHeadings) === JSON.stringify([
-      'Bitcoin.com Wallet',
-      'ITVX',
-      'OCBC',
-      'OpenPay',
-      'MySTC',
-    ]),
-    'Resume projects do not lead with Bitcoin.com Wallet'
-  );
 
+  // The web résumé is its own page: roles are headings, the to-scale career
+  // timeline jumps to each role, and every role links to its case study.
   const resumeStructure = await page.evaluate(() => ({
-    summaryBeforeScanner: document.querySelector('#professional-summary')?.compareDocumentPosition(
-      document.querySelector('#signal-scanner')
-    ) & Node.DOCUMENT_POSITION_FOLLOWING,
-    scannerBeforeSkills: document.querySelector('#signal-scanner')?.compareDocumentPosition(
-      document.querySelector('#core-skills')
-    ) & Node.DOCUMENT_POSITION_FOLLOWING,
-    roles: document.querySelectorAll('.resume-role').length,
-    roleBullets: document.querySelectorAll('.resume-role > ul > li').length,
-    projects: document.querySelectorAll('.resume-project').length,
-    evidenceBoundaries: document.querySelectorAll('.resume-evidence-boundary').length,
+    name: document.querySelector('main h1')?.textContent.trim(),
+    roles: [...document.querySelectorAll('.resume-role')].map((role) => role.id),
+    roleHeadings: document.querySelectorAll('.resume-role h3').length,
+    roleBullets: document.querySelectorAll('.resume-role__bullets > li').length,
+    timelineTargets: [...document.querySelectorAll('.resume-timeline__item a')].map((link) => link.getAttribute('href')),
+    caseStudies: [...document.querySelectorAll('.resume-role__links a[href^="/blog/"]')].map((link) => link.getAttribute('href')),
+    pdfLinks: document.querySelectorAll('a[href="/resume_concepcion_andrew.pdf"]').length,
+    contactExcludedFromSearch: document.querySelector('[data-resume-signature-visual]')?.hasAttribute('data-search-exclude'),
   }));
   await assert(
-    Boolean(resumeStructure.summaryBeforeScanner)
-      && Boolean(resumeStructure.scannerBeforeSkills)
-      && resumeStructure.roles === 7
+    resumeStructure.name === 'Andrew V. Concepcion'
+      && resumeStructure.roles.length === 7
+      && resumeStructure.roleHeadings === 7
       && resumeStructure.roleBullets === 21
-      && resumeStructure.projects === 5
-      && resumeStructure.evidenceBoundaries === 12,
-    `Resume dossier structure/content changed: ${JSON.stringify(resumeStructure)}`
+      && JSON.stringify([...resumeStructure.timelineTargets].reverse()) === JSON.stringify(resumeStructure.roles.map((id) => `#${id}`))
+      && resumeStructure.caseStudies.length === 8
+      && resumeStructure.pdfLinks >= 1
+      && resumeStructure.contactExcludedFromSearch === true,
+    `Web résumé structure changed: ${JSON.stringify(resumeStructure)}`
   );
-  await page.locator('[data-signal="android"]').click();
+  for (const caseStudy of resumeStructure.caseStudies) {
+    const response = await page.request.get(BASE_URL + caseStudy);
+    await assert(response.ok(), `Resume links to a missing case study: ${caseStudy}`);
+  }
+
+  await page.locator('[data-signal="fintech"]').click();
   const resumeSignalState = await page.evaluate(() => ({
     signal: new URL(location.href).searchParams.get('signal'),
-    active: document.querySelector('[data-resume-dossier]')?.dataset.activeSignal,
-    pressed: document.querySelector('[data-signal="android"]')?.getAttribute('aria-pressed'),
+    pressed: document.querySelector('[data-signal="fintech"]')?.getAttribute('aria-pressed'),
+    matchingRoles: document.querySelectorAll('.resume-role[data-signal-match="true"]').length,
     hiddenRoles: [...document.querySelectorAll('.resume-role')]
       .filter((role) => getComputedStyle(role).display === 'none').length,
-    hiddenProjects: [...document.querySelectorAll('.resume-project')]
-      .filter((project) => getComputedStyle(project).display === 'none').length,
-    matches: document.querySelectorAll('[data-signals][data-signal-match="true"]').length,
+    status: document.getElementById('signal-filter-status')?.textContent,
   }));
   await assert(
-    resumeSignalState.signal === 'android'
-      && resumeSignalState.active === 'android'
+    resumeSignalState.signal === 'fintech'
       && resumeSignalState.pressed === 'true'
+      && resumeSignalState.matchingRoles === 2
       && resumeSignalState.hiddenRoles === 0
-      && resumeSignalState.hiddenProjects === 0
-      && resumeSignalState.matches > 0,
-    `Resume signal scan hid or lost evidence: ${JSON.stringify(resumeSignalState)}`
+      && resumeSignalState.status?.includes('2 of 7 roles'),
+    `Resume focus highlight hid or lost roles: ${JSON.stringify(resumeSignalState)}`
   );
   await page.goBack({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => !new URL(location.href).searchParams.has('signal')

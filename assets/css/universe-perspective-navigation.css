@@ -78,6 +78,33 @@
   display: none;
 }
 
+@media screen {
+  #site-footer > div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0 1.5rem;
+    padding: 1.25rem;
+    font-size: 0.6875rem;
+  }
+
+  #site-footer > div > a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  #site-footer > div > span:first-child {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+}
+
 @view-transition {
   navigation: auto;
 }
@@ -227,6 +254,43 @@ html[data-universe-flight]::view-transition-new(universe-site-header) {
   display: block;
 }
 
+/* Give every primary rail the same baseline and target area. At tablet widths
+   the wordmark needs its intrinsic column instead of half the leftover space. */
+@media (min-width: 768px) {
+  #site-topbar > div {
+    min-height: 64px;
+    padding-block: 10px;
+  }
+
+  #site-topbar > div > a:first-child {
+    white-space: nowrap;
+  }
+
+  #site-nav > a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding-block: 0;
+    border-bottom: 2px solid transparent;
+    line-height: 1.2;
+  }
+
+  #site-nav > a[aria-current="page"] {
+    border-bottom-color: currentColor;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  #site-topbar > div {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+
+  #site-nav {
+    gap: clamp(12px, 1.8vw, 18px);
+  }
+}
+
 /* Shared compact header contract. Route-specific styles may change color and
    position, but mobile geometry and interactive target sizes stay identical. */
 @media (max-width: 767px) {
@@ -251,7 +315,7 @@ html[data-universe-flight]::view-transition-new(universe-site-header) {
 
   #site-topbar > div > a:first-child {
     min-width: 0;
-    max-width: none !important;
+    max-width: 100% !important;
     overflow: hidden;
     font-size: 18px !important;
     line-height: 28px !important;
@@ -305,6 +369,17 @@ html[data-universe-flight]::view-transition-new(universe-site-header) {
 
   #site-nav-mobile > [data-route="/"] {
     display: none !important;
+  }
+}
+
+@media (max-width: 374px) {
+  #site-topbar > div {
+    padding-inline: 16px !important;
+    gap: 8px !important;
+  }
+
+  #site-topbar > div > a:first-child {
+    font-size: clamp(14px, 4.6vw, 17px) !important;
   }
 }
 

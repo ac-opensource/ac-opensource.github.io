@@ -736,12 +736,12 @@ ${articleTagsMeta}
 <link rel="preload" href="/assets/fonts/manrope-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
 <link rel="preload" href="/assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
 <link href="/assets/css/site-fonts.css?v=20260819-local1" rel="stylesheet"/>
-<link href="/assets/css/article-debrief.css?v=20260820-hierarchy1" rel="stylesheet"/>
-<link href="/assets/css/article-aurora.css?v=20260908-1" rel="stylesheet"/>
-<link href="/assets/css/universe-field-map.css?v=20261004-sky1" rel="stylesheet"/>
-<link href="/assets/css/universe-perspective-navigation.css?v=20261005-cosmic1" rel="stylesheet" data-universe-perspective-styles/>
+<link href="/assets/css/article-debrief.css?v=20261005-design1" rel="stylesheet"/>
+<link href="/assets/css/article-aurora.css?v=20261005-design1" rel="stylesheet"/>
+<link href="/assets/css/universe-field-map.css?v=20261005-design1" rel="stylesheet"/>
+<link href="/assets/css/universe-perspective-navigation.css?v=20261005-spatial5" rel="stylesheet" data-universe-perspective-styles/>
 <link href="/assets/css/logs-theme.css?v=20260908-toggle1" rel="stylesheet"/>
-<link href="/assets/css/logs-surface.css?v=20261004-header1" rel="stylesheet"/>
+<link href="/assets/css/logs-surface.css?v=20261005-design1" rel="stylesheet"/>
 <script src="/assets/js/logs-theme.js?v=20261004-header1"></script>
 <script src="/assets/js/about-butterfly-field.js?v=20261005-spatial3" defer></script>
 <script src="/assets/js/universe-solid-field.js?v=20261005-spatial4" defer></script>

@@ -2492,6 +2492,7 @@ a.is-stellar-source {
 .stellar-tree__popup-header .stellar-spectrum__readout-kicker { margin: 0; }
 
 .stellar-tree__popup-close {
+  flex-shrink: 0;
   min-width: 44px;
   min-height: 44px;
   border: 1px solid var(--about-rule);
@@ -2501,6 +2502,7 @@ a.is-stellar-source {
   font: 700 0.58rem/1.2 "Space Grotesk", ui-monospace, monospace;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .stellar-atlas .stellar-spectrum__source-grid {
@@ -2776,6 +2778,34 @@ a.is-stellar-source {
 .stellar-calibration p,
 .stellar-calibration li,
 .stellar-calibration span { overflow-wrap: anywhere; }
+
+.stellar-calibration__metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stellar-calibration__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.stellar-calibration__metadata .font-label {
+  font-size: 0.6875rem;
+  overflow-wrap: normal;
+}
+
+.stellar-calibration__links a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  white-space: nowrap;
+}
 
 /* The Tailwind `lg` split becomes too narrow for the donut, its legend, and
    the behavior readout at laptop/tablet widths. Collapse the two assessment
@@ -3191,9 +3221,9 @@ body[data-universe-region="about"] :is(#site-nav, #site-nav-mobile) .site-nav-li
 
 .stellar-tree__projection button[data-tree-projection="free"] {
   line-height: 1.15;
-  overflow-wrap: anywhere;
+  padding-inline: 0;
   text-align: center;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .stellar-tree__interaction-toggle { display: none !important; }
@@ -3225,7 +3255,7 @@ body[data-universe-region="about"] :is(#site-nav, #site-nav-mobile) .site-nav-li
   text-decoration: underline;
   text-decoration-color: var(--stellar-blue);
   text-decoration-thickness: 2px;
-  text-underline-offset: 0.42rem;
+  text-underline-offset: 0.2rem;
 }
 
 .stellar-tree__camera button:hover,
@@ -3843,7 +3873,8 @@ html[data-about-theme="light"] .stellar-tree__root.is-open { color: var(--stella
     right: auto;
     bottom: auto;
     left: var(--popup-left, 0.75rem);
-    width: min(17rem, calc(100% - 1.5rem));
+    /* Keep the camera rail available beside narrow-screen evidence. */
+    width: min(17rem, calc(100% - 5.75rem));
     max-height: min(26rem, var(--popup-available-height, calc(100% - 1.5rem)));
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
@@ -4002,8 +4033,8 @@ html[data-about-theme="light"] .stellar-tree__root.is-open { color: var(--stella
   text-align: left;
 }
 @media (max-width: 720px) {
-  .stellar-tree__guide { font-size: 0.6rem; }
-  .about-opening .stellar-spectrum__node.stellar-tree__signal .stellar-spectrum__node-label { max-width: 7rem; font-size: 0.57rem; }
+  .stellar-tree__guide { left: var(--about-gutter); font-size: 0.6875rem; }
+  .about-opening .stellar-spectrum__node.stellar-tree__signal .stellar-spectrum__node-label { max-width: 7rem; font-size: 0.6875rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .stellar-tree__controls-layer * { transition: none !important; }

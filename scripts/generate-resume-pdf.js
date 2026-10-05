@@ -7,6 +7,10 @@ const ROOT_DIR = path.join(__dirname, "..");
 const HOST = "127.0.0.1";
 const OUTPUT_PATH = path.join(ROOT_DIR, "resume_concepcion_andrew.pdf");
 const PREVIEW_PATH = path.join(require("os").tmpdir(), "resume-preview.png");
+// The PDF has its own card layout, separate from the web résumé at
+// /resume.html, captured as one continuous desktop-width page.
+const SOURCE_PATH = "/applications/resume.html";
+const PAGE_WIDTH = 1440;
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
@@ -115,10 +119,11 @@ async function extractPdfPages(pdfBytes) {
 }
 
 function assertExtractedResume(pages) {
-  if (pages.length !== 3) throw new Error(`Resume extraction expected three pages; found ${pages.length}.`);
+  if (pages.length !== 1) throw new Error(`Resume extraction expected one continuous page; found ${pages.length}.`);
 
   const firstPage = pages[0];
-  if (!firstPage.startsWith("ANDREW V. CONCEPCION")) {
+  // The page opens with its bracketed section label, then the name.
+  if (!firstPage.replace(/^\[[^\]]*\]\s*/, "").startsWith("ANDREW V. CONCEPCION")) {
     throw new Error(`Resume extraction must begin with Andrew's identity; found: ${firstPage.slice(0, 96)}`);
   }
 
@@ -128,11 +133,14 @@ function assertExtractedResume(pages) {
     "github.com/ac-opensource",
     "linkedin.com/in/aarconcepcion",
     "AI-Native Software Engineer",
-    "Kotlin, Java"
+    "Core Skills",
+    "Kotlin",
+    "Experience",
+    "Projects"
   ];
   for (const requirement of firstPageRequirements) {
     if (!firstPage.includes(requirement)) {
-      throw new Error(`Resume extraction is missing or fragmented on page one: ${requirement}`);
+      throw new Error(`Resume extraction is missing or fragmented: ${requirement}`);
     }
   }
 
@@ -152,33 +160,28 @@ async function main() {
 
   try {
     browser = await chromium.launch({ headless: true });
-    const page = await browser.newPage({ viewport: { width: 1440, height: 2200 } });
-    await page.emulateMedia({ media: "print", colorScheme: "light", reducedMotion: "reduce" });
-    await page.goto(`http://${HOST}:${port}/resume.html?phone=all`, { waitUntil: "networkidle" });
+    const page = await browser.newPage({ viewport: { width: PAGE_WIDTH, height: 2200 } });
+    await page.emulateMedia({ media: "screen", colorScheme: "light", reducedMotion: "reduce" });
+    await page.goto(`http://${HOST}:${port}${SOURCE_PATH}`, { waitUntil: "networkidle" });
     await page.evaluate(async () => {
       const base = document.createElement("base");
       base.href = "https://ac-opensource.github.io/";
       document.head.prepend(base);
-      document.body.classList.add("pdf-export");
       if (document.fonts?.ready) await document.fonts.ready;
     });
+    const pageHeight = await page.evaluate(() => Math.ceil(Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight
+    )));
 
     await page.pdf({
       path: temporaryOutput,
-      format: "A4",
+      width: `${PAGE_WIDTH}px`,
+      height: `${pageHeight + 1}px`,
       printBackground: true,
       tagged: true,
       outline: true,
-      preferCSSPageSize: true,
-      displayHeaderFooter: true,
-      headerTemplate: "<span></span>",
-      footerTemplate: [
-        '<div style="box-sizing:border-box;width:100%;padding:0 12mm;color:#5a5f65;font:7px/1.2 Arial,sans-serif;letter-spacing:.04em;">',
-        '<span>Andrew Concepcion · ac-opensource.github.io</span>',
-        '<span style="float:right;"><span class="pageNumber"></span> / <span class="totalPages"></span></span>',
-        "</div>"
-      ].join(""),
-      margin: { top: "10mm", right: "11mm", bottom: "14mm", left: "11mm" }
+      margin: { top: "0", right: "0", bottom: "0", left: "0" }
     });
     await page.screenshot({ path: PREVIEW_PATH, fullPage: true });
 
@@ -187,7 +190,7 @@ async function main() {
     if (header !== "%PDF-") throw new Error("Chromium did not produce a valid PDF document.");
     const pdfSource = pdfBytes.toString("latin1");
     const pageCount = (pdfSource.match(/\/Type\s*\/Page\b/g) || []).length;
-    if (pageCount !== 3) throw new Error(`Resume PDF must contain exactly three A4 pages; found ${pageCount}.`);
+    if (pageCount !== 1) throw new Error(`Resume PDF must be one continuous page; found ${pageCount}.`);
     if (!pdfSource.includes("/StructTreeRoot")) throw new Error("Resume PDF is missing its tagged structure tree.");
     if (/127\.0\.0\.1|localhost/i.test(pdfSource)) throw new Error("Resume PDF contains a local-only link.");
     assertExtractedResume(await extractPdfPages(pdfBytes));
@@ -198,7 +201,7 @@ async function main() {
     await close(server);
   }
 
-  console.log(`Generated tagged A4 resume: ${OUTPUT_PATH}`);
+  console.log(`Generated tagged single-page resume: ${OUTPUT_PATH}`);
   console.log(`Rendered resume preview: ${PREVIEW_PATH}`);
 }
 
