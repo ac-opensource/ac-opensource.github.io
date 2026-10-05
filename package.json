@@ -29,6 +29,7 @@
     "verify:dist": "node scripts/verify-dist.js",
     "verify:deterministic": "node scripts/check-deterministic-build.js",
     "test:runtime": "node scripts/test-universe-transition-lifecycle.js",
+    "test:flight:browser": "node scripts/test-universe-flight-browser.js",
     "test:search-recovery": "node scripts/test-search-recovery.js",
     "test:build": "node scripts/test-build-pipeline.js",
     "test:discovery": "node scripts/test-public-discovery.js",

@@ -739,11 +739,11 @@ ${articleTagsMeta}
 <link href="/assets/css/article-debrief.css?v=20260820-hierarchy1" rel="stylesheet"/>
 <link href="/assets/css/article-aurora.css?v=20260908-1" rel="stylesheet"/>
 <link href="/assets/css/universe-field-map.css?v=20261004-sky1" rel="stylesheet"/>
-<link href="/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1" rel="stylesheet" data-universe-perspective-styles/>
+<link href="/assets/css/universe-perspective-navigation.css?v=20261005-cosmic1" rel="stylesheet" data-universe-perspective-styles/>
 <link href="/assets/css/logs-theme.css?v=20260908-toggle1" rel="stylesheet"/>
 <link href="/assets/css/logs-surface.css?v=20261004-header1" rel="stylesheet"/>
 <script src="/assets/js/logs-theme.js?v=20261004-header1"></script>
-<script src="/assets/js/universe-theme-transition.js?v=20260926-motion-lifecycle1"></script>
+<script src="/assets/js/universe-theme-transition.js?v=20261005-cosmic1"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",

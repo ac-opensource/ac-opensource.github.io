@@ -172,4 +172,47 @@ rejected.reduceMotion();
 rejected.advance(3000);
 assert.equal(rejected.navigations.length, 1, "A failed assignment must settle without replaying.");
 
-console.log("Universe transition lifecycle passed: motion changes, retargeting, one-time departures, native reduced motion, and restored-page cleanup.");
+// The flight model is pure: every route is a camera over one shared world.
+const model = createPage().window.UniversePerspective.model;
+const viewport = { w: 1280, h: 800 };
+const near = (a, b, tolerance = 1e-6) => Math.abs(a - b) <= tolerance * Math.max(1, Math.abs(a), Math.abs(b));
+for (const [from, to] of [
+  [{ x: 0, y: 0, w: 4 }, { x: 18, y: 8, w: 24 }],
+  [{ x: 18, y: 8, w: 24 }, { x: 15, y: 9, w: 0.7 }],
+  [{ x: 1, y: 1, w: 2 }, { x: 1, y: 1, w: 8 }],
+]) {
+  const path = model.zoomPath(from, to);
+  const start = path.at(0);
+  const end = path.at(1);
+  assert(near(start.x, from.x) && near(start.y, from.y) && near(start.w, from.w), "A zoom path starts at its origin view.");
+  assert(near(end.x, to.x, 1e-5) && near(end.y, to.y, 1e-5) && near(end.w, to.w, 1e-5), "A zoom path ends at its destination view.");
+}
+
+const record = (from, to, extra = {}) => ({
+  from, to, fromPath: extra.fromPath || "/", toPath: extra.toPath || "/",
+  fromSurface: "light", toSurface: "light", viewport,
+  fromFocus: { x: 900, y: 420, r: 230 }, toFocus: { x: 640, y: 432, r: 192 },
+});
+const farHop = model.planFlight(record("home", "logs"), { x: 820, y: 430, r: 340 }, viewport);
+assert(farHop.duration >= 950 && farHop.duration <= 1600, `Flight duration must stay navigable: ${farHop.duration}`);
+assert(farHop.peak > Math.max(farHop.start.w, farHop.end.w), "A hop between distant objects rises above both.");
+assert(!farHop.sourceEncloses && !farHop.targetEncloses);
+const startCamera = model.cameraAt(farHop, 0);
+const endCamera = model.cameraAt(farHop, 1);
+assert(near(startCamera.w, farHop.start.w) && near(endCamera.w, farHop.end.w, 1e-5), "The camera starts and ends on the two pages.");
+const landed = model.pageState(farHop.end, endCamera, farHop.targetFocus, viewport, { enclosing: farHop.targetEncloses });
+assert(near(landed.scale, 1, 1e-5) && Math.abs(landed.x) < 0.01 && Math.abs(landed.y) < 0.01, "The destination lands in place.");
+assert.equal(landed.opacity, 1);
+assert.equal(landed.feather, 0);
+const departing = model.pageState(farHop.start, model.cameraAt(farHop, 0.5), farHop.sourceFocus, viewport, { enclosing: false });
+assert(departing.opacity < 0.05, "By mid-flight the departing page has collapsed into its landmark.");
+
+const article = model.destinationForLocation("/blog/2026-04-30-agents-that-leave-receipts.html");
+const galaxy = model.destinationForLocation("/blog/").landmark;
+assert.equal(article.key, "article");
+assert(Math.hypot(article.landmark.x - galaxy.x, article.landmark.y - galaxy.y) < galaxy.r, "Log entries are stars inside the archive galaxy.");
+const dive = model.planFlight(record("logs", "article", { toPath: "/blog/2026-04-30-agents-that-leave-receipts.html" }), { x: 990, y: 480, r: 228 }, viewport);
+assert(dive.sourceEncloses, "Opening an entry dives into the galaxy instead of flying over it.");
+assert(model.pageOpacity(2, false) === 0 && model.pageOpacity(2, true) > 0, "Only nested pages are visible larger than the view.");
+
+console.log("Universe transition lifecycle passed: motion changes, retargeting, one-time departures, native reduced motion, and restored-page cleanup, and the camera flight model.");
