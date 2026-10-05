@@ -517,8 +517,7 @@ body.has-universe-route-map {
 
   /* Keep the collapsed 44px field map out of dense first-column evidence. */
   body.has-universe-route-map[data-universe-region="article"] .article-region__actions,
-  body.has-universe-route-map[data-universe-region="article"] .article-region__topic-field,
-  body.has-universe-route-map[data-universe-region="resume"] [data-resume-signature-visual] {
+  body.has-universe-route-map[data-universe-region="article"] .article-region__topic-field {
     padding-left: 3rem !important;
   }
 
@@ -528,6 +527,14 @@ body.has-universe-route-map {
 
   .universe-route-map[data-map-expanded="true"] {
     width: min(18rem, calc(100vw - 1.5rem - env(safe-area-inset-left)));
+  }
+}
+
+@media screen and (min-width: 481px) and (max-width: 760px) {
+  /* The résumé contact list only needs to clear the map where the map is
+     shown, and never on paper, where the indent would leak into the PDF. */
+  body.has-universe-route-map[data-universe-region="resume"] [data-resume-signature-visual] {
+    padding-left: 3rem !important;
   }
 }
 

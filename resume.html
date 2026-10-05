@@ -15,16 +15,16 @@
   <meta property="og:url" content="https://ac-opensource.github.io/resume.html"/>
   <meta property="og:title" content="Engineering Résumé | Andrew Concepcion"/>
   <meta property="og:description" content="10+ years of Android, iOS, backend, and shared Rust experience, with production work in multichain wallets, streaming, and engineering leadership."/>
-  <meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/resume-flight-recorder-20260908.png"/>
+  <meta property="og:image" content="https://ac-opensource.github.io/assets/images/og/resume-cards-20261005.png"/>
   <meta property="og:image:type" content="image/png"/>
   <meta property="og:image:width" content="1200"/>
   <meta property="og:image:height" content="630"/>
-  <meta property="og:image:alt" content="Andrew V. Concepcion’s engineering résumé with Android, iOS, backend, and shared-native experience"/>
+  <meta property="og:image:alt" content="Andrew V. Concepcion’s résumé with contact details, professional summary, and focus areas"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="Engineering Résumé | Andrew Concepcion"/>
   <meta name="twitter:description" content="10+ years of Android, iOS, backend, and shared Rust experience, with production work in multichain wallets, streaming, and engineering leadership."/>
-  <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/resume-flight-recorder-20260908.png"/>
-  <meta name="twitter:image:alt" content="Andrew V. Concepcion’s engineering résumé with Android, iOS, backend, and shared-native experience"/>
+  <meta name="twitter:image" content="https://ac-opensource.github.io/assets/images/og/resume-cards-20261005.png"/>
+  <meta name="twitter:image:alt" content="Andrew V. Concepcion’s résumé with contact details, professional summary, and focus areas"/>
   <meta name="author" content="Andrew V. Concepcion"/>
   <script type="application/ld+json">
   {
@@ -33,7 +33,7 @@
     "@id": "https://ac-opensource.github.io/resume.html#profile-page",
     "url": "https://ac-opensource.github.io/resume.html",
     "name": "Engineering Résumé | Andrew Concepcion",
-    "description": "Andrew Concepcion's engineering flight record across Android, iOS, backend systems, shared Rust, technical leadership, and production delivery.",
+    "description": "Andrew Concepcion's résumé across Android, iOS, backend systems, shared Rust, technical leadership, and production delivery.",
     "mainEntity": { "@id": "https://ac-opensource.github.io/#person" },
     "isPartOf": { "@id": "https://ac-opensource.github.io/#website" }
   }
@@ -42,7 +42,7 @@
   <link rel="preload" href="/assets/fonts/manrope-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
   <link rel="preload" href="/assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
   <link href="/assets/css/site-fonts.css?v=20260819-local1" rel="stylesheet"/>
-  <link href="/assets/css/resume-dossier.css?v=20260907-reading2" rel="stylesheet"/>
+  <link href="/assets/css/resume-dossier.css?v=20261005-cards1" rel="stylesheet"/>
   <link href="/assets/css/universe-field-map.css?v=20261004-sky1" rel="stylesheet"/>
   <link href="/assets/css/universe-perspective-navigation.css?v=20260820-fast-travel1" rel="stylesheet" data-universe-perspective-styles/>
   <script src="/assets/js/universe-theme-transition.js?v=20260926-motion-lifecycle1"></script>
@@ -150,6 +150,21 @@
       }
     }
 
+    body.pdf-export #site-topbar,
+    body.pdf-export #site-footer,
+    body.pdf-export .no-print {
+      display: none !important;
+    }
+
+    body.pdf-export .print-shell {
+      padding-top: 3rem !important;
+    }
+
+    body.pdf-export .print-card {
+      border: 1px solid #d6dbd2 !important;
+      background: white !important;
+      box-shadow: none !important;
+    }
   </style>
 </head>
 <body class="font-body text-on-surface antialiased overflow-x-hidden" data-universe-region="resume">
@@ -177,13 +192,14 @@
     </nav>
   </header>
 
-  <main id="main" class="resume-dossier print-shell relative z-10 max-w-7xl mx-auto px-6 pt-32 md:pt-24 pb-12" data-resume-dossier data-active-signal="">
-    <section class="resume-dossier__identity mb-10 grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.9fr)] gap-6">
+
+  <main id="main" class="print-shell relative z-10 max-w-7xl mx-auto px-6 pt-32 md:pt-24 pb-12">
+    <section id="resume-snapshot" class="mb-10 grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.9fr)] gap-6">
       <article class="print-card bg-surface-container-low border border-outline-variant/20 p-8 md:p-10">
-        <div class="font-label text-tertiary text-sm tracking-widest mb-3 bracket-label">engineering_flight_recorder</div>
-        <h1 class="font-headline text-4xl md:text-6xl font-bold tracking-tighter text-on-background leading-[0.95]" aria-label="Andrew V. Concepcion"><span>Andrew V.</span> <span>Concepcion</span></h1>
+        <div class="font-label text-tertiary text-sm tracking-widest mb-3 bracket-label">resume_snapshot</div>
+        <h1 class="font-headline text-4xl md:text-6xl font-bold tracking-tight text-on-background leading-[0.95]">ANDREW V. CONCEPCION</h1>
         <p class="mt-4 text-lg md:text-xl text-secondary max-w-3xl font-light leading-relaxed">
-          AI-Native Software Engineer shipping production Android, iOS, backend, and shared-native systems—from multichain wallet flows and Rust/UniFFI to ITVX playback and release hardening.
+          AI-Native Software Engineer with deep platform knowledge, shipping high-output product work across Android, iOS, backend, and agent-first workflows.
         </p>
         <div class="mt-8 flex flex-wrap gap-3">
           <a class="inline-flex items-center gap-2 bg-primary text-on-primary px-5 py-3 font-label text-xs uppercase tracking-widest hover:bg-primary-dim transition-colors no-print" href="/resume_concepcion_andrew.pdf">
@@ -197,8 +213,8 @@
         </div>
       </article>
 
-      <section class="print-card bg-surface-container-highest border border-outline-variant/20 p-8 md:p-10" aria-label="Contact and profile links" data-resume-signature-visual data-search-exclude>
-        <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-5">[operator_registry]</div>
+      <aside class="print-card bg-surface-container-highest border border-outline-variant/20 p-8 md:p-10" aria-label="Contact details" data-resume-signature-visual data-search-exclude>
+        <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-5">[contact_matrix]</div>
         <div class="space-y-5 text-sm">
           <div class="border-b border-outline-variant/20 pb-4">
             <div class="font-label text-[10px] uppercase tracking-widest text-outline mb-2">[phone]</div>
@@ -224,109 +240,74 @@
             <a class="text-on-surface font-medium hover:text-tertiary transition-colors" href="https://www.linkedin.com/in/aarconcepcion" target="_blank" rel="noreferrer">linkedin.com/in/aarconcepcion</a>
           </div>
         </div>
-      </section>
+      </aside>
     </section>
 
-    <section id="professional-summary" class="resume-dossier__summary mb-14 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6">
-      <article class="print-card bg-surface-container-low border border-outline-variant/20 p-8 md:p-10" data-signals="android architecture leadership fintech reliability cross-platform ai-assisted-delivery">
-        <div class="font-label text-tertiary text-sm tracking-widest mb-3 bracket-label">mission_brief</div>
+    <section id="professional-summary" class="mb-14 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6">
+      <article class="print-card bg-surface-container-low border border-outline-variant/20 p-8 md:p-10">
+        <div class="font-label text-tertiary text-sm tracking-widest mb-3 bracket-label">professional_summary</div>
         <p class="text-lg md:text-xl text-secondary leading-relaxed font-light max-w-4xl">
-          AI-native software engineer with 10+ years shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce. Recent work spans multichain wallet rewards and transactions, shared Rust services through UniFFI, and Android release hardening; earlier roles include ITVX playback and leading five senior Android engineers on MySTC. Kotlin and Jetpack Compose are home turf, with hands-on delivery across iOS, backend, product, and design.
+          AI-native software engineer with deep platform knowledge and 10+ years of experience shipping production systems across crypto, fintech, streaming, telecom, transport, rewards, safety, and e-commerce. Strong in Kotlin, Jetpack Compose, mobile architecture, performance tuning, release hardening, and third-party integrations. Known for agent-first execution, strong engineering judgment, and moving effectively across Android, iOS, backend, product, and design to ship reliable user-facing systems.
         </p>
       </article>
 
-      <section class="print-card bg-surface-container-low border border-outline-variant/20 p-8" aria-label="Résumé record index">
-        <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-4">[record_index]</div>
+      <aside class="print-card bg-surface-container-low border border-outline-variant/20 p-8" aria-label="Focus areas">
+        <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-4">[focus_areas]</div>
         <ul class="space-y-3 text-sm text-secondary">
-          <li class="border-b border-outline-variant/20 pb-3" data-signals="architecture cross-platform reliability">Multichain wallet, Bitcoin transaction, and shared-Rust delivery</li>
-          <li class="border-b border-outline-variant/20 pb-3" data-signals="android reliability">ITVX playback features and mobile reliability</li>
-          <li class="border-b border-outline-variant/20 pb-3" data-signals="android architecture leadership">Led five senior Android engineers on MySTC</li>
-          <li data-signals="cross-platform ai-assisted-delivery">Android, iOS, backend, release, and product collaboration</li>
+          <li class="border-b border-outline-variant/20 pb-3">Agent-first execution with evidence-backed verification</li>
+          <li class="border-b border-outline-variant/20 pb-3">Deep platform knowledge across Android, iOS, and backend</li>
+          <li class="border-b border-outline-variant/20 pb-3">Architecture leadership and fast, reliable delivery</li>
+          <li>Fintech-grade quality controls and release hardening</li>
         </ul>
-      </section>
+      </aside>
     </section>
-
-    <nav class="resume-local-map no-print" aria-label="Resume record sections">
-      <a href="#main"><span>00</span><strong>Cover</strong></a>
-      <a href="#core-skills"><span>01</span><strong>Systems</strong></a>
-      <a href="#experience"><span>02</span><strong>Flight record</strong></a>
-      <a href="#projects"><span>03</span><strong>Mission extracts</strong></a>
-    </nav>
-
-    <section id="signal-scanner" class="resume-signal-console no-print" data-signal-controls aria-labelledby="signal-filter-heading" hidden>
-      <div class="resume-signal-console__intro">
-        <p class="resume-signal-console__eyebrow">[RECORDER SIGNAL INDEX]</p>
-        <h2 id="signal-filter-heading">Engineering evidence across the record.</h2>
-        <p>Android, architecture, leadership, fintech, reliability, and cross-platform delivery recur across the roles and systems below.</p>
-      </div>
-      <div class="resume-signal-console__controls">
-        <p class="resume-signal-console__legend" id="signal-filter-legend">[SCAN BY SIGNAL]</p>
-        <div class="resume-signal-console__chips" role="group" aria-labelledby="signal-filter-legend">
-          <button class="signal-chip" type="button" data-signal="android" aria-pressed="false">Android</button>
-          <button class="signal-chip" type="button" data-signal="architecture" aria-pressed="false">Architecture</button>
-          <button class="signal-chip" type="button" data-signal="leadership" aria-pressed="false">Leadership</button>
-          <button class="signal-chip" type="button" data-signal="fintech" aria-pressed="false">Fintech</button>
-          <button class="signal-chip" type="button" data-signal="reliability" aria-pressed="false">Reliability</button>
-          <button class="signal-chip" type="button" data-signal="cross-platform" aria-pressed="false">Cross-platform</button>
-          <button class="signal-chip" type="button" data-signal="ai-assisted-delivery" aria-pressed="false">AI-assisted delivery</button>
-        </div>
-        <div class="resume-signal-console__actions">
-          <button class="signal-reset" type="button" data-signal-reset disabled>Show complete resume</button>
-          <button class="signal-print" type="button" data-print-resume>Print / save complete PDF</button>
-        </div>
-        <p class="resume-signal-console__status" id="signal-filter-status" role="status" aria-live="polite">All experience shown · choose a capability to highlight its evidence.</p>
-      </div>
-    </section>
-    <noscript>
-      <p class="resume-dossier__noscript no-print"><strong>JavaScript is off.</strong> The complete conventional resume remains visible and printable. Optional signal highlighting is unavailable.</p>
-    </noscript>
 
     <section id="core-skills" class="mb-14">
       <div class="mb-6 border-l-4 border-tertiary pl-6">
-        <div class="font-label text-tertiary text-sm tracking-widest mb-2">[systems_register]</div>
-        <h2 class="font-headline text-4xl font-bold tracking-tighter text-on-background">Core systems</h2>
+        <div class="font-label text-tertiary text-sm tracking-widest mb-2">[core_stack]</div>
+        <h2 class="font-headline text-4xl font-bold tracking-tighter text-on-background">Core Skills</h2>
       </div>
       <div class="resume-skills-grid grid grid-cols-1 md:grid-cols-3 gap-6">
-        <article class="resume-skill print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="android">
+        <article class="resume-skill print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break">
           <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-4">[android]</div>
           <div class="flex flex-wrap gap-2 text-sm">
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="android">Kotlin</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="android">Java</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="android">Jetpack Compose</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="android">XML layouts</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="android">Android SDK</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="android">Coroutines</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="android">Flow</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="android">RxJava</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="android">RxKotlin</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Kotlin</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Java</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Jetpack Compose</span>
+            <span class="px-3 py-1 bg-surface-container-highest">XML layouts</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Android SDK</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Coroutines</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Flow</span>
+            <span class="px-3 py-1 bg-surface-container-highest">RxJava</span>
+            <span class="px-3 py-1 bg-surface-container-highest">RxKotlin</span>
           </div>
         </article>
-        <article class="resume-skill print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="architecture reliability">
+        <article class="resume-skill print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break">
           <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-4">[architecture]</div>
           <div class="flex flex-wrap gap-2 text-sm">
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="architecture">Clean Architecture</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="architecture">MVVM</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="architecture">Modularization</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="architecture">SDK integration</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="reliability">Unit testing</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="reliability">CI/CD</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="reliability">Release hardening</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="reliability">Performance tuning</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Clean Architecture</span>
+            <span class="px-3 py-1 bg-surface-container-highest">MVVM</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Modularization</span>
+            <span class="px-3 py-1 bg-surface-container-highest">SDK integration</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Unit testing</span>
+            <span class="px-3 py-1 bg-surface-container-highest">CI/CD</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Release hardening</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Performance tuning</span>
           </div>
         </article>
-        <article class="resume-skill print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="cross-platform">
+        <article class="resume-skill print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break">
           <div class="font-label text-[10px] tracking-widest uppercase text-outline mb-4">[cross_platform_adjacent]</div>
           <div class="flex flex-wrap gap-2 text-sm">
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="cross-platform">Compose Multiplatform</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="cross-platform">Kotlin Multiplatform</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="cross-platform">Rust</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="cross-platform">UniFFI</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="cross-platform">SwiftUI</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="cross-platform">Swift</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="cross-platform">Firebase</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="cross-platform">Retrofit</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="cross-platform">SQLite</span>
-            <span class="px-3 py-1 bg-surface-container-highest" data-signals="cross-platform">REST APIs</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Compose Multiplatform</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Kotlin Multiplatform</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Rust</span>
+            <span class="px-3 py-1 bg-surface-container-highest">UniFFI</span>
+            <span class="px-3 py-1 bg-surface-container-highest">SwiftUI</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Swift</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Firebase</span>
+            <span class="px-3 py-1 bg-surface-container-highest">Retrofit</span>
+            <span class="px-3 py-1 bg-surface-container-highest">SQLite</span>
+            <span class="px-3 py-1 bg-surface-container-highest">REST APIs</span>
           </div>
         </article>
       </div>
@@ -334,55 +315,46 @@
 
     <section id="experience" class="mb-14">
       <div class="mb-6 border-l-4 border-tertiary pl-6">
-        <div class="font-label text-tertiary text-sm tracking-widest mb-2">[chronological_flight_record]</div>
-        <h2 class="font-headline text-4xl font-bold tracking-tighter text-on-background">Experience recorder</h2>
-        <p class="mt-3 max-w-4xl text-sm leading-relaxed text-secondary"><strong class="text-on-background">Evidence key:</strong> A public product listing confirms public availability; a first-person project note is my account of the work; and “Source implementation private” means the underlying code is not publicly inspectable. Unlinked scale figures are historical product-scale figures from the period of my work.</p>
+        <div class="font-label text-tertiary text-sm tracking-widest mb-2">[career_trajectory]</div>
+        <h2 class="font-headline text-4xl font-bold tracking-tighter text-on-background">Experience</h2>
       </div>
       <div class="resume-role-list space-y-6">
-        <article id="experience-bitcoin" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break" data-record="01" data-signals="android architecture leadership reliability cross-platform ai-assisted-delivery">
+        <article id="experience-bitcoin" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break">
           <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <div class="font-headline text-2xl font-bold tracking-tight">AI-Native Software Engineer</div>
+              <h3 class="font-headline text-2xl font-bold tracking-tight">AI-Native Software Engineer</h3>
               <div class="mt-2 text-secondary text-lg font-light">Bitcoin.com</div>
               <div class="mt-2 font-label text-[10px] uppercase tracking-widest text-tertiary">Bitcoin.com Wallet — Self-custody crypto wallet</div>
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2024 — Present</div>
           </div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
-            <li data-signals="android architecture leadership cross-platform">Led the foundation and first end-to-end Android implementation of a multichain rewards platform, then built reward-backed crypto market predictions and moved their service layer into shared Rust through UniFFI.</li>
-            <li data-signals="architecture leadership reliability">Co-built Bitcoin replace-by-fee with fee-aware UTXO validation, speed-up/cancel flows, reusable transaction preparation and signing, opt-out controls, and dust protection; led an in-app single-chain-to-multichain wallet migration.</li>
-            <li data-signals="android architecture reliability">Modernized staking and liquidity-reward pool reads from legacy RPC to typed REST, shipped provider-aware swap routing and recurring-buy reminders, and hardened startup, native builds, CI, and Android releases.</li>
+            <li>Led the foundation and first end-to-end Android implementation of a multichain rewards platform, then built reward-backed crypto market predictions and moved their service layer into shared Rust through UniFFI.</li>
+            <li>Co-built Bitcoin replace-by-fee with fee-aware UTXO validation, speed-up/cancel flows, reusable transaction preparation and signing, opt-out controls, and dust protection; led an in-app single-chain-to-multichain wallet migration.</li>
+            <li>Modernized staking and liquidity-reward pool reads from legacy RPC to typed REST, shipped provider-aware swap routing and recurring-buy reminders, and hardened startup, native builds, CI, and Android releases.</li>
           </ul>
         </article>
 
-        <article id="experience-candyspace" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break" data-record="02" data-signals="android reliability">
+        <article id="experience-candyspace" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break">
           <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <div class="font-headline text-2xl font-bold tracking-tight">Senior Mobile Developer</div>
+              <h3 class="font-headline text-2xl font-bold tracking-tight">Senior Mobile Developer</h3>
               <div class="mt-2 text-secondary text-lg font-light">Candyspace</div>
               <div class="mt-2 font-label text-[10px] uppercase tracking-widest text-tertiary">ITVX — Streaming platform</div>
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2023 — Jun 2024</div>
           </div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
-            <li data-signals="android">Built a recommendations panel that appears during playback, coordinating its animations with player-control and button movement across phone and tablet layouts.</li>
-            <li data-signals="android">Independently delivered timeline scrubbing with a visual preview so viewers could see where playback would land before seeking.</li>
-            <li data-signals="android reliability">Fixed long-standing player issues and improved reliability with stronger error tracking, security fixes, and a Simple XML-to-Jackson migration.</li>
+            <li>Built a recommendations panel that appears during playback, coordinating its animations with player-control and button movement across phone and tablet layouts.</li>
+            <li>Independently delivered timeline scrubbing with a visual preview so viewers could see where playback would land before seeking.</li>
+            <li>Fixed long-standing player issues and improved reliability with stronger error tracking, security fixes, and a Simple XML-to-Jackson migration.</li>
           </ul>
         </article>
 
-        <article id="experience-red-airship" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break" data-record="03" data-signals="android architecture fintech reliability">
+        <article id="experience-red-airship" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break">
           <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <div class="font-headline text-2xl font-bold tracking-tight">Senior Android Developer</div>
+              <h3 class="font-headline text-2xl font-bold tracking-tight">Senior Android Developer</h3>
               <div class="mt-2 text-secondary text-lg font-light">Red Airship</div>
               <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-label text-[10px] uppercase tracking-widest text-tertiary">
                 <span>OCBC — Mobile banking</span>
@@ -391,150 +363,109 @@
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2021 — Jun 2023</div>
           </div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-ocbc-banking-experience.html">First-person project note · OCBC</a>
-            <a class="resume-evidence-source" href="/blog/case-study-openpay-bnpl-experience.html">First-person project note · OpenPay</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
-            <li data-signals="android fintech">Built and launched OCBC Business mobile banking flows spanning onboarding, account dashboards, transfers, and digital account opening.</li>
-            <li data-signals="android architecture fintech reliability">Integrated third-party SDKs, refactored selected modules to reduce coupling, and improved unit-test coverage for critical fintech flows.</li>
-            <li data-signals="android fintech reliability">Improved OpenPay checkout reliability, UI responsiveness, partner-integrated payment flows, and release hardening.</li>
+            <li>Built and launched OCBC Business mobile banking flows spanning onboarding, account dashboards, transfers, and digital account opening.</li>
+            <li>Integrated third-party SDKs, refactored selected modules to reduce coupling, and improved unit-test coverage for critical fintech flows.</li>
+            <li>Improved OpenPay checkout reliability, UI responsiveness, partner-integrated payment flows, and release hardening.</li>
           </ul>
         </article>
 
-        <article id="experience-innovation-team" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break" data-record="04" data-signals="android architecture leadership reliability">
+        <article id="experience-innovation-team" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break">
           <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <div class="font-headline text-2xl font-bold tracking-tight">Lead Developer</div>
+              <h3 class="font-headline text-2xl font-bold tracking-tight">Lead Developer</h3>
               <div class="mt-2 text-secondary text-lg font-light">InnovationTeam</div>
               <div class="mt-2 font-label text-[10px] uppercase tracking-widest text-tertiary">MySTC — Telecom project</div>
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">May 2020 — Jun 2021</div>
           </div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-mystc-scale-and-reliability.html">First-person project note · MySTC</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
-            <li data-signals="android leadership">Led an offshore team of five senior Android engineers on MySTC, serving 10M+ installs across multilingual customer journeys.</li>
-            <li data-signals="android architecture leadership reliability">Drove Clean Architecture and MVVM adoption with RxJava and RxKotlin, improving modular boundaries and release confidence.</li>
-            <li data-signals="android reliability">Delivered performance, stability, and data synchronization improvements across account, ordering, and support flows.</li>
+            <li>Led an offshore team of five senior Android engineers on MySTC, serving 10M+ installs across multilingual customer journeys.</li>
+            <li>Drove Clean Architecture and MVVM adoption with RxJava and RxKotlin, improving modular boundaries and release confidence.</li>
+            <li>Delivered performance, stability, and data synchronization improvements across account, ordering, and support flows.</li>
           </ul>
         </article>
 
-        <article id="experience-ipara" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break" data-record="05" data-signals="android architecture leadership reliability cross-platform">
+        <article id="experience-ipara" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break">
           <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <div class="font-headline text-2xl font-bold tracking-tight">Team Lead</div>
+              <h3 class="font-headline text-2xl font-bold tracking-tight">Team Lead</h3>
               <div class="mt-2 text-secondary text-lg font-light">iPARA Technologies and Solutions</div>
               <div class="mt-2 font-label text-[10px] uppercase tracking-widest text-tertiary">OWTO — Ride-hailing service</div>
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2018 — May 2020</div>
           </div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-owto-ride-hailing-platform.html">First-person project note · OWTO</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
-            <li data-signals="android leadership cross-platform">Led cross-functional delivery across Android, iOS, and backend for a ride-hailing platform that grew to 500K+ downloads.</li>
-            <li data-signals="android architecture leadership">Architected the mobile app with Uber RIB-inspired patterns to support modular growth and clearer ownership boundaries.</li>
-            <li data-signals="reliability cross-platform">Improved booking reliability, payment-path handling, and backend API coordination for real-time transport flows.</li>
+            <li>Led cross-functional delivery across Android, iOS, and backend for a ride-hailing platform that grew to 500K+ downloads.</li>
+            <li>Architected the mobile app with Uber RIB-inspired patterns to support modular growth and clearer ownership boundaries.</li>
+            <li>Improved booking reliability, payment-path handling, and backend API coordination for real-time transport flows.</li>
           </ul>
         </article>
 
-        <article id="experience-yoyo" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break" data-record="06" data-signals="android leadership reliability">
+        <article id="experience-yoyo" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break">
           <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <div class="font-headline text-2xl font-bold tracking-tight">Senior Android Developer</div>
+              <h3 class="font-headline text-2xl font-bold tracking-tight">Senior Android Developer</h3>
               <div class="mt-2 text-secondary text-lg font-light">YOYO Holdings Pte. Ltd.</div>
               <div class="mt-2 font-label text-[10px] uppercase tracking-widest text-tertiary">PopSlide — Rewards platform</div>
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">Jun 2016 — Jun 2018</div>
           </div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-popslide-engagement-and-monetization.html">First-person project note · PopSlide</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
-            <li data-signals="android leadership">Led Android development for a rewards app with 1M+ downloads across Southeast Asia.</li>
-            <li data-signals="android reliability">Migrated large Java surfaces to Kotlin, reduced regressions in fragile areas, and shipped safer feature rollouts through A/B testing and guardrails.</li>
-            <li data-signals="android reliability">Improved API and caching behavior while keeping monetization-critical lockscreen and notification surfaces stable.</li>
+            <li>Led Android development for a rewards app with 1M+ downloads across Southeast Asia.</li>
+            <li>Migrated large Java surfaces to Kotlin, reduced regressions in fragile areas, and shipped safer feature rollouts through A/B testing and guardrails.</li>
+            <li>Improved API and caching behavior while keeping monetization-critical lockscreen and notification surfaces stable.</li>
           </ul>
         </article>
 
-        <article id="experience-isbx" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break" data-record="07" data-signals="android reliability cross-platform">
+        <article id="experience-isbx" class="resume-role print-card bg-surface-container-low border border-outline-variant/20 p-6 md:p-8 avoid-break">
           <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <div class="font-headline text-2xl font-bold tracking-tight">Full-Stack Web and Mobile Developer</div>
+              <h3 class="font-headline text-2xl font-bold tracking-tight">Full-Stack Web and Mobile Developer</h3>
               <div class="mt-2 text-secondary text-lg font-light">Internet Strategy Branding and Execution (ISBX)</div>
               <div class="mt-2 font-label text-[10px] uppercase tracking-widest text-tertiary">WebSafety — Parental controls</div>
             </div>
             <div class="font-label text-xs text-tertiary uppercase tracking-widest">May 2014 — Jun 2016</div>
           </div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-websafety-parental-controls.html">First-person project note · WebSafety</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
           <ul class="mt-5 space-y-3 text-secondary leading-relaxed list-disc pl-5">
-            <li data-signals="android cross-platform">Delivered end-to-end features for WebSafety across Android, iOS, web, and backend systems.</li>
-            <li data-signals="android reliability">Worked through undocumented Android APIs, GPS and sync reliability, and security-sensitive feature requirements.</li>
-            <li data-signals="reliability">Helped ship a robust parental-controls platform with stronger operational and compliance posture.</li>
+            <li>Delivered end-to-end features for WebSafety across Android, iOS, web, and backend systems.</li>
+            <li>Worked through undocumented Android APIs, GPS and sync reliability, and security-sensitive feature requirements.</li>
+            <li>Helped ship a robust parental-controls platform with stronger operational and compliance posture.</li>
           </ul>
         </article>
       </div>
     </section>
 
-    <section id="projects" class="resume-projects-section mb-14">
+    <section id="projects" class="mb-14">
       <div class="mb-6 border-l-4 border-tertiary pl-6">
-        <div class="font-label text-tertiary text-sm tracking-widest mb-2">[mission_extracts]</div>
-        <h2 class="font-headline text-4xl font-bold tracking-tighter text-on-background">Selected projects</h2>
+        <div class="font-label text-tertiary text-sm tracking-widest mb-2">[selected_projects]</div>
+        <h2 class="font-headline text-4xl font-bold tracking-tighter text-on-background">Projects</h2>
       </div>
       <div class="resume-projects-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
-        <article id="resume-project-bitcoin-wallet" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="android architecture reliability cross-platform">
-          <div class="font-headline text-2xl font-bold tracking-tight mb-3">Bitcoin.com Wallet</div>
+        <article id="resume-project-bitcoin-wallet" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break">
+          <h3 class="font-headline text-2xl font-bold tracking-tight mb-3">Bitcoin.com Wallet</h3>
           <p class="text-secondary leading-relaxed">Self-custody systems across multichain rewards, market predictions, Bitcoin transaction replacement, staking and liquidity pools, swaps, recurring-buy reminders, wallet migration, and shared Rust through UniFFI.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[self_custody]</div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=com.bitcoin.mwallet&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
         </article>
-        <article id="resume-project-itvx" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="android reliability">
-          <div class="font-headline text-2xl font-bold tracking-tight mb-3">ITVX</div>
+        <article id="resume-project-itvx" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break">
+          <h3 class="font-headline text-2xl font-bold tracking-tight mb-3">ITVX</h3>
           <p class="text-secondary leading-relaxed">Playback feature work on ITVX at Candyspace: in-player recommendations, independently delivered preview timeline scrubbing, tablet support, stronger error tracking, security fixes, and a Simple XML-to-Jackson migration.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[streaming]</div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="https://play.google.com/store/apps/details?id=air.ITVMobilePlayer&amp;hl=en" target="_blank" rel="noreferrer">Public product listing</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
         </article>
-        <article id="resume-project-ocbc" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="android fintech reliability">
-          <div class="font-headline text-2xl font-bold tracking-tight mb-3">OCBC</div>
+        <article id="resume-project-ocbc" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break">
+          <h3 class="font-headline text-2xl font-bold tracking-tight mb-3">OCBC</h3>
           <p class="text-secondary leading-relaxed">Mobile banking delivery for a major Singaporean bank, including onboarding, account dashboards, transfers, digital account opening, and guarded third-party SDK integration.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[fintech]</div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-ocbc-banking-experience.html">First-person project note · OCBC</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
         </article>
-        <article id="resume-project-openpay" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="android fintech reliability">
-          <div class="font-headline text-2xl font-bold tracking-tight mb-3">OpenPay</div>
+        <article id="resume-project-openpay" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break">
+          <h3 class="font-headline text-2xl font-bold tracking-tight mb-3">OpenPay</h3>
           <p class="text-secondary leading-relaxed">Fintech checkout, spending-limit, performance, and partner-integration work with an emphasis on reliable payment completion and release hardening.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[payments]</div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-openpay-bnpl-experience.html">First-person project note · OpenPay</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
         </article>
-        <article id="resume-project-mystc" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break" data-signals="android architecture leadership reliability">
-          <div class="font-headline text-2xl font-bold tracking-tight mb-3">MySTC</div>
+        <article id="resume-project-mystc" class="resume-project print-card bg-surface-container-low border border-outline-variant/20 p-6 avoid-break">
+          <h3 class="font-headline text-2xl font-bold tracking-tight mb-3">MySTC</h3>
           <p class="text-secondary leading-relaxed">Telecom-scale Android product serving 10M+ installs, where I led a team of five senior engineers and drove modular, multilingual stability improvements.</p>
           <div class="mt-5 font-label text-[10px] tracking-widest uppercase text-tertiary">[telecom_scale]</div>
-          <div class="resume-evidence-boundary">
-            <a class="resume-evidence-source" href="/blog/case-study-mystc-scale-and-reliability.html">First-person project note · MySTC</a>
-            <span class="resume-evidence-private">Source implementation private</span>
-          </div>
         </article>
       </div>
     </section>
@@ -551,7 +482,6 @@
       <a class="hover:text-[#1F5CBA] transition-colors" href="https://github.com/ac-opensource" target="_blank" rel="noreferrer">[github]</a>
     </div>
   </footer>
-  <script src="/assets/js/resume-dossier.js?v=20260812-motion1"></script>
   <script src="/assets/js/universe-field-map.js?v=20261004-sky1"></script>
 </body>
 </html>
