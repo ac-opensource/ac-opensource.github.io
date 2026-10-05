@@ -1122,7 +1122,7 @@
     trigger.type = "button";
     trigger.dataset.bandTrigger = band.id;
     trigger.setAttribute("aria-pressed", String(active));
-    trigger.setAttribute("aria-label", `${band.dataset.label}, ${band.axis.label}; ${band.nodes.length} equal signal points`);
+    trigger.setAttribute("aria-label", `${band.dataset.label}, ${band.axis.label}; ${band.nodes.length} signals, weighted equally`);
     trigger.append(
       element("span", "stellar-tree__branch-dataset", band.dataset.label),
       element("strong", "", band.axis.label),
