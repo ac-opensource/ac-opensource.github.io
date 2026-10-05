@@ -14,7 +14,7 @@ const socialPreviewContracts = [
   { path: '/blog/', canonicalUrl: 'https://ac-opensource.github.io/blog/', image: 'logs-spiral-galaxy.png' },
   { path: '/about.html', canonicalUrl: 'https://ac-opensource.github.io/about.html', image: 'about-butterfly-nebula-20260908.png' },
   { path: '/contact.html', canonicalUrl: 'https://ac-opensource.github.io/contact.html', image: 'contact-payload-integration-20260908.png' },
-  { path: '/resume.html', canonicalUrl: 'https://ac-opensource.github.io/resume.html', image: 'resume-flight-recorder-20260908.png' },
+  { path: '/resume.html', canonicalUrl: 'https://ac-opensource.github.io/resume.html', image: 'resume-cards-20261005.png' },
   { path: '/signals.html', canonicalUrl: 'https://ac-opensource.github.io/signals.html', image: 'signals-registry.png' },
   { path: '/search.html', canonicalUrl: 'https://ac-opensource.github.io/search.html', image: 'search-evidence-field.png' },
   { path: '/skills-graph.html', canonicalUrl: 'https://ac-opensource.github.io/about.html#profile-map', image: 'about-butterfly-nebula-20260908.png' },
@@ -1934,49 +1934,28 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
 
   const resumeStructure = await page.evaluate(() => ({
-    summaryBeforeScanner: document.querySelector('#professional-summary')?.compareDocumentPosition(
-      document.querySelector('#signal-scanner')
-    ) & Node.DOCUMENT_POSITION_FOLLOWING,
-    scannerBeforeSkills: document.querySelector('#signal-scanner')?.compareDocumentPosition(
+    summaryBeforeSkills: document.querySelector('#professional-summary')?.compareDocumentPosition(
       document.querySelector('#core-skills')
     ) & Node.DOCUMENT_POSITION_FOLLOWING,
     roles: document.querySelectorAll('.resume-role').length,
+    roleHeadings: document.querySelectorAll('.resume-role h3').length,
     roleBullets: document.querySelectorAll('.resume-role > ul > li').length,
     projects: document.querySelectorAll('.resume-project').length,
-    evidenceBoundaries: document.querySelectorAll('.resume-evidence-boundary').length,
+    projectHeadings: document.querySelectorAll('.resume-project > h3').length,
+    contactExcludedFromSearch: document.querySelector('[data-resume-signature-visual]')?.hasAttribute('data-search-exclude'),
+    name: document.querySelector('main h1')?.textContent.trim(),
   }));
   await assert(
-    Boolean(resumeStructure.summaryBeforeScanner)
-      && Boolean(resumeStructure.scannerBeforeSkills)
+    Boolean(resumeStructure.summaryBeforeSkills)
       && resumeStructure.roles === 7
+      && resumeStructure.roleHeadings === 7
       && resumeStructure.roleBullets === 21
       && resumeStructure.projects === 5
-      && resumeStructure.evidenceBoundaries === 12,
-    `Resume dossier structure/content changed: ${JSON.stringify(resumeStructure)}`
+      && resumeStructure.projectHeadings === 5
+      && resumeStructure.contactExcludedFromSearch === true
+      && resumeStructure.name === 'ANDREW V. CONCEPCION',
+    `Resume card structure/content changed: ${JSON.stringify(resumeStructure)}`
   );
-  await page.locator('[data-signal="android"]').click();
-  const resumeSignalState = await page.evaluate(() => ({
-    signal: new URL(location.href).searchParams.get('signal'),
-    active: document.querySelector('[data-resume-dossier]')?.dataset.activeSignal,
-    pressed: document.querySelector('[data-signal="android"]')?.getAttribute('aria-pressed'),
-    hiddenRoles: [...document.querySelectorAll('.resume-role')]
-      .filter((role) => getComputedStyle(role).display === 'none').length,
-    hiddenProjects: [...document.querySelectorAll('.resume-project')]
-      .filter((project) => getComputedStyle(project).display === 'none').length,
-    matches: document.querySelectorAll('[data-signals][data-signal-match="true"]').length,
-  }));
-  await assert(
-    resumeSignalState.signal === 'android'
-      && resumeSignalState.active === 'android'
-      && resumeSignalState.pressed === 'true'
-      && resumeSignalState.hiddenRoles === 0
-      && resumeSignalState.hiddenProjects === 0
-      && resumeSignalState.matches > 0,
-    `Resume signal scan hid or lost evidence: ${JSON.stringify(resumeSignalState)}`
-  );
-  await page.goBack({ waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => !new URL(location.href).searchParams.has('signal')
-    && document.querySelector('[data-resume-dossier]')?.dataset.activeSignal === '');
 
   // The About opening is a compact biography beside one directly manipulated
   // 3D nebula. Evidence stays exact and visible without a control dashboard.
