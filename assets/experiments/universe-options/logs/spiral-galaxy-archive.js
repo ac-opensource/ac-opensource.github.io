@@ -93,13 +93,14 @@
     stars: [],
     starSprites: [],
     nucleusSprite: null,
+    hazeSprite: null,
     gpu: null,
     rendererInitialized: false,
     // 1 is a formed galaxy; logs-motion.js can replay its formation from 0.
     formation: 1,
     width: 0
   };
-  const FORMATION_SECONDS = 3.6;
+  const FORMATION_SECONDS = 4.2;
 
   const normalize = (value) => String(value || "").trim().toLocaleLowerCase("en-US");
   const articleUrl = (post) => `/blog/${encodeURIComponent(post.slug)}.html`;
@@ -359,21 +360,27 @@
         uniform float orbital;
         uniform float formation;
         varying vec2 textureUv;
+        varying vec2 hazeUv;
+        varying float haze;
         varying float alpha;
         // Keep in step with formationPose() in the canvas fallback.
         float settleAt(float radius) {
           if (formation >= 1.0) return 1.0;
-          float local = clamp((formation - radius * 0.45) / 0.55, 0.0, 1.0);
+          float local = clamp((formation - radius * 0.5) / 0.5, 0.0, 1.0);
           return local * local * (3.0 - 2.0 * local);
         }
         void main() {
           vec2 point = position;
           alpha = opacity;
+          haze = 0.0;
+          // Gas uses the flat haze sprite (atlas cell 11) on the same quad corners.
+          hazeUv = vec2(0.75, 0.5) + step(0.0, position) * 0.25;
           if (orbital > 0.5) {
             float settle = anchor.z > 1.5 ? settleAt(orbit.y) : 1.0;
-            float bulge = smoothstep(0.02, 0.4, formation);
-            if (anchor.z > 1.5) point *= mix(2.1, 1.0, settle);
-            else if (anchor.z > 0.5) point *= mix(0.35, 1.0, bulge);
+            float stars = smoothstep(0.35, 0.85, settle);
+            float bulge = smoothstep(0.0, 0.45, formation);
+            if (anchor.z > 1.5) point *= mix(7.0, 1.0, stars);
+            else if (anchor.z > 0.5) point *= mix(0.5, 1.0, bulge);
             point += anchor.xy;
             if (anchor.z > 0.5) point += field.xy;
             if (anchor.z > 1.5) {
@@ -381,19 +388,24 @@
               float radius = orbit.y;
               vec2 axes = field.zw;
               if (settle < 1.0) {
-                // A diffuse, turbulent cloud contracts, spins up along the orbit
-                // direction, and flattens into the disk; stars light inside-out.
-                float cloud = 0.45 + orbit.y * 0.85 + 0.35 * fract(orbit.w * 1.618);
-                angle += (mod(orbit.w - angle, 6.2831853) + 6.2831853 * (0.6 + (1.0 - orbit.y) * 0.6)) * (1.0 - settle);
-                radius = mix(cloud, orbit.y, settle) + (1.0 - settle) * 0.05 * sin(orbit.w * 3.0 + elapsed * 1.1);
-                axes.y = mix(field.z, field.w, settle);
-                alpha *= (mix(0.16, 1.0, settle) + 0.55 * smoothstep(0.55, 0.85, settle) * (1.0 - smoothstep(0.85, 1.0, settle)))
-                  * smoothstep(0.0, 0.12, formation);
+                // Diffuse gas in a thick, irregular halo settles into the thin
+                // disk: a slight wind-up along the orbit plus scatter that
+                // converges into the arms, then stars form inside-out.
+                float scatter = fract(orbit.w * 4.3262379) - 0.5;
+                float cloud = orbit.y * 1.3 + 0.12 + 0.18 * fract(orbit.w * 1.618034);
+                angle += (1.0 - settle) * (0.7 * (1.0 - 0.4 * orbit.y) + scatter * 1.6);
+                radius = mix(cloud, orbit.y, settle) + (1.0 - settle) * 0.04 * sin(orbit.w * 3.0 + elapsed * 0.8);
+                axes.y = mix(field.z * 0.8, field.w, settle);
+                float ignite = smoothstep(0.6, 0.85, settle) * (1.0 - smoothstep(0.85, 1.0, settle));
+                haze = 1.0 - stars;
+                alpha *= mix(0.26, 1.0 + 0.45 * ignite, stars) * smoothstep(0.0, 0.15, formation);
               }
               point += vec2(cos(angle), sin(angle)) * radius * axes;
               alpha *= mix(0.9 + sin(elapsed * 0.45 + orbit.w) * 0.1, 1.0, reduced);
             } else if (anchor.z > 0.5) {
-              alpha *= bulge;
+              // The bulge glow condenses first; its bright core point follows.
+              bool corePoint = uv.x < 0.25 && uv.y < 0.25;
+              alpha *= corePoint ? smoothstep(0.25, 0.7, formation) : bulge;
             } else if (anchor.z < 0.5) {
               alpha *= mix(0.85 + sin(elapsed * 0.7 + orbit.w) * 0.15, 1.0, reduced);
             }
@@ -405,9 +417,12 @@
         precision mediump float;
         uniform sampler2D atlas;
         varying vec2 textureUv;
+        varying vec2 hazeUv;
+        varying float haze;
         varying float alpha;
         void main() {
           vec4 color = texture2D(atlas, textureUv);
+          if (haze > 0.001) color = mix(color, texture2D(atlas, hazeUv), haze);
           gl_FragColor = vec4(color.rgb, color.a * alpha);
         }`));
       gl.linkProgram(program);
@@ -430,7 +445,9 @@
         ctx.drawImage(sprite, index % 4 * 128, Math.floor(index / 4) * 128, 128, 128);
       });
       ctx.drawImage(canvasState.nucleusSprite, 256, 256, 128, 128);
-      // Cell 9 is an antialiased background star; cell 10 is the nucleus glow.
+      ctx.drawImage(canvasState.hazeSprite, 384, 256, 128, 128);
+      // Cell 9 is an antialiased background star; cell 10 is the nucleus glow;
+      // cell 11 is the broad, flat gas haze used while the galaxy forms.
       ctx.fillStyle = "rgb(195, 216, 239)";
       ctx.beginPath();
       ctx.arc(192, 320, 60, 0, Math.PI * 2);
@@ -572,6 +589,22 @@
     }
   }
 
+  // Forming gas: a broad, flat falloff with no bright centre, so neighbouring
+  // particles merge into one continuous cloud instead of separate bokeh.
+  function buildHazeSprite() {
+    const sprite = document.createElement("canvas");
+    sprite.width = sprite.height = 128;
+    const context = sprite.getContext("2d");
+    const glow = context.createRadialGradient(64, 64, 0, 64, 64, 64);
+    glow.addColorStop(0, "rgba(176, 200, 238, 0.42)");
+    glow.addColorStop(0.35, "rgba(160, 188, 232, 0.3)");
+    glow.addColorStop(0.68, "rgba(140, 172, 222, 0.1)");
+    glow.addColorStop(1, "rgba(122, 160, 214, 0)");
+    context.fillStyle = glow;
+    context.fillRect(0, 0, 128, 128);
+    return sprite;
+  }
+
   function buildNucleusSprite() {
     const sprite = document.createElement("canvas");
     sprite.width = sprite.height = 256;
@@ -605,6 +638,7 @@
     const budget = canvasState.budget || performanceBudgetFor(canvasState.width);
     if (!canvasState.starSprites.length) canvasState.starSprites = buildStarSprites();
     if (!canvasState.nucleusSprite) canvasState.nucleusSprite = buildNucleusSprite();
+    if (!canvasState.hazeSprite) canvasState.hazeSprite = buildHazeSprite();
     if (!canvasState.rendererInitialized) {
       canvasState.rendererInitialized = true;
       canvasState.gpu = createGpuRenderer();
@@ -687,11 +721,17 @@
       const tone = particle.tone < 0.12 ? 2 : particle.tone < 0.42 ? 1 : 0;
       const size = particle.spriteSize * (point.scale ?? 1);
       const alpha = particle.alpha * fade * shimmer * alphaMultiplier * (point.alpha ?? 1);
+      const haze = point.haze ?? 0;
       if (canvasState.gpu) {
-        canvasState.gpu.sprite(particle.spriteIndex, point.x + tidalX, point.y + tidalY, size, alpha);
+        if (haze > 0.001) canvasState.gpu.sprite(11, point.x + tidalX, point.y + tidalY, size, alpha * haze);
+        canvasState.gpu.sprite(particle.spriteIndex, point.x + tidalX, point.y + tidalY, size, alpha * (1 - haze));
         return;
       }
-      context.globalAlpha = alpha;
+      if (haze > 0.001) {
+        context.globalAlpha = alpha * haze;
+        context.drawImage(canvasState.hazeSprite, point.x + tidalX - size / 2, point.y + tidalY - size / 2, size, size);
+      }
+      context.globalAlpha = alpha * (1 - haze);
       context.drawImage(canvasState.starSprites[tone][particle.variant],
         point.x + tidalX - size / 2, point.y + tidalY - size / 2, size, size);
     });
@@ -713,30 +753,35 @@
       - (radius * geometry.twist + geometry.phase);
   }
 
-  // Galaxy formation, shared with the WebGL vertex shader: a diffuse, turbulent
-  // cloud contracts, spins up along the orbit direction, flattens into the
-  // inclined disk, and its stars light from the core outward.
+  // Galaxy formation, shared with the WebGL vertex shader: diffuse gas in a
+  // thick, irregular halo settles into the thin inclined disk with a slight
+  // wind-up along the orbit, the arms emerge from scatter, and stars form
+  // inside-out. Gas draws as soft haze that condenses into crisp stars.
+  const smoothstep = (from, to, value) => {
+    const t = Math.min(1, Math.max(0, (value - from) / (to - from)));
+    return t * t * (3 - 2 * t);
+  };
+
   function formationSettle(radius) {
     if (canvasState.formation >= 1) return 1;
-    const local = Math.min(1, Math.max(0, (canvasState.formation - radius * 0.45) / 0.55));
-    return local * local * (3 - 2 * local);
+    return smoothstep(0, 1, (canvasState.formation - radius * 0.5) / 0.5);
   }
 
   function formationPose(particle, angle, radius, radiusX, radiusY) {
     const settle = formationSettle(radius);
     if (settle >= 1) return null;
-    const turn = Math.PI * 2;
-    const cloud = 0.45 + radius * 0.85 + 0.35 * ((particle.phase * 1.618) % 1);
-    const lag = ((particle.phase - angle) % turn + turn) % turn;
-    const ignite = Math.min(1, Math.max(0, (settle - 0.55) / 0.3));
-    const fade = Math.min(1, Math.max(0, (settle - 0.85) / 0.15));
-    const fadeIn = Math.min(1, canvasState.formation / 0.12);
+    const fraction = (value) => value - Math.floor(value);
+    const scatter = fraction(particle.phase * 4.3262379) - 0.5;
+    const cloud = radius * 1.3 + 0.12 + 0.18 * fraction(particle.phase * 1.618034);
+    const stars = smoothstep(0.35, 0.85, settle);
+    const ignite = smoothstep(0.6, 0.85, settle) * (1 - smoothstep(0.85, 1, settle));
     return {
-      angle: angle + (lag + turn * (0.6 + (1 - radius) * 0.6)) * (1 - settle),
-      radius: cloud + (radius - cloud) * settle + (1 - settle) * 0.05 * Math.sin(particle.phase * 3 + canvasState.elapsed * 1.1),
-      radiusY: radiusX + (radiusY - radiusX) * settle,
-      alpha: (0.16 + 0.84 * settle + 0.55 * ignite * ignite * (3 - 2 * ignite) * (1 - fade * fade * (3 - 2 * fade))) * fadeIn * fadeIn * (3 - 2 * fadeIn),
-      scale: 2.1 - 1.1 * settle
+      angle: angle + (1 - settle) * (0.7 * (1 - 0.4 * radius) + scatter * 1.6),
+      radius: cloud + (radius - cloud) * settle + (1 - settle) * 0.04 * Math.sin(particle.phase * 3 + canvasState.elapsed * 0.8),
+      radiusY: radiusX * 0.8 + (radiusY - radiusX * 0.8) * settle,
+      alpha: (0.26 + (0.74 + 0.45 * ignite) * stars) * smoothstep(0, 0.15, canvasState.formation),
+      haze: 1 - stars,
+      scale: 7 - 6 * stars
     };
   }
 
@@ -861,18 +906,19 @@
     }
   }
 
-  function drawNucleus(context, x, y, radius, alpha = 1) {
+  function drawNucleus(context, x, y, radius, alpha = 1, coreAlpha = alpha) {
     context.save();
     context.globalCompositeOperation = "lighter";
     context.globalAlpha = alpha;
     if (canvasState.gpu) {
       canvasState.gpu.sprite(10, x, y, radius * 2, alpha);
-      canvasState.gpu.sprite(0, x, y, radius * 0.65, alpha);
+      canvasState.gpu.sprite(0, x, y, radius * 0.65, coreAlpha);
       context.restore();
       return;
     }
     context.drawImage(canvasState.nucleusSprite, x - radius, y - radius, radius * 2, radius * 2);
     const size = radius * 0.65;
+    context.globalAlpha = coreAlpha;
     context.drawImage(canvasState.starSprites[0][0], x - size / 2, y - size / 2, size, size);
     context.restore();
   }
@@ -1032,9 +1078,9 @@
           return { x: centerX + Math.cos(angle) * radius * radiusX,
             y: centerY + Math.sin(angle) * radius * radiusY * (merger.target ? 0.78 : 1) };
         }, clock);
-        const bulgeLinear = Math.min(1, Math.max(0, (canvasState.formation - 0.02) / 0.38));
-        const bulge = merger.target ? 1 : bulgeLinear * bulgeLinear * (3 - 2 * bulgeLinear);
-        drawNucleus(context, centerX, centerY, Math.min(radiusX, radiusY) * 0.4 * (0.35 + 0.65 * bulge), bulge);
+        const bulge = merger.target ? 1 : smoothstep(0, 0.45, canvasState.formation);
+        const corePoint = merger.target ? 1 : smoothstep(0.25, 0.7, canvasState.formation);
+        drawNucleus(context, centerX, centerY, Math.min(radiusX, radiusY) * 0.4 * (0.5 + 0.5 * bulge), bulge, corePoint);
       }
     }
     canvasState.gpu?.flush();

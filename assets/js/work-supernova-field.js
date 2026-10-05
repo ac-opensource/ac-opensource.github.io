@@ -73,11 +73,6 @@
       vec2 displaced=uv-flow*.075*envelope-direction*(wave*.012+front*.045)*envelope-drag;
       // Expansion follows irregular cloud density rather than drawing geometric rings.
       displaced=core+(displaced-core)/max(.045,size);
-      if(tension > 0.) {
-        float twist=tension*(1.-smoothstep(0.,.45,r))*1.6;
-        vec2 relative=displaced-core;
-        displaced=core+mat2(cos(twist),-sin(twist),sin(twist),cos(twist))*relative;
-      }
       vec3 ink;
       // burst: x flash, y signed zoom (negative pulls matter inward), z chromatic split.
       if(abs(burst.y) > .004 || burst.z > .0005) {
