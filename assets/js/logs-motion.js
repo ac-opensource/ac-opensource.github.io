@@ -46,7 +46,7 @@
   const form = () => {
     field.querySelectorAll(".galaxy-node").forEach((node) => {
       const radius = Number(node.dataset.progress) || 0;
-      node.style.setProperty("--node-form-at", (0.36 + radius * 0.45).toFixed(3));
+      node.style.setProperty("--node-form-at", (0.35 + radius * 0.5).toFixed(3));
     });
     hero.dispatchEvent(new CustomEvent("galaxy:form"));
   };

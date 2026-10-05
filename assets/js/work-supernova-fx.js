@@ -55,7 +55,6 @@
     let label = "";
     let ejecta = [];
     let knots = [];
-    let infall = [];
     let stars = [];
     let embers = [];
     let lastFrame = 0;
@@ -113,20 +112,6 @@
         size: 1.6 + random() * 1.4,
         family: FAMILIES[random() < 0.7 ? 0 : 1]
       }));
-      // Infall follows four spiral arms so the collapse reads as one accretion flow.
-      const arms = random() * TAU;
-      infall = Array.from({ length: Math.round(190 * density) }, (_, index) => {
-        const spawn = 0.12 + random() * 2.3;
-        return {
-          spawn,
-          duration: Math.max(0.32, Math.min(0.6 + random() * 0.85, 2.94 - spawn)),
-          radius: 0.36 + random() * 0.66,
-          angle: arms + (index % 4) * TAU / 4 + (random() - 0.5) * 0.7,
-          spin: 2 + random() * 1.1,
-          width: 0.45 + random() * 0.8,
-          color: [COLORS.cobalt, COLORS.teal, COLORS.periwinkle, COLORS.amber][Math.floor(random() * 4)]
-        };
-      });
       stars = Array.from({ length: Math.round(80 * density) }, () => ({
         radius: Math.sqrt(random()) * 0.82,
         angle: random() * TAU,
@@ -311,45 +296,13 @@
       }
       if (age >= DETONATE) return;
 
-      // Matter spirals into the core along curved, accelerating streaks.
-      for (let index = 0; index < infall.length; index += stride) {
-        const particle = infall[index];
-        const progress = (age - particle.spawn) / particle.duration;
-        if (progress <= 0 || progress >= 1) continue;
-        const point = (value) => {
-          const eased = Math.pow(value, 2.2);
-          const radius = particle.radius * (1 - eased) * unit;
-          const angle = particle.angle + particle.spin * eased;
-          return [x + Math.cos(angle) * radius, y + Math.sin(angle) * radius * 0.94];
-        };
-        const tail = Math.max(0, progress - 0.1 - progress * 0.08);
-        const alpha = smooth(0, 0.18, progress) * (1 - smooth(0.86, 1, progress)) * 0.85;
-        context.strokeStyle = rgba(blend(particle.color, COLORS.gold, smooth(0.4, 1, progress)), alpha);
-        context.lineWidth = particle.width * (0.7 + progress * 1.3);
-        context.beginPath();
-        for (let step = 0; step <= 4; step += 1) {
-          const [px, py] = point(tail + (progress - tail) * step / 4);
-          if (step) context.lineTo(px, py);
-          else context.moveTo(px, py);
-        }
-        context.stroke();
-      }
-
-      // A contracting ring is the last breath before ignition.
-      if (age > 2.45) {
-        const progress = smooth(2.45, 2.99, age);
-        const alpha = 0.75 * Math.pow(Math.sin(progress * Math.PI), 0.8);
-        const radius = unit * (0.3 * (1 - progress) + 0.012);
-        ring(x, y, radius, 2.4, [[0, COLORS.gold, 0], [0.5, blend(COLORS.cobalt, COLORS.gold, progress), alpha], [1, COLORS.cobalt, 0]]);
-      }
-
-      // The core heartbeat accelerates toward collapse, then pinches to a point.
+      // The core brightens unevenly as it nears collapse (irregular, not a
+      // rhythmic beat), then compresses to a point in the last instant.
       const tension = clamp(age / DETONATE);
-      const phase = 0.9 * age + 5.16 * Math.pow(tension, 3.2);
-      const beat = Math.exp(-(phase % 1) * 7);
+      const flicker = (Math.sin(age * 7.3) * 0.5 + Math.sin(age * 13.1 + 1.7) * 0.3 + Math.sin(age * 23.7 + 0.4) * 0.2) * tension;
       const pinch = 1 - 0.82 * smooth(2.72, 2.99, age);
-      const radius = (7 + 18 * Math.pow(tension, 1.4) + beat * 10 * tension) * pinch;
-      const intensity = clamp(0.35 + 0.6 * tension + beat * 0.25);
+      const radius = (7 + 18 * Math.pow(tension, 1.4)) * (1 + flicker * 0.06) * pinch;
+      const intensity = clamp(0.35 + 0.6 * tension + flicker * 0.12);
       glow(x, y, radius * 4.2, [[0, COLORS.white, intensity], [0.16, COLORS.cream, intensity * 0.9], [0.4, COLORS.gold, intensity * 0.45], [1, COLORS.amber, 0]]);
     };
 
