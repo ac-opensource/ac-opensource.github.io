@@ -170,6 +170,19 @@ button, input, textarea, select { font: inherit; }
   line-height: 1.65;
 }
 
+.payload-bay__direct {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  margin-top: 0.5rem;
+  color: var(--blue);
+  font: 600 0.68rem/1.3 var(--display);
+  letter-spacing: 0.02em;
+  text-underline-offset: 0.3em;
+}
+
+.payload-bay__direct:hover { color: var(--ink); }
+
 .payload-bay__demo {
   position: absolute;
   top: 5.2rem;
@@ -635,6 +648,7 @@ button, input, textarea, select { font: inherit; }
 .field-heading > span {
   color: var(--muted);
   font: 600 0.53rem/1 var(--display);
+  white-space: nowrap;
 }
 
 .bay-node input[type="text"],
@@ -662,7 +676,26 @@ button, input, textarea, select { font: inherit; }
 .bay-node textarea:focus,
 .bay-node select:focus {
   border-color: var(--blue);
-  box-shadow: 0 2px 0 var(--blue-soft);
+  box-shadow: 0 1px 0 var(--blue);
+}
+
+.bay-node input[type="radio"]:focus,
+.bay-node input[type="checkbox"]:focus { box-shadow: none; }
+
+.bay-node input[type="radio"]:focus-visible,
+.bay-node input[type="checkbox"]:focus-visible,
+.payload-bay__action button:focus-visible,
+.payload-bay__action a:focus-visible,
+.payload-bay__direct:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.bay-node input[type="text"]:user-invalid,
+.bay-node input[type="email"]:user-invalid,
+.bay-node textarea:user-invalid {
+  border-color: var(--red);
+  box-shadow: 0 1px 0 var(--red);
 }
 
 .bay-node input::placeholder,
@@ -745,6 +778,7 @@ button, input, textarea, select { font: inherit; }
   color: var(--blue);
   font: 700 0.6rem/1 var(--display);
   letter-spacing: 0.11em;
+  text-transform: uppercase;
 }
 
 .payload-bay__action {
@@ -1100,6 +1134,7 @@ button, input, textarea, select { font: inherit; }
   .option-bar,
   .payload-bay__visual,
   .payload-bay__demo,
+  .payload-bay__direct,
   .payload-bay__action > a { display: none !important; }
   .payload-bay,
   .payload-bay__intro,

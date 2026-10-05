@@ -8,6 +8,7 @@
   const adapter = window.ContactTransport;
   if (!form || !adapter) return;
 
+  const contactEmail = "aarconcepcion@gmail.com";
   const fallbackRuntime = Object.freeze({
     version: 1,
     enabled: false,
@@ -43,6 +44,7 @@
     receiptHeading: form.querySelector("[data-receipt-heading]"),
     receiptBody: form.querySelector("[data-receipt-body]"),
     receiptId: form.querySelector("[data-receipt-id]"),
+    receiptFallback: form.querySelector("[data-receipt-fallback]"),
     runtimeMessage: form.querySelector("[data-runtime-message]"),
     visual: form.querySelector("[data-payload-visual]"),
     submissionId: form.querySelector("[data-submission-id]"),
@@ -52,6 +54,7 @@
   };
   if (Object.values(elements).some(function (value) { return !value; })) return;
 
+  const defaultFallbackHref = elements.receiptFallback.getAttribute("href");
   const moduleNodes = Array.from(form.querySelectorAll("[data-module]"));
   const intentInputs = Array.from(form.querySelectorAll('input[name="intent"]'));
   const displayInputs = Array.from(form.querySelectorAll('input[name="publicDisplay"]'));
@@ -353,6 +356,17 @@
     return false;
   }
 
+  function missingLabel(moduleName) {
+    if (moduleName === "identity") return elements.name.value.trim() ? "a name of at least 2 characters" : "your name";
+    if (moduleName === "comms") return elements.email.value.trim() ? "a valid email address" : "your email";
+    if (moduleName === "payload") {
+      if (intent() !== "public") return "a message";
+      return elements.quote.value.trim() ? "consent to review the quote" : "the quote for review";
+    }
+    if (moduleName === "release") return "storage consent";
+    return "a payload topology";
+  }
+
   function setPart(moduleName, loaded) {
     const node = form.querySelector('[data-module="' + moduleName + '"]');
     if (node) node.classList.toggle("is-loaded", loaded);
@@ -375,6 +389,9 @@
       return loaded;
     });
     const count = states.filter(Boolean).length;
+    const missing = moduleNodes
+      .filter(function (_node, index) { return !states[index]; })
+      .map(function (node) { return missingLabel(node.dataset.module); });
     const ready = count === states.length;
     form.classList.toggle("is-ready", ready);
     form.style.setProperty("--payload-progress", (count / states.length * 100) + "%");
@@ -397,7 +414,7 @@
         ? "Payload stays local · the personal record service is not connected in this build."
         : ready
           ? "Payload integrated · ready to request a stored record."
-          : "Fairing open · " + (states.length - count) + " module" + (states.length - count === 1 ? "" : "s") + " incomplete · nothing recorded.";
+          : "Fairing open · still needed: " + missing.join(", ") + " · nothing recorded.";
     }
   }
 
@@ -424,8 +441,25 @@
     return value;
   }
 
+  function hideEmailFallback() {
+    elements.receiptFallback.hidden = true;
+    elements.receiptFallback.setAttribute("href", defaultFallbackHref);
+  }
+
+  function showEmailFallback(value) {
+    let href = defaultFallbackHref;
+    try {
+      href = adapter.buildMailto(value, contactEmail);
+    } catch (_error) {
+      // Keep the plain enquiry link when the payload cannot be encoded.
+    }
+    elements.receiptFallback.setAttribute("href", href);
+    elements.receiptFallback.hidden = false;
+  }
+
   function showReceipt(result) {
     elements.receipt.hidden = false;
+    hideEmailFallback();
     elements.receiptId.hidden = false;
     elements.receiptId.textContent = "OPAQUE RECEIPT · " + result.receiptId;
     if (result.state === adapter.STATES.PENDING_MODERATION) {
@@ -498,6 +532,7 @@
     terminalState = false;
     elements.retry.hidden = true;
     elements.receipt.hidden = true;
+    hideEmailFallback();
     clearAnimationTimers();
     form.classList.remove("is-sealing", "is-deploying", "is-deployed");
     update();
@@ -528,6 +563,7 @@
       elements.receiptHeading.textContent = "No stored record is being claimed.";
       elements.receiptBody.textContent = "The service did not return a valid persistence acknowledgement. Retry uses the same idempotency key unless you edit the payload.";
       elements.receiptId.hidden = true;
+      showEmailFallback(value);
       elements.retry.hidden = false;
       console.error("Configured Contact record request failed.", error);
       update();
@@ -549,6 +585,7 @@
     elements.submissionId.value = "";
     elements.receipt.hidden = true;
     elements.receiptId.hidden = true;
+    hideEmailFallback();
     elements.retry.hidden = true;
     elements.skip.hidden = true;
     elements.runtimeMessage.dataset.runtimeState = online() ? "online" : "offline";
@@ -599,7 +636,7 @@
     transport = adapter.create({
       config: runtime,
       location: window.location,
-      destination: "aarconcepcion@gmail.com",
+      destination: contactEmail,
       navigate: function () { throw new Error("Production Contact never opens an email client."); },
       fetchImpl: window.fetch.bind(window),
       iframeBridge: iframeBridge
