@@ -5,6 +5,14 @@
     // navigation. Keep the existing spatial fallback on slow WebGL backends.
     const gl = canvas.getContext("webgl", { alpha: true, antialias: false, depth: false, premultipliedAlpha: true, failIfMajorPerformanceCaveat: true });
     if (!gl) return null;
+    // Some drivers expose software rasterization as a regular GPU and do not
+    // report the caveat. Avoid compiling the volume shader on those backends.
+    const rendererInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    const rendererName = gl.getParameter(rendererInfo ? rendererInfo.UNMASKED_RENDERER_WEBGL : gl.RENDERER);
+    if (/swiftshader|llvmpipe|softpipe|software rasterizer/i.test(rendererName || "")) {
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      return null;
+    }
     let lost = false, disposed = false;
     const onLost = event => { event.preventDefault(); lost = true; };
     canvas.addEventListener("webglcontextlost", onLost);

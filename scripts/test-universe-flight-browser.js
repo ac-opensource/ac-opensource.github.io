@@ -94,6 +94,10 @@ async function waitForArrival(page) {
       log: window.__universeFlightLog,
       url: location.pathname,
       flight: document.documentElement.dataset.universeFlight || null,
+      animations: (window.__universeFlightAnimations || []).map((animation) => ({
+        pseudo: animation.effect?.pseudoElement, state: animation.playState, time: animation.currentTime,
+      })),
+      material: document.querySelector("[data-tree-material]")?.dataset.treeMaterial,
       snapshot: window.UniversePerspective?.snapshot(),
     })).catch((evaluateError) => evaluateError.message);
     throw new Error(`Arrival flight never started: ${JSON.stringify(state)}`);
