@@ -210,7 +210,7 @@ function injectBigBangLoader(html, relativePath) {
     'if(root.dataset.bigBang==="pending")delete root.dataset.bigBang;',
     '},900);',
     'var loader=document.createElement("script");',
-    'loader.src="/assets/js/big-bang-loader.js?v=20260819-performance2";',
+    'loader.src="/assets/js/big-bang-loader.js?v=20261005-fontsync1";',
     'loader.async=false;loader.dataset.bigBangRuntime="";document.head.append(loader);',
     '}());</script>'
   ].join("");

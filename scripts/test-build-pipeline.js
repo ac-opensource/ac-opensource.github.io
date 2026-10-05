@@ -206,7 +206,7 @@ function main() {
   const loaderEnhanced = injectBigBangLoader(loaderFixture, "work.html");
   if (!loaderEnhanced.includes('data-big-bang-bootstrap')
     || !loaderEnhanced.includes('/assets/css/big-bang-loader.css?v=20260819-performance2')
-    || !loaderEnhanced.includes('/assets/js/big-bang-loader.js?v=20260819-performance2')
+    || !loaderEnhanced.includes('/assets/js/big-bang-loader.js?v=20261005-fontsync1')
     || !loaderEnhanced.includes('root.dataset.bigBang="pending"')
     || !loaderEnhanced.includes('root.dataset.universePerspectiveTo==="work"')
     || !loaderEnhanced.includes('sessionStorage.getItem("ac.bigBangPortfolioPlayed.v1")')

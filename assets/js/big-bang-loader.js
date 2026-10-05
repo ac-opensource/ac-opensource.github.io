@@ -492,6 +492,40 @@
     return overlay;
   }
 
+  // Web fonts swap in after the landmarks are first measured on a cold visit,
+  // reflowing the hero under its locks. Re-measure the same elements once the
+  // fonts settle so the handoff still lands on the live interface.
+  function syncLandmarkGeometry() {
+    if (!state.active || state.revealStarted || !state.overlay) return;
+    const origin = resolveOrigin(state.profile);
+    const landmarks = state.landmarks.map(function (landmark) {
+      const rect = visibleRect(landmark.element);
+      if (!rect) return landmark;
+      return {
+        ...landmark,
+        height: rect.height,
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        x: clamp(rect.left + rect.width / 2, 8, window.innerWidth - 8),
+        y: clamp(rect.top + rect.height / 2, 8, window.innerHeight - 8)
+      };
+    });
+    state.origin = origin;
+    state.landmarks = landmarks;
+    root.style.setProperty("--big-bang-origin-x", `${origin.x.toFixed(1)}px`);
+    root.style.setProperty("--big-bang-origin-y", `${origin.y.toFixed(1)}px`);
+    for (const lock of state.overlay.querySelectorAll(".big-bang-loader__lock")) {
+      const landmark = landmarks[Number(lock.dataset.landmarkIndex)];
+      if (!landmark) continue;
+      lock.style.setProperty("--lock-height", `${landmark.height.toFixed(2)}px`);
+      lock.style.setProperty("--lock-left", `${landmark.left.toFixed(2)}px`);
+      lock.style.setProperty("--lock-top", `${landmark.top.toFixed(2)}px`);
+      lock.style.setProperty("--lock-width", `${landmark.width.toFixed(2)}px`);
+    }
+    state.matterRenderer?.updateGeometry(state.profile, origin, landmarks);
+  }
+
   function moveFocusToContent() {
     const main = document.querySelector("main");
     if (!main) return;
@@ -613,6 +647,9 @@
     root.dataset.bigBang = "running";
     root.append(state.overlay);
     emit("singularity", reason);
+    if (document.fonts && document.fonts.status === "loading") {
+      document.fonts.ready.then(syncLandmarkGeometry);
+    }
 
     window.requestAnimationFrame(function () {
       state.overlay?.classList.add("is-visible");
