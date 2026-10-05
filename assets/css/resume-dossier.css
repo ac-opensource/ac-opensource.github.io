@@ -43,6 +43,13 @@ html {
   }
 }
 
+/* Match the shared phone content gutter without changing the printed cards. */
+@media screen and (max-width: 480px) {
+  #main.print-shell {
+    padding-inline: 1.25rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

@@ -1483,6 +1483,8 @@
   function arrangeTreeLabels(projected, width, height) {
     const { controls, leaderLayer } = treeScene;
     leaderLayer.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    const compactLayout = mobileTreeInteraction.matches;
+    const minimumLabelY = compactLayout ? 32 : 94;
     width = Math.max(180, width - 76);
     const occupied = [];
     // Measure once per layout, before writing any label positions. Reading a
@@ -1502,12 +1504,12 @@
       const control = controls.get(key);
       const { w, h } = treeScene.labelSizes.get(key);
       const originX = clamp(point.x - w / 2, 4, Math.max(4, width - w - 4));
-      const originY = clamp(point.y - h / 2, width <= 720 ? 146 : 94, height - h - 8);
+      const originY = clamp(point.y - h / 2, minimumLabelY, height - h - 8);
       let best;
       branchPlacement: for (const dx of [0, -w - 8, w + 8]) {
         for (const dy of [0, -h - 8, h + 8, -2 * (h + 8), 2 * (h + 8)]) {
           const x = clamp(originX + dx, 4, Math.max(4, width - w - 4));
-          const y = clamp(originY + dy, width <= 720 ? 146 : 94, height - h - 8);
+          const y = clamp(originY + dy, minimumLabelY, height - h - 8);
           const overlap = occupied.reduce((total, box) => total
             + Math.max(0, Math.min(x + w + 4, box.x + box.w) - Math.max(x - 4, box.x))
             * Math.max(0, Math.min(y + h + 4, box.y + box.h) - Math.max(y - 4, box.y)), 0);
@@ -1525,28 +1527,72 @@
       occupied.push({ x, y, w, h });
     }
     const nodes = [...projected].filter(([key, point]) => key.startsWith("node:") && point.visible)
-      .sort((a, b) => a[1].y - b[1].y);
+      .sort((a, b) => {
+        if (compactLayout) {
+          // Place multiline labels before small ones fragment the free space.
+          const first = treeScene.labelSizes.get(a[0]);
+          const second = treeScene.labelSizes.get(b[0]);
+          return second.h - first.h || second.w - first.w || a[1].y - b[1].y;
+        }
+        return a[1].y - b[1].y;
+      });
     for (const [key, point] of nodes) {
       const control = controls.get(key);
       const label = control.querySelector(".stellar-spectrum__node-label");
       const { w, h } = treeScene.labelSizes.get(key);
       let best;
-      nodePlacement: for (const dy of [0, -18, 18, -36, 36, -54, 54, -72, 72, -90, 90]) {
+      // Try the nearest free edges of placed labels instead of stopping at a
+      // fixed 90px radius, which leaves dense branches overlapping on phones.
+      const originY = point.y - h / 2;
+      const candidates = [...new Set([
+        originY,
+        ...occupied.flatMap((box) => [box.y - h - 8, box.y + box.h + 8])
+      ].map((y) => clamp(y, minimumLabelY, height - h - 8)))]
+        .sort((first, second) => Math.abs(first - originY) - Math.abs(second - originY));
+      nodePlacement: for (const y of candidates) {
         for (const side of [1, -1]) {
           const x = clamp(point.x + (side === 1 ? 16 : -w - 16), 4, Math.max(4, width - w - 4));
-          const y = clamp(point.y + dy - h / 2, width <= 720 ? 146 : 94, height - h - 8);
           const overlap = occupied.reduce((total, box) => total
             + Math.max(0, Math.min(x + w + 3, box.x + box.w) - Math.max(x - 3, box.x))
             * Math.max(0, Math.min(y + h + 3, box.y + box.h) - Math.max(y - 3, box.y)), 0);
-          const score = overlap * 100 + Math.abs(dy) + (side === -1 ? 3 : 0);
-          if (!best || score < best.score) best = { x, y, w, h, score };
-          if (score === 0) break nodePlacement;
+          const score = overlap * 100 + Math.abs(y - originY) + (side === -1 ? 3 : 0);
+          if (!best || score < best.score) best = { x, y, w, h, score, overlap };
+          if (overlap === 0) break nodePlacement;
+        }
+      }
+      // Dense mobile branches can fill both sides of a star. Search nearby
+      // horizontal label edges too, while keeping the star itself in place.
+      if (best.overlap > 0) {
+        const originX = point.x + 16;
+        const horizontalCandidates = [...new Set([
+          originX,
+          point.x - w - 16,
+          4,
+          width - w - 4,
+          ...occupied.flatMap((box) => [box.x - w - 8, box.x + box.w + 8])
+        ].map((x) => clamp(x, 4, Math.max(4, width - w - 4))))]
+          .sort((first, second) => Math.abs(first - originX) - Math.abs(second - originX));
+        horizontalPlacement: for (const y of candidates) {
+          for (const x of horizontalCandidates) {
+            let overlap = 0;
+            for (const box of occupied) {
+              overlap += Math.max(0, Math.min(x + w + 3, box.x + box.w) - Math.max(x - 3, box.x))
+                * Math.max(0, Math.min(y + h + 3, box.y + box.h) - Math.max(y - 3, box.y));
+              if (overlap > best.overlap) break;
+            }
+            const score = overlap * 100 + Math.hypot(x - originX, y - originY);
+            if (overlap < best.overlap || (overlap === best.overlap && score < best.score)) {
+              best = { x, y, w, h, score, overlap };
+            }
+            if (overlap === 0) break horizontalPlacement;
+          }
         }
       }
       occupied.push(best);
       label.style.setProperty("--label-x", `${best.x - point.x}px`);
       label.style.setProperty("--label-y", `${best.y + h / 2 - point.y}px`);
-      if (Math.abs(best.y + h / 2 - point.y) > 12) {
+      if (Math.abs(best.y + h / 2 - point.y) > 12
+        || Math.min(Math.abs(best.x - point.x), Math.abs(best.x + w - point.x)) > 20) {
         let line = treeScene.leaderLines[leaderCount++];
         if (!line) {
           line = document.createElementNS(SVG_NS, "line");
@@ -1760,6 +1806,16 @@
           };
         })
       : [];
+    const toolbar = root.querySelector(".stellar-tree__toolbar");
+    if (toolbar) {
+      const bounds = toolbar.getBoundingClientRect();
+      if (bounds.width && bounds.height) protectedRects.push({
+        left: bounds.left - stageBounds.left - 8,
+        right: bounds.right - stageBounds.left + 8,
+        top: bounds.top - stageBounds.top - 8,
+        bottom: bounds.bottom - stageBounds.top + 8
+      });
+    }
     const protectedExtent = protectedRects.length ? {
       left: Math.min(...protectedRects.map((bounds) => bounds.left)),
       right: Math.max(...protectedRects.map((bounds) => bounds.right)),

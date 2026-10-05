@@ -59,9 +59,11 @@ html[data-logs-theme="dark"] .galaxy-categories button[data-saved-filter][aria-p
 /* In the site header the toggle reads like the neighbouring [search /] link. */
 #site-topbar .logs-theme-toggle--header {
   display: inline-flex;
-  min-height: 1.5rem;
+  min-width: 44px;
+  min-height: 44px;
   align-items: center;
-  margin-right: 1.1rem;
+  justify-content: center;
+  margin-block: -0.5rem;
   padding: 0;
   border: 0;
   border-radius: 0;
