@@ -45,7 +45,7 @@
     technical: "#2864c7",
     work: "#385f92"
   });
-  const geometry = Object.freeze({
+  const geometry = window.UniversePerspective?.model.galaxyGeometry || Object.freeze({
     arms: 4,
     centerX: 0.5,
     centerY: 0.52,
@@ -770,6 +770,7 @@
   }
 
   function orbitalAngle(particle, companion = false) {
+    if (!companion && geometry.angle) return geometry.angle(particle.radius, particle.arm, particle.angleJitter, canvasState.elapsed);
     const base = companion
       ? particle.arm * Math.PI + particle.radius * 7.3 - 1.08
       : particle.arm * Math.PI * 2 / geometry.arms + particle.radius * geometry.twist + geometry.phase;
@@ -1076,7 +1077,7 @@
   function drawGalaxy(time) {
     const context = canvasState.context;
     if (!context || !canvasState.width || !canvasState.height) return;
-    const delta = canvasState.lastDraw && shouldAnimateGalaxy()
+    const delta = canvasState.lastDraw && shouldAnimateGalaxy() && (!window.UniversePerspective || document.documentElement.dataset.universePerspective === "ready")
       ? Math.min(0.1, Math.max(0, (time - canvasState.lastDraw) / 1000)) : 0;
     canvasState.lastDraw = time;
     canvasState.elapsed += delta;
@@ -2264,6 +2265,21 @@
     requestAnimationFrame(syncCategoryRailAffordance);
     document.fonts?.ready.then(() => scheduleLabelCollisions({ updateFocus: true }));
   }
+
+  // Navigation samples the same live phase and actual responsive field. It
+  // never advances this clock independently of Pause or visibility handling.
+  window.UniverseGalaxy = Object.freeze({
+    snapshot() {
+      const core = elements.core.getBoundingClientRect();
+      const field = elements.field.getBoundingClientRect();
+      return {
+        elapsed: canvasState.elapsed, formation: canvasState.formation, paused: canvasState.paused,
+        mode: canvasState.merger.progress > 0 ? "encounter" : "spiral",
+        focus: { x: core.left + core.width / 2, y: core.top + core.height / 2,
+          r: field.width * geometry.radiusX, radiusX: field.width * geometry.radiusX, radiusY: field.height * geometry.radiusY },
+      };
+    },
+  });
 
   init().catch((error) => {
     console.error("Spiral galaxy archive unavailable", error);

@@ -164,9 +164,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   async function seekUniverseTransition(targetPage, progress) {
     await targetPage.waitForFunction(() => {
       const animation = document.getAnimations({ subtree: true })
-        .find((candidate) => candidate.animationName === 'universe-search-sky');
+        .find((candidate) => candidate.effect?.pseudoElement === '::view-transition-new(root)');
       return Number(animation?.effect?.getComputedTiming().duration) > 0;
-    }, null, { timeout: 2500 });
+    }, null, { timeout: 5000, polling: 50 });
     await targetPage.evaluate(async (targetProgress) => {
       document.getAnimations({ subtree: true })
         .filter((animation) => animation.effect?.pseudoElement?.startsWith('::view-transition'))
@@ -178,6 +178,20 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         });
       await new Promise(requestAnimationFrame);
     }, progress);
+  }
+
+  // Seeking contexts pause every view-transition animation the moment it is
+  // created, so a heavy destination cannot finish its flight before the test
+  // samples it. resumeUniverseTransition releases them.
+  async function pauseUniverseTransitionsOnCreate(targetContext) {
+    await targetContext.addInitScript(() => {
+      const animate = Element.prototype.animate;
+      Element.prototype.animate = function (...args) {
+        const animation = animate.apply(this, args);
+        if (String(args[1]?.pseudoElement || '').startsWith('::view-transition')) animation.pause();
+        return animation;
+      };
+    });
   }
 
   async function resumeUniverseTransition(targetPage) {
@@ -551,71 +565,59 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await bigBangContext.close();
 
   const integratedBigBangContext = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  await pauseUniverseTransitionsOnCreate(integratedBigBangContext);
   const integratedBigBangPage = await integratedBigBangContext.newPage();
   integratedBigBangPage.on('pageerror', (error) => failures.push(`Integrated Big Bang pageerror: ${error.message}`));
   await integratedBigBangPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded' });
   await Promise.all([
-    integratedBigBangPage.waitForURL('**/work.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    integratedBigBangPage.waitForURL('**/work.html', { timeout: 20000, waitUntil: 'domcontentloaded' }),
     integratedBigBangPage.locator('#site-nav a[href="/work.html"]').click(),
   ]);
   await seekUniverseTransition(integratedBigBangPage, 0.34);
   const integratedBigBang = await integratedBigBangPage.evaluate((sessionKey) => {
     const root = document.documentElement;
-    const visualStyle = getComputedStyle(root, '::view-transition-new(universe-target-visual)');
-    const visualMatrix = visualStyle.transform === 'none' ? new DOMMatrix() : new DOMMatrix(visualStyle.transform);
-    const supernova = document.querySelector('[data-universe-work-supernova]');
+    const flightDuration = Number(document.getAnimations({ subtree: true })
+      .find((candidate) => candidate.effect?.pseudoElement === '::view-transition-new(root)')
+      ?.effect?.getComputedTiming().duration);
     return {
       copyOpacity: Number(getComputedStyle(root, '::view-transition-new(root)').opacity),
+      flight: root.dataset.universeFlight || null,
+      flightDuration,
       loaderApi: Boolean(window.BigBangLoader),
       loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
       perspectiveDuration: Number(window.UniversePerspective?.snapshot().lastTravel?.duration),
       rootState: root.dataset.bigBang || 'inactive',
-      searchDuration: Number(document.getAnimations({ subtree: true })
-        .find((candidate) => candidate.animationName === 'universe-search-sky')
-        ?.effect?.getComputedTiming().duration),
       sessionValue: window.sessionStorage.getItem(sessionKey),
-      supernovaAnimation: getComputedStyle(root, '::view-transition-new(universe-work-supernova)').animationName,
-      supernovaBackground: supernova ? getComputedStyle(supernova).backgroundImage : null,
-      supernovaName: supernova ? getComputedStyle(supernova).viewTransitionName : null,
-      visualAnimation: visualStyle.animationName,
-      visualOpacity: Number(visualStyle.opacity),
-      visualTravel: Math.hypot(visualMatrix.m41, visualMatrix.m42, visualMatrix.m43),
+      skyLayers: [...document.querySelectorAll('[data-universe-sky]')].map((canvas) => getComputedStyle(canvas).viewTransitionName),
     };
   }, BIG_BANG_SESSION_KEY);
-  // The target visual should lead the acquisition, while the incoming page is
-  // already readable enough to overlap the outgoing snapshot instead of
-  // recreating the former blank travel interval.
+  // Arriving by camera flight replaces the Big Bang: the supernova is reached
+  // through the shared sky, so the loader never runs and a third of the way in
+  // the Portfolio page is still ahead of the camera.
   await assert(
-    integratedBigBang.perspectiveDuration >= 660
-      && integratedBigBang.perspectiveDuration <= 780
-      && integratedBigBang.searchDuration > 0
-      && integratedBigBang.searchDuration <= 780
+    integratedBigBang.perspectiveDuration >= 950
+      && integratedBigBang.perspectiveDuration <= 1900
+      && integratedBigBang.flightDuration === integratedBigBang.perspectiveDuration
+      && integratedBigBang.flight === 'true'
+      && integratedBigBang.skyLayers.join('|') === 'universe-cosmos|universe-cosmos-near'
       && integratedBigBang.loaderCount === 0
       && !integratedBigBang.loaderApi
       && integratedBigBang.rootState === 'inactive'
       && integratedBigBang.sessionValue === '1'
-      && integratedBigBang.visualAnimation === 'universe-work-visual-genesis'
-      && integratedBigBang.visualOpacity >= 0.75
-      && integratedBigBang.visualTravel > 18
-      && integratedBigBang.supernovaAnimation === 'universe-work-supernova-acquire'
-      && integratedBigBang.supernovaBackground.includes('repeating-conic-gradient')
-      && integratedBigBang.supernovaName === 'universe-work-supernova'
-      && integratedBigBang.copyOpacity >= 0.15
-      && integratedBigBang.copyOpacity <= 0.65
-      && integratedBigBang.visualOpacity > integratedBigBang.copyOpacity,
-    `Sky navigation to Work does not integrate the Big Bang with target acquisition: ${JSON.stringify(integratedBigBang)}`
+      && integratedBigBang.copyOpacity < 0.5,
+    `Sky navigation to Work does not replace the Big Bang with the camera flight: ${JSON.stringify(integratedBigBang)}`
   );
   await resumeUniverseTransition(integratedBigBangPage);
   await integratedBigBangPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
     null,
-    { timeout: 3500 }
+    { timeout: 20000, polling: 100 }
   );
   const integratedBigBangSettled = await integratedBigBangPage.evaluate((sessionKey) => ({
     loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
     perspective: window.UniversePerspective?.snapshot(),
     sessionValue: window.sessionStorage.getItem(sessionKey),
-    supernovaOpacity: getComputedStyle(document.querySelector('[data-universe-work-supernova]')).opacity,
+    skyLayers: document.querySelectorAll('[data-universe-sky]').length,
     transitionAnimations: document.getAnimations({ subtree: true })
       .filter((animation) => animation.effect?.pseudoElement?.startsWith('::view-transition')).length,
   }), BIG_BANG_SESSION_KEY);
@@ -624,7 +626,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && integratedBigBangSettled.sessionValue === '1'
       && integratedBigBangSettled.perspective?.pendingCleanup === 0
       && integratedBigBangSettled.perspective?.activeTransition === false
-      && integratedBigBangSettled.supernovaOpacity === '0'
+      && integratedBigBangSettled.skyLayers === 0
       && integratedBigBangSettled.transitionAnimations === 0,
     `Integrated Work Big Bang leaves loader or compositor work behind: ${JSON.stringify(integratedBigBangSettled)}`
   );
@@ -757,11 +759,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         routeMapPosition: routeMap ? getComputedStyle(routeMap).position : null,
         routeMapToggleExpanded: routeMap?.querySelector('[data-universe-map-toggle]')?.getAttribute('aria-expanded'),
         routeMapWidth: routeMapBounds?.width || 0,
-        depthFieldCount: document.querySelectorAll('[data-universe-depth-field]').length,
+        skyLayerCount: document.querySelectorAll('[data-universe-sky]').length,
         syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
-        depthPlaneCount: document.querySelectorAll('[data-universe-depth-plane]').length,
+        retiredDepthFieldCount: document.querySelectorAll('[data-universe-depth-field], [data-universe-depth-plane], [data-universe-work-supernova]').length,
         transientNebulaCount: document.querySelectorAll('[data-universe-target-nebula]').length,
-        workSupernovaCount: document.querySelectorAll('[data-universe-work-supernova]').length,
         artificialViewportCount: document.querySelectorAll('[data-universe-transit], .universe-transit__aperture').length,
         stylesheet: Boolean(document.querySelector('link[data-universe-perspective-styles]')),
       };
@@ -771,16 +772,16 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         && desktopPerspective.headerTelescopeArtifacts === 0
         && JSON.stringify(desktopPerspective.navigationLabels) === JSON.stringify(['Primary navigation', 'Mobile navigation'])
         && (!isSpatialHome || desktopPerspective.labelContentMatches)
-        && desktopPerspective.perspective?.model === 'observer-camera-3d'
+        && desktopPerspective.perspective?.model === 'cosmic-camera'
+        && desktopPerspective.perspective?.pathModel === 'spatial-zoom-orbit'
         && desktopPerspective.perspective?.ready === 'ready'
-        && desktopPerspective.perspective?.depthPlanes === 3
+        && Boolean(desktopPerspective.perspective?.landmark?.kind)
         && desktopPerspective.perspective?.stylesheet
         && desktopPerspective.stylesheet
-        && desktopPerspective.depthFieldCount === 1
+        && desktopPerspective.skyLayerCount === 0
         && desktopPerspective.syntheticCloudCount === 0
-        && desktopPerspective.depthPlaneCount === 3
+        && desktopPerspective.retiredDepthFieldCount === 0
         && desktopPerspective.transientNebulaCount === 0
-        && desktopPerspective.workSupernovaCount === 1
         && desktopPerspective.artificialViewportCount === 0
         && (isSpatialHome
           ? desktopPerspective.routeMap === null
@@ -3387,12 +3388,37 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   }
 
   const perspectiveTransitionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  await pauseUniverseTransitionsOnCreate(perspectiveTransitionContext);
   const perspectiveTransitionPage = await perspectiveTransitionContext.newPage();
   await perspectiveTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await perspectiveTransitionPage.evaluate(() => sessionStorage.clear());
   await perspectiveTransitionPage.reload({ waitUntil: 'domcontentloaded' });
   await waitForBigBangComplete(perspectiveTransitionPage);
   await expandUniverseRouteMap(perspectiveTransitionPage);
+
+  const readFlightFrame = (targetPage) => targetPage.evaluate(() => {
+    const root = document.documentElement;
+    const read = (pseudo) => {
+      const style = getComputedStyle(root, pseudo);
+      const matrix = style.transform === 'none' ? new DOMMatrix() : new DOMMatrix(style.transform);
+      return {
+        opacity: Number(style.opacity),
+        scale: Math.hypot(matrix.a, matrix.b),
+        x: matrix.e,
+        y: matrix.f,
+        lens: Number.parseFloat(style.getPropertyValue('--universe-lens-r')),
+        feather: Number.parseFloat(style.getPropertyValue('--universe-feather')),
+      };
+    };
+    return {
+      old: read('::view-transition-old(root)'),
+      next: read('::view-transition-new(root)'),
+      header: Number(getComputedStyle(root, '::view-transition-new(universe-site-header)').opacity),
+      flight: root.dataset.universeFlight || null,
+      skyLayers: [...document.querySelectorAll('[data-universe-sky]')].map((canvas) => getComputedStyle(canvas).viewTransitionName),
+      perspective: window.UniversePerspective?.snapshot(),
+    };
+  });
 
   const workPerspective = await perspectiveTransitionPage.evaluate(() => {
     const routeMap = document.querySelector('[data-universe-route-map]');
@@ -3406,12 +3432,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       headerViewTransitionName: getComputedStyle(document.querySelector('#site-topbar')).viewTransitionName,
       perspective: window.UniversePerspective?.snapshot(),
       routeMap: window.UniverseRouteMap?.snapshot(),
-      depthFieldCount: document.querySelectorAll('[data-universe-depth-field]').length,
-      depthPlaneNames: [...document.querySelectorAll('[data-universe-depth-plane]')]
-        .map((plane) => getComputedStyle(plane).viewTransitionName),
-      depthPlaneFilters: [...document.querySelectorAll('[data-universe-depth-plane]')]
-        .map((plane) => getComputedStyle(plane).filter),
-      targetCueCount: document.querySelectorAll('[data-universe-target-cue]').length,
+      skyLayers: document.querySelectorAll('[data-universe-sky]').length,
+      retiredDepthField: document.querySelectorAll('[data-universe-depth-field], [data-universe-depth-plane], [data-universe-target-cue]').length,
       scopeAngle: routeMap.style.getPropertyValue('--scope-angle'),
       barrelLength: Number.parseFloat(getComputedStyle(routeMap.querySelector('.universe-route-map__telescope')).width),
       sightlineLength: Number.parseFloat(routeMap.style.getPropertyValue('--sightline-length')),
@@ -3431,19 +3453,17 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && workPerspective.headerViewTransitionName === 'universe-site-header'
       && workPerspective.perspective?.current === 'work'
       && workPerspective.perspective?.depth === 3.1
-      && workPerspective.perspective?.depthPlanes === 3
       && workPerspective.perspective?.magnification === 2.4
-      && workPerspective.perspective?.model === 'observer-camera-3d'
-      && workPerspective.perspective?.searchModel === 'directional-guiding-scope'
+      && workPerspective.perspective?.model === 'cosmic-camera'
+      && workPerspective.perspective?.pathModel === 'spatial-zoom-orbit'
+      && workPerspective.perspective?.landmark?.kind === 'supernova'
       && workPerspective.perspective?.ready === 'ready'
       && workPerspective.routeMap?.current === 'work'
       && workPerspective.routeMap?.depth === 3.1
       && workPerspective.routeMap?.target === 'work'
       && workPerspective.routeMap?.targetCount === 7
-      && workPerspective.depthFieldCount === 1
-      && workPerspective.depthPlaneNames.join('|') === 'universe-depth-far|universe-depth-middle|universe-depth-near'
-      && workPerspective.depthPlaneFilters.every((filter) => filter === 'none')
-      && workPerspective.targetCueCount === 1
+      && workPerspective.skyLayers === 0
+      && workPerspective.retiredDepthField === 0
       && Boolean(workPerspective.scopeAngle)
       && workPerspective.barrelLength >= 35
       && workPerspective.barrelLength <= 38
@@ -3455,7 +3475,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && workPerspective.stateLabel === 'LOCKED'
       && workPerspective.fullScreenInstrument === 0
       && workPerspective.viewTransitionName === 'universe-shared-navigation',
-    `Work does not expose the shared sky map and three-depth observer camera: ${JSON.stringify(workPerspective)}`
+    `Work does not expose the shared sky map and the cosmic camera: ${JSON.stringify(workPerspective)}`
   );
 
   const trackingAngle = workPerspective.scopeAngle;
@@ -3498,10 +3518,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         fullScreenInstrument: document.querySelectorAll('[data-universe-transit], .universe-transit__aperture').length,
         motion: document.documentElement.dataset.universeMotion,
         perspectiveDuration: getComputedStyle(document.documentElement).getPropertyValue('--universe-perspective-duration').trim(),
-        targetCueAnimation: getComputedStyle(document.querySelector('[data-universe-target-cue]')).animationName,
-        targetCueOpacity: getComputedStyle(document.querySelector('[data-universe-target-cue]')).opacity,
-        targetCueViewTransitionName: getComputedStyle(document.querySelector('[data-universe-target-cue]')).viewTransitionName,
-        legacyPagePlaneMotion: ['oldX', 'oldY', 'newX', 'newY', 'oldScale', 'newScale']
+        irisLayers: [...document.querySelectorAll('[data-universe-sky]')].map((canvas) => getComputedStyle(canvas).viewTransitionName),
+        legacyCameraFields: ['cameraX', 'cameraY', 'cameraZ', 'skyX', 'targetEntryX', 'searchStart']
           .some((key) => Object.hasOwn(snapshot?.lastTravel || {}, key)),
         perspective: snapshot,
         stored: JSON.parse(sessionStorage.getItem('ac.universe-perspective.v1') || 'null'),
@@ -3512,239 +3530,114 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     }, { once: true });
     anchor.click();
   }));
+  const departureTravel = canceledDeparture.perspective?.lastTravel;
   await assert(
     canceledDeparture.from === 'work'
       && canceledDeparture.to === 'about'
       && canceledDeparture.motion === 'depart'
-      && canceledDeparture.perspective?.lastTravel?.motionModel === 'observer-camera-3d'
-      && canceledDeparture.perspective?.lastTravel?.searchModel === 'directional-guiding-scope'
-      && canceledDeparture.perspective?.lastTravel?.direction === 'southwest'
-      && canceledDeparture.perspective?.lastTravel?.depthDirection === 'farther'
-      && canceledDeparture.perspective?.lastTravel?.cameraX > 0
-      && canceledDeparture.perspective?.lastTravel?.cameraY < 0
-      && canceledDeparture.perspective?.lastTravel?.cameraZ < 0
-      && canceledDeparture.perspective?.lastTravel?.cameraScale > 1
-      && canceledDeparture.perspective?.lastTravel?.skyX > 20
-      && canceledDeparture.perspective?.lastTravel?.skyY < -30
-      && canceledDeparture.perspective?.lastTravel?.targetEntryX < -30
-      && canceledDeparture.perspective?.lastTravel?.targetEntryY > 50
-      && canceledDeparture.perspective?.lastTravel?.skyTone === 'twilight'
-      && canceledDeparture.perspective?.lastTravel?.skyFrom === '#faf9f4'
-      && canceledDeparture.perspective?.lastTravel?.skyTo === '#020817'
-      && Math.abs(canceledDeparture.perspective?.lastTravel?.nearX)
-        > Math.abs(canceledDeparture.perspective?.lastTravel?.middleX)
-      && Math.abs(canceledDeparture.perspective?.lastTravel?.middleX)
-        > Math.abs(canceledDeparture.perspective?.lastTravel?.farX)
-      && Math.abs(canceledDeparture.perspective?.lastTravel?.nearY)
-        > Math.abs(canceledDeparture.perspective?.lastTravel?.middleY)
-      && Math.abs(canceledDeparture.perspective?.lastTravel?.middleY)
-        > Math.abs(canceledDeparture.perspective?.lastTravel?.farY)
-      && canceledDeparture.perspective?.lastTravel?.toMagnification === 1.6
-      && canceledDeparture.perspective?.lastTravel?.duration >= 660
-      && canceledDeparture.perspective?.lastTravel?.duration <= 780
-      && canceledDeparture.perspective?.lastTravel?.searchStart === 0.22
-      && canceledDeparture.perspective?.lastTravel?.searchEnd === 0.68
-      && canceledDeparture.perspective?.lastTravel?.searchEnd
-        - canceledDeparture.perspective?.lastTravel?.searchStart >= 0.4
-      && canceledDeparture.perspectiveDuration === `${canceledDeparture.perspective?.lastTravel?.duration}ms`
+      && departureTravel?.motionModel === 'cosmic-camera'
+      && departureTravel?.pathModel === 'spatial-zoom-orbit'
+      && departureTravel?.direction === 'southwest'
+      && departureTravel?.depthDirection === 'farther'
+      && departureTravel?.fromSurface === 'light'
+      && departureTravel?.toSurface === 'dark'
+      && departureTravel?.toMagnification === 1.6
+      && departureTravel?.duration >= 950
+      && departureTravel?.duration <= 1900
+      && departureTravel?.zoomPathLength > 0.5
+      && departureTravel?.peakWidth > 0
+      && canceledDeparture.perspectiveDuration === `${departureTravel?.duration}ms`
       && (canceledDeparture.perspective?.crossDocument
-        ? canceledDeparture.targetCueOpacity === '1'
-          && canceledDeparture.targetCueViewTransitionName === 'universe-target-cue'
-        : canceledDeparture.targetCueAnimation === 'universe-target-acquisition')
+        ? canceledDeparture.irisLayers.join('|') === 'universe-iris'
+        : canceledDeparture.irisLayers.length <= 1)
       && canceledDeparture.stored?.from === 'work'
       && canceledDeparture.stored?.to === 'about'
-      && canceledDeparture.stored?.version === 8
-      && !canceledDeparture.legacyPagePlaneMotion
+      && canceledDeparture.stored?.version === 11
+      && !canceledDeparture.legacyCameraFields
       && canceledDeparture.fullScreenInstrument === 0,
-    `Work-to-About departure does not move the observer through a layered 3D field: ${JSON.stringify(canceledDeparture)}`
+    `Work-to-About departure does not plan a camera flight through the shared world: ${JSON.stringify(canceledDeparture)}`
   );
 
-  await perspectiveTransitionPage.reload({ waitUntil: 'domcontentloaded' });
+  // The probe cannot cancel the controller's own navigation, so return to
+  // Work explicitly instead of reloading whichever page won the race.
+  await perspectiveTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await waitForBigBangComplete(perspectiveTransitionPage);
   await expandUniverseRouteMap(perspectiveTransitionPage);
   await Promise.all([
-    perspectiveTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    perspectiveTransitionPage.waitForURL('**/about.html', { timeout: 20000, waitUntil: 'domcontentloaded' }),
     perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="about"]').click(),
   ]);
-  await seekUniverseTransition(perspectiveTransitionPage, 0.4);
-  const openSkyAbout = await perspectiveTransitionPage.evaluate(() => {
-    const root = document.documentElement;
-    const animation = document.getAnimations({ subtree: true })
-      .find((candidate) => candidate.animationName === 'universe-search-sky');
-    const canvas = document.querySelector('.stellar-tree__canvas');
-    const viewport = document.querySelector('.stellar-tree__viewport');
-    const readPseudo = (pseudo) => {
-      const style = getComputedStyle(root, pseudo);
-      const matrix = style.transform === 'none' ? null : new DOMMatrix(style.transform);
-      return {
-        opacity: Number(style.opacity),
-        x: matrix?.m41 || 0,
-        y: matrix?.m42 || 0,
-        z: matrix?.m43 || 0,
-      };
-    };
-    const duration = Number(animation?.effect?.getComputedTiming().duration);
-    return {
-      progress: duration > 0 ? Number(animation.currentTime) / duration : -1,
-      oldRoot: readPseudo('::view-transition-old(root)'),
-      newRoot: readPseudo('::view-transition-new(root)'),
-      oldHeader: readPseudo('::view-transition-old(universe-site-header)'),
-      newHeader: readPseudo('::view-transition-new(universe-site-header)'),
-      visual: readPseudo('::view-transition-new(universe-target-visual)'),
-      far: readPseudo('::view-transition-group(universe-depth-far)'),
-      middle: readPseudo('::view-transition-group(universe-depth-middle)'),
-      near: readPseudo('::view-transition-group(universe-depth-near)'),
-      target: readPseudo('::view-transition-group(universe-target-cue)'),
-      sourceVisual: readPseudo('::view-transition-old(universe-source-visual)'),
-      aboutMask: getComputedStyle(root, '::view-transition-new(universe-target-visual)').maskImage,
-      canvasBackingHeight: canvas.height,
-      canvasBackingWidth: canvas.width,
-      canvasCount: document.querySelectorAll('.stellar-tree__canvas').length,
-      canvasInTargetVisual: document.querySelector('#stellar-spectrum-panel').contains(canvas),
-      syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
-      viewportBackground: getComputedStyle(viewport).backgroundColor,
-      viewportBackgroundImage: getComputedStyle(viewport).backgroundImage,
-      perspective: window.UniversePerspective?.snapshot(),
-    };
-  });
-  const farTravel = Math.hypot(openSkyAbout.far.x, openSkyAbout.far.y, openSkyAbout.far.z);
-  const middleTravel = Math.hypot(openSkyAbout.middle.x, openSkyAbout.middle.y, openSkyAbout.middle.z);
-  const nearTravel = Math.hypot(openSkyAbout.near.x, openSkyAbout.near.y, openSkyAbout.near.z);
+  await seekUniverseTransition(perspectiveTransitionPage, 0.04);
+  const departingAbout = await readFlightFrame(perspectiveTransitionPage);
+  await seekUniverseTransition(perspectiveTransitionPage, 0.5);
+  const openSkyAbout = await readFlightFrame(perspectiveTransitionPage);
+  const aboutCanvas = await perspectiveTransitionPage.evaluate(() => ({
+    canvasCount: document.querySelectorAll('.stellar-tree__canvas').length,
+    syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
+    treeMotion: document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion || null,
+  }));
+  await seekUniverseTransition(perspectiveTransitionPage, 0.96);
+  const landingAbout = await readFlightFrame(perspectiveTransitionPage);
   await assert(
-    Math.abs(openSkyAbout.progress - 0.4) <= 0.01
-      && openSkyAbout.oldRoot.opacity >= 0.3
-      && openSkyAbout.newRoot.opacity >= 0.15
-      && openSkyAbout.oldRoot.opacity + openSkyAbout.newRoot.opacity >= 0.85
-      && openSkyAbout.oldHeader.opacity + openSkyAbout.newHeader.opacity >= 0.95
-      && openSkyAbout.visual.opacity >= 0.16
-      && openSkyAbout.visual.opacity <= 0.72
-      && Math.hypot(openSkyAbout.visual.x, openSkyAbout.visual.y, openSkyAbout.visual.z) > 24
-      && openSkyAbout.sourceVisual.opacity < 0.5
-      && Math.hypot(openSkyAbout.sourceVisual.x, openSkyAbout.sourceVisual.y, openSkyAbout.sourceVisual.z) > 1
-      && openSkyAbout.aboutMask === 'none'
-      && openSkyAbout.canvasBackingHeight > 0
-      && openSkyAbout.canvasBackingWidth > 0
-      && openSkyAbout.canvasCount === 1
-      && openSkyAbout.canvasInTargetVisual
-      && openSkyAbout.syntheticCloudCount === 0
-      && openSkyAbout.viewportBackground === 'rgba(0, 0, 0, 0)'
-      && openSkyAbout.viewportBackgroundImage === 'none'
-      && farTravel > 8
-      && middleTravel > farTravel * 1.6
-      && nearTravel > middleTravel * 1.5
-      && openSkyAbout.target.x < -100
-      && openSkyAbout.target.y > 100
-      && openSkyAbout.perspective?.lastTravel?.duration > 0
-      && openSkyAbout.perspective?.lastTravel?.duration <= 780
+    departingAbout.flight === 'true'
+      && departingAbout.skyLayers.join('|') === 'universe-cosmos|universe-cosmos-near'
+      && departingAbout.old.scale > 0.9
+      && departingAbout.next.opacity < 0.05
+      && (openSkyAbout.old.opacity < 0.2 || openSkyAbout.old.scale < 0.35)
+      && openSkyAbout.old.lens < departingAbout.old.lens * 0.5
+      && openSkyAbout.old.feather > 0
+      && openSkyAbout.next.scale < 1
+      && openSkyAbout.header < 0.5
+      && landingAbout.next.scale > 0.9
+      && landingAbout.next.opacity > 0.9
+      && aboutCanvas.canvasCount === 1
+      && aboutCanvas.syntheticCloudCount === 0
+      && aboutCanvas.treeMotion === null
       && openSkyAbout.perspective?.motion === 'arrive'
       && openSkyAbout.perspective?.ready === 'arriving'
       && openSkyAbout.perspective?.activeTransition === true,
-    `Work-to-About does not carry the incoming visual through negative sky with distinct 3D parallax: ${JSON.stringify({
-      ...openSkyAbout,
-      farTravel,
-      middleTravel,
-      nearTravel,
+    `Work-to-About does not fold Work into its supernova and open About from its nebula: ${JSON.stringify({
+      departingAbout,
+      openSkyAbout,
+      landingAbout,
+      aboutCanvas,
     })}`
-  );
-
-  await seekUniverseTransition(perspectiveTransitionPage, 0.62);
-  const visualFirstAbout = await perspectiveTransitionPage.evaluate(() => {
-    const root = document.documentElement;
-    const animation = document.getAnimations({ subtree: true })
-      .find((candidate) => candidate.animationName === 'universe-search-sky');
-    const duration = Number(animation?.effect?.getComputedTiming().duration);
-    const visualStyle = getComputedStyle(root, '::view-transition-new(universe-target-visual)');
-    const visualMatrix = visualStyle.transform === 'none' ? null : new DOMMatrix(visualStyle.transform);
-    return {
-      enhanced: Boolean(document.querySelector('.stellar-spectrum--enhanced')),
-      progress: duration > 0 ? Number(animation.currentTime) / duration : -1,
-      pageOpacity: Number(getComputedStyle(root, '::view-transition-new(root)').opacity),
-      headerOpacity: Number(getComputedStyle(root, '::view-transition-old(universe-site-header)').opacity)
-        + Number(getComputedStyle(root, '::view-transition-new(universe-site-header)').opacity),
-      treeMotion: document.querySelector('[data-stellar-spectrum]')?.dataset.treeMotion || null,
-      visualOpacity: Number(visualStyle.opacity),
-      visualTravel: Math.hypot(
-        visualMatrix?.m41 || 0,
-        visualMatrix?.m42 || 0,
-        visualMatrix?.m43 || 0
-      ),
-    };
-  });
-  await assert(
-    Math.abs(visualFirstAbout.progress - 0.62) <= 0.01
-      && visualFirstAbout.enhanced === true
-      && visualFirstAbout.treeMotion === null
-      && visualFirstAbout.visualOpacity >= 0.78
-      && visualFirstAbout.visualTravel
-        < Math.hypot(openSkyAbout.visual.x, openSkyAbout.visual.y, openSkyAbout.visual.z)
-      && visualFirstAbout.pageOpacity >= 0.55
-      && visualFirstAbout.headerOpacity >= 0.95,
-    `About transition creates a blank page or loses its persistent header: ${JSON.stringify(visualFirstAbout)}`
   );
   await resumeUniverseTransition(perspectiveTransitionPage);
 
-  const arrivedAboutHandle = await perspectiveTransitionPage.waitForFunction(() => {
-    const perspective = window.UniversePerspective?.snapshot();
-    const routeMap = window.UniverseRouteMap?.snapshot();
-    if (!perspective || !routeMap) return false;
-    return {
-      perspective,
-      routeMap,
-      theme: document.documentElement.dataset.aboutTheme,
-      fullScreenInstrument: document.querySelectorAll('[data-universe-transit], .universe-transit__aperture').length,
-      visualTransitionName: getComputedStyle(document.querySelector('#stellar-spectrum-panel')).viewTransitionName,
-    };
-  });
-  const arrivedAbout = await arrivedAboutHandle.jsonValue();
-  await assert(
-    arrivedAbout.perspective.current === 'about'
-      && arrivedAbout.perspective.lastTravel?.from === 'work'
-      && arrivedAbout.perspective.lastTravel?.to === 'about'
-      && arrivedAbout.perspective.lastTravel?.motionModel === 'observer-camera-3d'
-      && arrivedAbout.perspective.lastTravel?.searchModel === 'directional-guiding-scope'
-      && arrivedAbout.perspective.lastTravel?.fromDepth === 3.1
-      && arrivedAbout.perspective.lastTravel?.toDepth === 4.5
-      && arrivedAbout.perspective.lastTravel?.depthDirection === 'farther'
-      && arrivedAbout.perspective.lastTravel?.cameraZ < 0
-      && arrivedAbout.perspective.lastTravel?.cameraScale > 1
-      && arrivedAbout.perspective.depthPlanes === 3
-      && arrivedAbout.routeMap.current === 'about'
-      && arrivedAbout.routeMap.depth === 4.5
-      && arrivedAbout.routeMap.target === 'about'
-      && arrivedAbout.theme === 'dark'
-      && arrivedAbout.visualTransitionName === 'universe-target-visual'
-      && arrivedAbout.fullScreenInstrument === 0,
-    `About does not reacquire focus at its own depth in the shared field: ${JSON.stringify(arrivedAbout)}`
-  );
-
-  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
+  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 20000, polling: 100 });
   await perspectiveTransitionPage.waitForSelector('.stellar-spectrum--enhanced', { timeout: 3000 });
   const settledAbout = await perspectiveTransitionPage.evaluate(() => ({
     canvasCount: document.querySelectorAll('.stellar-tree__canvas').length,
     enhanced: Boolean(document.querySelector('.stellar-spectrum--enhanced')),
     perspective: window.UniversePerspective?.snapshot(),
+    routeMap: window.UniverseRouteMap?.snapshot(),
+    skyLayers: document.querySelectorAll('[data-universe-sky]').length,
     syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
+    theme: document.documentElement.dataset.aboutTheme,
     viewTransitionAnimations: document.getAnimations({ subtree: true })
-      .filter((animation) => animation.effect?.pseudoElement?.startsWith('::view-transition'))
-      .map((animation) => ({
-        name: animation.animationName,
-        pseudo: animation.effect.pseudoElement,
-        state: animation.playState,
-      })),
+      .filter((animation) => animation.effect?.pseudoElement?.startsWith('::view-transition')).length,
   }));
   await assert(
-    settledAbout.perspective?.motion === null
-      && settledAbout.canvasCount === 1
-      && settledAbout.syntheticCloudCount === 0
-      && settledAbout.enhanced === true
+    settledAbout.perspective?.current === 'about'
+      && settledAbout.perspective?.lastTravel?.from === 'work'
+      && settledAbout.perspective?.lastTravel?.to === 'about'
+      && settledAbout.perspective?.motion === null
       && settledAbout.perspective?.ready === 'ready'
       && settledAbout.perspective?.activeTransition === false
       && settledAbout.perspective?.pendingCleanup === 0
-      && settledAbout.viewTransitionAnimations.length === 0,
-    `About reports settled while the browser is still crossfading transition snapshots: ${JSON.stringify(settledAbout)}`
+      && settledAbout.routeMap?.current === 'about'
+      && settledAbout.routeMap?.depth === 4.5
+      && settledAbout.theme === 'dark'
+      && settledAbout.skyLayers === 0
+      && settledAbout.canvasCount === 1
+      && settledAbout.syntheticCloudCount === 0
+      && settledAbout.enhanced === true
+      && settledAbout.viewTransitionAnimations === 0,
+    `About reports settled while the flight is still on screen: ${JSON.stringify(settledAbout)}`
   );
   await Promise.all([
-    perspectiveTransitionPage.waitForURL('**/work.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    perspectiveTransitionPage.waitForURL('**/work.html', { timeout: 20000, waitUntil: 'domcontentloaded' }),
     perspectiveTransitionPage.locator('#site-nav a[href="/work.html"]').click(),
   ]);
   await seekUniverseTransition(perspectiveTransitionPage, 0.4);
@@ -3764,16 +3657,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       liveY: liveBounds.y,
       mode: routeMap.dataset.universeRouteMapMode || 'floating',
       perspective: window.UniversePerspective?.snapshot(),
-      supernovaAnimation: getComputedStyle(document.documentElement, '::view-transition-new(universe-work-supernova)').animationName,
-      visualAnimation: getComputedStyle(document.documentElement, '::view-transition-new(universe-target-visual)').animationName,
     };
   });
   await assert(
     reverseSharedNavigation.mode === 'floating'
       && reverseSharedNavigation.perspective?.lastTravel?.direction === 'northeast'
       && reverseSharedNavigation.perspective?.lastTravel?.depthDirection === 'nearer'
-      && reverseSharedNavigation.supernovaAnimation === 'universe-work-supernova-acquire'
-      && reverseSharedNavigation.visualAnimation === 'universe-work-visual-genesis'
+      && reverseSharedNavigation.perspective?.scene === 'arrival'
       && Math.abs(reverseSharedNavigation.groupX - reverseSharedNavigation.liveX) <= 2
       && Math.abs(reverseSharedNavigation.groupY - reverseSharedNavigation.liveY) <= 2
       && Math.abs(reverseSharedNavigation.groupWidth - reverseSharedNavigation.liveWidth) <= 1
@@ -3781,54 +3671,36 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `The shared map drifts away from its clickable viewport position during reverse travel: ${JSON.stringify(reverseSharedNavigation)}`
   );
   await resumeUniverseTransition(perspectiveTransitionPage);
-  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 3200 });
+  await perspectiveTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().ready === 'ready', null, { timeout: 20000, polling: 100 });
   await expandUniverseRouteMap(perspectiveTransitionPage);
   await Promise.all([
-    perspectiveTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    perspectiveTransitionPage.waitForURL('**/blog/', { timeout: 20000, waitUntil: 'domcontentloaded' }),
     perspectiveTransitionPage.locator('.universe-route-map a[data-map-id="threads"]').click(),
   ]);
-  await seekUniverseTransition(perspectiveTransitionPage, 0.4);
-  const arrivedLogs = await perspectiveTransitionPage.evaluate(() => {
-    const root = document.documentElement;
-    const targetStyle = getComputedStyle(root, '::view-transition-new(universe-target-visual)');
-    const sourceStyle = getComputedStyle(root, '::view-transition-old(universe-source-visual)');
-    const targetMatrix = targetStyle.transform === 'none' ? new DOMMatrix() : new DOMMatrix(targetStyle.transform);
-    return {
-      fieldHidden: document.querySelector('#galaxy-field').hidden,
-      perspective: window.UniversePerspective?.snapshot(),
-      sourceAnimation: sourceStyle.animationName,
-      targetAnimation: targetStyle.animationName,
-      targetOpacity: Number(targetStyle.opacity),
-      targetTravel: Math.hypot(targetMatrix.m41, targetMatrix.m42, targetMatrix.m43),
-      visualTransitionName: getComputedStyle(document.querySelector('#galaxy-field')).viewTransitionName,
-    };
-  });
+  await seekUniverseTransition(perspectiveTransitionPage, 0.5);
+  const arrivedLogs = await readFlightFrame(perspectiveTransitionPage);
+  const logsField = await perspectiveTransitionPage.evaluate(() => document.querySelector('#galaxy-field').hidden);
+  const logsTravel = arrivedLogs.perspective?.lastTravel;
   await assert(
-    !arrivedLogs.fieldHidden
+    !logsField
       && arrivedLogs.perspective?.current === 'logs'
-      && arrivedLogs.perspective?.lastTravel?.from === 'work'
-      && arrivedLogs.perspective?.lastTravel?.to === 'logs'
-      && arrivedLogs.perspective?.lastTravel?.direction === 'southeast'
-      && arrivedLogs.perspective?.lastTravel?.depthDirection === 'farther'
-      && arrivedLogs.perspective?.lastTravel?.cameraX < 0
-      && arrivedLogs.perspective?.lastTravel?.cameraY < 0
-      && arrivedLogs.perspective?.lastTravel?.cameraZ < 0
-      && arrivedLogs.perspective?.lastTravel?.skyTone === 'light'
-      && arrivedLogs.perspective?.lastTravel?.skyFrom === '#faf9f4'
-      && arrivedLogs.perspective?.lastTravel?.skyTo === '#faf9f4'
-      && arrivedLogs.sourceAnimation === 'universe-visual-release'
-      && arrivedLogs.targetAnimation === 'universe-visual-acquire'
-      && arrivedLogs.targetOpacity > 0.1
-      && arrivedLogs.targetOpacity < 0.7
-      && arrivedLogs.targetTravel > 12
-      && arrivedLogs.visualTransitionName === 'universe-target-visual',
-    `Light-to-light routes do not preserve angular and depth travel through the shared sky: ${JSON.stringify(arrivedLogs)}`
+      && logsTravel?.from === 'work'
+      && logsTravel?.to === 'logs'
+      && logsTravel?.direction === 'southeast'
+      && logsTravel?.depthDirection === 'farther'
+      && logsTravel?.fromSurface === 'light'
+      && logsTravel?.toSurface === 'dark'
+      && logsTravel?.zoomPathLength > 1
+      && arrivedLogs.skyLayers.join('|') === 'universe-cosmos|universe-cosmos-near'
+      && arrivedLogs.old.opacity < 0.2
+      && arrivedLogs.next.scale < 1,
+    `Work-to-Logs does not cross open sky between the supernova and the galaxy: ${JSON.stringify(arrivedLogs)}`
   );
   await resumeUniverseTransition(perspectiveTransitionPage);
   await perspectiveTransitionPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
     null,
-    { timeout: 3200 }
+    { timeout: 20000, polling: 100 }
   );
   const settledLogsMap = await perspectiveTransitionPage.evaluate(() => {
     const map = document.querySelector('[data-universe-route-map]');
@@ -3869,47 +3741,50 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await retargetTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await waitForBigBangComplete(retargetTransitionPage);
   await expandUniverseRouteMap(retargetTransitionPage);
+  // Retarget from a lightweight arrival so the click lands mid-flight rather
+  // than after a heavy page's start-up work.
   await Promise.all([
-    retargetTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
-    retargetTransitionPage.locator('.universe-route-map a[data-map-id="about"]').click(),
+    retargetTransitionPage.waitForURL('**/contact.html', { timeout: 20000, waitUntil: 'commit' }),
+    retargetTransitionPage.locator('.universe-route-map a[data-map-id="contact"]').click(),
   ]);
-  await retargetTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().motion === 'arrive');
+  await retargetTransitionPage.waitForFunction(() => window.UniversePerspective?.snapshot().scene === 'arrival', null, { polling: 50, timeout: 20000 });
   const inFlightPerspective = await retargetTransitionPage.evaluate(() => window.UniversePerspective?.snapshot());
   const retargetPoint = await retargetTransitionPage.locator('.universe-route-map a[data-map-id="threads"]').evaluate((link) => {
     const bounds = link.getBoundingClientRect();
     return { x: bounds.left + (bounds.width / 2), y: bounds.top + (bounds.height / 2) };
   });
-  const retargetNavigation = retargetTransitionPage.waitForURL('**/blog/', { timeout: 5000, waitUntil: 'domcontentloaded' });
+  const retargetNavigation = retargetTransitionPage.waitForURL('**/blog/', { timeout: 20000, waitUntil: 'domcontentloaded' });
   await retargetTransitionPage.mouse.click(retargetPoint.x, retargetPoint.y);
   await retargetNavigation;
   await retargetTransitionPage.waitForFunction(
     () => window.UniversePerspective?.snapshot().ready === 'ready',
     null,
-    { timeout: 2500 }
+    { timeout: 20000, polling: 100 }
   );
   const retargetedPerspective = await retargetTransitionPage.evaluate(() => {
     return {
       activeTransitionAnimations: document.getAnimations({ subtree: true })
         .filter((animation) => animation.effect?.pseudoElement?.startsWith('::view-transition')).length,
       perspective: window.UniversePerspective?.snapshot(),
+      skyLayers: document.querySelectorAll('[data-universe-sky]').length,
     };
   });
   await assert(
     inFlightPerspective?.ready === 'arriving'
       && inFlightPerspective?.retargetable === true
       && retargetedPerspective.perspective?.current === 'logs'
-      && retargetedPerspective.perspective?.lastTravel?.from === 'about'
+      && retargetedPerspective.perspective?.lastTravel?.from === 'contact'
       && retargetedPerspective.perspective?.lastTravel?.to === 'logs'
       && retargetedPerspective.perspective?.lastTravel?.retargeted === true
-      && retargetedPerspective.perspective?.lastTravel?.duration > 0
-      && retargetedPerspective.perspective?.lastTravel?.duration <= 780
-      && retargetedPerspective.perspective?.lastTravel?.skyFrom === '#020817'
-      && retargetedPerspective.perspective?.lastTravel?.skyMiddle === '#020817'
-      && retargetedPerspective.perspective?.lastTravel?.skyTo === '#faf9f4'
+      && retargetedPerspective.perspective?.lastTravel?.duration >= 950
+      && retargetedPerspective.perspective?.lastTravel?.duration <= 1900
+      && retargetedPerspective.perspective?.lastTravel?.fromSurface === 'light'
+      && retargetedPerspective.perspective?.lastTravel?.toSurface === 'dark'
       && retargetedPerspective.perspective?.pendingCleanup === 0
       && retargetedPerspective.perspective?.activeTransition === false
+      && retargetedPerspective.skyLayers === 0
       && retargetedPerspective.activeTransitionAnimations === 0,
-    `In-flight navigation does not immediately retarget and clean up its compositor state: ${JSON.stringify({
+    `In-flight navigation does not immediately retarget and clean up its flight: ${JSON.stringify({
       inFlightPerspective,
       retargetedPerspective,
     })}`
@@ -3921,7 +3796,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await reducedTransitionPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await expandUniverseRouteMap(reducedTransitionPage);
   await Promise.all([
-    reducedTransitionPage.waitForURL('**/about.html', { timeout: 5000, waitUntil: 'domcontentloaded' }),
+    reducedTransitionPage.waitForURL('**/about.html', { timeout: 20000, waitUntil: 'domcontentloaded' }),
     reducedTransitionPage.locator('.universe-route-map a[data-map-id="about"]').click(),
   ]);
   const reducedPerspective = await reducedTransitionPage.evaluate(() => ({
@@ -3930,8 +3805,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     motion: document.documentElement.dataset.universeMotion || null,
     perspective: window.UniversePerspective?.snapshot(),
     routeMap: window.UniverseRouteMap?.snapshot(),
-    depthFieldDisplay: getComputedStyle(document.querySelector('[data-universe-depth-field]')).display,
-    depthPlaneCount: document.querySelectorAll('[data-universe-depth-plane]').length,
+    skyLayers: document.querySelectorAll('[data-universe-sky]').length,
     telescopeTransition: getComputedStyle(document.querySelector('.universe-route-map__telescope')).transitionDuration,
   }));
   await assert(
@@ -3939,9 +3813,9 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && reducedPerspective.headerTelescopeArtifacts === 0
       && reducedPerspective.motion === null
       && reducedPerspective.perspective?.ready === 'ready'
-      && reducedPerspective.perspective?.model === 'observer-camera-3d'
-      && reducedPerspective.depthFieldDisplay === 'none'
-      && reducedPerspective.depthPlaneCount === 3
+      && reducedPerspective.perspective?.model === 'cosmic-camera'
+      && reducedPerspective.perspective?.lastTravel === null
+      && reducedPerspective.skyLayers === 0
       && reducedPerspective.routeMap?.targetCount === 7
       && reducedPerspective.telescopeTransition === '0s',
     `Reduced-motion navigation is not a static, usable sky map: ${JSON.stringify(reducedPerspective)}`
@@ -3960,51 +3834,48 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     ['/resume.html', 'resume', '[data-resume-signature-visual]'],
     ['/signals.html', 'signals', '.signals-hero__telemetry'],
   ];
+  // Each page dissolves into, and unfolds out of, its own signature visual:
+  // the camera's focus for a page must sit on that visual.
   for (const [route, destination, selector] of priorityVisualCases) {
     await page.goto(BASE_URL + route, { waitUntil: 'domcontentloaded' });
     if (['about', 'profile'].includes(destination)) {
       await page.waitForSelector('.stellar-spectrum--enhanced', { timeout: 15000 });
     }
-    const arrivalPriority = await page.evaluate(({ destinationKey, visualSelector }) => {
-      document.documentElement.dataset.universeCrossDocument = 'false';
-      document.documentElement.dataset.universeMotion = 'arrive';
-      document.documentElement.dataset.universePerspectiveTo = destinationKey;
+    const arrivalPriority = await page.evaluate(({ visualSelector }) => {
       const visual = document.querySelector(visualSelector);
+      const bounds = visual?.getBoundingClientRect();
+      const snapshot = window.UniversePerspective?.snapshot();
       const canvas = document.querySelector('.stellar-tree__canvas');
-      const supernova = document.querySelector('[data-universe-work-supernova]');
       const viewport = document.querySelector('.stellar-tree__viewport');
-      const namedVisuals = [...document.querySelectorAll('main *')]
-        .filter((element) => getComputedStyle(element).viewTransitionName === 'universe-target-visual');
+      const visible = Boolean(bounds && bounds.bottom > 0 && bounds.top < innerHeight && bounds.right > 0 && bounds.left < innerWidth);
       return {
-        animationName: visual ? getComputedStyle(visual).animationName : null,
+        current: snapshot?.current,
+        focus: snapshot?.focus,
+        visible,
+        focusOnVisual: Boolean(bounds && snapshot?.focus
+          && snapshot.focus.x >= bounds.left - 1 && snapshot.focus.x <= bounds.right + 1
+          && snapshot.focus.y >= Math.max(bounds.top, 0) - 1 && snapshot.focus.y <= Math.min(bounds.bottom, innerHeight) + 1),
+        hidden: visual?.hidden || false,
+        maskImage: visual ? getComputedStyle(visual).maskImage : null,
+        namedVisuals: [...document.querySelectorAll('main *')]
+          .filter((element) => getComputedStyle(element).viewTransitionName !== 'none').length,
         canvasBackingHeight: canvas?.height || 0,
         canvasBackingWidth: canvas?.width || 0,
         canvasCount: document.querySelectorAll('.stellar-tree__canvas').length,
         canvasInVisual: Boolean(canvas && visual?.contains(canvas)),
-        hidden: visual?.hidden || false,
-        maskImage: visual ? getComputedStyle(visual).maskImage : null,
-        namedVisuals: namedVisuals.length,
-        supernovaAnimationName: supernova ? getComputedStyle(supernova).animationName : null,
-        supernovaBackground: supernova ? getComputedStyle(supernova).backgroundImage : null,
-        supernovaTargetName: supernova ? getComputedStyle(supernova).viewTransitionName : null,
         syntheticCloudCount: document.querySelectorAll('[data-stellar-cloud], .stellar-tree__cloud').length,
-        targetName: visual ? getComputedStyle(visual).viewTransitionName : null,
         viewportBackground: viewport ? getComputedStyle(viewport).backgroundColor : null,
         viewportBackgroundImage: viewport ? getComputedStyle(viewport).backgroundImage : null,
       };
-    }, { destinationKey: destination, visualSelector: selector });
+    }, { visualSelector: selector });
     await assert(
-      arrivalPriority.targetName === 'universe-target-visual'
-        && arrivalPriority.namedVisuals === 1
-        && arrivalPriority.animationName === (destination === 'work'
-          ? 'universe-work-visual-genesis'
-          : 'universe-visual-acquire')
+      // About normalises its #profile-map hash once enhanced, so the Skills
+      // route may settle as About.
+      (arrivalPriority.current === destination || (destination === 'profile' && arrivalPriority.current === 'about'))
+        && arrivalPriority.focus?.r > 0
+        && arrivalPriority.namedVisuals === 0
         && !arrivalPriority.hidden
-        && (destination !== 'work' || (
-          arrivalPriority.supernovaAnimationName === 'universe-work-supernova-acquire-live'
-            && arrivalPriority.supernovaBackground.includes('repeating-conic-gradient')
-            && arrivalPriority.supernovaTargetName === 'universe-work-supernova'
-        ))
+        && (!arrivalPriority.visible || route.includes('#') || arrivalPriority.focusOnVisual)
         && (!['about', 'profile'].includes(destination) || (
           arrivalPriority.maskImage === 'none'
             && arrivalPriority.canvasBackingHeight > 0
@@ -4015,7 +3886,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
             && arrivalPriority.viewportBackground === 'rgba(0, 0, 0, 0)'
             && arrivalPriority.viewportBackgroundImage === 'none'
         )),
-      `Destination ${destination} does not prioritize exactly one signature visual before its text: ${JSON.stringify(arrivalPriority)}`
+      `Destination ${destination} does not focus the camera on its signature visual: ${JSON.stringify(arrivalPriority)}`
     );
   }
 

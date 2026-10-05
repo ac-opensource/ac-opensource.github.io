@@ -40,6 +40,7 @@ jobs:
         run: |
           npm run test:search-recovery
           npm run test:contact-signals:browser
+          npm run test:flight:browser
 
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'

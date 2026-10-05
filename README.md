@@ -10,6 +10,7 @@ Static multi-page portfolio and technical blog. SQLite is the authoring-only sou
 - `scripts/build-site.js`: assembles a fresh allowlisted `dist/`, generates responsive image references, and compiles Tailwind locally.
 - `blog/posts.json`: published-only metadata used for progressive enhancement; article bodies stay in static HTML.
 - `assets/data/profile-map.json`: public evidence model for the interactive Engineering and Interests profile tree.
+- `assets/js/universe-theme-transition.js`: cross-page navigation as a camera flight through one shared universe; see `docs/universe-navigation.md`.
 - `scripts/blog-writer-server.js`: loopback-only writer API with a per-run session check.
 - `.github/workflows/pages.yml`: verifies and deploys only `dist/` from the default `master` branch.
 
