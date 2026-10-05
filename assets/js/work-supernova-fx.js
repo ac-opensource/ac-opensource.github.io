@@ -139,6 +139,40 @@
       });
     };
 
+    const glitchTimers = [];
+    const clearGlitches = () => {
+      glitchTimers.splice(0).forEach((timer) => window.clearTimeout(timer));
+      hero?.querySelectorAll(".work-fail.is-glitching").forEach((word) => word.classList.remove("is-glitching"));
+    };
+
+    // A signal fault: the word jitters and flashes error red while offset red
+    // and cyan channels tear through it in horizontal slices.
+    const glitch = (word, amp, duration) => {
+      if (!word.isConnected) return;
+      word.classList.add("is-glitching");
+      const random = seeded(Math.round(amp * 1000) + pulse * 17);
+      const jitter = (scale) => `${((random() - 0.5) * 2 * scale * amp).toFixed(2)}px`;
+      const base = getComputedStyle(word).color;
+      const steps = 9;
+      const frames = (build) => Array.from({ length: steps + 1 }, (_, index) => ({ ...build(index), offset: index / steps, easing: "steps(1, end)" }));
+      play(word, frames((index) => index === steps
+        ? { translate: "0 0", color: base, opacity: 1 }
+        : { translate: `${jitter(5)} ${jitter(1.5)}`, color: index % 3 === 1 ? "#c8352c" : base, opacity: index === 4 ? 0.55 : 1 }), { duration });
+      [["::before", 1], ["::after", -1]].forEach(([pseudoElement, side]) => {
+        play(word, frames((index) => {
+          if (index === steps) return { clipPath: "inset(50% 0 50% 0)", translate: "0 0", opacity: 0 };
+          const top = Math.floor(random() * 70);
+          const height = 8 + Math.floor(random() * 30);
+          return {
+            clipPath: `inset(${top}% 0 ${Math.max(0, 100 - top - height)}% 0)`,
+            translate: `${(side * (2 + random() * 6) * amp).toFixed(2)}px 0`,
+            opacity: 0.9
+          };
+        }), { duration, pseudoElement });
+      });
+      glitchTimers.push(window.setTimeout(() => word.classList.remove("is-glitching"), duration + 40));
+    };
+
     const play = (element, keyframes, options) => {
       try {
         const animation = element.animate(keyframes, options);
@@ -175,17 +209,29 @@
           distance = Math.hypot(dx, dy) || 1;
         }
         const amplitude = 2.5 + 11 * (1 - smooth(0, 1150, distance));
+        // The wave is also a gravitational one: as it passes, each element is
+        // strained, stretched along one axis and squeezed along the other in
+        // alternation, ringing down with distance.
+        const strain = 0.012 + 0.03 * (1 - smooth(0, 1150, distance));
         const delay = 50 + distance / 1.5;
-        const offset = (scale) => `translate(${(dx / distance * amplitude * scale).toFixed(2)}px, ${(dy / distance * amplitude * scale).toFixed(2)}px)`;
+        const frame = (push, ring) => `translate(${(dx / distance * amplitude * push).toFixed(2)}px, ${(dy / distance * amplitude * push).toFixed(2)}px) scale(${(1 + strain * ring).toFixed(4)}, ${(1 - strain * ring).toFixed(4)})`;
         const spring = "cubic-bezier(.3,0,.3,1)";
         play(element, [
-          { transform: offset(0), easing: "cubic-bezier(.1,.7,.3,1)" },
-          { transform: offset(1), offset: 0.14, easing: spring },
-          { transform: offset(-0.38), offset: 0.38, easing: spring },
-          { transform: offset(0.14), offset: 0.62, easing: spring },
-          { transform: offset(-0.04), offset: 0.84, easing: spring },
-          { transform: offset(0) }
-        ], { duration: 1000, delay, composite: "add" });
+          { transform: frame(0, 0), easing: "cubic-bezier(.1,.7,.3,1)" },
+          { transform: frame(1, 1), offset: 0.12, easing: spring },
+          { transform: frame(-0.38, -0.7), offset: 0.3, easing: spring },
+          { transform: frame(0.14, 0.45), offset: 0.48, easing: spring },
+          { transform: frame(-0.04, -0.25), offset: 0.66, easing: spring },
+          { transform: frame(0, 0.1), offset: 0.84, easing: spring },
+          { transform: frame(0, 0) }
+        ], { duration: 1250, delay, composite: "add" });
+        const failing = element.querySelector(".work-fail");
+        if (failing) {
+          // The word "fail" breaks as the wave hits, then two aftershocks.
+          [[delay + 140, 1, 1300], [delay + 2700, 0.5, 520], [delay + 6600, 0.3, 380]].forEach(([at, amp, duration]) => {
+            glitchTimers.push(window.setTimeout(() => glitch(failing, amp, duration), at));
+          });
+        }
         if (element.matches(".work-hero__title > span:last-child")) {
           const color = getComputedStyle(element).color;
           play(element, [
@@ -296,13 +342,21 @@
       }
       if (age >= DETONATE) return;
 
-      // The core brightens unevenly as it nears collapse (irregular, not a
-      // rhythmic beat), then compresses to a point in the last instant.
+      // A contracting ring is the last breath before ignition.
+      if (age > 2.45) {
+        const progress = smooth(2.45, 2.99, age);
+        const alpha = 0.75 * Math.pow(Math.sin(progress * Math.PI), 0.8);
+        const radius = unit * (0.3 * (1 - progress) + 0.012);
+        ring(x, y, radius, 2.4, [[0, COLORS.gold, 0], [0.5, blend(COLORS.cobalt, COLORS.gold, progress), alpha], [1, COLORS.cobalt, 0]]);
+      }
+
+      // The core flickers faster and faster toward collapse, then pinches to a point.
       const tension = clamp(age / DETONATE);
-      const flicker = (Math.sin(age * 7.3) * 0.5 + Math.sin(age * 13.1 + 1.7) * 0.3 + Math.sin(age * 23.7 + 0.4) * 0.2) * tension;
+      const phase = 0.9 * age + 5.16 * Math.pow(tension, 3.2);
+      const beat = Math.exp(-(phase % 1) * 7);
       const pinch = 1 - 0.82 * smooth(2.72, 2.99, age);
-      const radius = (7 + 18 * Math.pow(tension, 1.4)) * (1 + flicker * 0.06) * pinch;
-      const intensity = clamp(0.35 + 0.6 * tension + flicker * 0.12);
+      const radius = (7 + 18 * Math.pow(tension, 1.4) + beat * 10 * tension) * pinch;
+      const intensity = clamp(0.35 + 0.6 * tension + beat * 0.25);
       glow(x, y, radius * 4.2, [[0, COLORS.white, intensity], [0.16, COLORS.cream, intensity * 0.9], [0.4, COLORS.gold, intensity * 0.45], [1, COLORS.amber, 0]]);
     };
 
@@ -446,6 +500,7 @@
     return {
       resize,
       reset(index) {
+        clearGlitches();
         pulse = index;
         detonated = false;
         active = true;
@@ -483,6 +538,7 @@
       },
       // Suppression (reduced motion, context loss) cancels the in-flight accents too.
       hide() {
+        clearGlitches();
         shock.forEach((animation) => animation.cancel());
         shock.clear();
         stop();
