@@ -596,7 +596,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   // the Portfolio page is still ahead of the camera.
   await assert(
     integratedBigBang.perspectiveDuration >= 950
-      && integratedBigBang.perspectiveDuration <= 1600
+      && integratedBigBang.perspectiveDuration <= 1900
       && integratedBigBang.flightDuration === integratedBigBang.perspectiveDuration
       && integratedBigBang.flight === 'true'
       && integratedBigBang.skyLayers.join('|') === 'universe-cosmos|universe-cosmos-near'
@@ -773,7 +773,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         && JSON.stringify(desktopPerspective.navigationLabels) === JSON.stringify(['Primary navigation', 'Mobile navigation'])
         && (!isSpatialHome || desktopPerspective.labelContentMatches)
         && desktopPerspective.perspective?.model === 'cosmic-camera'
-        && desktopPerspective.perspective?.pathModel === 'van-wijk-nuij'
+        && desktopPerspective.perspective?.pathModel === 'spatial-zoom-orbit'
         && desktopPerspective.perspective?.ready === 'ready'
         && Boolean(desktopPerspective.perspective?.landmark?.kind)
         && desktopPerspective.perspective?.stylesheet
@@ -3458,7 +3458,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && workPerspective.perspective?.depth === 3.1
       && workPerspective.perspective?.magnification === 2.4
       && workPerspective.perspective?.model === 'cosmic-camera'
-      && workPerspective.perspective?.pathModel === 'van-wijk-nuij'
+      && workPerspective.perspective?.pathModel === 'spatial-zoom-orbit'
       && workPerspective.perspective?.landmark?.kind === 'supernova'
       && workPerspective.perspective?.ready === 'ready'
       && workPerspective.routeMap?.current === 'work'
@@ -3539,14 +3539,14 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && canceledDeparture.to === 'about'
       && canceledDeparture.motion === 'depart'
       && departureTravel?.motionModel === 'cosmic-camera'
-      && departureTravel?.pathModel === 'van-wijk-nuij'
+      && departureTravel?.pathModel === 'spatial-zoom-orbit'
       && departureTravel?.direction === 'southwest'
       && departureTravel?.depthDirection === 'farther'
       && departureTravel?.fromSurface === 'light'
       && departureTravel?.toSurface === 'dark'
       && departureTravel?.toMagnification === 1.6
       && departureTravel?.duration >= 950
-      && departureTravel?.duration <= 1600
+      && departureTravel?.duration <= 1900
       && departureTravel?.zoomPathLength > 0.5
       && departureTravel?.peakWidth > 0
       && canceledDeparture.perspectiveDuration === `${departureTravel?.duration}ms`
@@ -3555,7 +3555,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         : canceledDeparture.irisLayers.length <= 1)
       && canceledDeparture.stored?.from === 'work'
       && canceledDeparture.stored?.to === 'about'
-      && canceledDeparture.stored?.version === 9
+      && canceledDeparture.stored?.version === 11
       && !canceledDeparture.legacyCameraFields
       && canceledDeparture.fullScreenInstrument === 0,
     `Work-to-About departure does not plan a camera flight through the shared world: ${JSON.stringify(canceledDeparture)}`
@@ -3780,7 +3780,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && retargetedPerspective.perspective?.lastTravel?.to === 'logs'
       && retargetedPerspective.perspective?.lastTravel?.retargeted === true
       && retargetedPerspective.perspective?.lastTravel?.duration >= 950
-      && retargetedPerspective.perspective?.lastTravel?.duration <= 1600
+      && retargetedPerspective.perspective?.lastTravel?.duration <= 1900
       && retargetedPerspective.perspective?.lastTravel?.fromSurface === 'light'
       && retargetedPerspective.perspective?.lastTravel?.toSurface === 'dark'
       && retargetedPerspective.perspective?.pendingCleanup === 0

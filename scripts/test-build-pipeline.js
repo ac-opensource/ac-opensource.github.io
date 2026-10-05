@@ -330,7 +330,8 @@ function main() {
       || !firstPostPage.includes('/assets/js/article-debrief.js?v=20260807-regions1')
       || !firstPostPage.includes('/assets/css/universe-field-map.css?v=20261004-sky1')
       || !firstPostPage.includes('/assets/css/universe-perspective-navigation.css?v=20261005-cosmic1')
-      || !firstPostPage.includes('/assets/js/universe-theme-transition.js?v=20261005-cosmic1')
+      || !firstPostPage.includes('/assets/js/universe-theme-transition.js?v=20261005-spatial4')
+      || !firstPostPage.includes('/assets/js/universe-solid-field.js?v=20261005-spatial4')
       || !firstPostPage.includes('/assets/js/universe-field-map.js?v=20261004-sky1')) {
       throw new Error("Generated articles are missing their region and shared navigation assets.");
     }

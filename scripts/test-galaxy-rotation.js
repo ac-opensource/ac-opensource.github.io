@@ -5,7 +5,7 @@ const { Encounter } = require("../assets/js/galaxy-dynamics");
 
 // Exercise the renderer's actual angle calculation without a browser clock.
 const source = fs.readFileSync(process.argv[2] || require.resolve("../assets/experiments/universe-options/logs/spiral-galaxy-archive.js"), "utf8");
-const geometry = source.match(/const geometry = Object.freeze\((\{[\s\S]*?\})\);/)[1];
+const geometry = source.match(/const geometry = (?:window\.UniversePerspective\?\.model\.galaxyGeometry \|\| )?Object.freeze\((\{[\s\S]*?\})\);/)[1];
 const orbitalAngle = source.match(/function orbitalAngle\([^]*?\n  \}/)[0];
 const context = vm.createContext({});
 vm.runInContext(`const geometry = ${geometry}; const canvasState = { elapsed: 0 }; ${orbitalAngle}`, context);

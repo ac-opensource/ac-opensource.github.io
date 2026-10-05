@@ -12,6 +12,8 @@
       uniform vec2 extent,resolution,center;
       uniform float scale,lightTheme;
       uniform mat3 axes;
+      uniform float navigationView,remnant;
+      uniform vec3 navigationEye,navigationRight,navigationDown,navigationForward;
       uniform sampler2D noiseTexture;
       float noise(vec3 p){
         vec3 cell=floor(p),f=fract(p);f=f*f*(3.-2.*f);
@@ -24,6 +26,10 @@
         vec3 view=normalize(vec3((pixel.x-center.x)/scale,(pixel.y-extent.y+center.y)/scale,-12.5));
         vec3 eye=vec3(axes[0].z,axes[1].z,axes[2].z)*12.5;
         vec3 ray=vec3(dot(axes[0],view),dot(axes[1],view),dot(axes[2],view));
+        if(navigationView>.5){
+          eye=navigationEye;
+          ray=normalize(navigationForward+navigationRight*(pixel.x-center.x)/scale+navigationDown*(extent.y-pixel.y-center.y)/scale);
+        }
         float b=dot(eye,ray),c=dot(eye,eye)-196.;
         float discriminant=b*b-c;
         if(discriminant<0.){gl_FragColor=vec4(0);return;}
@@ -33,6 +39,40 @@
         vec3 accumulated=vec3(0);float opacity=0.;
         for(int i=0;i<128;i++){
           vec3 p=eye+ray*distance;
+          // The navigation remnant is a separate field in the same bounded
+          // raymarcher. The default About field below remains unchanged.
+          if(remnant>.5){
+            vec3 q=vec3(dot(p.xy,vec2(.79,.613)),dot(p.xy,vec2(-.613,.79)),p.z);
+            q.yz=mat2(.969,-.247,.247,.969)*q.yz;
+            float radius=length(q/vec3(12.2,6.4,4.8));
+            if(radius<1.25){
+              float coarse=fbm(q*.58);
+              float fine=fbm(q*1.9+coarse*3.);
+              float ridge=1.-abs(fine*2.-1.);
+              float boundary=radius-.85+(coarse-.5)*.29;
+              float shell=exp(-abs(boundary)*36.);
+              float lace=pow(ridge,14.);
+              float cavity=1.-smoothstep(.57,.91,radius);
+              float threads=exp(-abs(fine-.51)*48.);
+              float skin=shell*(.08+lace*.95);
+              float diffuse=exp(-abs(boundary+.12)*11.)*(.055+coarse*.055);
+              float interior=cavity*threads*.22;
+              float core=exp(-dot(q,q)*3.8);
+              float density=skin+diffuse+interior+core*1.5;
+              float absorption=1.-exp(-density*stride*1.9);
+              vec3 blue=mix(vec3(.035,.12,.33),vec3(.26,.69,.88),ridge);
+              blue=mix(blue,vec3(.08,.49,.45),smoothstep(.56,.76,coarse)*.65);
+              vec3 copper=mix(vec3(.50,.12,.045),vec3(1.35,.91,.52),lace);
+              float hot=clamp(skin/(density+.001)*smoothstep(.38,.66,coarse)+interior*1.2,0.,1.);
+              vec3 color=mix(blue,copper,hot)+vec3(1.2,1.35,1.5)*core;
+              color*=.86+fine*.7;
+              accumulated+=(1.-opacity)*color*absorption;
+              opacity+=(1.-opacity)*absorption;
+              if(opacity>.987)break;
+            }
+            distance+=stride;
+            continue;
+          }
           float axial=dot(p.xy,vec2(.681,.732));
           vec3 q=vec3(dot(p.xy,vec2(-.732,.681)),p.z,axial);
           float a=abs(axial),t=a/10.2;
@@ -99,14 +139,14 @@
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);
     gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,256,256,0,gl.RGBA,gl.UNSIGNED_BYTE,lattice);
     const position=gl.getAttribLocation(program,"position");
-    const uniforms=Object.fromEntries(["extent","resolution","center","scale","axes","lightTheme","noiseTexture"].map(name=>[name,gl.getUniformLocation(program,name)]));
+    const uniforms=Object.fromEntries(["extent","resolution","center","scale","axes","lightTheme","noiseTexture","navigationView","navigationEye","navigationRight","navigationDown","navigationForward","remnant"].map(name=>[name,gl.getUniformLocation(program,name)]));
     canvas.dataset.particleCount="0";canvas.dataset.renderer="raymarched-volume";
     return {
-      draw({width,height,centerX,centerY,baseScale,axes,lightTheme}){
+      draw({width,height,centerX,centerY,baseScale,axes,lightTheme,navigation,remnant=false}){
         if(disposed||lost||gl.isContextLost()||!(width>0&&height>0&&baseScale>0))return false;
         // Preserve filament detail across the full overscan surface, with a
         // smaller mobile budget while rotation remains enabled.
-        const pixelBudget=window.matchMedia("(max-width: 720px)").matches?800000:1500000;
+        const pixelBudget=navigation?180000:window.matchMedia("(max-width: 720px)").matches?800000:1500000;
         const ratio=Math.min(window.devicePixelRatio||1,Math.sqrt(pixelBudget/(width*height)));
         const w=Math.max(1,Math.floor(width*ratio)),h=Math.max(1,Math.floor(height*ratio));
         if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
@@ -114,7 +154,12 @@
         gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,noiseTexture);gl.uniform1i(uniforms.noiseTexture,0);
         gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
         gl.uniform2f(uniforms.extent,width,height);gl.uniform2f(uniforms.resolution,w,h);gl.uniform2f(uniforms.center,centerX,centerY);
-        gl.uniform1f(uniforms.scale,baseScale);gl.uniform1f(uniforms.lightTheme,lightTheme?1:0);gl.uniformMatrix3fv(uniforms.axes,false,axes);
+        gl.uniform1f(uniforms.scale,baseScale);gl.uniform1f(uniforms.lightTheme,lightTheme?1:0);gl.uniformMatrix3fv(uniforms.axes,false,axes||[1,0,0,0,1,0,0,0,1]);
+        gl.uniform1f(uniforms.navigationView,navigation?1:0);
+        gl.uniform1f(uniforms.remnant,remnant?1:0);
+        if(navigation){
+          for(const [name,value] of Object.entries(navigation))gl.uniform3f(uniforms[name],value.x,value.y,value.z);
+        }
         gl.drawArrays(gl.TRIANGLES,0,6);return !gl.isContextLost();
       },
       dispose(){disposed=true;canvas.removeEventListener("webglcontextlost",onLost);gl.deleteTexture(noiseTexture);gl.deleteBuffer(buffer);gl.deleteProgram(program);}
