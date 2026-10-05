@@ -69,9 +69,31 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
+const failures = [];
+const warnings = [];
+const __T0 = Date.now();
+if (process.env.E2E_TRACE) {
+  const clientDir = path.join(path.dirname(require.resolve('playwright-core/package.json')), 'lib/client');
+  const { Page } = require(path.join(clientDir, 'page.js'));
+  const { Locator } = require(path.join(clientDir, 'locator.js'));
+  const scale = Number(process.env.E2E_TIMEOUT_SCALE || 1);
+  const optIndex = { goto: 1, waitForFunction: 2, reload: 0, waitForURL: 1, waitForSelector: 1 };
+  for (const name of Object.keys(optIndex)) {
+    const orig = Page.prototype[name];
+    Page.prototype[name] = async function (...args) {
+      const t = Date.now();
+      const i = optIndex[name];
+      if (scale !== 1) args[i] = { ...(args[i] || {}), timeout: ((args[i] && args[i].timeout) || 30000) * scale };
+      const line = (new Error().stack.split('\n').find((l) => l.includes('e2e-check.js:') && !l.includes('Page.')) || '').match(/e2e-check\.js:(\d+)/)?.[1];
+      try { return await orig.apply(this, args); }
+      finally { const d = Date.now() - t; if (d > 1500 || process.env.E2E_TRACE === '2') console.error(`[trace +${((Date.now() - __T0) / 1000).toFixed(1)}s] L${line} ${name} ${typeof args[0] === 'string' ? args[0].replace(/^http:\/\/[^/]+/, '') : ''} ${d}ms`); }
+    };
+  }
+  const origWaitFor = Locator.prototype.waitFor;
+  Locator.prototype.waitFor = function (options = {}) { return origWaitFor.call(this, scale !== 1 ? { ...options, timeout: (options.timeout || 30000) * scale } : options); };
+}
+
 (async () => {
-  const failures = [];
-  const warnings = [];
   const checkedExternalLinks = new Set();
 
   const api = await request.newContext({
@@ -80,7 +102,15 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     timeout: 20000,
   });
 
-  const browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+  // Keep WebGL available on GPU-less runners: Chromium no longer falls back
+  // to SwiftShader on its own. Do not also force --use-angle=swiftshader; that
+  // routes all compositing through the CPU rasterizer even when a GPU exists,
+  // so frame-paced checks measure SwiftShader and heavy canvases back up the
+  // GPU process for tens of seconds per navigation.
+  const browser = await chromium.launch({
+    headless: true,
+    args: (process.env.E2E_CHROMIUM_ARGS ?? '--enable-unsafe-swiftshader').split(' ').filter(Boolean),
+  });
   const desktop = await browser.newContext({ viewport: { width: 1600, height: 1100 } });
   const mobile = await browser.newContext({ viewport: { width: 430, height: 932 } });
 
@@ -94,6 +124,18 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await mobile.route(contactEndpointPattern, blockContactEndpoint);
 
   const page = await desktop.newPage();
+  // Main-thread budgets are only meaningful when Chromium composites and runs
+  // WebGL on a GPU. On GPU-less runners WebGL falls back to SwiftShader (kept
+  // available by --enable-unsafe-swiftshader), reports a major performance
+  // caveat, and the main thread waits on the software compositor instead.
+  const rendering = await page.evaluate(() => {
+    const probe = document.createElement('canvas').getContext('webgl');
+    const info = probe?.getExtension('WEBGL_debug_renderer_info');
+    return {
+      hardware: Boolean(document.createElement('canvas').getContext('webgl', { failIfMajorPerformanceCaveat: true })),
+      renderer: (info && probe.getParameter(info.UNMASKED_RENDERER_WEBGL)) || probe?.getParameter(probe.RENDERER) || 'no WebGL',
+    };
+  });
   const mobilePage = await mobile.newPage();
   let mobileChromeFontSizes = null;
 
@@ -122,6 +164,23 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       null,
       { timeout: 5000 }
     );
+  }
+
+  // About branch labels ride the idle-rotating nebula, which resumes 250ms
+  // after any interaction, so they never hold still for Playwright's
+  // two-frame stability check. Click where the label is now, as a pointer
+  // user would, after confirming the label itself receives that point.
+  async function clickDriftingControl(targetPage, locator, name) {
+    await locator.scrollIntoViewIfNeeded();
+    const target = await locator.evaluate((element) => {
+      const bounds = element.getBoundingClientRect();
+      const x = bounds.left + bounds.width / 2;
+      const y = bounds.top + bounds.height / 2;
+      const hit = document.elementFromPoint(x, y);
+      return { hitsControl: Boolean(hit && element.contains(hit)), x, y };
+    });
+    await assert(target.hitsControl, `${name} is covered at its visible position: ${JSON.stringify(target)}`);
+    await targetPage.mouse.click(target.x, target.y);
   }
 
   async function expandUniverseRouteMap(targetPage) {
@@ -371,13 +430,81 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   bigBangPage.on('pageerror', (error) => failures.push(`Big Bang loader pageerror: ${error.message}`));
   await bigBangPage.addInitScript(() => {
     window.__bigBangPhaseHistory = [];
+    window.__bigBangPhaseSamples = {};
     window.__bigBangLongTasks = [];
+    window.__bigBangCompletedAt = null;
+    // The whole sequence lasts 640-900ms, so a CDP round trip issued after a
+    // phase event can land in a later phase, or after the overlay is gone, on
+    // a busy runner. Sample inside the loader's own phase dispatch instead so
+    // each assertion describes exactly the phase the loader announced.
+    const sampleStructure = () => {
+      const canvas = document.querySelector('[data-big-bang-matter]');
+      const skip = document.querySelector('[data-big-bang-skip]');
+      const snapshot = window.BigBangLoader?.snapshot();
+      return {
+        bodyFilter: getComputedStyle(document.body).filter,
+        bodyTransform: getComputedStyle(document.body).transform,
+        canvasCount: document.querySelectorAll('[data-big-bang-matter]').length,
+        context: snapshot?.context,
+        activation: snapshot?.activation,
+        fullSequenceMs: snapshot?.fullSequenceMs,
+        maxSequenceMs: snapshot?.maxSequenceMs,
+        landmarkCount: snapshot?.landmarkCount,
+        landmarkDomCount: document.querySelectorAll('[data-big-bang-landmark]').length,
+        linkCount: Number(canvas?.dataset.linkCount || 0),
+        loaderDomNodes: document.querySelectorAll('[data-big-bang-loader] *').length,
+        loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
+        lockCount: document.querySelectorAll('.big-bang-loader__lock').length,
+        matterCount: Number(canvas?.dataset.matterCount || 0),
+        originSelector: snapshot?.origin?.selector,
+        particleCount: snapshot?.particleCount,
+        phase: snapshot?.phase,
+        phaseHistory: window.__bigBangPhaseHistory.map((entry) => entry.phase),
+        rootState: document.documentElement.dataset.bigBang,
+        skipVisible: Boolean(skip && skip.getBoundingClientRect().width > 0 && getComputedStyle(skip).opacity !== '0'),
+        sessionValue: window.sessionStorage.getItem('ac.bigBangPortfolioPlayed.v1'),
+        urlSearch: window.location.search,
+        bodyOpacity: Number(getComputedStyle(document.body).opacity),
+      };
+    };
+    const sampleHandoff = () => {
+      const landmarkByIndex = new Map(
+        [...document.querySelectorAll('[data-big-bang-landmark-index]')]
+          .map((element) => [element.dataset.bigBangLandmarkIndex, element])
+      );
+      const locks = [...document.querySelectorAll('.big-bang-loader__lock')];
+      const drift = locks.map((lock) => {
+        const target = landmarkByIndex.get(lock.dataset.landmarkIndex);
+        if (!target) return Infinity;
+        const lockRect = lock.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        return Math.max(
+          Math.abs(lockRect.left - targetRect.left),
+          Math.abs(lockRect.top - targetRect.top),
+          Math.abs(lockRect.width - targetRect.width),
+          Math.abs(lockRect.height - targetRect.height)
+        );
+      });
+      return {
+        bodyFilter: getComputedStyle(document.body).filter,
+        bodyTransform: getComputedStyle(document.body).transform,
+        lockCount: locks.length,
+        maxDrift: Math.max(0, ...drift),
+      };
+    };
     document.addEventListener('bigbang:phase', (event) => {
-      window.__bigBangPhaseHistory.push({ ...event.detail });
+      const entry = { ...event.detail };
+      window.__bigBangPhaseHistory.push(entry);
+      if (entry.phase === 'structure') window.__bigBangPhaseSamples.structure = sampleStructure();
+      if (entry.phase === 'reveal') window.__bigBangPhaseSamples.reveal = sampleHandoff();
+      if (entry.phase === 'complete') window.__bigBangCompletedAt = performance.now();
     });
     try {
       new PerformanceObserver((list) => {
-        window.__bigBangLongTasks.push(...list.getEntries().map((entry) => entry.duration));
+        window.__bigBangLongTasks.push(...list.getEntries().map((entry) => ({
+          duration: Math.round(entry.duration),
+          startTime: Math.round(entry.startTime),
+        })));
       }).observe({ type: 'longtask', buffered: true });
     } catch (_error) {
       // Long Task timing is an optional Chromium capability; phase/deadline
@@ -417,38 +544,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   }
 
   await bigBangPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
-  await bigBangPage.locator('[data-big-bang-loader]').waitFor({ state: 'attached', timeout: 3000 });
-  await bigBangPage.waitForFunction(() => window.__bigBangPhaseHistory?.some((entry) => entry.phase === 'structure'), null, { timeout: 3000 });
-  const bigBangImpact = await bigBangPage.evaluate(() => {
-    const canvas = document.querySelector('[data-big-bang-matter]');
-    const skip = document.querySelector('[data-big-bang-skip]');
-    const snapshot = window.BigBangLoader?.snapshot();
-    return {
-      bodyFilter: getComputedStyle(document.body).filter,
-      bodyTransform: getComputedStyle(document.body).transform,
-      canvasCount: document.querySelectorAll('[data-big-bang-matter]').length,
-      context: snapshot?.context,
-      activation: snapshot?.activation,
-      fullSequenceMs: snapshot?.fullSequenceMs,
-      maxSequenceMs: snapshot?.maxSequenceMs,
-      landmarkCount: snapshot?.landmarkCount,
-      landmarkDomCount: document.querySelectorAll('[data-big-bang-landmark]').length,
-      linkCount: Number(canvas?.dataset.linkCount || 0),
-      loaderDomNodes: document.querySelectorAll('[data-big-bang-loader] *').length,
-      loaderCount: document.querySelectorAll('[data-big-bang-loader]').length,
-      lockCount: document.querySelectorAll('.big-bang-loader__lock').length,
-      matterCount: Number(canvas?.dataset.matterCount || 0),
-      originSelector: snapshot?.origin?.selector,
-      particleCount: snapshot?.particleCount,
-      phase: snapshot?.phase,
-      phaseHistory: window.__bigBangPhaseHistory?.map((entry) => entry.phase) || [],
-      rootState: document.documentElement.dataset.bigBang,
-      skipVisible: Boolean(skip && skip.getBoundingClientRect().width > 0 && getComputedStyle(skip).opacity !== '0'),
-      sessionValue: window.sessionStorage.getItem('ac.bigBangPortfolioPlayed.v1'),
-      urlSearch: window.location.search,
-      bodyOpacity: Number(getComputedStyle(document.body).opacity),
-    };
-  });
+  await bigBangPage.waitForFunction(() => (
+    window.__bigBangPhaseHistory?.some((entry) => entry.phase === 'complete')
+  ), null, { timeout: 5000 });
+  const bigBangImpact = await bigBangPage.evaluate(() => (
+    window.__bigBangPhaseSamples.structure
+      || { missing: 'structure', phaseHistory: window.__bigBangPhaseHistory.map((entry) => entry.phase) }
+  ));
   await assert(
     bigBangImpact.loaderCount === 1
       && bigBangImpact.canvasCount === 1
@@ -475,32 +577,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     `Portfolio Big Bang structure phase is incomplete: ${JSON.stringify(bigBangImpact)}`
   );
 
-  await bigBangPage.waitForFunction(() => window.__bigBangPhaseHistory?.some((entry) => entry.phase === 'reveal'), null, { timeout: 2000 });
-  const handoffAlignment = await bigBangPage.evaluate(() => {
-    const landmarkByIndex = new Map(
-      [...document.querySelectorAll('[data-big-bang-landmark-index]')]
-        .map((element) => [element.dataset.bigBangLandmarkIndex, element])
-    );
-    const drift = [...document.querySelectorAll('.big-bang-loader__lock')].map((lock) => {
-      const target = landmarkByIndex.get(lock.dataset.landmarkIndex);
-      if (!target) return Infinity;
-      const lockRect = lock.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
-      return Math.max(
-        Math.abs(lockRect.left - targetRect.left),
-        Math.abs(lockRect.top - targetRect.top),
-        Math.abs(lockRect.width - targetRect.width),
-        Math.abs(lockRect.height - targetRect.height)
-      );
-    });
-    return {
-      bodyFilter: getComputedStyle(document.body).filter,
-      bodyTransform: getComputedStyle(document.body).transform,
-      maxDrift: Math.max(0, ...drift),
-    };
-  });
+  const handoffAlignment = await bigBangPage.evaluate(() => (
+    window.__bigBangPhaseSamples.reveal
+      || { missing: 'reveal', phaseHistory: window.__bigBangPhaseHistory.map((entry) => entry.phase) }
+  ));
   await assert(
-    handoffAlignment.maxDrift <= 1
+    handoffAlignment.lockCount === bigBangImpact.landmarkCount
+      && handoffAlignment.maxDrift <= 1
       && handoffAlignment.bodyTransform === 'none'
       && handoffAlignment.bodyFilter === 'none',
     `Portfolio Big Bang handoff is not pixel-aligned to the live page: ${JSON.stringify(handoffAlignment)}`
@@ -512,7 +595,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   ), null, { timeout: 5000 });
   const bigBangComplete = await bigBangPage.evaluate((sessionKey) => ({
     bodyOpacity: getComputedStyle(document.body).opacity,
-    longTasks: window.__bigBangLongTasks || [],
+    // Tasks that began before the sequence completed; entries are delivered
+    // asynchronously, so filter by start time rather than arrival.
+    longTasks: (window.__bigBangLongTasks || [])
+      .filter(({ startTime }) => startTime < window.__bigBangCompletedAt)
+      .map(({ duration }) => duration),
     phaseHistory: window.__bigBangPhaseHistory?.map((entry) => entry.phase) || [],
     sessionValue: window.sessionStorage.getItem(sessionKey),
     snapshot: window.BigBangLoader.snapshot(),
@@ -525,11 +612,19 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       && Number.isFinite(bigBangComplete.snapshot.readyDelayMs)
       && ['singularity', 'ignition', 'expansion', 'structure', 'reveal', 'complete']
         .every((phase) => bigBangComplete.phaseHistory.includes(phase))
-      && Math.max(0, ...bigBangComplete.longTasks) < 250
-      && bigBangComplete.longTasks.reduce((total, duration) => total + duration, 0) < 500
       && Number(bigBangComplete.bodyOpacity) >= 0.99,
     `Portfolio Big Bang did not complete and record the session: ${JSON.stringify(bigBangComplete)}`
   );
+  const bigBangWithinMainThreadBudget = Math.max(0, ...bigBangComplete.longTasks) < 250
+    && bigBangComplete.longTasks.reduce((total, duration) => total + duration, 0) < 500;
+  if (rendering.hardware) {
+    await assert(
+      bigBangWithinMainThreadBudget,
+      `Portfolio Big Bang exceeds its main-thread budget (longest <250ms, total <500ms): ${JSON.stringify(bigBangComplete.longTasks)}`
+    );
+  } else if (!bigBangWithinMainThreadBudget) {
+    warnings.push(`Portfolio Big Bang main-thread budget not enforced on software rendering (${rendering.renderer}); long tasks: ${JSON.stringify(bigBangComplete.longTasks)}`);
+  }
 
   await bigBangPage.reload({ waitUntil: 'load' });
   const repeatPortfolio = await bigBangPage.evaluate((sessionKey) => ({
@@ -709,6 +804,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   for (const route of routes) {
     const url = BASE_URL + route.path;
     const isSpatialHome = route.path === '/';
+    const isLogsRoute = route.path === '/blog/' || route.kind === 'blog-post';
     const resp = await page.goto(url, { waitUntil: 'domcontentloaded' });
     await waitForBigBangComplete(page);
     await page.waitForTimeout(200);
@@ -889,6 +985,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         headerStatus: headerStatus?.textContent?.trim() || '',
         headerSearchHref: headerStatus?.querySelector('[data-site-search-link]')?.getAttribute('href') || '',
         headerSearchSlots: document.querySelectorAll('#site-topbar [data-site-search-slot]').length,
+        headerThemeToggle: [...document.querySelectorAll('#site-topbar [data-logs-theme-toggle]')].map((toggle) => ({
+          label: toggle.getAttribute('aria-label'),
+          pressed: toggle.getAttribute('aria-pressed'),
+          text: toggle.textContent.trim(),
+        })),
         floatingSiteTools: document.querySelectorAll('.site-tools, [data-site-tools-capabilities]').length,
         headerTelescopeArtifacts: document.querySelectorAll(
           '#site-nav [data-telescope-target], #site-nav-mobile [data-telescope-target], .universe-telescope-nav__instrument'
@@ -919,7 +1020,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         && Math.abs(mobilePerspective.headerInnerHeight - 52) <= 0.5
         && Math.abs(mobilePerspective.headerNavHeight - 60) <= 0.5
         && mobilePerspective.headerLinkTargets.every(({ height, width }) => height >= 44 && width >= 44)
-        && mobilePerspective.headerStatus === '[search /]'
+        // Logs pages keep their page-level theme preference beside Search.
+        && (isLogsRoute
+          ? mobilePerspective.headerStatus === '[light][search /]'
+            && JSON.stringify(mobilePerspective.headerThemeToggle)
+              === JSON.stringify([{ label: 'Use light theme', pressed: 'false', text: '[light]' }])
+          : mobilePerspective.headerStatus === '[search /]'
+            && mobilePerspective.headerThemeToggle.length === 0)
         && mobilePerspective.headerSearchHref === '/search.html'
         && mobilePerspective.headerSearchSlots === 1
         && mobilePerspective.floatingSiteTools === 0
@@ -2072,8 +2179,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       canvas: {
         backingHeight: canvas.height,
         backingWidth: canvas.width,
-        coversOpening: canvasBounds.left <= 0
-          && canvasBounds.right >= window.innerWidth
+        // Offsets come from rounded offsetLeft/offsetTop (never transformed
+        // bounds), so every edge allows the same sub-pixel rounding.
+        coversOpening: canvasBounds.left <= 1
+          && canvasBounds.right >= window.innerWidth - 1
           && canvasBounds.top <= opening.top + 1
           && canvasBounds.bottom >= opening.bottom - 1,
         height: canvasBounds.height,
@@ -2146,7 +2255,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(
     desktopSpectrum.branches === 8
       && desktopSpectrum.visibleBranches === 8
-      && desktopSpectrum.visibleNodes === 0
+      && desktopSpectrum.visibleNodes === 31
       && desktopSpectrum.nodes === 31
       && desktopSpectrum.uniqueNodes === 31
       && desktopSpectrum.rows === 31
@@ -2351,21 +2460,36 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom === '0.400'
   ), undefined, { timeout: 2000 });
   const minimumZoom = (await readAboutCamera(page)).zoom;
+  // Record every camera frame of the tween instead of sampling after a fixed
+  // wall-clock delay, which lands on a different frame on every machine.
+  await page.evaluate(() => {
+    const spectrum = document.querySelector('[data-stellar-spectrum]');
+    window.__aboutZoomFrames = [];
+    window.__aboutZoomObserver?.disconnect();
+    window.__aboutZoomObserver = new MutationObserver(() => {
+      window.__aboutZoomFrames.push({
+        ariaValue: document.querySelector('[data-tree-zoom-range]')?.getAttribute('aria-valuetext'),
+        output: document.querySelector('[data-tree-zoom-output]')?.textContent,
+        range: document.querySelector('[data-tree-zoom-range]')?.value,
+        zoom: Number(spectrum.dataset.treeZoom),
+      });
+    });
+    window.__aboutZoomObserver.observe(spectrum, { attributes: true, attributeFilter: ['data-tree-zoom'] });
+  });
   await zoomRange.fill('260');
-  await page.waitForTimeout(90);
-  const tweenedMaximumState = await page.evaluate(() => ({
-    ariaValue: document.querySelector('[data-tree-zoom-range]')?.getAttribute('aria-valuetext'),
-    output: document.querySelector('[data-tree-zoom-output]')?.textContent,
-    range: document.querySelector('[data-tree-zoom-range]')?.value,
-    zoom: Number(document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom),
-  }));
   await page.waitForFunction(() => (
     document.querySelector('[data-stellar-spectrum]')?.dataset.treeZoom === '2.600'
   ), undefined, { timeout: 2000 });
   const maximumZoom = (await readAboutCamera(page)).zoom;
+  // The first camera frame that leaves the minimum is the tween's opening
+  // frame: the control already reports its target while the camera eases.
+  const tweenedMaximumState = await page.evaluate(() => {
+    window.__aboutZoomObserver.disconnect();
+    return window.__aboutZoomFrames.find(({ zoom }) => zoom > 0.4) || null;
+  });
   await assert(
     minimumZoom === 0.4
-      && tweenedMaximumState.zoom > minimumZoom
+      && tweenedMaximumState?.zoom > minimumZoom
       && tweenedMaximumState.zoom < 1
       && tweenedMaximumState.range === '260'
       && tweenedMaximumState.ariaValue === '260 percent'
@@ -2418,8 +2542,11 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     new Set(tweenedIdlePositions.map(({ position }) => position)).size === 1
       && new Set(tweenedIdlePositions.map(({ canvasFrame }) => canvasFrame)).size >= 3
       && new Set(tweenedIdlePositions.map(({ canvasSignature }) => canvasSignature)).size >= 5
-      && tweenedIdlePositions.every(({ canvasPixels }) => canvasPixels > 0 && canvasPixels <= 1050000)
-      && tweenedIdlePositions.every(({ properties }) => properties.includes('left') && properties.includes('top')),
+      // CANVAS_PIXEL_BUDGET is 2,000,000; each backing dimension rounds once.
+      && tweenedIdlePositions.every(({ canvasPixels }) => canvasPixels > 0 && canvasPixels <= 2004000)
+      // Labels are re-projected on every display frame, so a left/top
+      // transition would only make them trail their stars.
+      && tweenedIdlePositions.every(({ properties }) => !/\b(?:left|top|all)\b/.test(properties)),
     `About high-zoom nebula motion or stable controls regressed: ${JSON.stringify(tweenedIdlePositions)}`
   );
   await zoomRange.fill('145');
@@ -2563,7 +2690,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   );
 
   const surfacesBand = page.locator('[data-band-trigger="engineering:surfaces"]');
-  await surfacesBand.click();
+  await clickDriftingControl(page, surfacesBand, 'Desktop Surfaces branch');
   await assert((await page.locator('[data-band-id="engineering:surfaces"] [data-node-id]').count()) === 4,
     'Engineering surfaces branch does not expose its four exact signals');
   const desktopConstellationFocus = await page.evaluate(() => {
@@ -2970,7 +3097,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   // Overview collision reduction may hide individual signals until their real
   // branch is selected. Selecting Surfaces must reveal Android and keep it
   // normally hit-testable beside the open branch readout.
-  await mobilePage.locator('[data-band-trigger="engineering:surfaces"]').click();
+  await clickDriftingControl(mobilePage, mobilePage.locator('[data-band-trigger="engineering:surfaces"]'), 'Mobile Surfaces branch');
   await mobilePage.locator('[data-node-id="android"]').waitFor({ state: 'visible' });
   const mobileConstellationFocus = await mobilePage.evaluate(() => {
     const branches = [...document.querySelectorAll('[data-band-trigger]')];
@@ -4718,6 +4845,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
 
   const report = {
     baseUrl: BASE_URL,
+    rendering,
     screenshots: screenshotRoot,
     failures,
     warnings,
@@ -4732,4 +4860,10 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   if (failures.length) {
     process.exit(1);
   }
-})();
+})().catch((error) => {
+  // A timed-out wait aborts the remaining checks; still report every
+  // assertion that failed before it so one stall does not hide the rest.
+  console.error(JSON.stringify({ baseUrl: BASE_URL, failures, warnings }, null, 2));
+  console.error(error);
+  process.exit(1);
+});
