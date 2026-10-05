@@ -2,26 +2,77 @@
   "use strict";
 
   const root = document.querySelector("[data-resume-dossier]");
-  const controls = document.querySelector("[data-signal-controls]");
-  if (!root || !controls) return;
+  if (!root) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  // The current role's length and its share of the timeline grow with time.
+  function monthsSince(value) {
+    const [year, month] = String(value).split("-").map(Number);
+    if (!year || !month) return 0;
+    const now = new Date();
+    return Math.max(1, (now.getFullYear() - year) * 12 + (now.getMonth() + 1 - month));
+  }
+
+  function durationLabel(total) {
+    const years = Math.floor(total / 12);
+    const months = total % 12;
+    const parts = [];
+    if (years) parts.push(`${years} yr${years > 1 ? "s" : ""}`);
+    if (months) parts.push(`${months} mo${months > 1 ? "s" : ""}`);
+    return parts.join(" ") || "1 mo";
+  }
+
+  root.querySelectorAll("[data-duration-since]").forEach((node) => {
+    const total = monthsSince(node.dataset.durationSince);
+    if (total) node.textContent = durationLabel(total);
+  });
+  root.querySelectorAll("[data-months-since]").forEach((node) => {
+    const total = monthsSince(node.dataset.monthsSince);
+    if (total) node.style.setProperty("--months", String(total));
+  });
+
+  // Copy email, only where the clipboard is available.
+  const copyButton = root.querySelector("[data-copy-email]");
+  const copyStatus = root.querySelector("[data-copy-status]");
+  const email = root.querySelector("[data-email]");
+  let copyTimer = 0;
+  if (copyButton && email && navigator.clipboard?.writeText) {
+    copyButton.hidden = false;
+    copyButton.addEventListener("click", async () => {
+      window.clearTimeout(copyTimer);
+      try {
+        await navigator.clipboard.writeText(email.textContent.trim());
+        copyButton.textContent = "Copied";
+        if (copyStatus) copyStatus.textContent = "Email address copied.";
+      } catch (_error) {
+        if (copyStatus) copyStatus.textContent = "Copy failed. Select the address instead.";
+      }
+      copyTimer = window.setTimeout(() => {
+        copyButton.textContent = "Copy";
+        if (copyStatus) copyStatus.textContent = "";
+      }, 2400);
+    });
+  }
+
+  // Highlight roles by focus. Nothing is hidden; other roles are dimmed and the
+  // choice is kept in ?signal= so a highlighted view can be shared.
+  const controls = root.querySelector("[data-signal-controls]");
+  if (!controls) return;
 
   const SIGNALS = Object.freeze({
-    android: "Android",
-    architecture: "Architecture",
     leadership: "Leadership",
-    fintech: "Fintech",
-    reliability: "Reliability",
+    architecture: "Architecture",
+    fintech: "Fintech & crypto",
     "cross-platform": "Cross-platform",
-    "ai-assisted-delivery": "AI-assisted delivery"
+    reliability: "Reliability"
   });
   const buttons = Array.from(controls.querySelectorAll("[data-signal]"));
   const resetButton = controls.querySelector("[data-signal-reset]");
-  const printButton = controls.querySelector("[data-print-resume]");
   const status = document.getElementById("signal-filter-status");
+  const roles = Array.from(root.querySelectorAll(".resume-role[data-signals]"));
   const evidenceNodes = Array.from(root.querySelectorAll("[data-signals]"));
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let activeSignal = "";
-  let scanTimer = 0;
 
   function requestedSignal() {
     const value = new URL(window.location.href).searchParams.get("signal") || "";
@@ -45,7 +96,7 @@
     }, "", next);
   }
 
-  function nodeSupportsSignal(node, signal) {
+  function supports(node, signal) {
     return !signal || (node.dataset.signals || "").split(/\s+/).includes(signal);
   }
 
@@ -54,47 +105,43 @@
     root.dataset.activeSignal = activeSignal;
 
     buttons.forEach((button) => {
-      const selected = button.dataset.signal === activeSignal;
-      button.setAttribute("aria-pressed", String(selected));
-      button.dataset.selected = String(selected);
+      button.setAttribute("aria-pressed", String(button.dataset.signal === activeSignal));
     });
     evidenceNodes.forEach((node) => {
-      node.dataset.signalMatch = String(nodeSupportsSignal(node, activeSignal));
+      node.dataset.signalMatch = String(supports(node, activeSignal));
     });
 
     resetButton.disabled = !activeSignal;
     if (status) {
+      const matches = roles.filter((role) => supports(role, activeSignal)).length;
       status.textContent = activeSignal
-        ? `${SIGNALS[activeSignal]} evidence is highlighted. Every other resume item remains visible and print stays complete.`
-        : "All experience shown · choose a capability to highlight its evidence.";
+        ? `${SIGNALS[activeSignal]}: ${matches} of ${roles.length} roles. The others are dimmed, not hidden.`
+        : "";
     }
     if (history) writeHistory(activeSignal, history);
   }
 
-  function pulseScan() {
-    window.clearTimeout(scanTimer);
-    root.classList.remove("is-scanning");
-    if (reducedMotion.matches) return;
-    root.getBoundingClientRect();
-    root.classList.add("is-scanning");
-    scanTimer = window.setTimeout(() => root.classList.remove("is-scanning"), 700);
+  function revealFirstMatch() {
+    const first = roles.find((role) => supports(role, activeSignal));
+    if (!activeSignal || !first) return;
+    const bounds = first.getBoundingClientRect();
+    if (bounds.top >= 0 && bounds.top < window.innerHeight * 0.8) return;
+    first.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "start" });
   }
 
-  root.classList.add("resume-dossier--enhanced");
   controls.hidden = false;
 
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
       const next = button.dataset.signal === activeSignal ? "" : button.dataset.signal;
       applySignal(next, { history: "push" });
-      pulseScan();
+      revealFirstMatch();
     });
   });
   resetButton.addEventListener("click", () => {
     applySignal("", { history: "push" });
-    pulseScan();
+    buttons[0]?.focus();
   });
-  printButton.addEventListener("click", () => window.print());
   window.addEventListener("popstate", () => applySignal(requestedSignal()));
   window.addEventListener("pageshow", () => applySignal(requestedSignal()));
 
