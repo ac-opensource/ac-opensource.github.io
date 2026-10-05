@@ -1,7 +1,7 @@
 (() => {
   "use strict";
   window.createAboutButterflyField = canvas => {
-    const gl = canvas.getContext("webgl", { alpha: true, antialias: false, depth: false, premultipliedAlpha: true });
+    const gl = canvas.getContext("webgl", { alpha: true, antialias: false, depth: false, failIfMajorPerformanceCaveat: true, premultipliedAlpha: true });
     if (!gl) return null;
     let lost = false, disposed = false;
     const onLost = event => { event.preventDefault(); lost = true; };
