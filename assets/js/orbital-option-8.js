@@ -432,6 +432,66 @@
     // Writing shadowed copies on the node only invalidated its animated subtree.
   };
 
+  // Labels keep their designed side while it fits on the visible stage. Near a
+  // clipped edge a label mirrors around its sculpture; the CSS moves the anchor
+  // with it, so the sculpture never leaves its orbit point. Rects are read at
+  // the start of a frame, before this frame writes any styles.
+  const labelGap = 6;
+  const labelHysteresis = 24;
+  const labelSyncInterval = 6;
+  const designedLabelSides = new Map();
+  let labelClipElements = [];
+  let labelSyncCountdown = 0;
+  let labelSyncFrame = 0;
+
+  const refreshLabelLayout = () => {
+    nodes.forEach((node) => node.removeAttribute("data-label-side"));
+    nodes.forEach((node) => {
+      const column = getComputedStyle(node.querySelector(".sculpture")).gridColumnStart;
+      designedLabelSides.set(node.dataset.orbitObject, column === "2" ? "start" : "end");
+    });
+    labelClipElements = [root, overview, cameraWindow].filter((element) => getComputedStyle(element).overflowX !== "visible");
+    labelSyncCountdown = 0;
+  };
+
+  const syncLabelSides = () => {
+    if (state.phase !== "overview") return;
+    let stageLeft = 0;
+    let stageRight = document.documentElement.clientWidth;
+    labelClipElements.forEach((element) => {
+      const bounds = element.getBoundingClientRect();
+      stageLeft = Math.max(stageLeft, bounds.left);
+      stageRight = Math.min(stageRight, bounds.right);
+    });
+    nodes.forEach((node) => {
+      const key = node.dataset.orbitObject;
+      if (state.held.has(key) || state.drag?.key === key) return;
+      const designed = designedLabelSides.get(key);
+      const current = node.dataset.labelSide || designed;
+      const sculpture = node.querySelector(".sculpture").getBoundingClientRect();
+      const needed = node.querySelector(".node-label").getBoundingClientRect().width + labelGap;
+      const room = (side) => (side === "end" ? stageRight - sculpture.right : sculpture.left - stageLeft);
+      let next = current;
+      if (current === designed) {
+        const other = designed === "end" ? "start" : "end";
+        if (room(designed) < needed && room(other) > room(designed)) next = other;
+      } else if (room(designed) >= needed + labelHysteresis || (room(current) < needed && room(designed) > room(current))) {
+        next = designed;
+      }
+      if (next === current) return;
+      if (next === designed) node.removeAttribute("data-label-side");
+      else node.dataset.labelSide = next;
+    });
+  };
+
+  const scheduleLabelSync = () => {
+    if (labelSyncFrame) return;
+    labelSyncFrame = window.requestAnimationFrame(() => {
+      labelSyncFrame = 0;
+      syncLabelSides();
+    });
+  };
+
   const renderedLayers = new WeakMap();
 
   const render = () => {
@@ -483,6 +543,11 @@
   const frame = (timestamp) => {
     const delta = state.lastFrame ? Math.min(timestamp - state.lastFrame, 48) : 16;
     state.lastFrame = timestamp;
+    labelSyncCountdown -= 1;
+    if (labelSyncCountdown <= 0) {
+      labelSyncCountdown = labelSyncInterval;
+      syncLabelSides();
+    }
     profiles.forEach((profile) => {
       const custom = state.customOrbits.get(profile.key);
       if (state.held.has(profile.key)) return;
@@ -500,6 +565,7 @@
     state.lastFrame = 0;
     render();
     if (shouldAnimate()) state.frameRequest = window.requestAnimationFrame(frame);
+    else scheduleLabelSync();
   };
 
   const syncMotion = () => {
@@ -1321,6 +1387,7 @@
     state.compact = compactQuery.matches;
     state.phone = phoneQuery.matches;
     state.short = shortQuery.matches;
+    refreshLabelLayout();
     measure();
     syncRegularTracks();
     if (state.cometKey) syncCustomTrack(state.cometKey);
@@ -1360,6 +1427,7 @@
   setView("orbit", { sound: false });
   syncSelection();
   clearPreview();
+  refreshLabelLayout();
   measure();
   syncRegularTracks();
   syncResetControl();

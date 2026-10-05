@@ -1280,6 +1280,32 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
       `Homepage internal geometry is not animated at ${viewport.width}x${viewport.height}`
     );
 
+    // Near a clipped stage edge a label mirrors around its sculpture, so a body
+    // that is on stage never carries a label that runs off it.
+    const findOffStageLabels = () => {
+      const stageBounds = ['[data-synthesis]', '[data-overview]', '[data-camera-window]']
+        .map((selector) => document.querySelector(selector))
+        .filter((element) => getComputedStyle(element).overflowX !== 'visible')
+        .map((element) => element.getBoundingClientRect());
+      const left = Math.max(0, ...stageBounds.map((bounds) => bounds.left));
+      const right = Math.min(document.documentElement.clientWidth, ...stageBounds.map((bounds) => bounds.right));
+      return [...document.querySelectorAll('[data-orbit-object]')].filter((node) => {
+        const sculpture = node.querySelector('.sculpture').getBoundingClientRect();
+        const label = node.querySelector('.node-label').getBoundingClientRect();
+        return sculpture.left >= left - 1 && sculpture.right <= right + 1
+          && (label.left < left - 1 || label.right > right + 1);
+      }).map((node) => node.dataset.orbitObject);
+    };
+    let offStageLabels = await spatialPage.evaluate(findOffStageLabels);
+    for (let attempt = 0; offStageLabels.length && attempt < 20; attempt += 1) {
+      await spatialPage.waitForTimeout(100);
+      offStageLabels = await spatialPage.evaluate(findOffStageLabels);
+    }
+    await assert(
+      offStageLabels.length === 0,
+      `Homepage orbit labels run off the stage at ${viewport.width}x${viewport.height}: ${JSON.stringify(offStageLabels)}`
+    );
+
     const beforeOrbit = await readOrbitCoordinates(spatialPage);
     await spatialPage.waitForTimeout(900);
     const afterOrbit = await readOrbitCoordinates(spatialPage);
