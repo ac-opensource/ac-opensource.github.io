@@ -197,7 +197,7 @@ async function flyViaLink(page, { from, to, kind, href, selector, nested = null,
       targetKind: plan.to.landmark.kind,
     };
   });
-  assert.equal(arrival.snapshot.lastTravel.version, 11, `${label}: use the current flight record.`);
+  assert.equal(arrival.snapshot.lastTravel.version, 12, `${label}: use the current flight record.`);
   assert.equal(arrival.snapshot.lastTravel.from, from);
   assert.equal(arrival.snapshot.lastTravel.to, to);
   assert.equal(arrival.snapshot.current, pageKey);
@@ -352,7 +352,7 @@ async function main() {
     assert.deepEqual(arrival.layers.map((layer) => layer.name), ["universe-cosmos", "universe-cosmos-near"]);
     assert.equal(arrival.layers[0].painted, 255, "The far sky is painted before the first transition frame.");
     const travel = arrival.snapshot.lastTravel;
-    assert.equal(travel.version, 11);
+    assert.equal(travel.version, 12);
     assert.equal(travel.from, "contact");
     assert.equal(travel.to, "resume");
     assert.equal(travel.motionModel, "cosmic-camera");
@@ -452,7 +452,7 @@ async function main() {
     ]);
     await waitForArrival(page);
     const logsTravel = await page.evaluate(() => window.UniversePerspective.snapshot().lastTravel);
-    assert.equal(logsTravel.version, 11);
+    assert.equal(logsTravel.version, 12);
     assert.equal(logsTravel.from, "about");
     assert.equal(logsTravel.to, "logs");
     assertIdentity((await seek(page, 0)).old, "About starts at rest before entering the galaxy");

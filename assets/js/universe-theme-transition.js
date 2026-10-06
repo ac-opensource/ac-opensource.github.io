@@ -13,7 +13,7 @@
   const root = document.documentElement;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const ARRIVAL_KEY = "ac.universe-perspective.v1";
-  const RECORD_VERSION = 11;
+  const RECORD_VERSION = 12;
   const MOTION_MODEL = "cosmic-camera";
   const PATH_MODEL = "spatial-zoom-orbit";
   const MAX_ARRIVAL_AGE = 8000;
@@ -41,27 +41,29 @@
   // One volume, not a page plane: x grows east, y grows down, z grows toward
   // the observer at rest. The sky map is its X/Y chart. Pages rest facing -Z;
   // flights yaw/pitch toward their actual target, including objects behind us.
+  // Region centers leave open space between their fixed-size landmarks.
+  // Skills and Production retain their local offsets inside their parent region.
   const DESTINATIONS = Object.freeze({
     home: destination("home", "Dashboard", "home", 1, 1, "[data-camera-window]",
       { x: 0, y: 0, z: 0, r: 1, kind: "orbital", tag: "00 HOME" }),
     about: destination("about", "About", "about", 4.5, 1.6, "#profile-map",
-      { x: -9.6, y: 4.4, z: 15, r: 2.6, kind: "nebula", tag: "01 ABOUT" }),
+      { x: -28.8, y: 13.2, z: 45, r: 2.6, kind: "nebula", tag: "01 ABOUT" }),
     profile: destination("profile", "Skills", "profile", 7.4, 3.2, null,
-      { x: -8.1, y: 2.6, z: 15, r: 0.62, kind: "tree", tag: "02 SKILLS" }),
+      { x: -27.3, y: 11.4, z: 45, r: 0.62, kind: "tree", tag: "02 SKILLS" }),
     work: destination("work", "Portfolio", "work", 3.1, 2.4, ".work-hero__art",
-      { x: -1.2, y: -7.4, z: -5, r: 1.5, kind: "supernova", tag: "03 PORTFOLIO" }),
+      { x: -3.6, y: -22.2, z: -15, r: 1.5, kind: "supernova", tag: "03 PORTFOLIO" }),
     projects: destination("projects", "Production apps", "projects", 8.8, 5.6, null,
-      { x: 1.5, y: -6.6, z: -5, r: 0.42, kind: "cluster", tag: "04 PRODUCTION" }),
+      { x: -0.9, y: -21.4, z: -15, r: 0.42, kind: "cluster", tag: "04 PRODUCTION" }),
     logs: destination("logs", "Logs", "threads", 6.5, 2.8, "#galaxy-field",
-      { x: 17.5, y: 8.2, z: -12, r: 6.4, kind: "galaxy", tag: "05 LOGS" }),
+      { x: 52.5, y: 24.6, z: -36, r: 6.4, kind: "galaxy", tag: "05 LOGS" }),
     contact: destination("contact", "Contact", "contact", 4, 1.8, "[data-payload-visual]",
-      { x: 0.8, y: 2.9, z: 1.8, r: 0.32, kind: "probe", tag: "06 CONTACT" }),
+      { x: 2.4, y: 8.7, z: 5.4, r: 0.32, kind: "probe", tag: "06 CONTACT" }),
     resume: destination("resume", "Resume", "work", 6.2, 4.4, "[data-resume-signature-visual]",
-      { x: 1.9, y: -4.2, z: 5, r: 0.55, kind: "chart", tag: "07 RÉSUMÉ" }),
+      { x: 5.7, y: -12.6, z: 15, r: 0.55, kind: "chart", tag: "07 RÉSUMÉ" }),
     signals: destination("signals", "Signals", "contact", 6.9, 3.6, ".signals-hero__telemetry",
-      { x: 2.4, y: 3.9, z: 4.8, r: 0.26, kind: "beacon", tag: "08 SIGNALS" }),
+      { x: 7.2, y: 11.7, z: 14.4, r: 0.26, kind: "beacon", tag: "08 SIGNALS" }),
     search: destination("search", "Evidence search", "threads", 5.4, 3.8, ".evidence-search__console",
-      { x: 3.2, y: 0.4, z: -4, r: 9, kind: "survey", tag: "09 SEARCH" }),
+      { x: 9.6, y: 1.2, z: -12, r: 9, kind: "survey", tag: "09 SEARCH" }),
   });
   const LANDMARK_KEYS = ["search", "logs", "about", "work", "home", "resume", "projects", "profile", "contact", "signals"];
   const CHART_LINES = [

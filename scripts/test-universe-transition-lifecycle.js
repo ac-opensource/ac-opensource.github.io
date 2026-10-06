@@ -126,7 +126,7 @@ for (const crossDocument of [false, true]) {
   assert.equal(page.snapshot().pendingCleanup, 0);
   assert.equal(JSON.parse(page.storage.get(ARRIVAL_KEY)).destinationUrl, "/about.html?source=map#profile-map",
     "Completing departure must retain the destination's one-time arrival payload.");
-  assert.equal(JSON.parse(page.storage.get(ARRIVAL_KEY)).version, 11, "Changed galaxy/exposure contracts must use the current arrival record.");
+  assert.equal(JSON.parse(page.storage.get(ARRIVAL_KEY)).version, 12, "Changed world geometry must use the current arrival record.");
   page.frame();
   page.frame();
   page.advance(3000);

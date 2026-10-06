@@ -3552,7 +3552,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
         : canceledDeparture.irisLayers.length <= 1)
       && canceledDeparture.stored?.from === 'work'
       && canceledDeparture.stored?.to === 'about'
-      && canceledDeparture.stored?.version === 11
+      && canceledDeparture.stored?.version === 12
       && !canceledDeparture.legacyCameraFields
       && canceledDeparture.fullScreenInstrument === 0,
     `Work-to-About departure does not plan a camera flight through the shared world: ${JSON.stringify(canceledDeparture)}`
