@@ -13,7 +13,7 @@
   const root = document.documentElement;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const ARRIVAL_KEY = "ac.universe-perspective.v1";
-  const RECORD_VERSION = 12;
+  const RECORD_VERSION = 13;
   const MOTION_MODEL = "cosmic-camera";
   const PATH_MODEL = "spatial-zoom-orbit";
   const MAX_ARRIVAL_AGE = 8000;
@@ -52,17 +52,17 @@
       { x: -27.3, y: 11.4, z: 45, r: 0.62, kind: "tree", tag: "02 SKILLS" }),
     work: destination("work", "Portfolio", "work", 3.1, 2.4, ".work-hero__art",
       { x: -3.6, y: -22.2, z: -15, r: 1.5, kind: "supernova", tag: "03 PORTFOLIO" }),
-    projects: destination("projects", "Production apps", "projects", 8.8, 5.6, null,
+    projects: destination("projects", "Production apps", "projects", 8.8, 5.6, ".work-bitcoin-gallery",
       { x: -0.9, y: -21.4, z: -15, r: 0.42, kind: "cluster", tag: "04 PRODUCTION" }),
     logs: destination("logs", "Logs", "threads", 6.5, 2.8, "#galaxy-field",
       { x: 52.5, y: 24.6, z: -36, r: 6.4, kind: "galaxy", tag: "05 LOGS" }),
     contact: destination("contact", "Contact", "contact", 4, 1.8, "[data-payload-visual]",
       { x: 2.4, y: 8.7, z: 5.4, r: 0.32, kind: "probe", tag: "06 CONTACT" }),
-    resume: destination("resume", "Resume", "work", 6.2, 4.4, "[data-resume-signature-visual]",
+    resume: destination("resume", "Resume", "work", 6.2, 4.4, ".resume-timeline__track",
       { x: 5.7, y: -12.6, z: 15, r: 0.55, kind: "chart", tag: "07 RÉSUMÉ" }),
-    signals: destination("signals", "Signals", "contact", 6.9, 3.6, ".signals-hero__telemetry",
+    signals: destination("signals", "Signals", "contact", 6.9, 3.6, ".signals-orbit__field",
       { x: 7.2, y: 11.7, z: 14.4, r: 0.26, kind: "beacon", tag: "08 SIGNALS" }),
-    search: destination("search", "Evidence search", "threads", 5.4, 3.8, ".evidence-search__console",
+    search: destination("search", "Evidence search", "threads", 5.4, 3.8, ".evidence-search__field",
       { x: 9.6, y: 1.2, z: -12, r: 9, kind: "survey", tag: "09 SEARCH" }),
   });
   const LANDMARK_KEYS = ["search", "logs", "about", "work", "home", "resume", "projects", "profile", "contact", "signals"];
@@ -191,7 +191,7 @@
       mapId: "threads",
       depth: 8.4,
       magnification: 6.4,
-      focus: ".article-region__hero",
+      focus: ".article-region__hero, .work-post-hero",
       landmark: Object.freeze({
         x: galaxy.x + point.x * galaxy.r,
         y: galaxy.y + point.y * galaxy.r,
@@ -281,7 +281,24 @@
       && focus.x > 0 && focus.x < viewport.w && focus.y > 56 && focus.y < viewport.h * 0.9);
   }
 
+  // Only page-owned cosmetic geometry crosses documents. Each provider exposes
+  // finite dimensions/pose, never labels, form values or application records.
+  function capturePageVisuals() {
+    const provider = window.UniversePageLandmark;
+    if (!provider || !["orbital", "probe", "supernova"].includes(provider.kind)) return {};
+    try {
+      const visual = provider.snapshot();
+      return visual && typeof visual === "object" ? { [provider.kind]: visual } : {};
+    } catch (_error) { return {}; }
+  }
+
   function measureFocus(target, viewport = viewportSize()) {
+    if (target?.key === "work" || target?.key === "home") {
+      const kind = target.key === "home" ? "orbital" : "supernova";
+      const focus = window.UniversePageLandmark?.kind === kind
+        ? window.UniversePageLandmark.measureFocus?.() || capturePageVisuals()[kind]?.focus : null;
+      if (visibleGalaxyFocus(focus, viewport)) return { x: focus.x, y: focus.y, r: focus.r };
+    }
     if (target?.key === "logs") {
       const focus = window.UniverseGalaxy?.snapshot().focus;
       // The portrait archive sits below its introduction. Land on the region
@@ -456,6 +473,7 @@
       travelDusk: 0.74 * smoothstep(0.7, 1.9, Math.abs(path.S)),
       correction: null,
       galaxy: to.key === "logs" ? window.UniverseGalaxy?.snapshot() || null : record.galaxy || null,
+      visuals: { ...record.visuals, ...capturePageVisuals() },
     };
     if (arrivalFocus) correctLanding(plan, arrivalFocus, 0);
     measureEnclosure(plan);
@@ -479,6 +497,7 @@
   // measured focus; the change happens while that page is still far away.
   function correctLanding(plan, focus, from) {
     if (plan.to.key === "logs") plan.galaxy = window.UniverseGalaxy?.snapshot() || plan.galaxy;
+    Object.assign(plan.visuals, capturePageVisuals());
     const measured = pageCamera(plan.to.landmark, focus, plan.viewport);
     plan.targetFocus = focus;
     const dx = measured.x - plan.end.x;
@@ -783,8 +802,10 @@
       y: x * Math.sin(roll) + y * Math.cos(roll), z: -point.x * Math.sin(yaw) + z * Math.cos(yaw) };
   }
 
-  function landmarkGeometry(kind) {
-    if (landmarkGeometryCache.has(kind)) return landmarkGeometryCache.get(kind);
+  function landmarkGeometry(kind, visual = null) {
+    const artwork = kind === "supernova" ? window.prepareUniverseRemnantArtwork?.() : null;
+    const cacheKey = `${kind}:${visual ? JSON.stringify(visual) : "default"}:${artwork?.ready ? "artwork" : "fallback"}`;
+    if (landmarkGeometryCache.has(cacheKey)) return landmarkGeometryCache.get(cacheKey);
     const geometry = { segments: [], bodies: [], faces: [], clouds: [] };
     const random = seededRandom(stableHash(`volume:${kind}`));
     const tau = Math.PI * 2;
@@ -834,217 +855,513 @@
     };
 
     if (kind === "orbital") {
-      // Six eccentric tracks follow the live Home rig's radii, centers and tilts.
+      // One tilted rig carries Home's six wire sculptures. A page snapshot
+      // supplies the actual responsive/custom tracks and current body anchors.
+      const pitch = 56 * Math.PI / 180, roll = -7 * Math.PI / 180;
+      const cp = Math.cos(pitch), sp = Math.sin(pitch), cr = Math.cos(roll), sr = Math.sin(roll);
+      const defaultPose = [cr, cp * sr, sp * sr, -sr, cp * cr, sp * cr, 0, -sp, cp];
+      const inversePose = [cr, -sr, 0, cp * sr, cp * cr, -sp, sp * sr, sp * cr, cp];
+      const motifs = ["sphere", "frames", "gyroscope", "compass", "loom", "cubes"];
+      const keys = ["about", "profile", "work", "projects", "threads", "contact"];
       const profiles = [[.19, .125, .03, -.005, -8, -62], [.255, .17, .065, -.025, 13, 12],
         [.315, .215, .02, .025, -17, 82], [.37, .255, .08, -.035, 7, 137],
         [.42, .29, .11, -.01, 19, 211], [.47, .325, .065, .035, -11, 292]];
-      profiles.forEach(([rx, ry, cx, cy, tilt, phase], index) => {
-        const track = ring(point(cx * 1.8, cy * 1.8, (index - 2.5) * .018), rx * 1.8, ry * 1.8,
-          .52 + index * .09, (index % 2 ? 1 : -1) * .24, tilt * Math.PI / 180 - .2,
-          index % 3 === 1 ? teal : blue, .43 + index * .035);
-        const node = track(phase * Math.PI / 180);
-        body(node, .033 + index * .007, [silver, teal, copper, blue, silver, teal][index], .04, index > 2 ? "gas" : "rock");
-        cloud(node, .09, blue, .18);
+      const defaults = profiles.map(([rx, ry, cx, cy, tilt, phase], index) => {
+        const angle = phase * Math.PI / 180, rotation = tilt * Math.PI / 180;
+        const x = Math.cos(angle) * rx * 1.18, y = Math.sin(angle) * ry;
+        return { key: keys[index], motif: motifs[index], rx: rx * 1.18, ry, tilt: rotation,
+          center: point(cx * 1.18, cy), size: .11,
+          sculpturePose: index === 1 ? [Math.SQRT1_2, Math.SQRT1_2, 0, -Math.SQRT1_2, Math.SQRT1_2, 0, 0, 0, 1] : inversePose,
+          position: point(cx * 1.18 + x * Math.cos(rotation) - y * Math.sin(rotation),
+            cy + x * Math.sin(rotation) + y * Math.cos(rotation)) };
       });
-      body(origin, .064, white, 1);
-      cloud(origin, .32, blue, .15);
-      ring(origin, .11, .11, .6, .2, 0, silver, .38);
-    } else if (kind === "supernova") {
-      // The live Work artwork is an elongated cobalt/teal remnant with ragged
-      // copper filaments. A thick, irregular shell preserves that silhouette.
-      const shell = (angle, latitude, layer = 1) => {
-        const radial = Math.sqrt(1 - latitude * latitude);
-        const ripple = 1 + .09 * Math.sin(angle * 7 + latitude * 11) + .045 * Math.cos(angle * 17 - latitude * 8);
-        return rotateLandmark(point(Math.cos(angle) * radial * 1.08 * ripple * layer,
-          Math.sin(angle) * radial * .58 * ripple * layer, latitude * .44 * layer), .24, -.2, -.66);
+      const snapshot = visual?.kind === "orbital" && visual.orbits?.length === 6 ? visual : null;
+      const pose = snapshot?.pose || defaultPose, orbits = snapshot?.orbits || defaults;
+      const core = snapshot?.origin || { x: .0472, y: .02, z: .008, r: .056 };
+      const apply = (p, matrix) => point(matrix[0] * p.x + matrix[3] * p.y + matrix[6] * p.z,
+        matrix[1] * p.x + matrix[4] * p.y + matrix[7] * p.z,
+        matrix[2] * p.x + matrix[5] * p.y + matrix[8] * p.z);
+      const corePosition = apply(core, pose);
+      const rig = (p) => {
+        const q = apply(p, pose);
+        return point((q.x - corePosition.x) * 1.8, (q.y - corePosition.y) * 1.8, (q.z - corePosition.z) * 1.8);
       };
-      const matter = [[42, 100, 198], [69, 148, 185], [43, 154, 153], [115, 148, 205], copper];
-      for (let i = 0; i < 1050; i += 1) {
-        const angle = random() * tau, latitude = random() * 2 - 1;
-        cloud(shell(angle, latitude, .72 + random() * .29), .035 + random() * .085,
-          matter[i % matter.length], .14 + random() * .19);
-      }
-      for (let i = 0; i < 64; i += 1) {
-        const latitude = (random() * 2 - 1) * .93;
-        const start = random() * tau, length = .13 + random() * .6;
-        const color = i % 3 === 0 ? [233, 186, 125] : i % 3 === 1 ? copper : [111, 188, 216];
-        let previous = null;
-        for (let step = 0; step <= 16; step += 1) {
-          const angle = start + length * step / 16;
-          const p = shell(angle, clamp(latitude + Math.sin(step * .7 + i) * .025, -.98, .98), .92 + .06 * Math.sin(step * 1.3 + i));
-          if (previous) line(previous, p, color, .24 + random() * .3, .65);
-          previous = p;
+      const ink = [153, 168, 180], accent = [40, 100, 199], porcelain = [243, 245, 240];
+      const stroke = (a, b, color = ink, alpha = .9) => line(rig(a), rig(b), color, alpha, .9);
+      const path = (sample, count = 48, color = ink, alpha = .9, dashed = false) => {
+        for (let i = 0; i < count; i += 1) {
+          if (!dashed || i % 4 < 2) stroke(sample(i / count * tau), sample((i + 1) / count * tau), color, alpha);
         }
-      }
-      body(origin, .016, white, 1.5);
-      cloud(origin, .11, white, .2);
-    } else if (kind === "probe") {
-      const pose = (p) => rotateLandmark(p, -.26, .38, -.3);
-      const metal = [155, 177, 195], dark = [31, 44, 59], gold = [199, 146, 67];
-      // An octagonal, insulated bus with a separate frame and service deck.
-      // The bevels, foil and hardware remain physical surfaces from the rear.
-      const outline = [[-.125, -.225], [.125, -.225], [.175, -.175], [.175, .175],
-        [.125, .225], [-.125, .225], [-.175, .175], [-.175, -.175]];
-      const busEnd = (z) => outline.map(([x, y]) => pose(point(x, y, z)));
-      const uv = outline.map(([x, y]) => ({ x: x / .35 + .5, y: y / .45 + .5 }));
-      face(busEnd(.15), gold, false, { material: "foil", uv });
-      face(busEnd(-.15).reverse(), gold, false, { material: "foil", uv: [...uv].reverse() });
-      outline.forEach(([x, y], i) => {
-        const [nx, ny] = outline[(i + 1) % outline.length];
-        face([point(x, y, -.15), point(nx, ny, -.15), point(nx, ny, .15), point(x, y, .15)].map(pose), gold, false,
-          { material: "foil", uv: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }] });
-        for (const z of [-.155, .155]) tube(point(x, y, z), point(nx, ny, z), .007, .007, metal, pose, "metal", 6);
-        if (i % 2 === 0) tube(point(x, y, -.155), point(x, y, .155), .009, .009, metal, pose, "metal", 6);
+      };
+      orbits.forEach((orbit, index) => {
+        const ct = Math.cos(orbit.tilt), st = Math.sin(orbit.tilt);
+        path((angle) => point(orbit.center.x + Math.cos(angle) * orbit.rx * ct - Math.sin(angle) * orbit.ry * st,
+          orbit.center.y + Math.cos(angle) * orbit.rx * st + Math.sin(angle) * orbit.ry * ct), 96,
+        orbit.custom ? accent : ink, orbit.custom ? .6 : .46, orbit.custom || index === 1 || index === 3);
+        const at = (p) => {
+          const q = apply(p, orbit.sculpturePose || inversePose), size = orbit.size;
+          return point(orbit.position.x + q.x * size, orbit.position.y + q.y * size, orbit.position.z + q.z * size);
+        };
+        const wireColor = orbit.comet ? accent : ink;
+        const edge = (a, b, color = wireColor) => stroke(at(a), at(b), color);
+        const hoop = (rx, ry, rotation = (p) => p, color = wireColor, dashed = false) =>
+          path((angle) => at(rotation(point(Math.cos(angle) * rx, Math.sin(angle) * ry))), 40, color, .92, dashed);
+        const bead = (p, r = .043) => {
+          body(rig(at(p)), orbit.size * r * 1.8, porcelain, 0, "ceramic");
+          path((angle) => at(point(p.x + Math.cos(angle) * r, p.y + Math.sin(angle) * r, p.z + r * .3)), 16, accent);
+        };
+        const frame = (center, width, height, depth, color = wireColor) => {
+          const vertices = [-1, 1].flatMap((z) => [-1, 1].flatMap((y) => [-1, 1].map((x) =>
+            point(center.x + x * width / 2, center.y + y * height / 2, center.z + z * depth / 2))));
+          [[0, 1], [0, 2], [1, 3], [2, 3], [4, 5], [4, 6], [5, 7], [6, 7],
+            [0, 4], [1, 5], [2, 6], [3, 7]].forEach(([a, b]) => edge(vertices[a], vertices[b], color));
+        };
+        const stud = (p, diamond = false) => box(p, point(.09, .09, .075), porcelain,
+          (q) => rig(at(diamond ? point(p.x + (q.x - p.x - q.y + p.y) / Math.SQRT2,
+            p.y + (q.x - p.x + q.y - p.y) / Math.SQRT2, q.z) : q)), false, "ceramic");
+        const motif = orbit.motif || motifs[index];
+        if (motif === "sphere") {
+          hoop(.5, .5);
+          hoop(.22, .42, (p) => point(p.x, p.y, p.x * 1.65));
+          hoop(.42, .22, (p) => point(p.x, p.y, p.y * 1.65));
+          [0, Math.PI / 4, -Math.PI / 4].forEach((angle) => edge(
+            point(-.47 * Math.cos(angle), -.47 * Math.sin(angle), .02), point(.47 * Math.cos(angle), .47 * Math.sin(angle), .02)));
+          [point(0, -.38, .09), point(.38, .22, .09), point(-.38, .22, .09)].forEach((p) => bead(p));
+        } else if (motif === "frames") {
+          [1, .8, .54, .28].forEach((size, i) => frame(point(0, 0, [0, .12, -.12, .18][i]), size, size, .045));
+          edge(point(-.62, 0), point(.62, 0));
+          [-.5, .5].forEach((x) => [-.5, .5].forEach((y) => stud(point(x, y, .04))));
+        } else if (motif === "gyroscope") {
+          hoop(.5, .5);
+          hoop(.4, .4, (p) => rotateLandmark(p, 64 * Math.PI / 180));
+          hoop(.4, .4, (p) => rotateLandmark(p, 0, 64 * Math.PI / 180));
+          [0, 1, 2].forEach((i) => {
+            const angle = -Math.PI / 2 + i * tau / 3, tip = point(Math.cos(angle) * .4, Math.sin(angle) * .4, .035);
+            edge(point(0, 0, .035), tip); bead(tip);
+          });
+          bead(point(0, 0, .035), .025);
+        } else if (motif === "compass") {
+          hoop(.5, .5);
+          hoop(.34, .34, (p) => point(p.x, p.y, -.085), accent, true);
+          [0, 1, 2, 3].forEach((i) => {
+            const angle = (18 + i * 90) * Math.PI / 180;
+            edge(point(0, 0, .035), point(Math.cos(angle) * .49, Math.sin(angle) * .49, .035));
+            const corner = (-45 + i * 90) * Math.PI / 180;
+            stud(point(Math.cos(corner) * .43, Math.sin(corner) * .43, .035), true);
+          });
+        } else if (motif === "loom") {
+          [-.5, .5].forEach((y) => edge(point(-.5, y), point(.5, y)));
+          [-.4, .4].forEach((x) => {
+            edge(point(x, -.58, -.07), point(x, .58, -.07));
+            edge(point(x, -.58, .07), point(x, .58, .07));
+          });
+          [[-.3, 9], [-.08, -7], [.14, 5], [.32, -3]].forEach(([y, angle], i) => {
+            const slope = Math.tan(angle * Math.PI / 180), z = i % 2 ? -.045 : .045;
+            edge(point(-.4, y, z), point(.4, y + .8 * slope, z));
+            if (i < 3) { const x = [-.28, .02, .27][i]; bead(point(x, y + (x + .4) * slope, z + .04), .05); }
+          });
+        } else if (motif === "cubes") {
+          frame(point(-.11, -.11, .12), .54, .54, .28);
+          frame(point(.13, .13, -.12), .54, .54, .28, accent);
+          [[-.38, -.38], [.16, -.38], [-.38, .16]].forEach(([x, y]) => edge(point(x, y, .12), point(x + .24, y + .24, -.12)));
+          bead(point(.42, -.38, .04), .05); bead(point(-.39, .4, .04), .05);
+        }
+        if (orbit.comet) {
+          const dx = orbit.position.x - core.x, dy = orbit.position.y - core.y;
+          const distance = Math.max(.001, Math.hypot(dx, dy)), length = orbit.size * 1.5;
+          [accent, teal, copper].forEach((color, lane) => {
+            const sample = (t) => {
+              const spread = Math.sin(t * Math.PI * .75) * (lane - 1) * orbit.size * .12;
+              return point(orbit.position.x + dx / distance * length * t - dy / distance * spread,
+                orbit.position.y + dy / distance * length * t + dx / distance * spread, orbit.position.z + spread * .3);
+            };
+            for (let i = 0; i < 12; i += 1) stroke(sample(i / 12), sample((i + 1) / 12), color, .55 * (1 - i / 12));
+          });
+        }
       });
-      box(point(-.026, .06, .163), point(.205, .235, .026), dark, pose, false, "dark");
-      // A louvred radiator, recessed optical port and mounting fasteners.
-      for (let i = 0; i < 9; i += 1) box(point(-.055, -.028 + i * .02, .183), point(.125, .007, .015), metal, pose);
-      tube(point(.094, .046, .155), point(.094, .046, .215), .043, .04, metal, pose, "metal", 24);
-      tube(point(.094, .046, .215), point(.094, .046, .219), .031, .031, [20, 43, 68], pose, "dark", 24);
-      for (const x of [-.119, .119]) for (const y of [-.176, .177]) body(pose(point(x, y, .164)), .006, silver, 0, "metal");
-      for (const side of [-1, 1]) {
-        // Thick array edges, mechanical hinges and an aft triangulated support.
-        tube(point(side * .174, 0, 0), point(side * .355, 0, 0), .021, .016, metal, pose);
-        tube(point(side * .31, -.074, 0), point(side * .31, .074, 0), .031, .031, gold, pose);
-        box(point(side * .75, 0, -.006), point(.84, .46, .029), metal, pose, true);
-        const corners = [point(side * .341, -.216, .011), point(side * 1.159, -.216, .011),
-          point(side * 1.159, .216, .011), point(side * .341, .216, .011)];
-        const panelUV = [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }];
-        face((side < 0 ? corners.reverse() : corners).map(pose), [30, 65, 111], false,
-          { material: "solar", uv: side < 0 ? panelUV.reverse() : panelUV });
-        for (const y of [-.226, .226]) box(point(side * .75, y, .016), point(.84, .009, .019), metal, pose);
-        for (const x of [.335, .612, .889, 1.165]) box(point(side * x, 0, .016), point(.009, .45, .019), metal, pose);
-        for (const y of [-.19, .19]) {
-          tube(point(side * .245, 0, -.035), point(side * .67, y, -.035), .005, .004, metal, pose, "metal", 6);
-          tube(point(side * .67, y, -.035), point(side * 1.12, -y, -.035), .004, .004, metal, pose, "metal", 6);
-        }
-        line(pose(point(side * .18, .025, .065)), pose(point(side * .35, .025, .025)), copper, .85, 1.1);
-        tube(point(side * .137, .16, -.04), point(side * .137, .266, -.04), .034, .034, metal, pose);
-        tube(point(side * .137, .266, -.04), point(side * .137, .307, -.04), .015, .027, dark, pose, "dark");
-      }
-      // Radially tessellated reflector with smooth paraboloid normals, a rolled
-      // rim and feed support. There is no fan of flat wedge-shaped highlights.
-      const dishRadius = .27, dishY = -.367;
-      const dishPoint = (angle, r, back = false) => pose(point(Math.cos(angle) * r, dishY + Math.sin(angle) * r, .178 + r * r * 1.85 - (back ? .011 : 0)));
-      const dishNormal = (angle, r) => pose(point(-3.7 * Math.cos(angle) * r, -3.7 * Math.sin(angle) * r, 1));
-      for (let band = 0; band < 7; band += 1) {
-        const inner = band / 7 * dishRadius, outer = (band + 1) / 7 * dishRadius;
-        for (let i = 0; i < 48; i += 1) {
-          const a = i / 48 * tau, b = (i + 1) / 48 * tau;
-          const angles = band ? [a, a, b, b] : [a, a, b];
-          const radii = band ? [inner, outer, outer, inner] : [0, outer, outer];
-          face(angles.map((angle, j) => dishPoint(angle, radii[j])), [202, 211, 215], true,
-            { material: "ceramic", normals: angles.map((angle, j) => dishNormal(angle, radii[j])),
-              uv: angles.map((angle, j) => ({ x: .5 + Math.cos(angle) * radii[j] / dishRadius / 2, y: .5 + Math.sin(angle) * radii[j] / dishRadius / 2 })) });
-        }
-      }
-      // The rear ribs sit behind the reflecting surface; feed stays above it.
+      // The AC origin is a raised ceramic medallion, including physical lettering.
+      const coreAt = (x, y, z) => point(core.x + x * core.r, core.y + y * core.r, core.z + z * core.r);
+      const rim = (angle, z, radius = 1) => coreAt(Math.cos(angle) * radius, Math.sin(angle) * radius, z);
+      face(Array.from({ length: 48 }, (_, i) => rig(rim(i / 48 * tau, .12))), porcelain, false, { material: "ceramic" });
+      face(Array.from({ length: 48 }, (_, i) => rig(rim(-i / 48 * tau, -.12))), silver, false, { material: "metal" });
       for (let i = 0; i < 48; i += 1) {
         const a = i / 48 * tau, b = (i + 1) / 48 * tau;
-        const unposed = (angle) => point(Math.cos(angle) * dishRadius, dishY + Math.sin(angle) * dishRadius, .178 + dishRadius ** 2 * 1.85);
-        tube(unposed(a), unposed(b), .006, .006, metal, pose, "metal", 6);
+        face([rim(a, .12), rim(a, -.12), rim(b, -.12), rim(b, .12)].map(rig), silver, false, { material: "metal" });
       }
-      for (let i = 0; i < 8; i += 1) {
-        let prior = dishPoint(i / 8 * tau, .04, true);
-        for (let j = 1; j <= 6; j += 1) {
-          const p = dishPoint(i / 8 * tau, .04 + j / 6 * .224, true);
-          line(prior, p, metal, .8, 1.2); prior = p;
+      path((angle) => rim(angle, .13), 64, ink);
+      path((angle) => rim(angle, .14, .76), 64, ink, .62, true);
+      const letterStroke = (a, b) => {
+        const length = Math.hypot(b[0] - a[0], b[1] - a[1]);
+        const dx = (b[1] - a[1]) / length * .034, dy = (a[0] - b[0]) / length * .034;
+        const corners = [[a[0] - dx, a[1] - dy], [b[0] - dx, b[1] - dy], [b[0] + dx, b[1] + dy], [a[0] + dx, a[1] + dy]];
+        face(corners.map(([x, y]) => rig(coreAt(x, y, .23))), accent, true, { material: "ceramic" });
+        corners.forEach(([x, y], i) => {
+          const [nx, ny] = corners[(i + 1) % 4];
+          face([coreAt(x, y, .13), coreAt(nx, ny, .13), coreAt(nx, ny, .23), coreAt(x, y, .23)].map(rig), accent, true, { material: "ceramic" });
+        });
+      };
+      letterStroke([-.54, .2], [-.33, -.34]); letterStroke([-.33, -.34], [-.12, .2]);
+      letterStroke([-.46, 0], [-.20, 0]);
+      for (let i = 0; i < 18; i += 1) {
+        const a = .65 + (tau - 1.3) * i / 18, b = .65 + (tau - 1.3) * (i + 1) / 18;
+        letterStroke([.27 + Math.cos(a) * .24, -.06 + Math.sin(a) * .27], [.27 + Math.cos(b) * .24, -.06 + Math.sin(b) * .27]);
+      }
+      // Extreme user flings remain one bounded landmark; the atlas radius and
+      // distances between destinations never change with a page interaction.
+      const vertices = new Set(geometry.faces.flatMap((surface) => surface.points));
+      geometry.segments.forEach(({ a, b }) => { vertices.add(a); vertices.add(b); });
+      geometry.bodies.forEach(({ at }) => vertices.add(at));
+      const extent = Math.max(...[...vertices].map((p) => Math.hypot(p.x, p.y, p.z)),
+        ...geometry.bodies.map(({ at, r }) => Math.hypot(at.x, at.y, at.z) + r));
+      if (extent > 3.8) {
+        const scale = 3.8 / extent;
+        vertices.forEach((p) => { p.x *= scale; p.y *= scale; p.z *= scale; });
+        geometry.bodies.forEach((item) => { item.r *= scale; });
+      }
+    } else if (kind === "supernova") {
+      if (artwork?.ready) {
+        const { pixels, size } = artwork;
+        for (let i = 0; i < 4800; i += 1) {
+          const u = random(), v = random();
+          const offset = (Math.floor(v * size) * size + Math.floor(u * size)) * 4;
+          const color = [pixels[offset], pixels[offset + 1], pixels[offset + 2]];
+          const pigment = Math.max(0, .975 - (color[0] * .299 + color[1] * .587 + color[2] * .114) / 255);
+          if (pigment < .055 || random() > Math.min(1, pigment * 2.4)) continue;
+          const depth = .03 + pigment * .12;
+          const tone = artwork.palette?.length ? artwork.palette.reduce((nearest, candidate) => {
+            const distance = rgb => rgb.reduce((sum, value, channel) => sum + (value - color[channel]) ** 2, 0);
+            return distance(candidate) < distance(nearest) ? candidate : nearest;
+          }) : color;
+          cloud(point((u - .501) * 2, (v - .496) * 2, (random() * 2 - 1) * depth),
+            .008 + random() * .019, tone, .15 + pigment * .55);
         }
-      }
-      tube(point(0, -.2, .02), point(0, dishY, .154), .036, .021, metal, pose);
-      for (let i = 0; i < 3; i += 1) {
-        const a = i * tau / 3 - Math.PI / 2;
-        tube(point(Math.cos(a) * .257, dishY + Math.sin(a) * .257, .306), point(0, dishY, .475), .005, .004, dark, pose, "metal", 6);
-      }
-      tube(point(0, dishY, .448), point(0, dishY, .494), .021, .031, copper, pose);
-      tube(point(.135, -.186, -.1), point(.135, -.79, -.1), .006, .0025, metal, pose, "metal", 8);
-      for (let i = 0; i < 3; i += 1) tube(point(.105 - i * .012, -.68 + i * .058, -.1), point(.165 + i * .012, -.68 + i * .058, -.1), .002, .002, metal, pose, "metal", 6);
-      body(pose(point(.135, -.79, -.1)), .009, teal, 1.2);
-      body(pose(point(-.142, .16, .16)), .007, teal, 1.2);
-    } else if (kind === "chart") {
-      // An ordered chain of milestones, related to the numbered mission dossier.
-      const nodes = [point(-.86, .32, -.26), point(-.55, -.02, .05), point(-.27, .16, .32),
-        point(.04, -.22, -.05), point(.4, -.08, .26), point(.76, -.47, .02)];
-      nodes.forEach((node, i) => {
-        if (i) line(nodes[i - 1], node, i === 5 ? copper : blue, .82, 1.4);
-        body(node, i === 5 ? .076 : .039, i === 5 ? [233, 199, 152] : white, .65);
-        ring(node, i === 5 ? .15 : .076, i === 5 ? .15 : .076, .3, -.32, 0, i === 5 ? copper : blue, .4);
-        const foot = point(node.x, .56, -.3 + i * .1);
-        line(node, foot, blue, .15, .7);
-        line(point(foot.x - .03, foot.y, foot.z), point(foot.x + .03, foot.y, foot.z), blue, .45);
-        if (i > 1) line(nodes[i - 2], node, blue, .15, .6);
-      });
-      line(point(-.95, .56, -.3), point(.9, .56, .3), blue, .28);
-    } else if (kind === "beacon") {
-      // Empty registry rings are instruments, not invented public records.
-      ring(origin, .42, .42, .7, .2, -.24, teal, .7);
-      ring(origin, .72, .72, -.55, .45, .24, blue, .55);
-      ring(origin, .98, .98, .3, -.55, -.2, blue, .35);
-      body(origin, .12, [133, 181, 206], .12, "metal");
-      box(point(0, .22, 0), point(.08, .2, .08), silver);
-      line(point(0, -.12), point(0, -.54, .08), silver, .8, 1.4);
-      body(point(0, -.54, .08), .027, teal, 1);
-      for (let i = 0; i < 3; i += 1) ring(point(0, -.54, .08 + i * .11), .12 + i * .13, .12 + i * .13, .75, .2, 0, teal, .45 - i * .11, Math.PI * 1.08, Math.PI * 1.92);
-    } else if (kind === "survey") {
-      // Three range gates and six converging rays echo Search's route field.
-      const pose = (p) => rotateLandmark(p, .6, -.3, -.22);
-      const gates = [[1, -.44], [.68, 0], [.37, .44]];
-      gates.forEach(([radius, z], gate) => {
-        let prior = null;
-        for (let i = 0; i <= 120; i += 1) {
-          const a = i / 120 * tau;
-          const p = pose(point(Math.cos(a) * radius, Math.sin(a) * radius, z));
-          if (prior) line(prior, p, gate === 2 ? teal : blue, .26 + gate * .12, gate === 2 ? 1.3 : .9);
-          prior = p;
-          if (i < 120 && i % 5 === 0) line(p, pose(point(Math.cos(a) * (radius + (i % 15 === 0 ? .038 : .018)), Math.sin(a) * (radius + (i % 15 === 0 ? .038 : .018)), z)), blue, .42, .8);
+        body(origin, .009, [255, 228, 180], 1.4);
+        cloud(origin, .045, [255, 223, 171], .3);
+      } else {
+        // The live Work artwork is an elongated cobalt/teal remnant with ragged
+        // copper filaments. A thick, irregular shell preserves that silhouette.
+        const shell = (angle, latitude, layer = 1) => {
+          const radial = Math.sqrt(1 - latitude * latitude);
+          const ripple = 1 + .09 * Math.sin(angle * 7 + latitude * 11) + .045 * Math.cos(angle * 17 - latitude * 8);
+          return rotateLandmark(point(Math.cos(angle) * radial * 1.08 * ripple * layer,
+            Math.sin(angle) * radial * .58 * ripple * layer, latitude * .44 * layer), .24, -.2, -.66);
+        };
+        const matter = [[42, 100, 198], [69, 148, 185], [43, 154, 153], [115, 148, 205], copper];
+        for (let i = 0; i < 1050; i += 1) {
+          const angle = random() * tau, latitude = random() * 2 - 1;
+          cloud(shell(angle, latitude, .72 + random() * .29), .035 + random() * .085,
+            matter[i % matter.length], .14 + random() * .19);
         }
-      });
-      for (let i = 0; i < 6; i += 1) {
-        const a = i / 6 * tau;
-        line(pose(point(Math.cos(a), Math.sin(a), -.44)), pose(point(Math.cos(a) * .37, Math.sin(a) * .37, .44)), blue, .18, .8);
-      }
-      const target = pose(point(.06, -.07, .7));
-      body(target, .036, white, 1);
-      ring(target, .1, .1, .6, -.3, -.22, teal, .8);
-      line(pose(point(-.86, .22, -.44)), target, copper, .5, 1.1);
-    } else if (kind === "tree") {
-      const trunks = [point(-.27, .18, .1), point(.25, .08, -.15)];
-      body(point(0, .6, .1), .066, white, .7);
-      trunks.forEach((trunk, side) => {
-        line(point(0, .6, .1), trunk, blue, .65, 1.6);
-        body(trunk, .055, side ? teal : silver, .5);
-        for (let branch = 0; branch < 4; branch += 1) {
-          const a = (side ? -.1 : Math.PI) + (branch - 1.5) * .5;
-          const joint = point(trunk.x + Math.cos(a) * .38, trunk.y + Math.sin(a) * .38 - .25, (branch - 1.5) * .22);
-          line(trunk, joint, side ? teal : blue, .65);
-          body(joint, .032, white, .6);
-          for (let leaf = 0; leaf < 3; leaf += 1) {
-            const tip = point(joint.x + Math.cos(a + (leaf - 1) * .7) * .19,
-              joint.y + Math.sin(a + (leaf - 1) * .7) * .19 - .08, joint.z + (leaf - 1) * .16);
-            line(joint, tip, side ? teal : blue, .36, .7);
-            body(tip, .014, side ? teal : silver, .3);
+        for (let i = 0; i < 64; i += 1) {
+          const latitude = (random() * 2 - 1) * .93;
+          const start = random() * tau, length = .13 + random() * .6;
+          const color = i % 3 === 0 ? [233, 186, 125] : i % 3 === 1 ? copper : [111, 188, 216];
+          let previous = null;
+          for (let step = 0; step <= 16; step += 1) {
+            const angle = start + length * step / 16;
+            const p = shell(angle, clamp(latitude + Math.sin(step * .7 + i) * .025, -.98, .98), .92 + .06 * Math.sin(step * 1.3 + i));
+            if (previous) line(previous, p, color, .24 + random() * .3, .65);
+            previous = p;
           }
+        }
+        body(origin, .016, white, 1.5);
+        cloud(origin, .11, white, .2);
+      }
+    } else if (kind === "probe") {
+      const art = typeof visual === "object" && visual ? visual : {};
+      const deployed = art.topology === "public";
+      const aspect = clamp(Number.isFinite(art.bayAspect) ? art.bayAspect : .8, .32, 3);
+      const bayWidth = 2 * Math.max(1, aspect), bayHeight = 2 * Math.max(1, 1 / aspect);
+      const size = 2 * clamp(Number.isFinite(art.satelliteScale) ? art.satelliteScale : .42, .18, 1.3);
+      const pose = (p) => p, part = (x, y, z = 0) => point(x * size, y * size, z * size);
+      const ceramic = [225, 233, 227], metal = [130, 151, 140], ink = [77, 104, 90], cobalt = [31, 92, 186];
+      // These proportions follow Contact's .satellite CSS: a .30-wide bus,
+      // .36-wide three-panel wings, a .156 core and a .20 upward-open dish.
+      const bx = .15, by = .15 / .78, bevelX = deployed ? .06 : .008, bevelY = deployed ? by * .44 : .008;
+      const outline = [[-bx + bevelX, -by], [bx - bevelX, -by], [bx, -by + bevelY], [bx, by - bevelY],
+        [bx - bevelX, by], [-bx + bevelX, by], [-bx, by - bevelY], [-bx, -by + bevelY]];
+      const uv = outline.map(([x, y]) => ({ x: x / .3 + .5, y: y / (by * 2) + .5 }));
+      face(outline.map(([x, y]) => part(x, y, .075)), ceramic, false, { material: "ceramic", uv });
+      face(outline.map(([x, y]) => part(x, y, -.075)).reverse(), metal, false, { material: "metal", uv: [...uv].reverse() });
+      outline.forEach(([x, y], i) => {
+        const [nx, ny] = outline[(i + 1) % outline.length];
+        face([part(x, y, -.075), part(nx, ny, -.075), part(nx, ny, .075), part(x, y, .075)], ceramic, false, { material: "ceramic" });
+        tube(part(x, y, .078), part(nx, ny, .078), .0028 * size, .0028 * size, metal, pose, "metal", 6);
+        line(part(x, y, -.078), part(nx, ny, -.078), ink, .6);
+      });
+      // A machined circular payload core sits inside the pale capsule face.
+      const coreY = -.011538;
+      const circle = (angle, radius, z) => part(Math.cos(angle) * radius, coreY + Math.sin(angle) * radius, z);
+      for (let i = 0; i < 40; i += 1) {
+        const a = i / 40 * tau, b = (i + 1) / 40 * tau;
+        face([circle(a, .078, .079), circle(b, .078, .079), circle(b, .065, .095), circle(a, .065, .095)], metal, false, { material: "metal" });
+        face([part(0, coreY, .087), circle(a, .065, .087), circle(b, .065, .087)], [196, 214, 206], false, { material: "ceramic" });
+        line(circle(a, .078, .097), circle(b, .078, .097), cobalt, .7);
+        if (i % 2 === 0) line(circle(a, .04056, .098), circle(b, .04056, .098), cobalt, .55);
+      }
+      box(part(0, -.143, .079), part(.15, .013, .006), metal, pose);
+      box(part(0, .153, .08), part(.075, .011, .007), cobalt, pose);
+      for (const x of [-.115, .115]) for (const y of [-.149, .149]) body(part(x, y, .082), .0045 * size, silver, 0, "metal");
+      for (let i = 0; i < 6; i += 1) box(part(-.075 + i * .03, 0, -.08), part(.004, .24, .01), metal, pose);
+      for (const side of [-1, 1]) {
+        // The private capsule folds its wings backward, retaining the page's
+        // 18% front-view span while exposing real hinges and rear structure.
+        const angle = side * (deployed ? 0 : Math.acos(.18));
+        const wing = (p) => point(side * .15 * size + Math.cos(angle) * p.x + Math.sin(angle) * p.z,
+          p.y, -.025 * size - Math.sin(angle) * p.x + Math.cos(angle) * p.z);
+        tube(part(side * .15, -.058, -.025), part(side * .15, .058, -.025), .01 * size, .01 * size, metal, pose);
+        for (let panel = 0; panel < 3; panel += 1) {
+          const start = panel * .12 + .0035, end = (panel + 1) * .12 - .0035;
+          box(part(side * (start + end) / 2, 0, 0), part(end - start, .171428, .009), [199, 219, 217], wing, false, "ceramic");
+          const corners = [[start, -.085714], [end, -.085714], [end, .085714], [start, .085714]]
+            .map(([x, y]) => wing(part(side * x, y, .006)));
+          corners.forEach((p, i) => tube(p, corners[(i + 1) % 4], .0022 * size, .0022 * size, cobalt, pose, "metal", 6));
+          for (let cell = 1; cell < 5; cell += 1) {
+            const x = side * lerp(start, end, cell / 5);
+            line(wing(part(x, -.078, .007)), wing(part(x, .078, .007)), cobalt, .42);
+          }
+          line(wing(part(side * start, -.078, -.007)), wing(part(side * end, .078, -.007)), ink, .35);
+          line(wing(part(side * start, .078, -.007)), wing(part(side * end, -.078, -.007)), ink, .35);
+        }
+      }
+      // The page's small U-shaped cup opens upward. Smooth paraboloid normals
+      // retain that side silhouette without turning it into a camera-facing disc.
+      const dishRadius = .1, dishHeight = .2 / 1.45, dishBottom = -.27 / 2.1 - .5 / 2.1 + dishHeight;
+      const dishPoint = (angle, r) => part(Math.cos(angle) * r, dishBottom - dishHeight * (r / dishRadius) ** 2, Math.sin(angle) * r);
+      const dishNormal = (angle, r) => point(-2 * dishHeight * r / dishRadius ** 2 * Math.cos(angle), -1,
+        -2 * dishHeight * r / dishRadius ** 2 * Math.sin(angle));
+      for (let band = 0; band < 6; band += 1) {
+        const inner = band / 6 * dishRadius, outer = (band + 1) / 6 * dishRadius;
+        for (let i = 0; i < 40; i += 1) {
+          const a = i / 40 * tau, b = (i + 1) / 40 * tau;
+          const angles = band ? [a, a, b, b] : [a, a, b], radii = band ? [inner, outer, outer, inner] : [0, outer, outer];
+          face(angles.map((angle, j) => dishPoint(angle, radii[j])), ceramic, true,
+            { material: "ceramic", normals: angles.map((angle, j) => dishNormal(angle, radii[j])),
+              uv: angles.map((angle, j) => ({ x: .5 + Math.cos(angle) * radii[j] / .2, y: .5 + Math.sin(angle) * radii[j] / .2 })) });
+        }
+      }
+      for (let i = 0; i < 40; i += 1) tube(dishPoint(i / 40 * tau, dishRadius), dishPoint((i + 1) / 40 * tau, dishRadius), .0025 * size, .0025 * size, metal, pose, "metal", 6);
+      tube(part(0, dishBottom, 0), part(0, -.1763, 0), .0045 * size, .0045 * size, metal, pose);
+
+      // Contact's open fairings frame the whole [data-payload-visual] region.
+      // Curved ribs and narrow shell strips keep their airy diagram silhouette
+      // while the camera can move around the hollow bay in three dimensions.
+      for (const side of [-1, 1]) {
+        const centerX = side * .268 * bayWidth, centerY = -.01 * bayHeight;
+        const turn = side * 2.5 * Math.PI / 180;
+        const fairing = (latitude, angle) => {
+          const p = rotateLandmark(point(side * (.093 + .35 * Math.sin(latitude) * Math.cos(angle)) * bayWidth - centerX,
+            -.4 * Math.cos(latitude) * bayHeight, .11 * bayWidth * Math.sin(latitude) * Math.sin(angle)), 0, 0, turn);
+          return point(p.x + centerX, p.y + centerY, p.z);
+        };
+        const normal = (latitude, angle) => rotateLandmark(point(side * Math.sin(latitude) * Math.cos(angle) / (.35 * bayWidth),
+          -Math.cos(latitude) / (.4 * bayHeight), Math.sin(latitude) * Math.sin(angle) / (.11 * bayWidth)), 0, 0, turn);
+        for (const angle of [-Math.PI / 2, -.8, 0, .8, Math.PI / 2]) {
+          for (let i = 0; i < 32; i += 1) line(fairing(i / 32 * Math.PI, angle), fairing((i + 1) / 32 * Math.PI, angle), ink, angle === 0 ? .66 : .32);
+        }
+        for (const angle of [-1.48, 0, 1.48]) {
+          for (let band = 0; band < 24; band += 1) {
+            const a = band / 24 * Math.PI, b = (band + 1) / 24 * Math.PI;
+            let samples = band === 0 ? [[a, angle - .014], [b, angle - .014], [b, angle + .014]]
+              : band === 23 ? [[a, angle - .014], [b, angle - .014], [a, angle + .014]]
+              : [[a, angle - .014], [b, angle - .014], [b, angle + .014], [a, angle + .014]];
+            if (side < 0) samples = samples.reverse();
+            face(samples.map(([latitude, theta]) => fairing(latitude, theta)), [181, 199, 187], true,
+              { material: "ceramic", normals: samples.map(([latitude, theta]) => normal(latitude, theta)) });
+          }
+        }
+        for (const height of [.304, .2, .088]) ring(point(side * .1665 * bayWidth, centerY, .115 * bayWidth),
+          .0455 * bayWidth, height * bayHeight, 0, side * .12, turn, ink, .3);
+      }
+      ring(point(0, 0, -.15), .315 * bayWidth, .315 * bayWidth / 1.65, 0, 0, -7 * Math.PI / 180, ink, .22);
+      ring(point(0, 0, -.12), .22 * bayWidth, .22 * bayWidth / 1.75, 0, 0, (deployed ? -13 : -8) * Math.PI / 180, cobalt, deployed ? .36 : .1);
+      ring(point(0, 0, -.09), .145 * bayWidth, .145 * bayWidth / 1.4, 0, 0, 14 * Math.PI / 180, cobalt, .28);
+      if (deployed) ring(part(0, 0, .115), .185 * size, .185 * size, 0, 0, 0, cobalt, .3);
+    } else if (kind === "chart") {
+      // Seven solid timeline blocks preserve resume.html's authored role widths
+      // and resume-dossier.css's blue current-role cap, rather than a star chain.
+      const months = [25, 24, 23, 13, 24, 12, 28];
+      const total = months.reduce((sum, value) => sum + value, 0);
+      const pose = (p) => rotateLandmark(p, -.1, -.12, 0);
+      const paper = [224, 229, 224], ink = [77, 100, 108], current = [49, 109, 190];
+      let left = -.96;
+      months.forEach((duration, i) => {
+        const width = 1.8 * duration / total;
+        const x = left + width / 2, z = (i - 3) * .011;
+        box(point(x, 0, z), point(width, .67, .17), i === 6 ? [198, 217, 235] : paper, pose, false, "ceramic");
+        box(point(x, -.318, z + .006), point(width, .035, .19), i === 6 ? current : ink, pose);
+        body(pose(point(x - width * .25, -.19, z + .1)), .024, i === 6 ? current : ink, .04, "metal");
+        for (let row = 0; row < 3; row += 1) {
+          box(point(x - width * .07, .015 + row * .065, z + .09),
+            point(width * (row === 2 ? .47 : .7), .009, .008), row === 2 ? [139, 155, 158] : ink, pose);
+        }
+        box(point(x - width * .18, .252, z + .09), point(width * .38, .012, .009), ink, pose);
+        tube(point(x, .315, z), point(x, .397, z), .012, .012, silver, pose, "metal", 8);
+        left += width + .02;
+      });
+      box(point(0, .408, 0), point(1.94, .035, .085), ink, pose);
+    } else if (kind === "beacon") {
+      // Signals' empty public-slot field: aligned ellipses, a dashed middle
+      // orbit and the centered registry origin. No invented occupied slots.
+      const pose = (p) => rotateLandmark(p, 0, 0, -8 * Math.PI / 180);
+      const registry = [65, 115, 185];
+      [[.98, .62, -.04], [.98 * 63 / 82, .62 * 53 / 72, 0], [.98 * 36 / 82, .62 * 29 / 72, .04]].forEach(([rx, ry, z], index) => {
+        for (let i = 0; i < 96; i += 1) {
+          if (index === 1 && i % 6 >= 3) continue;
+          const a = i / 96 * tau, b = (i + 1) / 96 * tau;
+          tube(point(Math.cos(a) * rx, Math.sin(a) * ry, z), point(Math.cos(b) * rx, Math.sin(b) * ry, z),
+            .0055, .0055, registry, pose, "metal", 6);
+        }
+      });
+      line(pose(point(-1.08, 0, -.07)), pose(point(1.08, 0, -.07)), registry, .22, .7);
+      line(pose(point(0, -.73, -.07)), pose(point(0, .73, -.07)), registry, .22, .7);
+      tube(point(0, 0, -.065), point(0, 0, .065), .132, .132, [217, 231, 233], pose, "ceramic", 40);
+      ring(point(0, 0, .068), .13, .13, 0, 0, -8 * Math.PI / 180, registry, .9);
+      // Raised AC monogram follows the public origin marker, not telemetry data.
+      const glyph = (points) => points.slice(1).forEach((p, i) => line(pose(point(...points[i])), pose(point(...p)), registry, .95, 1.25));
+      glyph([[-.075, .035, .072], [-.044, -.04, .072], [-.014, .035, .072]]);
+      glyph([[-.063, .006, .072], [-.025, .006, .072]]);
+      glyph([[.066, -.027, .072], [.047, -.04, .072], [.019, -.019, .072], [.019, .023, .072], [.047, .04, .072], [.066, .027, .072]]);
+    } else if (kind === "survey") {
+      // evidence-search.css authors 27x14, 19x9.8 and 10x5 gates at -9 degrees.
+      // They share a target; all six route rays approach it from the same side.
+      const pose = (p) => rotateLandmark(p, 0, 0, -9 * Math.PI / 180);
+      const searchBlue = [56, 110, 180];
+      [[27, 14, -.055], [19, 9.8, 0], [10, 5, .055]].forEach(([w, h, z], gate) => {
+        const rx = w / 27, ry = h / 27;
+        for (let i = 0; i < 96; i += 1) {
+          const a = i / 96 * tau, b = (i + 1) / 96 * tau;
+          tube(point(Math.cos(a) * rx, Math.sin(a) * ry, z), point(Math.cos(b) * rx, Math.sin(b) * ry, z),
+            .0035 + gate * .0007, .0035 + gate * .0007, searchBlue, pose, "metal", 6);
+        }
+        line(pose(point(-rx - .018, 0, z)), pose(point(-rx + .018, 0, z)), searchBlue, .7, 1);
+        line(pose(point(0, -ry - .018, z)), pose(point(0, -ry + .018, z)), searchBlue, .7, 1);
+      });
+      [-18, -10, -3, 5, 13, 21].forEach((degrees, index) => {
+        const a = degrees * Math.PI / 180;
+        const start = point(-1.65 * Math.cos(a), -1.65 * Math.sin(a), -.2 - index * .022);
+        line(start, point(0, 0, .08), searchBlue, .37, .8);
+        const pin = point(start.x * .31, start.y * .31, lerp(.08, start.z, .31));
+        box(pin, point(.026, .026, .021), [211, 227, 230]);
+      });
+      ring(point(0, 0, .084), .087, .087, 0, 0, 0, searchBlue, .95);
+      line(point(-.119, 0, .086), point(.119, 0, .086), searchBlue, .8, .9);
+      line(point(0, -.119, .086), point(0, .119, .086), searchBlue, .8, .9);
+      body(point(0, 0, .09), .014, teal, .9);
+      line(point(.1, 0, .04), point(.5, 0, -.025), searchBlue, .5, 1.1);
+    } else if (kind === "tree") {
+      // Match buildTreeGeometry in about-spectrograph.js: two diagonal lobes,
+      // eight named branch anchors and 31 equal evidence stars with their tones.
+      const bands = [
+        [-2.3, -4.6, .5, 4, [101, 168, 255]], [-4.3, -2.6, -.8, 6, [127, 145, 255]],
+        [-2.5, -1.7, 1.2, 7, [170, 134, 255]], [-.9, -3.4, -1, 4, [85, 200, 223]],
+        [2.2, 1.8, .6, 3, [91, 213, 188]], [4.1, 3.6, -.7, 2, [131, 203, 255]],
+        [2.1, 5.1, 1, 3, [192, 165, 255]], [.6, 3.4, -1, 2, [217, 185, 121]],
+      ];
+      const local = (p) => point(p.x / 8, -p.y / 8, p.z / 8);
+      const curve = (first, last, bend, depth, color, alpha, width) => {
+        const a = point(lerp(first.x, last.x, .34) + bend, lerp(first.y, last.y, .34), lerp(first.z, last.z, .34) + depth);
+        const b = point(lerp(first.x, last.x, .72) - bend * .28, lerp(first.y, last.y, .72), lerp(first.z, last.z, .72) - depth * .35);
+        let previous = local(first);
+        for (let i = 1; i <= 22; i += 1) {
+          const t = i / 22, v = 1 - t;
+          const p = local(point(...["x", "y", "z"].map((axis) => v ** 3 * first[axis] + 3 * v * v * t * a[axis] + 3 * v * t * t * b[axis] + t ** 3 * last[axis])));
+          line(previous, p, color, alpha, width); previous = p;
+        }
+      };
+      const junctions = [point(-1.5, -1.2, .5), point(1.5, 1.2, -.5)];
+      curve(origin, junctions[0], -.28, .82, bands[0][4], .8, 1.5);
+      curve(origin, junctions[1], .28, -.66, bands[4][4], .8, 1.5);
+      body(origin, .045, white, 1);
+      bands.forEach(([x, y, z, count, tone], index) => {
+        const anchor = point(x * 1.32, y * 1.18, z * 1.3);
+        curve(junctions[index < 4 ? 0 : 1], anchor, (index % 2 ? 1 : -1) * .34, (index - 3.5) * .19, tone, .72, 1.1);
+        body(local(anchor), .027, tone, .65);
+        cloud(local(anchor), .13, tone, .12);
+        for (let i = 0; i < count; i += 1) {
+          const a = i / count * tau + .4;
+          const leaf = point(anchor.x + Math.cos(a) * (count > 4 ? 1.7 : 1.35), anchor.y + Math.sin(a) * 1.4, anchor.z + Math.sin(a * 2) * .85);
+          curve(anchor, leaf, (i - (count - 1) / 2) * .06, (i % 2 ? 1 : -1) * .24, tone, .55, .75);
+          body(local(leaf), .018, tone, .7);
         }
       });
     } else if (kind === "cluster") {
-      body(origin, .11, white, 1);
-      [.46, .82].forEach((radius, group) => {
-        const orbit = ring(origin, radius, radius, group ? -.65 : .6, group ? .45 : -.3, -.18, blue, .35);
-        for (let i = 0; i < 5; i += 1) {
-          const at = orbit(i / 5 * tau + group * .6);
-          body(at, .052 + (i % 3) * .012, [teal, silver, copper, blue, silver][i], .04, i % 2 ? "gas" : "rock");
-          cloud(at, .13, blue, .18);
+      // The first production case's three staggered phone screens, rendered as
+      // rounded solid handsets with their actual page artwork and rear hardware.
+      const orange = [237, 143, 46], glass = [19, 29, 40], chassis = [93, 109, 125];
+      const screens = ["img_bitcoin_wallet_2.webp", "img_bitcoin_wallet_1.webp", "img_bitcoin_wallet_3.webp"];
+      const phone = (x, y, z, scale, roll, yaw, variant) => {
+        const pose = (p) => {
+          const q = rotateLandmark(point(p.x * scale, p.y * scale, p.z * scale), -.035, yaw, roll);
+          return point(q.x + x, q.y + y, q.z + z);
+        };
+        const outline = (w, h, r, depth, transform = pose) => {
+          const corners = [[w / 2 - r, -h / 2 + r], [w / 2 - r, h / 2 - r], [-w / 2 + r, h / 2 - r], [-w / 2 + r, -h / 2 + r]];
+          return corners.flatMap(([cx, cy], corner) => Array.from({ length: 8 }, (_, i) => {
+            const a = -Math.PI / 2 + corner * Math.PI / 2 + i / 7 * Math.PI / 2;
+            return transform(point(cx + Math.cos(a) * r, cy + Math.sin(a) * r, depth));
+          }));
+        };
+        const front = outline(.55, .98, .052, .049), back = outline(.55, .98, .052, -.049);
+        face(front, chassis, false, { material: "metal" });
+        face([...back].reverse(), [40, 52, 64], false, { material: "dark" });
+        front.forEach((p, i) => { const next = (i + 1) % front.length; face([back[i], back[next], front[next], p], chassis, false, { material: "metal" }); });
+        const screenHeight = .94, screenWidth = screenHeight * 443 / 788, halfWidth = screenWidth / 2;
+        const screen = outline(screenWidth, screenHeight, .044, 0, (p) => p);
+        const screenPoint = (p) => pose(point(p.x, p.y, .061 - .008 * (p.x / halfWidth) ** 2));
+        const screenNormal = (p) => {
+          const nx = .016 * p.x / (halfWidth * halfWidth), length = Math.hypot(nx, 1);
+          return rotateLandmark(point(nx / length, 0, 1 / length), -.035, yaw, roll);
+        };
+        const screenUV = (p) => ({ x: (p.x + halfWidth) / screenWidth, y: (p.y + screenHeight / 2) / screenHeight });
+        screen.forEach((p, i) => {
+          const triangle = [origin, p, screen[(i + 1) % screen.length]];
+          face(triangle.map(screenPoint), glass, false, { material: "screen", texture: `/assets/images/work/${screens[variant]}`,
+            uv: triangle.map(screenUV), normals: triangle.map(screenNormal) });
+        });
+        box(point(0, -.481, .056), point(.09, .007, .004), [109, 128, 144], pose);
+        body(pose(point(.068, -.481, .058)), .005 * scale, [81, 126, 144], .02, "metal");
+        box(point(0, .48, .056), point(.1, .005, .004), [139, 157, 173], pose);
+        for (const side of [-1, 1]) box(point(side * .278, -.16, 0), point(.013, side < 0 ? .16 : .085, .035), silver, pose);
+        box(point(-.149, -.336, -.056), point(.157, .212, .025), chassis, pose, false, "dark");
+        for (const dy of [-.38, -.294]) {
+          body(pose(point(-.162, dy, -.074)), .032 * scale, silver, 0, "metal");
+          body(pose(point(-.162, dy, -.093)), .022 * scale, [21, 44, 63], .02, "dark");
         }
-      });
+      };
+      phone(-.38, .05, -.1, .88, -8 * Math.PI / 180, -.11, 0);
+      phone(.38, .05, -.06, .88, 8 * Math.PI / 180, .11, 2);
+      phone(0, 0, .16, 1, -Math.PI / 180, -.02, 1);
+      ring(point(0, 0, -.18), .78, .78, 0, 0, 0, orange, .24);
+      cloud(point(0, 0, -.18), .82, orange, .095);
     } else if (kind === "star") {
-      body(origin, .23, [252, 229, 186], 1.5);
-      for (let i = 0; i < 110; i += 1) {
-        const a = random() * tau, z = random() * 2 - 1, radial = Math.sqrt(1 - z * z);
-        cloud(point(Math.cos(a) * radial * .27, Math.sin(a) * radial * .27, z * .27), .07 + random() * .09,
-          i % 3 ? [236, 182, 110] : white, .12);
+      // An article remains a star within Logs. Up close, article-aurora.js's
+      // green hem and pink/violet folded curtains resolve around that star.
+      body(origin, .022, [221, 240, 224], 1.4);
+      cloud(origin, .075, [139, 212, 177], .22);
+      const hues = [[110, 227, 153], [159, 226, 141], [226, 124, 155], [233, 78, 148], [206, 75, 161], [154, 74, 173], [117, 75, 165]];
+      for (let layer = 0; layer < 2; layer += 1) {
+        for (let i = 0; i <= 80; i += 1) {
+          const u = i / 80, phase = layer * 2.7;
+          const fold = u * (12 + layer * 2.7) + phase + Math.sin(u * 19 + phase) * .37;
+          const x = (u - .5) * 1.9 + Math.sin(fold) * .054;
+          const hem = .29 + layer * .14 + Math.sin(u * 6 + phase) * .17 + Math.cos(fold) * .056;
+          const depth = Math.cos(fold) * .25 + (layer - .5) * .29;
+          const height = .47 + .29 * (.5 + .5 * Math.sin(u * 15 + phase)) + random() * .11;
+          const envelope = Math.pow(Math.sin(Math.PI * u), .55);
+          let prior = point(x, hem, depth);
+          for (let ray = 1; ray <= hues.length; ray += 1) {
+            const t = ray / hues.length;
+            const p = point(x + Math.sin(u * 5 + phase) * .055 * t, hem - height * t, depth + Math.sin(t * Math.PI) * .075);
+            line(prior, p, hues[ray - 1], envelope * (.76 - t * .6), .9);
+            prior = p;
+          }
+          if (i % 2 === 0) {
+            cloud(point(x, hem - .02, depth), .07, hues[0], envelope * .2);
+            cloud(point(x, hem - height * .47, depth + .065), .115, hues[3], envelope * .10);
+          }
+        }
       }
-      for (let i = 0; i < 9; i += 1) ring(origin, .31 + i * .011, .31 + i * .011,
-        i * .57, i * .9, i, copper, .14, i, i + .65);
     }
     const bounds = { min: point(Infinity, Infinity, Infinity), max: point(-Infinity, -Infinity, -Infinity) };
     const include = (p, radius = 0) => {
@@ -1057,7 +1374,8 @@
     geometry.segments.forEach(({ a, b }) => { include(a); include(b); });
     geometry.bodies.forEach(({ at, r }) => include(at, r));
     geometry.bounds = bounds;
-    landmarkGeometryCache.set(kind, geometry);
+    if (landmarkGeometryCache.size >= 24) landmarkGeometryCache.delete(landmarkGeometryCache.keys().next().value);
+    landmarkGeometryCache.set(cacheKey, geometry);
     return geometry;
   }
 
@@ -1366,15 +1684,16 @@
       return true;
     }
 
-    function drawNebula(camera, landmark, x, y, radius, alpha, colors) {
+    function drawNebula(camera, landmark, x, y, radius, alpha, colors, visual = null) {
       const volume = prepareNebulaVolume();
       if (!volume) return landmark.kind === "supernova"
-        ? drawLandmarkGeometry(camera, landmark, radius, alpha, colors) : drawNebulaCloud(camera, landmark, alpha);
+        ? drawLandmarkGeometry(camera, landmark, radius, alpha, colors, visual) : drawNebulaCloud(camera, landmark, alpha);
       // Crop the raymarch to this object's projected sphere. The eye and all
       // rays are the observer's actual world-space frame, in nebula units.
       const frame = cameraFrame(camera);
       const distance = Math.hypot(frame.eye.x - landmark.x, frame.eye.y - landmark.y, frame.eye.z - landmark.z);
-      const bound = distance < landmark.r * 1.8 ? Math.hypot(width, height) * 2 : radius * 1.85;
+      const matterScale = landmark.kind === "supernova" && Number.isFinite(visual?.size) ? clamp(visual.size, .045, 1.3) : 1;
+      const bound = distance < landmark.r * matterScale * 1.8 ? Math.hypot(width, height) * 2 : radius * matterScale * 1.85;
       const left = Math.max(0, Math.floor(x - bound)), top = Math.max(0, Math.floor(y - bound));
       const w = Math.min(width, Math.ceil(x + bound)) - left;
       const h = Math.min(height, Math.ceil(y + bound)) - top;
@@ -1387,21 +1706,23 @@
         navigationRight: local(frame.right), navigationDown: local(frame.down), navigationForward: local(frame.forward),
       };
       const drawn = volume.renderer.draw({ width: w, height: h, centerX: width / 2 - left,
-        centerY: height / 2 - top, baseScale: base, lightTheme: colors.night < 0.5, navigation, remnant: landmark.kind === "supernova" });
+        centerY: height / 2 - top, baseScale: base, lightTheme: colors.night < 0.5, navigation,
+        remnant: landmark.kind === "supernova", remnantState: visual });
       if (!drawn) return landmark.kind === "supernova"
-        ? drawLandmarkGeometry(camera, landmark, radius, alpha, colors) : drawNebulaCloud(camera, landmark, alpha);
+        ? drawLandmarkGeometry(camera, landmark, radius, alpha, colors, visual) : drawNebulaCloud(camera, landmark, alpha);
       context.globalAlpha = alpha;
       context.drawImage(volume.canvas, left, top, w, h);
       context.globalAlpha = 1;
       return true;
     }
 
-    function drawLandmarkGeometry(camera, landmark, radius, alpha, colors) {
-      const geometry = landmarkGeometry(landmark.kind);
+    function drawLandmarkGeometry(camera, landmark, radius, alpha, colors, visual = null) {
+      const geometry = landmarkGeometry(landmark.kind, landmark.kind === "supernova" ? null : visual);
       const frame = cameraFrame(camera);
       const near = Math.max(1e-5, camera.w * .02);
       const viewport = { w: width, h: height };
-      const world = (p) => landmarkWorldPoint(landmark, p);
+      const matterScale = landmark.kind === "supernova" && Number.isFinite(visual?.size) ? clamp(visual.size, .045, 1.3) : 1;
+      const world = (p) => landmarkWorldPoint(landmark, matterScale === 1 ? p : { x: p.x * matterScale, y: p.y * matterScale, z: p.z * matterScale });
       const project = (p) => {
         const local = cameraPoint(frame, world(p));
         return { x: width / 2 + local.x * base / Math.max(near, local.z),
@@ -1412,7 +1733,7 @@
       const queue = [];
       const light = { x: -.45, y: -.62, z: .64 };
       const lightX = dot(light, frame.right), lightY = dot(light, frame.down);
-      const localSize = (r, depth) => clamp(r * landmark.r * base / depth, .4, Math.hypot(width, height));
+      const localSize = (r, depth) => clamp(r * matterScale * landmark.r * base / depth, .4, Math.hypot(width, height));
       const stride = radius < 10 ? 8 : radius < 32 ? 3 : 1;
 
       // Opaque material surfaces use a real depth buffer. Transparent halos
@@ -1562,6 +1883,8 @@
       const reach = radius * 2.8 + 120;
       if (weight < 0.02 || x + reach < 0 || x - reach > width || y + reach < 0 || y - reach > height) return;
       const diagonal = Math.hypot(width, height);
+      const visual = landmark.kind === "supernova" && window.UniversePageLandmark?.kind === "supernova"
+        ? window.UniversePageLandmark.snapshot() : plan?.visuals?.[landmark.kind] || null;
       const insideFade = (landmark.kind === "galaxy"
         ? 1 - smoothstep(diagonal * 6, diagonal * 16, radius)
         : 1 - smoothstep(diagonal * 1.2, diagonal * 4.5, radius)) * weight;
@@ -1572,11 +1895,11 @@
       } else {
         const glowWeight = landmarkGlowWeight(landmark.kind, colors.night) * insideFade;
         if (landmark.kind === "nebula" || landmark.kind === "supernova") {
-          drawNebula(camera, landmark, x, y, radius, landmark.kind === "supernova" ? insideFade : glowWeight, colors);
+          drawNebula(camera, landmark, x, y, radius, landmark.kind === "supernova" ? insideFade : glowWeight, colors, visual);
         } else if (landmark.kind === "galaxy") {
           drawGalaxyField(camera, landmark, radius, Math.max(glowWeight, 0.65 * insideFade), colors, plan);
         } else {
-          drawLandmarkGeometry(camera, landmark, radius, insideFade, colors);
+          drawLandmarkGeometry(camera, landmark, radius, insideFade, colors, visual);
         }
       }
       if (!landmark.tag || labelAlpha <= 0) return;
@@ -2130,6 +2453,7 @@
       fromMagnification: source.magnification,
       fromSurface: surfaceForDestination(source),
       fromFocus,
+      visuals: capturePageVisuals(),
       galaxy: source.key === "logs" ? window.UniverseGalaxy?.snapshot() || null : null,
       to: target.key,
       toPath: normalizedPath(targetUrl.pathname),

@@ -1,8 +1,9 @@
 (() => {
   "use strict";
 
-  const MATERIALS = { metal: 0, foil: 1, solar: 2, ceramic: 3, dark: 4, rock: 5, gas: 6, star: 7 };
+  const MATERIALS = { metal: 0, foil: 1, solar: 2, ceramic: 3, dark: 4, rock: 5, gas: 6, star: 7, screen: 9 };
   const STRIDE = 18;
+  const FRAME_AXES = ["eye", "right", "down", "forward"];
   const finitePoint = p => p && Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.z);
   const clamp = (value, low = 0, high = 1) => Math.min(high, Math.max(low, value));
   const sub = (a, b) => ({ x: a.x - b.x, y: a.y - b.y, z: a.z - b.z });
@@ -26,6 +27,8 @@
     const derivatives = Boolean(gl.getExtension("OES_standard_derivatives"));
     const buffers = new Set();
     const cache = new WeakMap();
+    const screens = new Map();
+    const screenPixel = new Uint8Array([244, 247, 250, 255]);
     let program = null, noiseTexture = null;
 
     const dispose = () => {
@@ -33,6 +36,11 @@
       disposed = true;
       canvas.removeEventListener("webglcontextlost", onLost);
       buffers.forEach(buffer => gl.deleteBuffer(buffer));
+      screens.forEach(({ texture, image }) => {
+        if (image) image.onload = image.onerror = null;
+        gl.deleteTexture(texture);
+      });
+      screens.clear();
       if (noiseTexture) gl.deleteTexture(noiseTexture);
       if (program) gl.deleteProgram(program);
     };
@@ -61,7 +69,7 @@
       }`,
       `${derivatives ? "#extension GL_OES_standard_derivatives : enable" : ""}
       precision highp float;
-      uniform sampler2D grain;
+      uniform sampler2D grain,screenMap;
       uniform float night,isBody;
       uniform vec3 bodyCenter;
       varying vec3 vNormal,vColor,vSurface,vView,vPoint;
@@ -109,11 +117,18 @@
       }
       void main(){
         float material=vSurface.x,emission=vSurface.y,opacity=vSurface.z;
-        if(material>7.5){
+        if(material>7.5&&material<8.5){
           gl_FragColor=vec4(vColor*mix(.48,.94,night)*opacity,opacity);return;
         }
         vec3 n=normalize(vNormal),view=normalize(vView);
         if(!gl_FrontFacing)n=-n;
+        if(material>8.5){
+          vec4 artwork=texture2D(screenMap,vUV);
+          float grazing=pow(1.-max(dot(n,view),0.),3.);
+          vec3 display=mix(vColor,artwork.rgb,artwork.a)*(.98-.07*grazing);
+          display+=reflectedSky(reflect(-view,n),.18)*(.025+.08*grazing);
+          gl_FragColor=vec4(clamp(display,0.,1.),1.);return;
+        }
         vec3 tangent=normalize(vTangent.xyz-n*dot(n,vTangent.xyz));
         vec3 bitangent=normalize(cross(n,tangent))*vTangent.w;
         vec3 albedo=pow(vColor,vec3(2.2));
@@ -218,7 +233,7 @@
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { dispose(); return null; }
 
     const uniforms = Object.fromEntries([
-      "eye", "right", "down", "forward", "landmark", "radius", "nearPlane", "projection", "night", "grain",
+      "eye", "right", "down", "forward", "landmark", "radius", "nearPlane", "projection", "night", "grain", "screenMap",
       "isBody", "bodyCenter", "bodyColor", "bodyRadius", "bodyMaterial", "bodyEmission",
     ].map(name => [name, gl.getUniformLocation(program, name)]));
     const attributes = [
@@ -239,6 +254,41 @@
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+
+    const screenTexture = source => {
+      if (screens.has(source)) return screens.get(source);
+      const texture = gl.createTexture();
+      if (!texture) throw new Error("Unable to allocate navigation screen");
+      const entry = { texture, image: null };
+      screens.set(source, entry);
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      // NPOT artwork stays complete before and after its asynchronous upload.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, screenPixel);
+      const image = new Image();
+      entry.image = image;
+      image.decoding = "async";
+      const release = () => { image.onload = image.onerror = null; entry.image = null; };
+      image.onload = () => {
+        if (disposed || lost || gl.isContextLost() || !image.naturalWidth || !image.naturalHeight) { release(); return; }
+        try {
+          gl.activeTexture(gl.TEXTURE1);
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          // Authored screen UVs use y=0 at the top, matching unflipped DOM uploads.
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+          gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        } catch { /* Keep the complete placeholder when an image cannot be uploaded. */ }
+        release();
+      };
+      image.onerror = release;
+      image.src = source;
+      return entry;
+    };
 
     const makeBuffer = (values, target = gl.ARRAY_BUFFER) => {
       const buffer = gl.createBuffer();
@@ -272,7 +322,7 @@
 
     const compileGeometry = geometry => {
       if (cache.has(geometry)) return cache.get(geometry);
-      const front = [], both = [], segments = [];
+      const front = [], both = [], segments = [], textured = new Map();
       for (const face of geometry.faces || []) {
         const points = face.points;
         if (!Array.isArray(points) || points.length < 3 || !points.every(finitePoint)) continue;
@@ -297,7 +347,16 @@
         }
         const normals = face.normals?.length === points.length && face.normals.every(finitePoint)
           ? face.normals.map(normalized) : points.map(() => normal);
-        const target = face.doubleSided ? both : front, color = rgb(face.color);
+        let target = face.doubleSided ? both : front;
+        if (face.material === "screen" && typeof face.texture === "string" && face.texture) {
+          let group = textured.get(face.texture);
+          if (!group) {
+            group = { front: [], both: [], texture: screenTexture(face.texture) };
+            textured.set(face.texture, group);
+          }
+          target = face.doubleSided ? group.both : group.front;
+        }
+        const color = rgb(face.color);
         const surface = [MATERIALS[face.material] ?? MATERIALS.metal, 0, 1];
         for (let i = 1; i < points.length - 1; i += 1) {
           const indices = [0, i, i + 1], [a, b, c] = indices.map(index => points[index]);
@@ -321,11 +380,17 @@
           color, { x: 1, y: 0, z: 0, w: 1 }, [8, 0, alpha]);
       }
       const batches = [front, both, segments].map(values => ({ buffer: values.length ? makeBuffer(values) : null, count: values.length / STRIDE }));
+      const screenBatches = [];
+      textured.forEach(group => {
+        for (const [values, doubleSided] of [[group.front, false], [group.both, true]]) {
+          if (values.length) screenBatches.push({ buffer: makeBuffer(values), count: values.length / STRIDE, texture: group.texture, doubleSided });
+        }
+      });
       const bodies = (geometry.bodies || []).filter(body => finitePoint(body.at) && Number.isFinite(body.r) && body.r > 0).map(body => ({
         ...body, color: rgb(body.color), emission: clamp(Number.isFinite(body.emission) ? body.emission : 0, 0, 4),
         material: MATERIALS[body.material] ?? (body.emission > .8 ? MATERIALS.star : MATERIALS.rock),
       }));
-      const compiled = { batches, bodies };
+      const compiled = { batches, bodies, screenBatches };
       cache.set(geometry, compiled);
       return compiled;
     };
@@ -343,10 +408,10 @@
     return {
       draw({ geometry, frame, landmark, viewport, crop, near, night = 1 }) {
         if (disposed || lost || gl.isContextLost() || !geometry || typeof geometry !== "object"
-          || !frame || ![frame.eye, frame.right, frame.down, frame.forward, landmark].every(finitePoint)
+          || !frame || !finitePoint(frame.eye) || !finitePoint(frame.right) || !finitePoint(frame.down) || !finitePoint(frame.forward) || !finitePoint(landmark)
           || !(landmark.r > 0) || !Number.isFinite(landmark.r) || !Number.isFinite(near) || near <= 0
-          || !viewport || ![viewport.w, viewport.h].every(value => Number.isFinite(value) && value > 0)
-          || !crop || ![crop.left, crop.top, crop.width, crop.height].every(Number.isFinite) || crop.width <= 0 || crop.height <= 0) return false;
+          || !viewport || !Number.isFinite(viewport.w) || !Number.isFinite(viewport.h) || viewport.w <= 0 || viewport.h <= 0
+          || !crop || !Number.isFinite(crop.left) || !Number.isFinite(crop.top) || !Number.isFinite(crop.width) || !Number.isFinite(crop.height) || crop.width <= 0 || crop.height <= 0) return false;
         let compiled;
         try { compiled = compileGeometry(geometry); } catch { dispose(); return false; }
         const ratio = Math.min(1.5, window.devicePixelRatio || 1, Math.sqrt(300000 / (crop.width * crop.height)),
@@ -365,7 +430,10 @@
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
         gl.uniform1i(uniforms.grain, 0);
-        for (const name of ["eye", "right", "down", "forward"]) vector(name, frame[name]);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
+        gl.uniform1i(uniforms.screenMap, 1);
+        for (const name of FRAME_AXES) vector(name, frame[name]);
         vector("landmark", landmark);
         gl.uniform1f(uniforms.radius, landmark.r);
         gl.uniform1f(uniforms.nearPlane, near);
@@ -387,12 +455,19 @@
         gl.frontFace(gl.CW);
         gl.enable(gl.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
-        compiled.batches.slice(0, 2).forEach((batch, index) => {
-          if (!batch.count) return;
+        for (let index = 0; index < 2; index += 1) {
+          const batch = compiled.batches[index];
+          if (!batch.count) continue;
           if (index) gl.disable(gl.CULL_FACE);
           bind(batch.buffer);
           gl.drawArrays(gl.TRIANGLES, 0, batch.count);
-        });
+        }
+        for (const batch of compiled.screenBatches) {
+          if (batch.doubleSided) gl.disable(gl.CULL_FACE); else gl.enable(gl.CULL_FACE);
+          gl.bindTexture(gl.TEXTURE_2D, batch.texture.texture);
+          bind(batch.buffer);
+          gl.drawArrays(gl.TRIANGLES, 0, batch.count);
+        }
         gl.disable(gl.POLYGON_OFFSET_FILL);
         gl.enable(gl.CULL_FACE);
         if (compiled.bodies.length) {

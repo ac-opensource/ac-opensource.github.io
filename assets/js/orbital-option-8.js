@@ -1501,4 +1501,60 @@
   syncMotion();
   seedDefaultComet();
   restoreFromLocation();
+
+  // The navigation model reads the displayed rig without owning its clock or
+  // interaction state. Only finite geometry crosses the document boundary.
+  window.UniversePageLandmark = {
+    kind: "orbital",
+    snapshot() {
+      try {
+        const width = state.width, height = state.height;
+        if (!(width > 0 && height > 0)) return null;
+        const scale = Math.min(width, height);
+        const matrixValues = (element) => {
+          const matrix = new DOMMatrix(getComputedStyle(element).transform);
+          return [matrix.m11, matrix.m12, matrix.m13, matrix.m21, matrix.m22, matrix.m23,
+            matrix.m31, matrix.m32, matrix.m33];
+        };
+        const motifs = ["sphere", "frames", "gyroscope", "compass", "loom", "cubes"];
+        const core = plane.querySelector(".field-origin");
+        if (!core || !core.offsetWidth) return null;
+        const coreMatrix = new DOMMatrix(getComputedStyle(core).transform);
+        const snapshot = {
+          kind: "orbital", version: 1, view: state.view, paused: state.paused || state.reduced,
+          plane: { width, height }, pose: matrixValues(cameraRig),
+          origin: { x: (core.offsetLeft - width / 2) / scale, y: (core.offsetTop - height / 2) / scale,
+            z: coreMatrix.m43 / scale, r: core.offsetWidth / (2 * scale) },
+          orbits: profiles.map((profile, index) => {
+            const layout = responsiveLayout(profile), custom = state.customOrbits.get(profile.key);
+            const tilt = (custom?.tilt ?? layout.tilt) * Math.PI / 180;
+            const rx = custom ? custom.majorRatio : width * layout.rx / scale;
+            const ry = custom ? custom.minorRatio : height * layout.ry / scale;
+            const node = nodeByKey.get(profile.key), sculpture = node.querySelector(".sculpture");
+            if (!sculpture?.offsetWidth) throw new Error("Orbital sculpture has no geometry");
+            const position = nodePoint(node);
+            return {
+              key: profile.key, motif: motifs[index], rx, ry, tilt, custom: Boolean(custom),
+              comet: Boolean(custom || state.drag?.active && state.drag.key === profile.key),
+              center: custom
+                ? { x: width * .04 / scale + custom.eccentricity * rx * Math.cos(tilt),
+                    y: height * .02 / scale + custom.eccentricity * rx * Math.sin(tilt) }
+                : { x: width * layout.cx / scale, y: height * layout.cy / scale },
+              position: { x: position.x / scale, y: position.y / scale, z: 0 },
+              size: sculpture.offsetWidth / scale, sculpturePose: matrixValues(sculpture),
+            };
+          }),
+        };
+        const coreBounds = core.getBoundingClientRect();
+        const horizontalAxis = Math.hypot(snapshot.pose[0], snapshot.pose[3]);
+        snapshot.focus = { x: coreBounds.left + coreBounds.width / 2, y: coreBounds.top + coreBounds.height / 2,
+          r: coreBounds.width / Math.max(.001, 2 * snapshot.origin.r * 1.8 * horizontalAxis) };
+        const finite = (value) => typeof value === "number" ? Number.isFinite(value)
+          : value && typeof value === "object" ? Object.values(value).every(finite) : true;
+        return finite(snapshot) ? snapshot : null;
+      } catch (_error) {
+        return null;
+      }
+    },
+  };
 })();

@@ -7,6 +7,22 @@
   const hint = document.querySelector('[data-nova-hint]');
   const fxCanvas = nova?.querySelector('[data-nova-fx]');
   if (!field || !image || !surface || !pause) return;
+  let paintedState = { size: 1, flash: 0, phase: 'remnant' };
+  let paintedFocus = null;
+  const measureLandmarkFocus = () => {
+    const bounds = image.getBoundingClientRect();
+    paintedFocus = bounds.width > 0 && bounds.height > 0 ? {
+      x: bounds.left + bounds.width * .501,
+      y: bounds.top + bounds.height * .496,
+      r: Math.min(bounds.width, bounds.height) / 2,
+    } : null;
+    return paintedFocus;
+  };
+  window.UniversePageLandmark = Object.freeze({
+    kind: 'supernova',
+    measureFocus: measureLandmarkFocus,
+    snapshot: () => ({ ...paintedState, focus: paintedFocus }),
+  });
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const forced = matchMedia('(forced-colors: active)');
   const connection = navigator.connection;
@@ -14,6 +30,7 @@
   const idleHint = 'Move to stir. Press to collapse & ignite.';
   let fx = null;
   const staticView = () => {
+    paintedState = { size: 1, flash: 0, phase: 'remnant' };
     fx?.hide();
     if (fxCanvas) fxCanvas.hidden = true;
     field.hidden = true;
@@ -215,6 +232,7 @@
     const flash = age < 3 ? 0 : Math.exp(-(age-3)/.16);
     gl.uniform3f(uniforms.burst, flash, age < 3 ? -tension*.09 : impact*.17, tension*.004+impact*.014);
     const phase = age < 3 ? 'collapsing' : age < 3.7 ? 'exploding' : age < 6 ? 'settling' : 'remnant';
+    paintedState = { size, flash, phase };
     if (field.dataset.phase !== phase) field.dataset.phase = phase;
     gl.uniform2f(uniforms.pointer, pointerX, pointerY);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -252,6 +270,7 @@
     if (canRun()) frame = requestAnimationFrame(tick);
   };
   const resize = () => {
+    measureLandmarkFocus();
     const bounds = field.getBoundingClientRect();
     const ratio = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(750000 / Math.max(1,bounds.width*bounds.height)));
     const width = Math.max(1,Math.floor(bounds.width*ratio));
