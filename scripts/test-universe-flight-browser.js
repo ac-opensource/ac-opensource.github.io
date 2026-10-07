@@ -173,9 +173,41 @@ async function assertLiveGalaxyAlignment(page) {
   return alignment.galaxy;
 }
 
+async function assertPageLandmark(page, kind) {
+  await page.waitForFunction(expected => window.UniversePageLandmark?.kind === expected
+    && window.UniversePageLandmark.snapshot(), kind, { polling: 100 });
+  const visual = await page.evaluate(() => window.UniversePageLandmark.snapshot());
+  if (kind === "probe") {
+    assert.deepEqual(Object.keys(visual).sort(), ["bayAspect", "satelliteScale", "topology"],
+      "Contact navigation exposes no form values, identity, consent or transport state.");
+    assert(["private", "public"].includes(visual.topology));
+    assert(visual.bayAspect >= .32 && visual.bayAspect <= 3 && visual.satelliteScale >= .18 && visual.satelliteScale <= 1.3);
+  } else if (kind === "orbital") {
+    assert.equal(visual.orbits.length, 6);
+    assert.deepEqual(visual.orbits.map(orbit => orbit.motif), ["sphere", "frames", "gyroscope", "compass", "loom", "cubes"]);
+    assert(visual.pose.length === 9 && visual.pose.every(Number.isFinite));
+    const hub = await page.locator(".field-origin").boundingBox();
+    assert(Math.abs(visual.focus.x - hub.x - hub.width / 2) < .5 && Math.abs(visual.focus.y - hub.y - hub.height / 2) < .5,
+      "Home camera focuses on the visible AC hub instead of its clipped window.");
+    assert(visual.orbits.every(orbit => [orbit.position.x, orbit.position.y, orbit.position.z, orbit.rx, orbit.ry, orbit.size].every(Number.isFinite)
+      && orbit.sculpturePose.length === 9 && orbit.sculpturePose.every(Number.isFinite)), "Home's live rig has finite responsive poses.");
+  } else if (kind === "supernova") {
+    assert(visual.size > 0 && Number.isFinite(visual.flash));
+    await page.waitForFunction(() => window.prepareUniverseRemnantArtwork().ready, null, { polling: 100 });
+    const state = await page.evaluate(() => {
+      const provider = window.UniversePageLandmark;
+      const focus = provider.measureFocus(), rect = document.querySelector('[data-nova-field]').closest('.work-nova').querySelector('img').getBoundingClientRect();
+      return { focus, expected: { x: rect.left + rect.width * .501, y: rect.top + rect.height * .496, r: Math.min(rect.width, rect.height) / 2 } };
+    });
+    for (const axis of ["x", "y", "r"]) assert(Math.abs(state.focus[axis] - state.expected[axis]) < .1, `Work focus ${axis} uses the painted artwork bounds.`);
+  }
+  return visual;
+}
+
 async function flyViaLink(page, { from, to, kind, href, selector, nested = null, pageKey = to, renderer = "materialFrames" }) {
   const label = `${from} -> ${to}`;
   const destination = new URL(href, page.url());
+  const sourceKind = await page.evaluate(() => window.UniversePageLandmark?.kind || null);
   await page.evaluate(() => { window.__universeFlightAnimations = []; });
   await Promise.all([
     page.waitForURL((url) => url.pathname === destination.pathname && url.search === destination.search && url.hash === destination.hash,
@@ -197,11 +229,13 @@ async function flyViaLink(page, { from, to, kind, href, selector, nested = null,
       targetKind: plan.to.landmark.kind,
     };
   });
-  assert.equal(arrival.snapshot.lastTravel.version, 12, `${label}: use the current flight record.`);
+  assert.equal(arrival.snapshot.lastTravel.version, 13, `${label}: use the current flight record.`);
   assert.equal(arrival.snapshot.lastTravel.from, from);
   assert.equal(arrival.snapshot.lastTravel.to, to);
   assert.equal(arrival.snapshot.current, pageKey);
   assert.equal(arrival.targetKind, kind, `${label}: the flight uses its authored celestial object.`);
+  if (sourceKind) assert(arrival.snapshot.lastTravel.visuals?.[sourceKind], `${label}: departure preserves the displayed source artwork.`);
+  if (["orbital", "probe", "supernova"].includes(kind)) await assertPageLandmark(page, kind);
   assert.equal(arrival.snapshot.scene, "arrival");
   assert.equal(arrival.snapshot.activeTransition, true);
   assert.equal(arrival.layers, 2, `${label}: both shared sky layers are available during flight.`);
@@ -322,6 +356,11 @@ async function main() {
     assert.equal(settledContact.landmark.kind, "probe");
     assert.equal(await page.locator("[data-universe-sky]").count(), 0, "A settled page carries no sky layers.");
     await assertSolidRenderer(page);
+    const privateVisual = await assertPageLandmark(page, "probe");
+    assert.equal(privateVisual.topology, "private");
+    await page.locator('input[name="intent"][value="public"]').check();
+    assert.equal((await assertPageLandmark(page, "probe")).topology, "public");
+    await page.locator('input[name="intent"][value="private"]').check();
 
     if (!settledContact.crossDocument) {
       console.log("SKIP universe flight: this browser has no cross-document view transitions");
@@ -352,8 +391,9 @@ async function main() {
     assert.deepEqual(arrival.layers.map((layer) => layer.name), ["universe-cosmos", "universe-cosmos-near"]);
     assert.equal(arrival.layers[0].painted, 255, "The far sky is painted before the first transition frame.");
     const travel = arrival.snapshot.lastTravel;
-    assert.equal(travel.version, 12);
+    assert.equal(travel.version, 13);
     assert.equal(travel.from, "contact");
+    assert.deepEqual(travel.visuals.probe, privateVisual, "The private capsule state crosses into the destination document.");
     assert.equal(travel.to, "resume");
     assert.equal(travel.motionModel, "cosmic-camera");
     assert.equal(travel.pathModel, "spatial-zoom-orbit");
@@ -452,7 +492,7 @@ async function main() {
     ]);
     await waitForArrival(page);
     const logsTravel = await page.evaluate(() => window.UniversePerspective.snapshot().lastTravel);
-    assert.equal(logsTravel.version, 12);
+    assert.equal(logsTravel.version, 13);
     assert.equal(logsTravel.from, "about");
     assert.equal(logsTravel.to, "logs");
     assertIdentity((await seek(page, 0)).old, "About starts at rest before entering the galaxy");

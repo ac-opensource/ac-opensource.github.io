@@ -1,5 +1,39 @@
 (() => {
   "use strict";
+  let remnantArtwork = null;
+  // The authored Work image supplies color and matter density to both the
+  // navigation volume and its spatial Canvas fallback. Its paper is not a plane.
+  window.prepareUniverseRemnantArtwork = () => {
+    if (remnantArtwork) return remnantArtwork;
+    const image = new Image();
+    remnantArtwork = { image, ready: false, pixels: null, size: 256 };
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = remnantArtwork.size;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      if (!context) return;
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      try {
+        const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+        remnantArtwork.pixels = pixels;
+        // Keep source colors while bounding the fallback's tinted sprite cache.
+        const bins = new Map();
+        for (let i = 0; i < pixels.length; i += 4) {
+          const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+          if (.975 - (r * .299 + g * .587 + b * .114) / 255 < .055) continue;
+          const key = (r >> 5) * 64 + (g >> 5) * 8 + (b >> 5);
+          const bin = bins.get(key) || { count: 0, color: [0, 0, 0] };
+          bin.count += 1; bin.color[0] += r; bin.color[1] += g; bin.color[2] += b;
+          bins.set(key, bin);
+        }
+        remnantArtwork.palette = [...bins.values()].sort((a, b) => b.count - a.count).slice(0, 24)
+          .map(bin => bin.color.map(value => Math.round(value / bin.count)));
+        remnantArtwork.ready = true;
+      } catch (_error) { /* The procedural spatial fallback remains available. */ }
+    };
+    image.src = "/assets/images/work/supernova-remnant.jpg";
+    return remnantArtwork;
+  };
   window.createAboutButterflyField = canvas => {
     // Software raymarching can stall document capture long enough to cancel
     // navigation. Keep the existing spatial fallback on slow WebGL backends.
@@ -22,9 +56,10 @@
       uniform vec2 extent,resolution,center;
       uniform float scale,lightTheme;
       uniform mat3 axes;
-      uniform float navigationView,remnant;
+      uniform float navigationView,remnant,artworkReady,remnantSize,remnantFlash;
       uniform vec3 navigationEye,navigationRight,navigationDown,navigationForward;
       uniform sampler2D noiseTexture;
+      uniform sampler2D remnantTexture;
       float noise(vec3 p){
         vec3 cell=floor(p),f=fract(p);f=f*f*(3.-2.*f);
         vec2 uv=(cell.xy+cell.z*vec2(37.,17.)+f.xy+.5)/256.;
@@ -40,7 +75,9 @@
           eye=navigationEye;
           ray=normalize(navigationForward+navigationRight*(pixel.x-center.x)/scale+navigationDown*(extent.y-pixel.y-center.y)/scale);
         }
-        float b=dot(eye,ray),c=dot(eye,eye)-196.;
+        float volumeScale=remnant>.5?clamp(remnantSize,.045,1.3):1.;
+        float bound=14.*volumeScale;
+        float b=dot(eye,ray),c=dot(eye,eye)-bound*bound;
         float discriminant=b*b-c;
         if(discriminant<0.){gl_FragColor=vec4(0);return;}
         float start=max(0.,-b-sqrt(discriminant)),end=-b+sqrt(discriminant);
@@ -52,7 +89,35 @@
           // The navigation remnant is a separate field in the same bounded
           // raymarcher. The default About field below remains unchanged.
           if(remnant>.5){
-            vec3 q=vec3(dot(p.xy,vec2(.79,.613)),dot(p.xy,vec2(-.613,.79)),p.z);
+            if(artworkReady>.5){
+              vec3 q=p/volumeScale;
+              vec2 uv=q.xy/24.+vec2(.501,.504);
+              if(all(greaterThan(uv,vec2(0)))&&all(lessThan(uv,vec2(1)))){
+                // Lift the real image into a cloud with an irregular depth
+                // profile. Off-axis rays traverse matter and reveal its volume.
+                vec3 ink=texture2D(remnantTexture,uv).rgb;
+                float pigment=max(0.,.975-dot(ink,vec3(.299,.587,.114)));
+                float edge=smoothstep(.025,.28,pigment);
+                float coarse=fbm(q*.7);
+                float centerDepth=(coarse-.5)*.7;
+                float halfDepth=.45+pigment*1.1;
+                float depth=1.-smoothstep(halfDepth*.32,halfDepth,abs(q.z-centerDepth));
+                float fibers=.45+fbm(q*2.6)*1.1;
+                float density=edge*depth*fibers*(.08+pigment*.72);
+                float absorption=1.-exp(-density*stride/volumeScale*5.5);
+                // Keep the cobalt/copper drawing recognizable on either sky.
+                vec3 color=ink*(.78+.72*coarse);
+                float core=exp(-dot(q.xy,q.xy)*8.)*exp(-q.z*q.z*2.);
+                color+=vec3(1.25,.93,.56)*core*(1.+remnantFlash*2.);
+                color=mix(color,color*.82,lightTheme);
+                accumulated+=(1.-opacity)*color*absorption;
+                opacity+=(1.-opacity)*absorption;
+                if(opacity>.987)break;
+              }
+              distance+=stride;
+              continue;
+            }
+            vec3 q=vec3(dot(p.xy,vec2(.79,.613)),dot(p.xy,vec2(-.613,.79)),p.z)/volumeScale;
             q.yz=mat2(.969,-.247,.247,.969)*q.yz;
             float radius=length(q/vec3(12.2,6.4,4.8));
             if(radius<1.25){
@@ -69,7 +134,7 @@
               float interior=cavity*threads*.22;
               float core=exp(-dot(q,q)*3.8);
               float density=skin+diffuse+interior+core*1.5;
-              float absorption=1.-exp(-density*stride*1.9);
+              float absorption=1.-exp(-density*stride/volumeScale*1.9);
               vec3 blue=mix(vec3(.035,.12,.33),vec3(.26,.69,.88),ridge);
               blue=mix(blue,vec3(.08,.49,.45),smoothstep(.56,.76,coarse)*.65);
               vec3 copper=mix(vec3(.50,.12,.045),vec3(1.35,.91,.52),lace);
@@ -149,10 +214,17 @@
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);
     gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,256,256,0,gl.RGBA,gl.UNSIGNED_BYTE,lattice);
     const position=gl.getAttribLocation(program,"position");
-    const uniforms=Object.fromEntries(["extent","resolution","center","scale","axes","lightTheme","noiseTexture","navigationView","navigationEye","navigationRight","navigationDown","navigationForward","remnant"].map(name=>[name,gl.getUniformLocation(program,name)]));
+    const uniforms=Object.fromEntries(["extent","resolution","center","scale","axes","lightTheme","noiseTexture","navigationView","navigationEye","navigationRight","navigationDown","navigationForward","remnant","remnantTexture","artworkReady","remnantSize","remnantFlash"].map(name=>[name,gl.getUniformLocation(program,name)]));
+    const remnantTexture=gl.createTexture();
+    if(!remnantTexture){gl.deleteTexture(noiseTexture);gl.deleteBuffer(buffer);gl.deleteProgram(program);canvas.removeEventListener("webglcontextlost",onLost);return null;}
+    let artworkUploaded=false;
+    gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,remnantTexture);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([250,249,244,255]));
     canvas.dataset.particleCount="0";canvas.dataset.renderer="raymarched-volume";
     return {
-      draw({width,height,centerX,centerY,baseScale,axes,lightTheme,navigation,remnant=false}){
+      draw({width,height,centerX,centerY,baseScale,axes,lightTheme,navigation,remnant=false,remnantState=null}){
         if(disposed||lost||gl.isContextLost()||!(width>0&&height>0&&baseScale>0))return false;
         // Preserve filament detail across the full overscan surface, with a
         // smaller mobile budget while rotation remains enabled.
@@ -162,6 +234,18 @@
         if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
         gl.viewport(0,0,w,h);gl.useProgram(program);gl.disable(gl.BLEND);
         gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,noiseTexture);gl.uniform1i(uniforms.noiseTexture,0);
+        gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,remnantTexture);
+        if(remnant&&!artworkUploaded){
+          const artwork=window.prepareUniverseRemnantArtwork();
+          if(artwork.ready){
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
+            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,artwork.image);
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);artworkUploaded=true;
+          }
+        }
+        gl.uniform1i(uniforms.remnantTexture,1);gl.uniform1f(uniforms.artworkReady,artworkUploaded?1:0);
+        gl.uniform1f(uniforms.remnantSize,Number.isFinite(remnantState?.size)?remnantState.size:1);
+        gl.uniform1f(uniforms.remnantFlash,Number.isFinite(remnantState?.flash)?remnantState.flash:0);
         gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
         gl.uniform2f(uniforms.extent,width,height);gl.uniform2f(uniforms.resolution,w,h);gl.uniform2f(uniforms.center,centerX,centerY);
         gl.uniform1f(uniforms.scale,baseScale);gl.uniform1f(uniforms.lightTheme,lightTheme?1:0);gl.uniformMatrix3fv(uniforms.axes,false,axes||[1,0,0,0,1,0,0,0,1]);
@@ -172,7 +256,7 @@
         }
         gl.drawArrays(gl.TRIANGLES,0,6);return !gl.isContextLost();
       },
-      dispose(){disposed=true;canvas.removeEventListener("webglcontextlost",onLost);gl.deleteTexture(noiseTexture);gl.deleteBuffer(buffer);gl.deleteProgram(program);}
+      dispose(){disposed=true;canvas.removeEventListener("webglcontextlost",onLost);gl.deleteTexture(noiseTexture);gl.deleteTexture(remnantTexture);gl.deleteBuffer(buffer);gl.deleteProgram(program);}
     };
   };
 })();

@@ -5,6 +5,26 @@
   document.documentElement.classList.add("js");
 
   const form = document.getElementById("contact-form");
+  if (form) {
+    const bay = form.querySelector("[data-payload-visual]");
+    const satellite = form.querySelector(".satellite");
+    // Navigation may reuse the artwork's proportions and topology, never any
+    // identity, message, consent, receipt or transport state from this form.
+    window.UniversePageLandmark = Object.freeze({
+      kind: "probe",
+      snapshot() {
+        const bounds = bay?.getBoundingClientRect();
+        const valid = bounds && bounds.width > 0 && bounds.height > 0;
+        const ratio = (value, fallback, min, max) => Number(Math.min(max, Math.max(min,
+          Number.isFinite(value) && value > 0 ? value : fallback)).toFixed(3));
+        return Object.freeze({
+          topology: form.dataset.topology === "public" ? "public" : "private",
+          bayAspect: ratio(valid ? bounds.width / bounds.height : NaN, .8, .32, 3),
+          satelliteScale: ratio(valid ? satellite?.offsetWidth / Math.min(bounds.width, bounds.height) : NaN, .42, .18, 1.3),
+        });
+      },
+    });
+  }
   const adapter = window.ContactTransport;
   if (!form || !adapter) return;
 

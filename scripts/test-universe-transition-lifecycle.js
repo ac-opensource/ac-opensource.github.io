@@ -7,7 +7,7 @@ const controllerPath = process.argv[2] || path.join(__dirname, "../assets/js/uni
 const source = fs.readFileSync(controllerPath, "utf8");
 const ARRIVAL_KEY = "ac.universe-perspective.v1";
 
-function createPage({ crossDocument = false, reduced = false, rejectNavigation = false, pathname = "/work.html", galaxySnapshot = null } = {}) {
+function createPage({ crossDocument = false, reduced = false, rejectNavigation = false, pathname = "/work.html", galaxySnapshot = null, landmarkSnapshot = null } = {}) {
   const scheduled = new Map();
   const frames = new Map();
   const storage = new Map();
@@ -52,6 +52,7 @@ function createPage({ crossDocument = false, reduced = false, rejectNavigation =
   };
   window.matchMedia = () => media;
   if (galaxySnapshot) window.UniverseGalaxy = { snapshot: () => galaxySnapshot };
+  if (landmarkSnapshot) window.UniversePageLandmark = { kind: landmarkSnapshot.kind, snapshot: () => landmarkSnapshot.visual };
   window.localStorage = { getItem: () => null };
   window.sessionStorage = {
     getItem: (key) => storage.get(key) ?? null,
@@ -126,7 +127,7 @@ for (const crossDocument of [false, true]) {
   assert.equal(page.snapshot().pendingCleanup, 0);
   assert.equal(JSON.parse(page.storage.get(ARRIVAL_KEY)).destinationUrl, "/about.html?source=map#profile-map",
     "Completing departure must retain the destination's one-time arrival payload.");
-  assert.equal(JSON.parse(page.storage.get(ARRIVAL_KEY)).version, 12, "Changed world geometry must use the current arrival record.");
+  assert.equal(JSON.parse(page.storage.get(ARRIVAL_KEY)).version, 13, "Changed world geometry must use the current arrival record.");
   page.frame();
   page.frame();
   page.advance(3000);
@@ -341,6 +342,45 @@ const record = (from, to, extra = {}) => ({
   fromFocus: { x: 900, y: 420, r: 230 }, toFocus: { x: 640, y: 432, r: 192 },
   ...extra,
 });
+
+// Cosmetic page state travels with the source, then the destination's actual
+// displayed topology replaces stale source state during layout correction.
+const privateProbe = { topology: "private", bayAspect: .8, satelliteScale: .42 };
+const publicProbe = { ...privateProbe, topology: "public", bayAspect: 1.6 };
+const contactPage = createPage({ pathname: "/contact.html", landmarkSnapshot: { kind: "probe", visual: privateProbe } });
+contactPage.click("/resume.html");
+contactPage.reduceMotion();
+assert.deepEqual(JSON.parse(contactPage.storage.get(ARRIVAL_KEY)).visuals, { probe: privateProbe },
+  "Departure transports only the page provider's cosmetic snapshot.");
+const contactArrival = createPage({ landmarkSnapshot: { kind: "probe", visual: publicProbe } });
+const contactModel = contactArrival.window.UniversePerspective.model;
+const contactPlan = contactModel.planFlight(record("home", "contact", { visuals: { probe: privateProbe } }), { x: 820, y: 430, r: 200 }, viewport);
+assert.equal(contactPlan.visuals.probe, publicProbe, "Arrival uses the current Contact topology and responsive dimensions.");
+contactArrival.window.UniversePageLandmark.snapshot = () => privateProbe;
+contactModel.correctLanding(contactPlan, { x: 830, y: 440, r: 210 }, .55);
+assert.equal(contactPlan.visuals.probe, privateProbe, "Late layout correction refreshes the page-owned visual state.");
+const folded = model.landmarkGeometry("probe", privateProbe), deployed = model.landmarkGeometry("probe", publicProbe);
+assert.notEqual(folded, deployed, "Different responsive/topology states must not reuse stale cached geometry.");
+assert.equal(model.landmarkGeometry("probe", { ...privateProbe }), folded, "Equivalent snapshots reuse their geometry.");
+const wingVertices = geometry => geometry.faces.filter(face => face.material === "ceramic" && face.color.join() === "199,219,217").flatMap(face => face.points);
+const span = (points, axis) => Math.max(...points.map(p => p[axis])) - Math.min(...points.map(p => p[axis]));
+assert(span(wingVertices(folded), "z") > span(wingVertices(deployed), "z") * 2,
+  "Private wings fold in physical depth instead of only becoming narrower.");
+assert(span(wingVertices(folded), "x") < span(wingVertices(deployed), "x"), "Public wings open across the page's wider silhouette.");
+const workFocus = { x: 910, y: 425, r: 610 };
+const workPage = createPage({ landmarkSnapshot: { kind: "supernova", visual: { size: .3, flash: .7, phase: "collapse", focus: workFocus } } });
+workPage.window.innerWidth = viewport.w; workPage.window.innerHeight = viewport.h;
+assert.deepEqual(JSON.parse(JSON.stringify(workPage.snapshot().focus)), workFocus,
+  "Work's camera uses the artwork's overscanned core and radius, not its smaller wrapper.");
+const artwork = { ready: false, size: 2, pixels: new Uint8Array([30, 70, 150, 255, 60, 150, 140, 255, 180, 100, 60, 255, 250, 249, 244, 255]) };
+workPage.window.prepareUniverseRemnantArtwork = () => artwork;
+const workModel = workPage.window.UniversePerspective.model;
+const beforeArtwork = workModel.landmarkGeometry("supernova");
+artwork.ready = true;
+const afterArtwork = workModel.landmarkGeometry("supernova");
+assert.notEqual(afterArtwork, beforeArtwork, "Decoded Work artwork invalidates the procedural geometry fallback.");
+assert(span(afterArtwork.clouds.map(cloud => cloud.at), "z") > .1, "Source-colored fallback matter retains real depth.");
+assert(afterArtwork.clouds.some(cloud => cloud.color[0] === 30 && cloud.color[2] === 150), "Fallback matter takes its colors from the same page artwork.");
 
 // A live archive may have been orbiting for minutes or be paused. Its source
 // phase survives navigation, while an arriving archive owns its current phase.
