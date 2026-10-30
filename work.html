@@ -28,7 +28,7 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
   <link href="/assets/css/neural-background.css?v=20260812-reduced1" rel="stylesheet"/>
-  <link href="/assets/css/work-portfolio.css?v=20261005-design1" rel="stylesheet"/>
+  <link href="/assets/css/work-portfolio.css?v=20261030-showcases1" rel="stylesheet"/>
   <link href="/assets/experiments/universe-options/work-round-05/supernova-portfolio.css?v=20261003-detonate1" rel="stylesheet"/>
   <link href="/assets/css/work-motion.css?v=20261005-strain2" rel="stylesheet"/>
   <link href="/assets/css/route-signal-handoff.css?v=20260806-t3" rel="stylesheet"/>
@@ -57,7 +57,7 @@
     },
     "mainEntity": {
       "@type": "ItemList",
-      "numberOfItems": 16,
+      "numberOfItems": 18,
       "itemListElement": [
         {"@type":"ListItem","position":1,"name":"Bitcoin.com Wallet","url":"https://ac-opensource.github.io/blog/case-study-bitcoin-wallet-multichain-android-systems.html"},
         {"@type":"ListItem","position":2,"name":"ITVX","url":"https://ac-opensource.github.io/blog/case-study-itvx-playback-at-candyspace.html"},
@@ -72,9 +72,11 @@
         {"@type":"ListItem","position":11,"name":"ProjectBASS","url":"https://ac-opensource.github.io/blog/case-study-projectbass-crowdsourced-network-mapping.html"},
         {"@type":"ListItem","position":12,"name":"NTU Pass and NUS counterpart","url":"https://play.google.com/store/apps/details?id=sg.edu.ntu.apps.ntusmartpass&hl=en"},
         {"@type":"ListItem","position":13,"name":"Aqua Expeditions","url":"https://www.aquaexpeditions.com/"},
-        {"@type":"ListItem","position":14,"name":"Persons Finder","url":"https://github.com/ac-opensource/persons-finder"},
-        {"@type":"ListItem","position":15,"name":"Orchestrum","url":"https://github.com/ac-opensource/Orchestrum"},
-        {"@type":"ListItem","position":16,"name":"MemPalace project-mining contribution","url":"https://github.com/MemPalace/mempalace/pull/78"}
+        {"@type":"ListItem","position":14,"name":"Astra","url":"https://play.google.com/store/apps/details?id=tech.aconcepcion.astra"},
+        {"@type":"ListItem","position":15,"name":"Accompany, on!","url":"https://accompanyon.site/"},
+        {"@type":"ListItem","position":16,"name":"Persons Finder","url":"https://github.com/ac-opensource/persons-finder"},
+        {"@type":"ListItem","position":17,"name":"Orchestrum","url":"https://github.com/ac-opensource/Orchestrum"},
+        {"@type":"ListItem","position":18,"name":"MemPalace project-mining contribution","url":"https://github.com/MemPalace/mempalace/pull/78"}
       ]
     }
   }
@@ -500,8 +502,56 @@
           <span class="work-eyebrow">[04 / public]</span>
           <h2 id="public-title">Recent work you can open.</h2>
         </div>
-        <p>These are public repositories, so you can read the code and tests yourself.</p>
+        <p>Apps I’ve built and open-source work you can explore.</p>
       </header>
+
+      <div class="work-featured-projects">
+        <article id="project-astra" class="work-public-card work-public-card--personal" data-portfolio-entry>
+          <figure class="work-showcase work-showcase--astra">
+            <div class="work-showcase__masthead">
+              <span class="work-showcase__brand"><img src="/assets/images/work/ic_astra_project.png" alt="Astra app icon" width="512" height="512" loading="lazy" decoding="async"/><span>ASTRA <small>PERSONAL FINANCE</small></span></span>
+              <span class="work-showcase__platform">ANDROID APP</span>
+            </div>
+            <div class="work-showcase__phones">
+              <div class="work-showcase__phone work-showcase__phone--today"><img src="/assets/images/work/astra-today-example.png?v=20260921" alt="Astra Today screen showing example income and spending" width="1080" height="2400" loading="lazy" decoding="async"/></div>
+              <div class="work-showcase__phone work-showcase__phone--budget"><img src="/assets/images/work/astra-budget-example.png?v=20260921" alt="Astra budget planner showing example category limits" width="1080" height="2400" loading="lazy" decoding="async"/></div>
+            </div>
+            <figcaption>Example financial data</figcaption>
+          </figure>
+          <div class="work-public-card__body">
+            <span class="work-eyebrow">Android · Personal finance</span>
+            <h3>Astra</h3>
+            <p>I built Astra to make everyday money planning easier. It brings transactions and supported imports into a reviewable ledger alongside budgets, bills, and savings goals, with financial records kept in an encrypted on-device vault.</p>
+            <div class="work-case__meta"><span class="work-chip">Expense tracking</span><span class="work-chip">Budgets + goals</span><span class="work-chip">Encrypted local vault</span></div>
+            <a class="work-text-link" href="https://play.google.com/store/apps/details?id=tech.aconcepcion.astra" target="_blank" rel="noreferrer">View Astra on Google Play <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+        </article>
+
+        <article id="project-accompany-on" class="work-public-card work-public-card--personal" data-portfolio-entry>
+          <figure class="work-showcase work-showcase--accompany">
+            <div class="work-showcase__masthead">
+              <span class="work-showcase__brand"><img src="/assets/images/work/ic_accompany_on_project.png" alt="Accompany, on! app icon" width="512" height="512" loading="lazy" decoding="async"/><span>ACCOMPANY, ON! <small>TRAVEL PLANNING</small></span></span>
+              <span class="work-showcase__platform">WEB APP</span>
+            </div>
+            <div class="work-showcase__window work-showcase__window--together">
+              <div class="work-showcase__window-bar" aria-hidden="true"><i></i><i></i><i></i><span>TOGETHER</span></div>
+              <img src="/assets/images/work/accompany-together-example.jpg" alt="Accompany, on! group planning workspace for an example Japan trip" width="1398" height="874" loading="lazy" decoding="async"/>
+            </div>
+            <div class="work-showcase__window work-showcase__window--bookings">
+              <div class="work-showcase__window-bar" aria-hidden="true"><i></i><i></i><i></i><span>BOOKINGS</span></div>
+              <img src="/assets/images/work/accompany-bookings-example.jpg" alt="Accompany, on! booking timeline for an example Japan trip" width="1398" height="874" loading="lazy" decoding="async"/>
+            </div>
+            <figcaption>Fictional trip</figcaption>
+          </figure>
+          <div class="work-public-card__body">
+            <span class="work-eyebrow">Web · Travel planning</span>
+            <h3>Accompany, on!</h3>
+            <p>I built Accompany, on! for planning trips alone or together. It brings saved places, maps, day-by-day itineraries, bookings, group decisions, and shared expenses into one place.</p>
+            <div class="work-case__meta"><span class="work-chip">Shared itineraries</span><span class="work-chip">Maps + places</span><span class="work-chip">Group coordination</span></div>
+            <a class="work-text-link" href="https://accompanyon.site/" target="_blank" rel="noreferrer">Open Accompany, on! <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+        </article>
+      </div>
 
       <div class="work-public-grid">
         <article class="work-public-card work-public-card--persons" data-portfolio-entry>

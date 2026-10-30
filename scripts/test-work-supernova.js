@@ -53,7 +53,7 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:42873';
     const staticPage = await browser.newPage({ javaScriptEnabled: false });
     await staticPage.goto(`${BASE_URL}/work.html`);
     assert(await staticPage.locator('.work-nova__image').isVisible());
-    assert.equal(await staticPage.locator('[data-portfolio-entry]').count(), 16);
+    assert.equal(await staticPage.locator('[data-portfolio-entry]').count(), 18);
     assert.deepEqual(errors, []);
     console.log('Work supernova passed: collapse/explosion/remnant, 2.3x anchored field, desktop/mobile budgets, keyboard ignition, pause, reduced motion, offscreen suspension, no-JS content.');
   } finally {
