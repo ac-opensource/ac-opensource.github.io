@@ -4373,13 +4373,13 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   });
   const expectedProductionProjects = ['Bitcoin.com Wallet', 'ITVX', 'OCBC Business', 'openpay', 'MySTC'];
   const expectedArchiveProjects = ['Littlepay', 'OWTO', 'Popslide', 'WebSafety', 'Solo', 'ProjectBASS', 'NTU Pass + NUS', 'Aqua Expeditions'];
-  const expectedPublicProjects = ['Persons Finder', 'Orchestrum', 'MemPalace'];
+  const expectedPublicProjects = ['Astra', 'Accompany, on!', 'Persons Finder', 'Orchestrum', 'MemPalace'];
   await assert(
-    portfolioContract.entryCount === 16
+    portfolioContract.entryCount === 18
       && JSON.stringify(portfolioContract.production) === JSON.stringify(expectedProductionProjects)
       && JSON.stringify(portfolioContract.archive) === JSON.stringify(expectedArchiveProjects)
       && JSON.stringify(portfolioContract.publicBuilds) === JSON.stringify(expectedPublicProjects),
-    `Work page no longer matches the public 5 / 8 / 3 portfolio baseline: ${JSON.stringify(portfolioContract)}`
+    `Work page no longer matches the public 5 / 8 / 5 portfolio baseline: ${JSON.stringify(portfolioContract)}`
   );
   await assert(
     portfolioContract.heroTitle === 'I build the parts people notice when they fail.'
@@ -4410,7 +4410,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   await assert(
     portfolioContract.imageCounts.production === 11
       && portfolioContract.imageCounts.archive === 7
-      && portfolioContract.imageCounts.publicBuilds === 1
+      && portfolioContract.imageCounts.publicBuilds === 7
       && portfolioContract.allImagesNamed,
     `Work image evidence changed: ${JSON.stringify(portfolioContract.imageCounts)}`
   );
@@ -4467,6 +4467,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   }
 
   const requiredProjectLinks = [
+    ['Astra', 'a[href="https://play.google.com/store/apps/details?id=tech.aconcepcion.astra"]'],
+    ['Accompany, on!', 'a[href="https://accompanyon.site/"]'],
     ['Bitcoin.com Wallet', 'a[href*="play.google.com/store/apps/details?id=com.bitcoin.mwallet"]'],
     ['ITVX', 'a[href*="play.google.com/store/apps/details?id=air.ITVMobilePlayer"]'],
     ['OCBC Business', 'a[href*="play.google.com/store/apps/details?id=com.ocbc.mobilebv"]'],
@@ -4495,7 +4497,7 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
     productionTitles: [...document.querySelectorAll('#production-work .work-case h3')].map((heading) => heading.textContent.trim()),
   }));
   await assert(
-    mobileWork.entryCount === 16
+    mobileWork.entryCount === 18
       && mobileWork.heroFontSize <= 58
       && mobileWork.rootWidth <= mobileWork.viewportWidth + 2
       && mobileWork.routeMapCount >= 6
@@ -4567,8 +4569,8 @@ for (const dir of [screenshotRoot, desktopDir, mobileDir]) {
   const noJavaScriptResponse = await noJavaScriptPage.goto(BASE_URL + '/work.html', { waitUntil: 'domcontentloaded' });
   await assert(noJavaScriptResponse && noJavaScriptResponse.status() >= 200 && noJavaScriptResponse.status() < 400,
     'Work page failed to load with JavaScript disabled');
-  await assert(await noJavaScriptPage.locator('[data-portfolio-entry]').count() === 16,
-    'Work page does not expose all 16 portfolio entries without JavaScript');
+  await assert(await noJavaScriptPage.locator('[data-portfolio-entry]').count() === 18,
+    'Work page does not expose all 18 portfolio entries without JavaScript');
   const staticWorkPageText = ((await noJavaScriptPage.locator('body').textContent()) || '').replace(/\s+/g, ' ').trim();
   for (const projectName of [...expectedProductionProjects, ...expectedArchiveProjects, ...expectedPublicProjects]) {
     await assert(staticWorkPageText.includes(projectName), `Work page hides ${projectName} when JavaScript is disabled`);
