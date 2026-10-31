@@ -130,6 +130,7 @@
   motionButton?.addEventListener("click", () => {
     motionPaused = !motionPaused;
     syncMotionButton();
+    syncIdleRotation();
   });
 
   let profile = null;
@@ -145,6 +146,8 @@
   let evidenceBackdropElement = null;
   let sourcePanelOpen = false;
   let idleRotationFrame = 0;
+  let idleRotationTimer = 0;
+  let idleRotationStarted = false;
   let idleRotationTimestamp = 0;
   let fixedViewPhase = 0;
   let cameraInteractionUntil = 0;
@@ -778,60 +781,81 @@
   function noteCameraInteraction(delay = IDLE_ROTATION_DELAY) {
     cameraInteractionUntil = window.performance.now() + delay;
     if (root.dataset.treeMotion !== "paused") root.dataset.treeMotion = "paused";
+    syncIdleRotation();
   }
 
-  function runIdleRotation(timestamp) {
-    const canRotate = !motionPaused && !reducedMotion.matches
+  function canRunIdleRotation() {
+    return idleRotationStarted && !motionPaused && !reducedMotion.matches
       && !document.hidden
       && stageIsVisible
       && !state.bandId
       && !sourcePanelOpen
-      && !cameraPointerActive
-      && timestamp >= cameraInteractionUntil;
-
-    if (canRotate) {
-      if (root.dataset.treeMotion !== "idle-rotation") root.dataset.treeMotion = "idle-rotation";
-      const elapsed = idleRotationTimestamp ? timestamp - idleRotationTimestamp : 0;
-      // Follow the display clock; elapsed time keeps rotation speed independent of refresh rate.
-      if (elapsed > 0) {
-        const boundedElapsed = Math.min(100, elapsed);
-        const zoomAdjustedSpeed = IDLE_ROTATION_SPEED / zoomMotionScale();
-        idleRotationTimestamp = timestamp;
-        if (state.projection === "free") {
-          state.yaw = normalizeAngle(state.yaw + boundedElapsed * zoomAdjustedSpeed);
-          syncCameraControls();
-        } else {
-          fixedViewPhase += boundedElapsed * zoomAdjustedSpeed * 1.8;
-        }
-        drawTreeScene();
-      }
-    } else {
-      idleRotationTimestamp = timestamp;
-      const motionState = reducedMotion.matches ? "reduced" : "paused";
-      if (root.dataset.treeMotion !== motionState) {
-        root.dataset.treeMotion = motionState;
-      }
-    }
-    idleRotationFrame = reducedMotion.matches ? 0 : window.requestAnimationFrame(runIdleRotation);
+      && !cameraPointerActive;
   }
 
-  function startIdleRotation() {
-    if (idleRotationFrame) return;
+  function stopIdleRotation() {
+    window.cancelAnimationFrame(idleRotationFrame);
+    window.clearTimeout(idleRotationTimer);
+    idleRotationFrame = 0;
+    idleRotationTimer = 0;
     idleRotationTimestamp = 0;
-    cameraInteractionUntil = window.performance.now() + 350;
+  }
+
+  function syncIdleRotation() {
+    const now = window.performance.now();
+    const delay = cameraInteractionUntil - now;
+    if (!canRunIdleRotation() || delay > 0) {
+      stopIdleRotation();
+      root.dataset.treeMotion = reducedMotion.matches ? "reduced" : "paused";
+      // Interactions need one wake-up after their cooldown, not a polling frame loop.
+      if (canRunIdleRotation() && delay > 0) {
+        idleRotationTimer = window.setTimeout(syncIdleRotation, delay);
+      }
+      return;
+    }
+    if (idleRotationFrame) return;
+    window.clearTimeout(idleRotationTimer);
+    idleRotationTimer = 0;
+    idleRotationTimestamp = now;
     idleRotationFrame = window.requestAnimationFrame(runIdleRotation);
   }
 
-  function syncIdleRotationMotion() {
-    if (!reducedMotion.matches) {
-      startIdleRotation();
+  function runIdleRotation(timestamp) {
+    idleRotationFrame = 0;
+    if (!canRunIdleRotation() || timestamp < cameraInteractionUntil) {
+      syncIdleRotation();
       return;
     }
-    window.cancelAnimationFrame(idleRotationFrame);
-    idleRotationFrame = 0;
-    idleRotationTimestamp = 0;
-    root.dataset.treeMotion = "reduced";
-    drawTreeScene();
+
+    if (root.dataset.treeMotion !== "idle-rotation") root.dataset.treeMotion = "idle-rotation";
+    const elapsed = timestamp - idleRotationTimestamp;
+    idleRotationTimestamp = timestamp;
+    // Follow the display clock; elapsed time keeps rotation speed independent of refresh rate.
+    if (elapsed > 0) {
+      const boundedElapsed = Math.min(100, elapsed);
+      const zoomAdjustedSpeed = IDLE_ROTATION_SPEED / zoomMotionScale();
+      if (state.projection === "free") {
+        state.yaw = normalizeAngle(state.yaw + boundedElapsed * zoomAdjustedSpeed);
+        syncCameraControls();
+      } else {
+        fixedViewPhase += boundedElapsed * zoomAdjustedSpeed * 1.8;
+      }
+      drawTreeScene();
+    }
+    idleRotationFrame = window.requestAnimationFrame(runIdleRotation);
+  }
+
+  function startIdleRotation() {
+    if (!idleRotationStarted) {
+      idleRotationStarted = true;
+      cameraInteractionUntil = Math.max(cameraInteractionUntil, window.performance.now() + 350);
+    }
+    syncIdleRotation();
+  }
+
+  function syncIdleRotationMotion() {
+    syncIdleRotation();
+    if (reducedMotion.matches) drawTreeScene();
   }
 
   function syncTreeInteractionControl() {
@@ -2175,6 +2199,7 @@
     window.requestAnimationFrame(positionPopup);
     window.clearTimeout(popupSettleTimer);
     popupSettleTimer = window.setTimeout(positionPopup, 220);
+    syncIdleRotation();
   }
 
   function updateProjectionControls() {
@@ -2354,6 +2379,7 @@
         window.clearTimeout(scanTimer);
         stageElement.classList.remove("is-scanning");
       }
+      syncIdleRotation();
     }, { rootMargin: "120px 0px" });
     observer.observe(stageElement);
   }
@@ -2385,11 +2411,13 @@
         readLocationState();
         render();
       });
+      window.addEventListener("pagehide", stopIdleRotation);
       document.addEventListener("visibilitychange", () => {
         if (document.hidden) {
           window.clearTimeout(scanTimer);
           stageElement.classList.remove("is-scanning");
         }
+        syncIdleRotation();
       });
       root.classList.add("stellar-spectrum--enhanced");
       stageElement.hidden = false;

@@ -28,6 +28,8 @@
     "build": "node scripts/build-site.js",
     "verify:dist": "node scripts/verify-dist.js",
     "verify:deterministic": "node scripts/check-deterministic-build.js",
+    "test:performance:browser": "node scripts/test-performance-browser.js",
+    "test:performance": "node scripts/test-about-frame-pacing.js && node scripts/test-article-aurora-rendering.js && node scripts/test-blog-thumbnail-sizes.js",
     "test:runtime": "node scripts/test-universe-transition-lifecycle.js",
     "test:flight:browser": "node scripts/test-universe-flight-browser.js",
     "test:search-recovery": "node scripts/test-search-recovery.js",
@@ -45,7 +47,7 @@
     "test:options": "node scripts/test-universe-options.js",
     "contact-signals:local": "node scripts/local-contact-signals-server.js",
     "contact:verify-apps-script": "node scripts/verify-contact-apps-script.js",
-    "verify": "npm run build && npm run social:previews:check && npm run verify:dist && npm run verify:deterministic && npm run test:build && npm run test:resume-parity && npm run test:runtime && npm run test:semantics && npm run test:discovery && npm run test:writer && npm run test:contact-apps-script && npm run test:contact-signals && npm run test:contact-apps-script-verifier",
+    "verify": "npm run build && npm run social:previews:check && npm run verify:dist && npm run verify:deterministic && npm run test:build && npm run test:resume-parity && npm run test:runtime && npm run test:performance && npm run test:semantics && npm run test:discovery && npm run test:writer && npm run test:contact-apps-script && npm run test:contact-signals && npm run test:contact-apps-script-verifier",
     "test:e2e": "node scripts/run-e2e.js",
     "test:cross-browser": "node scripts/test-cross-browser-production.js",
     "test:resume-parity": "node scripts/test-resume-parity.js"

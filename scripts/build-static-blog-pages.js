@@ -308,10 +308,15 @@ function buildBlogIndexEntry(post) {
   const summary = String(post.summary || "").trim() || stripHtml(post.body_html).slice(0, 180);
   const publishedDate = String(post.published_date || "").trim();
   const readingTime = String(post.reading_time || "").trim() || "n/a";
-  const heroData = resolvePublicImage(toAssetUrl(post.hero_image), {
+  let heroData = resolvePublicImage(toAssetUrl(post.hero_image), {
     widths: THUMBNAIL_WIDTHS,
     sizes: ENTRY_THUMBNAIL_SIZES
   });
+  // Older images have article-sized variants but no dedicated thumbnails.
+  // Keep their responsive candidates so small cards can use the smaller file.
+  if (!heroData.hasReplacement) {
+    heroData = resolvePublicImage(toAssetUrl(post.hero_image), { sizes: ENTRY_THUMBNAIL_SIZES });
+  }
   const heroImage = heroData.src || toAssetUrl(post.hero_image);
   const heroAlt = String(post.hero_alt || `${title} preview`).trim() || `${title} preview`;
   const heroResponsiveAttributes = heroData.srcset
@@ -880,7 +885,7 @@ ${articleTagsMeta}
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<canvas class="article-aurora" aria-hidden="true"></canvas><script src="/assets/js/article-aurora.js?v=20260908-reference4" defer></script>
+<canvas class="article-aurora" aria-hidden="true"></canvas><script src="/assets/js/article-aurora.js?v=20261031-cache1" defer></script>
 <main id="main-content" class="article-region-main">
 <article class="article-debrief article-region" data-article-debrief data-debrief-variant="${escapeHtml(debrief.variant)}" data-article-mode="${escapeHtml(debrief.mode)}">
 <header class="article-region__header">
