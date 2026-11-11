@@ -10,7 +10,7 @@ const baselineIndex = process.argv.indexOf("--baseline");
 const baseline = baselineIndex >= 0
   ? fs.readFileSync(process.argv[baselineIndex + 1], "utf8") : null;
 
-function createHarness(script, { width = 1440, height = 900, reduced = false, hidden = false } = {}) {
+function createHarness(script, { width = 1440, height = 900, reduced = false, hidden = false, motion = null } = {}) {
   let hash;
   let commands;
   let sinCalls;
@@ -78,6 +78,7 @@ function createHarness(script, { width = 1440, height = 900, reduced = false, hi
     innerHeight: height,
     document: {
       hidden,
+      documentElement: { dataset: motion ? { universeMotion: motion } : {} },
       querySelector: (selector) => selector === ".article-aurora" ? canvas : button,
       createElement: () => curtain,
       addEventListener: (type, handler) => events.set(type, handler)
@@ -123,6 +124,13 @@ function createHarness(script, { width = 1440, height = 900, reduced = false, hi
       return capture(() => {
         scope.document.hidden = value;
         events.get("visibilitychange")();
+      });
+    },
+    travel(type, value) {
+      return capture(() => {
+        if (value) scope.document.documentElement.dataset.universeMotion = value;
+        else delete scope.document.documentElement.dataset.universeMotion;
+        events.get(`universe-perspective:${type}`)();
       });
     }
   };
@@ -190,4 +198,20 @@ if (baseline) {
   const after = captures.frame50.sinCalls;
   console.log(`Compared ${Object.keys(captures).length} exact canvas command streams with baseline. Desktop frame sine calls: ${before} -> ${after} (${((before - after) / before * 100).toFixed(1)}% fewer).`);
 }
-console.log("Article aurora passed: rendering density, resize invalidation, 50 ms pacing, pause/resume, reduced motion, visibility and cached calculation budget.");
+// Route travel: the curtain holds one still frame while the page is covered
+// or revealed, and the click itself never waits on a repaint.
+const arriving = createHarness(source, { motion: "arrive" });
+assert.equal(arriving.initial.gradients, 3842, "An arriving article still paints its first frame");
+assert.equal(arriving.pendingFrames, 0, "The curtain must not animate under the route reveal");
+const landed = arriving.travel("settled", null);
+assert.equal(landed.gradients, 3842);
+assert.equal(arriving.pendingFrames, 1, "The curtain starts once the route has landed");
+const leaving = arriving.travel("depart", "depart");
+assert.equal(leaving.commands, 0, "Departure must stop the curtain without repainting");
+assert.equal(arriving.pendingFrames, 0);
+arriving.hide(true);
+arriving.hide(false);
+assert.equal(arriving.pendingFrames, 0, "Visibility changes must not restart the curtain mid-travel");
+arriving.travel("settled", null);
+assert.equal(arriving.pendingFrames, 1, "A departure that is handed back resumes the curtain");
+console.log("Article aurora passed: rendering density, resize invalidation, 50 ms pacing, pause/resume, reduced motion, visibility, route-travel hold and cached calculation budget.");
