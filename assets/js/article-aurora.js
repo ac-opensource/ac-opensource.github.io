@@ -116,13 +116,10 @@
     if (now - last >= 50) { time += Math.min((now - last) / 1000, .1); last = now; draw(); }
     frame = requestAnimationFrame(tick);
   }
-  // Route travel animates the whole viewport. The curtain holds a still frame
-  // while the page is being covered or revealed, and moves once it has landed.
-  const travelling = () => Boolean(document.documentElement.dataset.universeMotion);
   function sync() {
     cancelAnimationFrame(frame);
     draw();
-    if (!paused && !reduced.matches && !document.hidden && !travelling()) { last = performance.now(); frame = requestAnimationFrame(tick); }
+    if (!paused && !reduced.matches && !document.hidden) { last = performance.now(); frame = requestAnimationFrame(tick); }
   }
   function resize() {
     // Bound rendering cost independently of a Retina display's device pixel ratio.
@@ -144,8 +141,5 @@
   addEventListener("resize", resize, { passive: true });
   document.addEventListener("visibilitychange", sync);
   reduced.addEventListener("change", sync);
-  // Stop without repainting on departure: the click must not wait on a draw.
-  document.addEventListener("universe-perspective:depart", () => cancelAnimationFrame(frame));
-  document.addEventListener("universe-perspective:settled", sync);
   resize();
 })();
