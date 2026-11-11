@@ -10,6 +10,10 @@ for (const motion of [undefined, 'arrive']) {
   assert(entryReady({ documentElement: { dataset: { universeMotion: motion } } }),
     'The supernova must begin immediately on direct load and during navigation arrival');
 }
+assert(entryReady({ documentElement: { dataset: { universeMotion: 'arrive', universePhase: 'reveal' } } }),
+  'The supernova must begin as the arrival reveals the page');
+assert(!entryReady({ documentElement: { dataset: { universeMotion: 'arrive', universePhase: 'cover' } } }),
+  'The supernova must not spend its opening beats behind the route cover');
 assert(!entryReady({ documentElement: { dataset: { universeMotion: 'depart' } } }));
 for (const bigBang of ['pending', 'running', 'revealing']) {
   assert(!entryReady({ documentElement: { dataset: { bigBang, universeMotion: 'arrive' } } }));

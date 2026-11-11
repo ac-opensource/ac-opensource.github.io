@@ -744,13 +744,11 @@ ${articleTagsMeta}
 <link href="/assets/css/article-debrief.css?v=20261005-design1" rel="stylesheet"/>
 <link href="/assets/css/article-aurora.css?v=20261005-design1" rel="stylesheet"/>
 <link href="/assets/css/universe-field-map.css?v=20261005-design1" rel="stylesheet"/>
-<link href="/assets/css/universe-perspective-navigation.css?v=20261005-spatial5" rel="stylesheet" data-universe-perspective-styles/>
+<link href="/assets/css/universe-perspective-navigation.css?v=20261110-fade-through1" rel="stylesheet" data-universe-perspective-styles/>
 <link href="/assets/css/logs-theme.css?v=20260908-toggle1" rel="stylesheet"/>
 <link href="/assets/css/logs-surface.css?v=20261005-design1" rel="stylesheet"/>
 <script src="/assets/js/logs-theme.js?v=20261004-header1"></script>
-<script src="/assets/js/about-butterfly-field.js?v=20261006-identity1" defer></script>
-<script src="/assets/js/universe-solid-field.js?v=20261006-identity1" defer></script>
-<script src="/assets/js/universe-theme-transition.js?v=20261006-identity1"></script>
+<script src="/assets/js/universe-theme-transition.js?v=20261110-fade-through1"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -885,7 +883,7 @@ ${articleTagsMeta}
     <a data-route="/contact.html" href="/contact.html" class="site-nav-link text-[#5A5F65] hover:text-[#2F342D] transition-colors duration-150">[contact]</a>
   </nav>
 </header>
-<canvas class="article-aurora" aria-hidden="true"></canvas><script src="/assets/js/article-aurora.js?v=20261031-cache1" defer></script>
+<canvas class="article-aurora" aria-hidden="true"></canvas><script src="/assets/js/article-aurora.js?v=20261110-travel1" defer></script>
 <main id="main-content" class="article-region-main">
 <article class="article-debrief article-region" data-article-debrief data-debrief-variant="${escapeHtml(debrief.variant)}" data-article-mode="${escapeHtml(debrief.mode)}">
 <header class="article-region__header">
