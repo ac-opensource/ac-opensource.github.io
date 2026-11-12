@@ -35,8 +35,22 @@
   border: 1px solid currentColor;
   border-radius: 50%;
   background: #1f5cba;
-  box-shadow: 0 0 0 0 rgba(31, 92, 186, 0.18);
   content: "";
+}
+
+/* Keep the pulse on the compositor instead of repainting a box-shadow on the
+   main thread for the lifetime of every page. */
+.site-search-link::after {
+  flex: none;
+  order: -1;
+  width: calc(0.34rem + 2px);
+  height: calc(0.34rem + 2px);
+  margin-right: calc(-0.34rem - 2px);
+  border-radius: 50%;
+  background: rgba(31, 92, 186, 0.2);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
   animation: site-search-signal 2.8s ease-out infinite;
 }
 
@@ -67,12 +81,12 @@
 }
 
 @keyframes site-search-signal {
-  0%, 34% { box-shadow: 0 0 0 0 rgba(31, 92, 186, 0.2); }
-  72%, 100% { box-shadow: 0 0 0 0.32rem rgba(31, 92, 186, 0); }
+  0%, 34% { opacity: 1; transform: scale(1); }
+  72%, 100% { opacity: 0; transform: scale(2.4); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-search-link::before { animation: none; }
+  .site-search-link::after { animation: none; }
 }
 
 @media (forced-colors: active) {
