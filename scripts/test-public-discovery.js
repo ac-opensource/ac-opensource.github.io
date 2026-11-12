@@ -143,6 +143,10 @@ function main() {
     assert(!/localStorage|motionMode|calm[- ]sky|data-calm/i.test(siteSearchScript));
     assert(siteSearchStyles.includes("[data-site-search-slot]"));
     assert(siteSearchStyles.includes(".site-search-link"));
+    assert(siteSearchStyles.includes(".site-search-link::after"));
+    assert(siteSearchStyles.includes("transform: scale(2.4)"));
+    assert(!siteSearchStyles.includes("box-shadow: 0 0 0 0.32rem"),
+      "The persistent Search signal must stay on compositor-only opacity and transform.");
     assert(siteSearchStyles.includes("min-width: 44px"));
     assert(siteSearchStyles.includes("min-height: 44px"));
     assert(!/position:\s*fixed|\.site-tools/.test(siteSearchStyles),
